@@ -155,7 +155,7 @@ def compute_O2_cocycle_defect(
 
 
 # ----------------------------
-# NEW: epsilon alignment sup (geodesic), plus chordal conversion
+# epsilon alignment sup (geodesic), plus chordal conversion
 # ----------------------------
 
 def compute_eps_alignment_sup_geo(
