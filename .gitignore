@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data / large binaries
+data/
+*.pkl
+*.npy
+*.npz
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
