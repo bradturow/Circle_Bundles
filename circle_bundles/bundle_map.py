@@ -934,12 +934,12 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
         d_out = report.reduction_d_out
 
         if d_out is None:
-            red_rows.append((r"\text{method}", rf"\texttt{{{meth}}}"))
+            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}}"))
         else:
-            red_rows.append((r"\text{method}", rf"\texttt{{{meth}}},\ d={int(d_out)}"))
+            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}},\ d={int(d_out)}"))
 
         red_rows.append((
-            r"\text{mean projection err.}",
+            r"\text{Mean projection err.}",
             r"\mathbb{E}\,\|Y - BB^{\mathsf{T}}Y\|_{F}"
             + r" \approx " + f"{float(report.reduction_mean_proj_err):.{r}f}"
         ))

@@ -892,166 +892,193 @@ def summarize_edge_driven_persistence(
     *,
     top_k: int = 10,
     show: bool = True,
-    mode: str = "auto",   # {"auto","text","latex","both"}
+    mode: str = "auto",  # {"auto","text","latex","both"}
 ) -> Dict[str, Any]:
     """
-    Pretty summary of persistence results in the SAME format as show_summary().
+    Persistence summary in the same style as other summaries, with:
+      - rows: full, w1 cobirth, w1 codeath, Euler cobirth, Euler codeath
+      - columns: k, r, |W_r^(1)|, |W_r^(2)|, |W_r^(3)|
+    where W_r is the induced subcomplex on the kept edges at cutoff r.
 
-    Returns the same dict as before; only the printed/LaTeX formatting changes.
+    Notes
+    -----
+    - "k" means number of edges removed (heaviest-first).
+    - "r" means cutoff weight at that stage (∞ for the full complex).
+    - |W_r^(d)| are the counts of d-simplices in the induced subcomplex.
     """
 
-    E = p.edges
-    ew = p.edge_weights
+    # ----------------------------
+    # Canonicalize full complex
+    # ----------------------------
+    E_all = sorted({canon_edge_tuple(e) for e in p.edges})
+    T_all = sorted({canon_tri_tuple(t) for t in p.triangles})
+    TT_all = sorted({canon_tet_tuple(tt) for tt in p.tets})
+
+    ew = {canon_edge_tuple(e): float(w) for e, w in p.edge_weights.items()}
+
+    # Filtration order (heaviest removed first) — this defines the induced subcomplex at stage k
+    rem_order = [canon_edge_tuple(e) for e in list(p.sw1["removal_order"])]
 
     # ----------------------------
     # Helpers
     # ----------------------------
     def worst(edges: List[Edge]) -> List[Tuple[Edge, float]]:
-        arr = [(e, ew[e]) for e in edges if e in ew]
+        arr = [(canon_edge_tuple(e), ew[canon_edge_tuple(e)]) for e in edges if canon_edge_tuple(e) in ew]
         arr.sort(key=lambda t: (-t[1], t[0]))
         return arr[:top_k]
 
-    def fmt_cutoff(w: float) -> str:
+    def fmt_r_3(w: float) -> str:
+        """Cutoff display: 3 decimals, or ±∞."""
         if np.isposinf(w):
             return "∞"
         if np.isneginf(w):
             return "-∞"
-        if np.isnan(w):
-            return "nan"
-        return f"{float(w):.6g}"
+        return f"{float(w):.3f}"
 
-    def fmt_edge(e: Edge) -> str:
-        a, b = canon_edge(int(e[0]), int(e[1]))
-        return f"({a},{b})"
+    def stage_sizes(k_removed: int) -> Tuple[int, int, int]:
+        """
+        Induced subcomplex sizes after removing the first k_removed edges from rem_order,
+        and keeping exactly those triangles/tets from the FULL nerve supported by kept edges.
+        """
+        k = int(k_removed)
+        if k < 0:
+            raise ValueError(f"k_removed must be >= 0 (got {k}). This should not happen.")
+        k = max(0, min(k, len(rem_order)))
 
-    def fmt_edge_list(pairs: List[Tuple[Edge, float]]) -> str:
-        if not pairs:
-            return "(none)"
-        # e.g. "(1,7):0.23, (2,9):0.21, ..."
-        parts = [f"{fmt_edge(e)}:{float(w):.3g}" for e, w in pairs]
-        return ", ".join(parts)
+        removed = set(rem_order[:k])
+        kept_edges = set(E_all) - removed
+
+        kept_tris = induced_triangles_from_edges(T_all, kept_edges)
+        kept_tets = induced_tetrahedra_from_edges(TT_all, kept_edges) if TT_all else []
+
+        return (len(kept_edges), len(kept_tris), len(kept_tets))
 
     # ----------------------------
-    # Pull persistence results
+    # Pull events
     # ----------------------------
     sw1_cob: CobirthResult = p.sw1["cobirth"]
     sw1_cod: CodeathResult = p.sw1["codeath"]
     te_cob: CobirthResult = p.twisted_euler["cobirth"]
     te_cod: CodeathResult = p.twisted_euler["codeath"]
 
+    # "Should never happen" guard
+    for name, res in [
+        ("sw1_cobirth", sw1_cob),
+        ("sw1_codeath", sw1_cod),
+        ("euler_cobirth", te_cob),
+        ("euler_codeath", te_cod),
+    ]:
+        if int(res.k_removed) < 0:
+            raise ValueError(f"{name}.k_removed is {res.k_removed}. Expected >= 0.")
+
     # ----------------------------
-    # Build output dict 
+    # Stage rows (always include full)
+    # ----------------------------
+    # Each row: (label, k, r_str, |W_r^(1)|, |W_r^(2)|, |W_r^(3)|, removed_edges_top)
+    rows: List[Tuple[str, int, str, int, int, int, List[Tuple[Edge, float]]]] = []
+
+    # full complex row = k=0, r=∞
+    full_ke, full_kt, full_ktt = stage_sizes(0)
+    rows.append(("Full nerve", 0, "∞", full_ke, full_kt, full_ktt, []))
+
+    def add_row(label: str, res_obj):
+        k = int(res_obj.k_removed)
+        r_str = fmt_r_3(float(res_obj.cutoff_weight))
+        ke, kt, ktt = stage_sizes(k)
+        rows.append((label, k, r_str, int(ke), int(kt), int(ktt), worst(list(res_obj.removed_edges))))
+
+    add_row("w₁ cobirth", sw1_cob)
+    add_row("w₁ codeath", sw1_cod)
+    add_row("Euler cobirth", te_cob)
+    add_row("Euler codeath", te_cod)
+
+    # ----------------------------
+    # Output dict 
     # ----------------------------
     out: Dict[str, Any] = {
+        "n_edges_total": int(len(E_all)),
+        "n_triangles_total": int(len(T_all)),
+        "n_tets_total": int(len(TT_all)),
+        "rows": [
+            {
+                "stage": lab,
+                "k_removed": int(k),
+                "r_str": r_str,
+                "W1": int(ne),
+                "W2": int(nt),
+                "W3": int(ntt),
+                "removed_edges_top": red_top,
+            }
+            for (lab, k, r_str, ne, nt, ntt, red_top) in rows
+        ],
+        # Back-compat keys for the four “events”
         "SW1 cobirth": {
             "k_removed": int(sw1_cob.k_removed),
             "cutoff_weight": float(sw1_cob.cutoff_weight),
-            "cutoff_str": fmt_cutoff(sw1_cob.cutoff_weight),
-            "removed_edges_top": worst(sw1_cob.removed_edges),
+            "r_str": fmt_r_3(float(sw1_cob.cutoff_weight)),
+            "|W_r^(1)|": stage_sizes(int(sw1_cob.k_removed))[0],
+            "|W_r^(2)|": stage_sizes(int(sw1_cob.k_removed))[1],
+            "|W_r^(3)|": stage_sizes(int(sw1_cob.k_removed))[2],
+            "removed_edges_top": worst(list(sw1_cob.removed_edges)),
         },
         "SW1 codeath": {
             "k_removed": int(sw1_cod.k_removed),
             "cutoff_weight": float(sw1_cod.cutoff_weight),
-            "cutoff_str": fmt_cutoff(sw1_cod.cutoff_weight),
-            "removed_edges_top": worst(sw1_cod.removed_edges),
+            "r_str": fmt_r_3(float(sw1_cod.cutoff_weight)),
+            "|W_r^(1)|": stage_sizes(int(sw1_cod.k_removed))[0],
+            "|W_r^(2)|": stage_sizes(int(sw1_cod.k_removed))[1],
+            "|W_r^(3)|": stage_sizes(int(sw1_cod.k_removed))[2],
+            "removed_edges_top": worst(list(sw1_cod.removed_edges)),
         },
         "Euler cobirth": {
             "k_removed": int(te_cob.k_removed),
             "cutoff_weight": float(te_cob.cutoff_weight),
-            "cutoff_str": fmt_cutoff(te_cob.cutoff_weight),
-            "removed_edges_top": worst(te_cob.removed_edges),
+            "r_str": fmt_r_3(float(te_cob.cutoff_weight)),
+            "|W_r^(1)|": stage_sizes(int(te_cob.k_removed))[0],
+            "|W_r^(2)|": stage_sizes(int(te_cob.k_removed))[1],
+            "|W_r^(3)|": stage_sizes(int(te_cob.k_removed))[2],
+            "removed_edges_top": worst(list(te_cob.removed_edges)),
         },
         "Euler codeath": {
             "k_removed": int(te_cod.k_removed),
             "cutoff_weight": float(te_cod.cutoff_weight),
-            "cutoff_str": fmt_cutoff(te_cod.cutoff_weight),
-            "removed_edges_top": worst(te_cod.removed_edges),
+            "r_str": fmt_r_3(float(te_cod.cutoff_weight)),
+            "|W_r^(1)|": stage_sizes(int(te_cod.k_removed))[0],
+            "|W_r^(2)|": stage_sizes(int(te_cod.k_removed))[1],
+            "|W_r^(3)|": stage_sizes(int(te_cod.k_removed))[2],
+            "removed_edges_top": worst(list(te_cod.removed_edges)),
         },
-        "n_edges_total": int(len(E)),
-        "n_triangles_total": int(len(p.triangles)),
-        "n_tets_total": int(len(p.tets)),
     }
 
     # ----------------------------
-    # Render text (same style as show_summary)
+    # Renderers
     # ----------------------------
-    IND = "  "
-    LABEL_W = 28
-
-    def _tline(label: str, content: str) -> str:
-        return f"{IND}{label:<{LABEL_W}} {content}"
-
-    lines: List[str] = []
-    lines.append("=== Persistence Diagnostics ===")
-    lines.append(_tline("total edges:", f"{len(E)}"))
-    lines.append(_tline("total triangles:", f"{len(p.triangles)}"))
-    lines.append(_tline("total tetrahedra:", f"{len(p.tets)}"))
-
-    lines.append("")
-    lines.append("=== Edge-Driven Persistence ===")
-
-    def add_block(title: str, res_obj) -> None:
-        lines.append(_tline(f"{title}:", f"k_removed = {int(res_obj.k_removed)}, cutoff = {fmt_cutoff(float(res_obj.cutoff_weight))}"))
-        top = worst(list(res_obj.removed_edges))
-        if top_k > 0:
-            lines.append(_tline(f"{title} top edges:", fmt_edge_list(top)))
-
-    add_block("w₁ cobirth", sw1_cob)
-    add_block("w₁ codeath", sw1_cod)
-    add_block("ẽ cobirth", te_cob)
-    add_block("ẽ codeath", te_cod)
-
-    text = "\n".join(lines)
-
-    # ----------------------------
-    # LaTeX display (best-effort, same philosophy as show_summary)
-    # ----------------------------
-    def _display_persistence_latex() -> bool:
+    def _display_summary_latex_persistence(rows_for_tex) -> bool:
+        """
+        rows_for_tex: list of tuples (stage, k, r_str, ne, nt, ntt)
+        """
         try:
             from IPython.display import display, Math  # type: ignore
         except Exception:
             return False
 
-        def L(x: str) -> str:
-            # tiny helper to keep things readable
-            return x
-
-        def cutoff_tex(w: float) -> str:
-            if np.isposinf(w):
+        def _fmt_r_tex(r_str: str) -> str:
+            if r_str == "∞":
                 return r"\infty"
-            if np.isneginf(w):
+            if r_str == "-∞":
                 return r"-\infty"
-            if np.isnan(w):
-                return r"\mathrm{nan}"
-            return f"{float(w):.6g}"
+            return r_str
 
-        rows_diag = [
-            (r"\text{total edges}", str(int(len(E)))),
-            (r"\text{total triangles}", str(int(len(p.triangles)))),
-            (r"\text{total tetrahedra}", str(int(len(p.tets)))),
-        ]
-
-        rows_pers = [
-            (r"\text{$w_1$ cobirth}", rf"k = {int(sw1_cob.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(sw1_cob.cutoff_weight))}"),
-            (r"\text{$w_1$ codeath}", rf"k = {int(sw1_cod.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(sw1_cod.cutoff_weight))}"),
-            (r"\text{$\tilde{{e}}$ cobirth}", rf"k = {int(te_cob.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(te_cob.cutoff_weight))}"),
-            (r"\text{$\tilde{{e}}$ codeath}", rf"k = {int(te_cod.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(te_cod.cutoff_weight))}"),
-        ]
-
-        def rows_to_aligned(rows):
-            out = []
-            for a, b in rows:
-                out.append(r"\quad " + a + r" &:\quad " + b)
-            return r"\\[3pt]".join(out)
+        body = []
+        for stage, k, r_str, ne, nt, ntt in rows_for_tex:
+            # stage is text; keep it inside \text{...}
+            body.append(rf"\text{{{stage}}} & {k} & {_fmt_r_tex(r_str)} & {ne} & {nt} & {ntt}")
 
         latex = (
-            r"\begin{aligned}"
-            r"\textbf{Persistence Diagnostics} & \\[6pt]"
-            + rows_to_aligned(rows_diag)
-            + r"\\[14pt]"
-            r"\textbf{Edge-Driven Persistence} & \\[6pt]"
-            + rows_to_aligned(rows_pers)
-            + r"\end{aligned}"
+            r"\begin{array}{lrrrrr}"
+            r"\textbf{Stage} & k & r & |W_r^{(1)}| & |W_r^{(2)}| & |W_r^{(3)}| \\ \hline "
+            + r" \\ ".join(body)
+            + r"\end{array}"
         )
 
         try:
@@ -1060,14 +1087,50 @@ def summarize_edge_driven_persistence(
         except Exception:
             return False
 
+    def _print_text_table(rows_for_txt):
+        title = "=== Characteristic Class Persistence ==="
+        print("\n" + title)
+
+        stage_w = max(12, max(len(r[0]) for r in rows_for_txt))
+        k_w = 6
+        r_w = 10
+        w1_w = 12
+        w2_w = 12
+        w3_w = 12
+
+        header = (
+            f"{'Stage':<{stage_w}}"
+            f"{'k':>{k_w}}  "
+            f"{'r':>{r_w}}  "
+            f"{'|W_r^(1)|':>{w1_w}}  "
+            f"{'|W_r^(2)|':>{w2_w}}  "
+            f"{'|W_r^(3)|':>{w3_w}}"
+        )
+        print(header)
+        print("-" * len(header))
+
+        for stage, k, r_str, ne, nt, ntt in rows_for_txt:
+            print(
+                f"{stage:<{stage_w}}"
+                f"{int(k):>{k_w}}  "
+                f"{r_str:>{r_w}}  "
+                f"{int(ne):>{w1_w}}  "
+                f"{int(nt):>{w2_w}}  "
+                f"{int(ntt):>{w3_w}}"
+            )
+        print("")
+
     # ----------------------------
-    # Show
+    # Show (text/latex/auto/both)
     # ----------------------------
     if show:
+        core_rows = [(lab, k, r_str, ne, nt, ntt) for (lab, k, r_str, ne, nt, ntt, _top) in rows]
+
         did_latex = False
         if mode in {"latex", "auto", "both"}:
-            did_latex = _display_persistence_latex()
+            did_latex = _display_summary_latex_persistence(core_rows)
+
         if mode == "both" or mode == "text" or (mode == "auto" and not did_latex):
-            print("\n" + text + "\n")
+            _print_text_table(core_rows)
 
     return out
