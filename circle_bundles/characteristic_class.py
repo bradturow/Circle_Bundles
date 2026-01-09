@@ -1207,7 +1207,7 @@ def _display_summary_latex(
     else:
         if eps_triv is not None:
             diag_rows.append((
-                r"\text{trivialization error}",
+                r"\text{Trivialization error}",
                 r"\varepsilon_{\mathrm{triv}} := "
                 r"\sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} "
                 r"d_{\mathbb{S}^1}(\Omega_{jk}f_k(x),f_j(x))"
@@ -1215,7 +1215,7 @@ def _display_summary_latex(
             ))
         if delta is not None:
             diag_rows.append((
-                r"\text{surjectivity defect}",
+                r"\text{Surjectivity defect}",
                 r"\delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} "
                 r"d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right)"
                 + r" = " + f"{float(delta):.3f}"
@@ -1223,18 +1223,18 @@ def _display_summary_latex(
         if alpha is not None:
             if alpha == float("inf"):
                 diag_rows.append((
-                    r"\text{stability ratio}",
+                    r"\text{Stability ratio}",
                     r"\alpha := \varepsilon_{\mathrm{triv}}/(1-\delta) = \infty"
                 ))
             else:
                 diag_rows.append((
-                    r"\text{stability ratio}",
+                    r"\text{Stability ratio}",
                     r"\alpha := \varepsilon_{\mathrm{triv}}/(1-\delta)"
                     + r" = " + f"{float(alpha):.3f}"
                 ))
         if eps_coc is not None:
             diag_rows.append((
-                r"\text{cocycle error}",
+                r"\text{Cocycle error}",
                 r"\varepsilon_{\mathrm{coc}} := "
                 r"\sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F"
                 + r" = " + f"{float(eps_coc):.3f}"
@@ -1246,9 +1246,9 @@ def _display_summary_latex(
         ))
 
         if mean_rms is not None:
-            diag_rows.append((r"\text{mean edge RMS}", f"{float(mean_rms):.3f}"))
+            diag_rows.append((r"\text{Mean edge RMS}", f"{float(mean_rms):.3f}"))
         if max_rms is not None:
-            diag_rows.append((r"\text{max edge RMS}", f"{float(max_rms):.3f}"))
+            diag_rows.append((r"\text{Max edge RMS}", f"{float(max_rms):.3f}"))
 
     class_rows: List[tuple[str, str]] = []
 

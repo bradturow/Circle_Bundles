@@ -365,7 +365,165 @@ class ZpHopfQuotientMetricS3:
             Dmin = Dm if Dmin is None else np.minimum(Dmin, Dm)
 
         return Dmin
+
+def _pick_u_perp_v(v_axis: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
+    """
+    Choose a unit 3-vector u ⟂ v_axis in a deterministic way.
+    Returns u_vec in R^3 (not a quaternion).
+    """
+    v = np.asarray(v_axis, dtype=float).reshape(3,)
+    nv = max(np.linalg.norm(v), eps)
+    v = v / nv
+
+    # pick a helper vector not parallel to v
+    a = np.array([1.0, 0.0, 0.0])
+    if abs(np.dot(a, v)) > 0.9:
+        a = np.array([0.0, 1.0, 0.0])
+
+    u = np.cross(v, a)
+    nu = max(np.linalg.norm(u), eps)
+    u = u / nu
+    return u
+
+
+def _right_mul_by_u(Q: np.ndarray, u_axis: np.ndarray) -> np.ndarray:
+    """
+    Apply tau(q)=q*u where u is the pure-imag unit quaternion (0,u_axis).
+    Q: (n,4) -> (n,4)
+    """
+    u_axis = np.asarray(u_axis, dtype=float).reshape(3,)
+    u_quat = np.array([0.0, u_axis[0], u_axis[1], u_axis[2]], dtype=float)
+    return _quat_mul(Q, u_quat[None, :])
+
+
+@dataclass(frozen=True)
+class Z2LensAntipodalQuotientMetricS3:
+    """
+    Metric on the quotient of the lens space L(p,1)=S^3/<g> by the Z2-action tau(q)=q*u
+    that covers antipodal on S^2 under pi_v(q)=q v q^{-1}.
+
+    Requires p even so that tau^2 is trivial on L(p,1).
+    Distance:
+        d([x],[y]) = min_{e in {id,tau}} min_{m=0..p-1} d_S3(x, e(y) * g^m)
+    """
+    p: int
+    v_axis: np.ndarray = np.array([1.0, 0.0, 0.0])
+    base: str = "geodesic"  # "geodesic" or "chordal"
+    name: str = "Z2LensAntipodalQuotientMetricS3"
+    eps: float = 1e-12
+    u_axis: Optional[np.ndarray] = None  # if None, we pick a canonical u ⟂ v
+
+    def __post_init__(self) -> None:
+        p = int(self.p)
+        if p <= 0:
+            raise ValueError(f"p must be positive. Got {self.p}.")
+        if p % 2 != 0:
+            raise ValueError(f"This Z2 quotient covers antipodal and is well-defined only for even p. Got p={p}.")
+        if self.base not in ("geodesic", "chordal"):
+            raise ValueError(f"base must be 'geodesic' or 'chordal'. Got {self.base}.")
+
+    def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        X = np.asarray(X, dtype=float)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+
+        if X.ndim != 2 or X.shape[1] != 4:
+            raise ValueError(f"X must be (n,4) quaternions. Got {X.shape}.")
+        if Y0.ndim != 2 or Y0.shape[1] != 4:
+            raise ValueError(f"Y must be (m,4) quaternions. Got {Y0.shape}.")
+
+        Xn = _safe_normalize_rows(X, eps=self.eps)
+        Yn = _safe_normalize_rows(Y0, eps=self.eps)
+
+        # base S^3 distance
+        dist_fn = _s3_geodesic_pairwise if self.base == "geodesic" else _s3_chordal_pairwise
+
+        # generator g = exp(v * 2pi/p)
+        theta0 = 2.0 * np.pi / float(self.p)
+        gs = np.stack(
+            [_unit_quat_from_axis_angle(self.v_axis, m * theta0, eps=self.eps) for m in range(self.p)],
+            axis=0,
+        )  # (p,4)
+
+        # choose u ⟂ v so that u v u^{-1} = -v
+        u_axis = _pick_u_perp_v(self.v_axis, eps=self.eps) if self.u_axis is None else np.asarray(self.u_axis, dtype=float).reshape(3,)
+        u_axis = u_axis / max(np.linalg.norm(u_axis), self.eps)
+
+        # Two representatives for Y-orbit: Y and tau(Y)=Y*u
+        Ytau = _right_mul_by_u(Yn, u_axis)
+
+        def min_over_zp(Yrep: np.ndarray) -> np.ndarray:
+            Dmin = None
+            for m in range(self.p):
+                Ym = _quat_mul(Yrep, gs[m][None, :])  # right-multiply by g^m
+                Dm = dist_fn(Xn, Ym, eps=self.eps)
+                Dmin = Dm if Dmin is None else np.minimum(Dmin, Dm)
+            return Dmin
+
+        D0 = min_over_zp(Yn)
+        D1 = min_over_zp(Ytau)
+        return np.minimum(D0, D1)
     
+
+    
+def S3QuotientMetric(
+    p: int,
+    *,
+    v_axis: np.ndarray = np.array([1.0, 0.0, 0.0]),
+    antipodal: bool = False,
+    base: str = "geodesic",
+    u_axis: Optional[np.ndarray] = None,
+    name: Optional[str] = None,
+) -> "Metric":
+    """
+    Unified constructor for S^3 quotient metrics compatible with hopf_projection.
+
+    Parameters
+    ----------
+    p : int
+        Lens parameter. Uses the cyclic subgroup <exp(v * 2pi/p)> acting by right-multiplication.
+        p=1 means "no Z_p quotient" (still returns a valid Metric).
+    v_axis : (3,) array
+        Axis v defining hopf_projection(q,v)=q v q^{-1} and the Hopf circle subgroup S^1_v.
+    antipodal : bool
+        If True, additionally quotient by the Z2-action tau(q)=q*u covering antipodal on S^2.
+        This is well-defined only when p is even (because tau^2 = (-1) which must lie in <g>).
+    base : {"geodesic","chordal"}
+        Underlying S^3 distance used before quotienting.
+    u_axis : optional (3,) array
+        Controls which u ⟂ v is used for the Z2 element. If None, a canonical perpendicular is chosen.
+    name : optional str
+        Override metric.name. Otherwise a reasonable default is used.
+
+    Returns
+    -------
+    Metric
+        Either ZpHopfQuotientMetricS3 or Z2LensAntipodalQuotientMetricS3.
+    """
+    p = int(p)
+    if p <= 0:
+        raise ValueError(f"p must be positive. Got {p}.")
+    if base not in ("geodesic", "chordal"):
+        raise ValueError(f"base must be 'geodesic' or 'chordal'. Got {base}.")
+
+    v_axis = np.asarray(v_axis, dtype=float).reshape(3,)
+
+    if antipodal:
+        if p % 2 != 0:
+            raise ValueError(f"antipodal=True requires even p (so -1 ∈ <exp(v*2pi/p)>). Got p={p}.")
+        return Z2LensAntipodalQuotientMetricS3(
+            p=p,
+            v_axis=v_axis,
+            base=base,
+            u_axis=u_axis,
+            name=name or f"S3/(Z_{p}⋊Z2)_antipodal",
+        )
+
+    return ZpHopfQuotientMetricS3(
+        p=p,
+        v_axis=v_axis,
+        base=base,
+        name=name or f"S3/Z_{p}",
+    )
     
     
 # ============================================================
