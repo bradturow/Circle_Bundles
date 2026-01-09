@@ -765,7 +765,7 @@ def compute_classes(
         eZ = None
         eZ2 = None
 
-        # NEW: no triangles => no Euler class rep => no coboundary test
+        # no triangles => no Euler class rep => no coboundary test
         euler_is_coboundary_Z: Optional[bool] = None
 
         bundle_trivial = None
@@ -780,6 +780,18 @@ def compute_classes(
         # sw2 on triangles is e mod 2 (cochain-level)
         sw2 = {tri: (int(val) & 1) for tri, val in euler_rep.items()}
 
+        # --- w2 coboundary check (spin) over Z2 ---
+        sw2_is_coboundary_Z2: Optional[bool] = None
+        if orientable and (len(tris_list) > 0) and (len(edges_list) > 0):
+            # δ: C^1 -> C^2 over Z2 is the transpose of ∂2: C2 -> C1
+            D2_mod2 = build_boundary_mod2_C2_to_C1(edges_list, tris_list)   # (E x T)
+            A12_mod2 = (D2_mod2.T).astype(np.uint8)                         # (T x E)
+
+            b2 = np.array([sw2.get(t, 0) & 1 for t in tris_list], dtype=np.uint8)  # (T,)
+            sw2_is_coboundary_Z2 = bool(in_image_mod2(A12_mod2, b2))
+        
+        
+        
         # ---- 3D cocycle check for Euler class if tets exist ----
         if len(tets_list) == 0:
             euler_is_cocycle = None
@@ -795,7 +807,7 @@ def compute_classes(
             euler_is_cocycle = (not bad)
             max_abs_delta = int(max_abs)
 
-        # ---- NEW: Euler coboundary test (e in Im δ_ω: C^1->C^2 over Z) ----
+        # ---- Euler coboundary test (e in Im δ_ω: C^1->C^2 over Z) ----
         euler_is_coboundary_Z: Optional[bool] = None
         if len(tris_list) > 0 and len(edges_list) > 0:
             A12 = build_delta_C1_to_C2_Z_twisted(edges=edges_list, triangles=tris_list, omega_O1=omega_O1_used).astype(np.int64)
@@ -821,9 +833,9 @@ def compute_classes(
                 H2_dim_Q = int(dims["dim_Q"])
                 H2_dim_Z2 = int(dims["dim_Z2"])
 
-                # (kept as-is): pairing conventions / availability logic
+                # pairing conventions / availability logic
                 if H2_dim_Q == 0:
-                    eZ = 0
+                    eZ = None
                 elif H2_dim_Q == 1:
                     z = fundamental_class_Z_rank1(edges_list, tris_list, tets_list, omega_O1=omega_O1_used)
                     eZ = None if z is None else euler_pairing_Z(euler_rep, tris_list, z)
@@ -843,13 +855,16 @@ def compute_classes(
         # ------------------------------------------------------------
         if len(tets_list) == 0:
             bundle_trivial = bool(orientable and (euler_is_coboundary_Z is True))
-            spin = bool(all(v == 0 for v in sw2.values())) if sw2 else None
+
         else:
             bundle_trivial = bool(
                 orientable and (euler_is_cocycle is True) and (euler_is_coboundary_Z is True)
             )
-            spin = bool(all(v == 0 for v in sw2.values())) if sw2 else None
 
+        spin = bool(sw2_is_coboundary_Z2) if sw2_is_coboundary_Z2 is not None else None
+
+            
+            
     return ClassResult(
         n_vertices=int(n_vertices),
         n_edges=int(len(edges_list)),
@@ -1047,7 +1062,7 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
 
     # Euler class
     if orientable:
-        lines.append(_tline("Euler class:", "e = 0" if e_zero_for_print else "e ≠ 0"))
+        lines.append(_tline("Euler class:", "e = 0 (trivial)" if e_zero_for_print else "e ≠ 0 (non-trivial)"))
     else:
         lines.append(_tline("Euler class:", "ẽ = 0" if e_zero_for_print else "ẽ ≠ 0"))
 
@@ -1079,7 +1094,7 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
 
     # Nontrivial Euler: show check-H2 iso type
     if H2_tag is not None:
-        lines.append(_tline("second homology:", f"Ĥ₂(U; Z_ω) ≅ {_pretty_H2_text(H2_tag)}"))
+        lines.append(_tline("Second homology:", f"Ĥ₂(U; Z_ω) ≅ {_pretty_H2_text(H2_tag)}"))
 
     # Euler number if available, else brief reason
     eZ = getattr(classes, "twisted_euler_number_Z", None)
@@ -1088,25 +1103,17 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
             lines.append(_tline("Euler number:", f"⟨e, [U]⟩ = {eZ}"))
         else:
             lines.append(_tline("Euler number:", f"⟨ẽ, [U]⟩ = {eZ}"))
-    else:
-        if H2_tag == "Z2":
-            lines.append(_tline("Euler number:", "(not defined: only mod 2 fundamental class)"))
-        elif H2_tag == "0":
-            lines.append(_tline("Euler number:", "(not defined: Ĥ₂ ≅ 0)"))
-        elif H2_tag == "non-cyclic":
-            lines.append(_tline("Euler number:", "(not well-defined: Ĥ₂ non-cyclic)"))
-        else:
-            lines.append(_tline("Euler number:", "(unavailable)"))
 
     # w2/spin only in orientable case (and e != 0 branch)
     if orientable:
-        sw2 = getattr(classes, "sw2_Z2", {}) or {}
-        w2_trivial = all((int(v) & 1) == 0 for v in sw2.values()) if sw2 else True
-        lines.append(_tline("mod 2 info:", "w₂ = 0 (spin)" if w2_trivial else "w₂ ≠ 0 (not spin)"))
-
-        eZ2 = getattr(classes, "euler_number_mod2", None)
-        if eZ2 is not None:
-            lines.append(_tline("w₂ pairing:", f"⟨w₂, [U]⟩ = {int(eZ2)} (mod 2)"))
+        spin_flag = getattr(classes, "spin_on_this_complex", None)
+        if spin_flag is not None:
+            lines.append(
+                _tline(
+                    "mod 2 info:",
+                    "w₂ = 0 (spin)" if bool(spin_flag) else "w₂ ≠ 0 (not spin)"
+                )
+            )
 
     bt = getattr(classes, "bundle_trivial_on_this_complex", None)
     if bt is not None:
@@ -1178,9 +1185,14 @@ def _display_summary_latex(
     eZ2 = getattr(classes, "euler_number_mod2", None)       # mod 2 pairing if defined
 
     sw2 = getattr(classes, "sw2_Z2", {}) or {}
-    w2_trivial = all((int(v) & 1) == 0 for v in sw2.values()) if sw2 else True
 
-    # Always use tilde-e in the rounding diagnostic (per your request)
+    w2_trivial = getattr(classes, "spin_on_this_complex", None)
+    if w2_trivial is None:
+        # fallback if older objects don’t have it
+        w2_trivial = all((int(v) & 1) == 0 for v in (getattr(classes, "sw2_Z2", {}) or {}).values())
+    
+    
+    # Always use tilde-e in the rounding diagnostic 
     e_sym_round = r"\tilde{e}"
 
     # In the characteristic class section: use e vs tilde-e by orientability
@@ -1241,7 +1253,7 @@ def _display_summary_latex(
     class_rows: List[tuple[str, str]] = []
 
     class_rows.append((
-        r"\text{Stiefel--Whitney}",
+        r"\text{Stiefel-Whitney}",
         r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})"
     ))
 
@@ -1250,15 +1262,15 @@ def _display_summary_latex(
     else:
         # Euler class statement
         if orientable:
-            class_rows.append((r"\text{Euler class}", r"e = 0\ (\text{trivial})" if e_zero_for_print else r"e \neq 0"))
+            class_rows.append((r"\text{Euler class}", r"e = 0\ (\text{trivial})" if e_zero_for_print else r"e \neq 0\ (\text{non-trivial})"))
         else:
             class_rows.append((r"\text{Euler class}", r"\tilde{e} = 0" if e_zero_for_print else r"\tilde{e} \neq 0"))
 
-        # Only show extra invariants if Euler class is NONTRIVIAL (avoid redundancy)
+        # Only show extra invariants if Euler class is nontrivial
         if not e_zero_for_print:
             if H2_tag is not None:
                 class_rows.append((
-                    r"\text{second homology}",
+                    r"\text{Second homology}",
                     r"\check{H}_2(\mathcal{U};\mathbb{Z}_\omega)\cong " + _latex_H2_iso(H2_tag)
                 ))
 
@@ -1276,13 +1288,13 @@ def _display_summary_latex(
                     r"\text{mod 2 info}",
                     r"w_2 = 0\ (\text{spin})" if w2_trivial else r"w_2 \neq 0\ (\text{not spin})"
                 ))
-                if eZ2 is not None:
+                if (eZ is None) and (eZ2 is not None):
                     class_rows.append((
                         r"\text{mod 2 pairing}",
                         r"\langle w_2,[\mathcal{U}]\rangle = " + str(int(eZ2) & 1) + r"\ (\mathrm{mod}\ 2)"
                     ))
             else:
-                if eZ2 is not None:
+                if (eZ is None) and (eZ2 is not None):
                     class_rows.append((
                         r"\text{mod 2 pairing}",
                         r"\langle " + e_sym + r",[\mathcal{U}]\rangle = " + str(int(eZ2) & 1) + r"\ (\mathrm{mod}\ 2)"

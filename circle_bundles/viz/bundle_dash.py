@@ -146,15 +146,32 @@ def _parse_click_index(clickData: Any) -> Optional[int]:
         return None
 
 
-def _call_get_dist_mat(get_dist_mat: Callable[..., np.ndarray], bp: np.ndarray, base_metric: Any) -> np.ndarray:
+def _call_get_dist_mat(
+    get_dist_mat: Optional[Callable[..., np.ndarray]],
+    bp: np.ndarray,
+    base_metric: Any,
+) -> np.ndarray:
     """
-    Try get_dist_mat(bp, metric=...) but fall back to get_dist_mat(bp)
-    to support user-provided callables with simpler signatures.
+    Priority:
+      1) If base_metric has .pairwise, use base_metric.pairwise(bp) directly.
+      2) Else if get_dist_mat provided, try get_dist_mat(bp, metric=base_metric) then fallback get_dist_mat(bp)
+      3) Else fallback to circle_bundles.metrics.get_dist_mat(bp, metric=base_metric)
     """
-    try:
-        return np.asarray(get_dist_mat(bp, metric=base_metric))
-    except TypeError:
-        return np.asarray(get_dist_mat(bp))
+    # 1) Metric object fast path
+    if base_metric is not None and hasattr(base_metric, "pairwise"):
+        return np.asarray(base_metric.pairwise(bp))
+
+    # 2) User-provided callable
+    if get_dist_mat is not None:
+        try:
+            return np.asarray(get_dist_mat(bp, metric=base_metric))
+        except TypeError:
+            return np.asarray(get_dist_mat(bp))
+
+    # 3) Library fallback
+    from ..metrics import get_dist_mat as _get_dist_mat  # adjust if your relative path differs
+    return np.asarray(_get_dist_mat(bp, metric=base_metric))
+
 
 
 # ----------------------------
@@ -165,7 +182,7 @@ def prepare_bundle_viz_inputs(
     *,
     base_points: np.ndarray,
     data: np.ndarray,
-    get_dist_mat: Callable[..., np.ndarray],
+    get_dist_mat: Optional[Callable[..., np.ndarray]] = None,
     full_dist_mat: Optional[np.ndarray] = None,
     base_metric: Any = None,
     same_metric: bool = False,
@@ -257,11 +274,13 @@ def prepare_bundle_viz_inputs_from_bundle(
     if base_points is None:
         raise AttributeError("bundle.cover.base_points is missing (needed for show_bundle).")
 
+
     cover_metric = getattr(cover, "metric", None)
     if base_metric is None:
         base_metric = cover_metric
     if base_metric is None:
-        base_metric = "euclidean"
+        from ..metrics import EuclideanMetric
+        base_metric = EuclideanMetric()
 
     same_metric = (base_metric is cover_metric)
     full_dist_mat = getattr(cover, "full_dist_mat", None)
@@ -602,10 +621,6 @@ def show_bundle_vis(
     - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat).
     - "Fiber Data" shows PCA of data restricted to the selected neighborhood.
     """
-    if get_dist_mat is None:
-        # lazy import: avoids circular imports and keeps viz import light
-        from ..metrics import get_dist_mat as _get_dist_mat  # adjust path if needed
-        get_dist_mat = _get_dist_mat
 
     viz = prepare_bundle_viz_inputs(
         base_points=np.asarray(base_points),

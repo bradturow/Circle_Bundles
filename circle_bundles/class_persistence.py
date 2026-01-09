@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Literal
 
 import numpy as np
 
@@ -795,6 +795,36 @@ class PersistenceResult:
     twisted_euler: Dict[str, object]
 
 
+SubcomplexMode = Literal["full", "cocycle", "max_trivial"]
+
+def _edges_for_subcomplex_from_persistence(p, mode: SubcomplexMode) -> List[Edge]:
+    """
+    p is a PersistenceResult from compute_bundle_persistence.
+    Returns the list of kept edges (in canonical (i<j) form) for the chosen mode.
+    """
+    # In your persistence code, the true edge filtration order lives here:
+    rem_order = list(p.sw1["removal_order"])  # heaviest first, length = #edges
+
+    if mode == "full":
+        return list(rem_order)
+
+    sw1_cob = int(p.sw1["cobirth"].k_removed)
+    sw1_cod = int(p.sw1["codeath"].k_removed)
+
+    eu_cob  = int(p.twisted_euler["cobirth"].k_removed)
+    eu_cod  = int(p.twisted_euler["codeath"].k_removed)
+
+    if mode == "cocycle":
+        k = max(sw1_cob, eu_cob)
+    elif mode == "max_trivial":
+        k = max(sw1_cod, eu_cod)
+    else:
+        raise ValueError(f"Unknown mode: {mode}")
+
+    k = max(0, min(k, len(rem_order)))
+    return rem_order[k:]
+
+
 def compute_bundle_persistence(
     *,
     cover: Any,
@@ -858,11 +888,24 @@ def compute_bundle_persistence(
 
 
 def summarize_edge_driven_persistence(
-    p: PersistenceResult, *, top_k: int = 10, show: bool = True
+    p: PersistenceResult,
+    *,
+    top_k: int = 10,
+    show: bool = True,
+    mode: str = "auto",   # {"auto","text","latex","both"}
 ) -> Dict[str, Any]:
+    """
+    Pretty summary of persistence results in the SAME format as show_summary().
+
+    Returns the same dict as before; only the printed/LaTeX formatting changes.
+    """
+
     E = p.edges
     ew = p.edge_weights
 
+    # ----------------------------
+    # Helpers
+    # ----------------------------
     def worst(edges: List[Edge]) -> List[Tuple[Edge, float]]:
         arr = [(e, ew[e]) for e in edges if e in ew]
         arr.sort(key=lambda t: (-t[1], t[0]))
@@ -873,14 +916,32 @@ def summarize_edge_driven_persistence(
             return "∞"
         if np.isneginf(w):
             return "-∞"
+        if np.isnan(w):
+            return "nan"
         return f"{float(w):.6g}"
 
+    def fmt_edge(e: Edge) -> str:
+        a, b = canon_edge(int(e[0]), int(e[1]))
+        return f"({a},{b})"
+
+    def fmt_edge_list(pairs: List[Tuple[Edge, float]]) -> str:
+        if not pairs:
+            return "(none)"
+        # e.g. "(1,7):0.23, (2,9):0.21, ..."
+        parts = [f"{fmt_edge(e)}:{float(w):.3g}" for e, w in pairs]
+        return ", ".join(parts)
+
+    # ----------------------------
+    # Pull persistence results
+    # ----------------------------
     sw1_cob: CobirthResult = p.sw1["cobirth"]
     sw1_cod: CodeathResult = p.sw1["codeath"]
-
     te_cob: CobirthResult = p.twisted_euler["cobirth"]
     te_cod: CodeathResult = p.twisted_euler["codeath"]
 
+    # ----------------------------
+    # Build output dict 
+    # ----------------------------
     out: Dict[str, Any] = {
         "SW1 cobirth": {
             "k_removed": int(sw1_cob.k_removed),
@@ -911,13 +972,102 @@ def summarize_edge_driven_persistence(
         "n_tets_total": int(len(p.tets)),
     }
 
+    # ----------------------------
+    # Render text (same style as show_summary)
+    # ----------------------------
+    IND = "  "
+    LABEL_W = 28
+
+    def _tline(label: str, content: str) -> str:
+        return f"{IND}{label:<{LABEL_W}} {content}"
+
+    lines: List[str] = []
+    lines.append("=== Persistence Diagnostics ===")
+    lines.append(_tline("total edges:", f"{len(E)}"))
+    lines.append(_tline("total triangles:", f"{len(p.triangles)}"))
+    lines.append(_tline("total tetrahedra:", f"{len(p.tets)}"))
+
+    lines.append("")
+    lines.append("=== Edge-Driven Persistence ===")
+
+    def add_block(title: str, res_obj) -> None:
+        lines.append(_tline(f"{title}:", f"k_removed = {int(res_obj.k_removed)}, cutoff = {fmt_cutoff(float(res_obj.cutoff_weight))}"))
+        top = worst(list(res_obj.removed_edges))
+        if top_k > 0:
+            lines.append(_tline(f"{title} top edges:", fmt_edge_list(top)))
+
+    add_block("w₁ cobirth", sw1_cob)
+    add_block("w₁ codeath", sw1_cod)
+    add_block("ẽ cobirth", te_cob)
+    add_block("ẽ codeath", te_cod)
+
+    text = "\n".join(lines)
+
+    # ----------------------------
+    # LaTeX display (best-effort, same philosophy as show_summary)
+    # ----------------------------
+    def _display_persistence_latex() -> bool:
+        try:
+            from IPython.display import display, Math  # type: ignore
+        except Exception:
+            return False
+
+        def L(x: str) -> str:
+            # tiny helper to keep things readable
+            return x
+
+        def cutoff_tex(w: float) -> str:
+            if np.isposinf(w):
+                return r"\infty"
+            if np.isneginf(w):
+                return r"-\infty"
+            if np.isnan(w):
+                return r"\mathrm{nan}"
+            return f"{float(w):.6g}"
+
+        rows_diag = [
+            (r"\text{total edges}", str(int(len(E)))),
+            (r"\text{total triangles}", str(int(len(p.triangles)))),
+            (r"\text{total tetrahedra}", str(int(len(p.tets)))),
+        ]
+
+        rows_pers = [
+            (r"\text{$w_1$ cobirth}", rf"k = {int(sw1_cob.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(sw1_cob.cutoff_weight))}"),
+            (r"\text{$w_1$ codeath}", rf"k = {int(sw1_cod.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(sw1_cod.cutoff_weight))}"),
+            (r"\text{$\tilde{{e}}$ cobirth}", rf"k = {int(te_cob.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(te_cob.cutoff_weight))}"),
+            (r"\text{$\tilde{{e}}$ codeath}", rf"k = {int(te_cod.k_removed)},\ \text{{cutoff}} = {cutoff_tex(float(te_cod.cutoff_weight))}"),
+        ]
+
+        def rows_to_aligned(rows):
+            out = []
+            for a, b in rows:
+                out.append(r"\quad " + a + r" &:\quad " + b)
+            return r"\\[3pt]".join(out)
+
+        latex = (
+            r"\begin{aligned}"
+            r"\textbf{Persistence Diagnostics} & \\[6pt]"
+            + rows_to_aligned(rows_diag)
+            + r"\\[14pt]"
+            r"\textbf{Edge-Driven Persistence} & \\[6pt]"
+            + rows_to_aligned(rows_pers)
+            + r"\end{aligned}"
+        )
+
+        try:
+            display(Math(latex))
+            return True
+        except Exception:
+            return False
+
+    # ----------------------------
+    # Show
+    # ----------------------------
     if show:
-        print("\n" + "=" * 12 + " Characteristic Class Persistence Summary " + "=" * 12)
-        print(f"Total edges: {len(E)} | triangles: {len(p.triangles)} | tetrahedra: {len(p.tets)}")
-        print(f"SW1 cobirth:    k={sw1_cob.k_removed}, cutoff={fmt_cutoff(sw1_cob.cutoff_weight)}")
-        print(f"SW1 codeath:    k={sw1_cod.k_removed}, cutoff={fmt_cutoff(sw1_cod.cutoff_weight)}")
-        print(f"Euler cobirth:  k={te_cob.k_removed}, cutoff={fmt_cutoff(te_cob.cutoff_weight)}")
-        print(f"Euler codeath:  k={te_cod.k_removed}, cutoff={fmt_cutoff(te_cod.cutoff_weight)}")
-        print("=" * 52 + "\n")
+        did_latex = False
+        if mode in {"latex", "auto", "both"}:
+            did_latex = _display_persistence_latex()
+        if mode == "both" or mode == "text" or (mode == "auto" and not did_latex):
+            print("\n" + text + "\n")
 
     return out

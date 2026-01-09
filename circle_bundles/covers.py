@@ -6,7 +6,8 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
-from .metrics import Euc_met, get_dist_mat
+from .metrics import EuclideanMetric, as_metric
+
 from .geometry import get_bary_coords, points_in_triangle_mask
 from .combinatorics import Edge, Tri, canon_edge, canon_tri
 
@@ -334,7 +335,20 @@ class CoverBase:
     U: Optional[np.ndarray] = None          # (n_sets, n_samples) bool
     pou: Optional[np.ndarray] = None        # (n_sets, n_samples) float
     landmarks: Optional[np.ndarray] = None  # (n_sets, dB) float
+    metric: Any = None                 # should be a Metric object (has .pairwise)
+    full_dist_mat: Optional[np.ndarray] = None  # optional cache for viz
 
+    def ensure_metric(self):
+        """
+        Normalize self.metric into a vectorized Metric object with .pairwise.
+        Defaults to EuclideanMetric if missing.
+        """
+        if self.metric is None:
+            self.metric = EuclideanMetric()
+        else:
+            self.metric = as_metric(self.metric)
+        return self.metric
+        
     def build(self) -> "CoverBase":
         raise NotImplementedError
 
@@ -548,18 +562,26 @@ class MetricBallCover(CoverBase):
         base_points: np.ndarray,
         landmarks: np.ndarray,
         radius: float,
-        metric: Any = Euc_met,
+        metric: Any = None,
+
     ):
         super().__init__(base_points=np.asarray(base_points))
         self.landmarks = np.asarray(landmarks)
         self.radius = float(radius)
         self.metric = metric
+        self.ensure_metric()
 
     def build(self) -> "MetricBallCover":
         if self.landmarks is None:
             raise ValueError("MetricBallCover requires landmarks.")
 
-        dist = get_dist_mat(self.landmarks, data2=self.base_points, metric=self.metric)  # (n_sets, n_samples)
+            
+        M = self.ensure_metric()
+        dist = M.pairwise(np.asarray(self.landmarks), np.asarray(self.base_points))  # (n_sets, n_samples)
+
+        # optional cache for viz (sample-sample)
+        self.full_dist_mat = M.pairwise(np.asarray(self.base_points))
+
         self.U = dist < self.radius
 
         # Linear hat POU, normalized
@@ -644,6 +666,8 @@ class TriangulationStarCover(CoverBase):
         K_preimages: np.ndarray,
         K: Any,
         vertex_coords_dict: dict,
+        metric: Any = None,
+
     ):
         super().__init__(base_points=np.asarray(base_points))
         self.K_preimages = np.asarray(K_preimages)

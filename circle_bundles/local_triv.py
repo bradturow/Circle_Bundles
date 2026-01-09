@@ -24,6 +24,8 @@ def compute_circular_coords_dreimac(
     update_frac: float = 0.25,
     standard_range: bool = False,
     CircularCoords_cls=None,
+    # NEW:
+    dist_mat: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, int, int]:
     if CircularCoords_cls is None:
         raise ValueError("CircularCoords_cls must be provided (e.g., dreimac.CircularCoords).")
@@ -33,6 +35,15 @@ def compute_circular_coords_dreimac(
     if n_points == 0:
         raise ValueError("Empty patch: cannot compute circular coordinates.")
 
+    use_dist = dist_mat is not None
+    if use_dist:
+        D = np.asarray(dist_mat, dtype=float)
+        if D.shape != (n_points, n_points):
+            raise ValueError(f"dist_mat has shape {D.shape}, expected ({n_points},{n_points}).")
+        X_or_D = D
+    else:
+        X_or_D = X
+
     n_landmarks = min(int(n_landmarks_init), n_points)
     n_retries = 0
 
@@ -40,7 +51,12 @@ def compute_circular_coords_dreimac(
         try:
             with warnings.catch_warnings(record=True) as wlist:
                 warnings.simplefilter("always")
-                cc = CircularCoords_cls(X, n_landmarks, prime=prime)
+                cc = CircularCoords_cls(
+                    X_or_D,
+                    n_landmarks,
+                    prime=prime,
+                    distance_matrix=use_dist,  # IMPORTANT
+                )
                 angles = cc.get_coordinates(standard_range=standard_range)
 
                 for w in wlist:
@@ -66,6 +82,10 @@ def compute_local_triv(
     U: np.ndarray,
     *,
     cc_alg: Optional[Callable[[np.ndarray], np.ndarray]] = None,
+
+    # NEW: total-space metric object (vectorized)
+    total_metric: Optional[object] = None,  # expects .pairwise(X)->(m,m)
+
     # Dreimac defaults
     landmarks_per_patch: int = 200,
     prime: int = 41,
@@ -80,12 +100,8 @@ def compute_local_triv(
     """
     Compute local circle coordinates f[j, s] on each cover set U[j].
 
-    If fail_fast=True: raise immediately on the first failure.
-    If fail_fast=False: continue and return valid/errors.
-
-    Returns
-    -------
-    LocalTrivResult
+    If total_metric is provided, Dreimac runs on the induced distance matrix
+    total_metric.pairwise(Xj) with distance_matrix=True.
     """
     data = np.asarray(data)
     U = np.asarray(U, dtype=bool)
@@ -129,8 +145,17 @@ def compute_local_triv(
                 valid[j] = True
 
             else:
+                Dj = None
+                if total_metric is not None:
+                    if not hasattr(total_metric, "pairwise"):
+                        raise TypeError("total_metric must have a .pairwise(X, Y=None) method.")
+                    Dj = np.asarray(total_metric.pairwise(Xj), dtype=float)
+                    if Dj.shape != (m, m):
+                        raise ValueError(f"total_metric.pairwise returned shape {Dj.shape}, expected ({m},{m}).")
+
                 ang, retries, n_lmks = compute_circular_coords_dreimac(
                     Xj,
+                    dist_mat=Dj,
                     n_landmarks_init=landmarks_per_patch,
                     prime=prime,
                     update_frac=update_frac,

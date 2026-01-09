@@ -18,15 +18,17 @@ then taking an *anchored* weighted mean (strict semicircle by default).
 If semicircle hypothesis holds, these chart formulas glue exactly on overlaps.
 """
 
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Literal
+from typing import Dict, Iterable, List, Optional, Tuple, Literal, Any, Set
 
 import numpy as np
 
 from .combinatorics import Edge, canon_edge
 from .o2_cocycle import angles_to_unit
+from .class_persistence import PersistenceResult, SubcomplexMode, _edges_for_subcomplex_from_persistence
 
 from .frame_reduction import (
     FrameReducerConfig,
@@ -39,6 +41,17 @@ Mat2 = np.ndarray
 
 SummaryMode = Literal["auto", "text", "latex", "both"]
 
+__all__ = [
+    "weighted_angle_mean_anchored",
+    "infer_edges_from_U",
+    "build_true_frames",
+    "apply_frame_reduction",
+    "build_bundle_map",
+    "get_bundle_map",
+    "BundleMapReport",
+    "TrueFramesResult",
+    "show_bundle_map_summary",
+]
 
 
 # ============================================================
@@ -369,7 +382,7 @@ def witness_error(
 
 
 # ============================================================
-# Bundle map construction 
+# Bundle map construction
 # ============================================================
 
 def build_bundle_map(
@@ -411,7 +424,7 @@ def build_bundle_map(
         raise ValueError("Phi_true must have shape (n_sets,n_samples,D,2).")
 
     D = int(Phi_true.shape[2])
-    Eset = {canon_edge(a, b) for (a, b) in edges if a != b}
+    edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
 
     def omega_dir(j: int, k: int, s: int) -> Optional[np.ndarray]:
         """Omega_{j<-k}(s) from undirected store (a<b)."""
@@ -446,8 +459,6 @@ def build_bundle_map(
                 if O is None:
                     continue
 
-                # Apply Omega to the unit vector (this is the “S^1 action”),
-                # then take arg/log (angle) of the resulting point on S^1.
                 v = angles_to_unit(np.array([f[k, s]], dtype=float))[0]
                 u = O @ v
                 th = float(np.arctan2(u[1], u[0]))
@@ -461,13 +472,19 @@ def build_bundle_map(
             ang = np.asarray(transported_angles, dtype=float)
             wts = np.asarray(weights, dtype=float)
 
+            # Renormalize weights over the contributing charts for this (j,s)
+            ws = float(wts.sum())
+            if ws <= 0.0:
+                continue
+            wts = wts / ws
+
             if strict_semicircle:
                 # Deterministic anchor: transported angle corresponding to largest weight
                 idx_max = int(np.argmax(wts))
                 anchor = float(ang[idx_max])
                 mean_theta = weighted_angle_mean_anchored(ang, wts, anchor=anchor, tol=semicircle_tol)
             else:
-                z = np.sum((wts / wts.sum()) * np.exp(1j * ang))
+                z = np.sum(wts * np.exp(1j * ang))
                 mean_theta = float(np.angle(z))
 
             out = Phi_true[j, s] @ np.array([np.cos(mean_theta), np.sin(mean_theta)], dtype=float)
@@ -523,7 +540,7 @@ def chart_disagreement_stats(*, U: np.ndarray, pre_F: np.ndarray) -> ChartDisagr
 
 
 # ============================================================
-# Public pipeline (refactored)
+# Public pipeline 
 # ============================================================
 
 @dataclass
@@ -602,6 +619,155 @@ def apply_frame_reduction(
 
     raise ValueError(f"Unknown reducer.method: {reducer.method}")
 
+    
+    
+@dataclass
+class FrameDataset:
+    """
+    Packed dataset of frames for downstream reducers/curves.
+
+    Y: (m, D, 2) frames (only from active charts/samples)
+    idx: (m, 2) integer pairs (j, s) telling where each frame came from
+    """
+    Y: np.ndarray
+    idx: np.ndarray
+    stage: str
+    D: int
+    n_sets: int
+    n_samples: int
+
+
+# in circle_bundles/bundle_map.py
+
+from typing import Optional, Set, Tuple
+
+def stack_active_frames(
+    *,
+    Phi: np.ndarray,
+    U: np.ndarray,
+    max_frames: Optional[int] = None,
+    rng: Optional[np.random.Generator] = None,
+    allowed_vertices: Optional[Set[int]] = None,   # NEW
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Convert Phi[j,s] (only meaningful where U[j,s]=True) into a packed dataset.
+
+    allowed_vertices:
+        If provided, only include frames whose chart index j is in this set.
+        (Vertex-induced restriction coming from a chosen subcomplex.)
+    """
+    Phi = np.asarray(Phi, dtype=float)
+    U = np.asarray(U, dtype=bool)
+
+    n_sets, n_samples, D, two = Phi.shape
+    if two != 2:
+        raise ValueError("Phi must have shape (n_sets,n_samples,D,2).")
+    if U.shape != (n_sets, n_samples):
+        raise ValueError("U shape mismatch with Phi.")
+
+    js, ss = np.where(U)
+
+    if allowed_vertices is not None:
+        allowed = np.array([int(j) in allowed_vertices for j in js], dtype=bool)
+        js = js[allowed]
+        ss = ss[allowed]
+
+    idx = np.stack([js, ss], axis=1).astype(int)  # (m,2)
+
+    if idx.shape[0] == 0:
+        return np.zeros((0, D, 2), dtype=float), idx
+
+    if (max_frames is not None) and (idx.shape[0] > int(max_frames)):
+        rng = np.random.default_rng() if rng is None else rng
+        keep = rng.choice(idx.shape[0], size=int(max_frames), replace=False)
+        idx = idx[keep]
+
+    Y = Phi[idx[:, 0], idx[:, 1], :, :]  # (m,D,2)
+    return np.asarray(Y, dtype=float), np.asarray(idx, dtype=int)
+
+
+
+def _vertices_from_edges(edges: list[tuple[int,int]]) -> Set[int]:
+    V: Set[int] = set()
+    for (a, b) in edges:
+        V.add(int(a)); V.add(int(b))
+    return V
+
+def get_frame_dataset(
+    *,
+    U: np.ndarray,
+    pou: np.ndarray,
+    Omega: dict,
+    edges=None,
+    reducer=None,
+    stage: str = "post_projection_pre_reduction",          # default
+    max_frames: Optional[int] = None,
+    rng_seed: Optional[int] = None,
+
+    subcomplex: SubcomplexMode = "full",     # "full" | "cocycle" | "max_trivial"
+    persistence: Optional[PersistenceResult] = None,
+) -> FrameDataset:
+    """
+    Build and return a packed frame dataset at a specified pipeline stage.
+
+    stage ∈ {
+      "pre_projection",          # tf.Phi
+      "post_projection",         # tf.Phi_true (DEFAULT)
+      "post_reduction"           # Phi after reducer (if reducer provided)
+    }
+
+    subcomplex ∈ {"full","cocycle","max_trivial"}:
+      - full: all charts
+      - cocycle: cobirth complex (max of SW1/Euler cobirth k_removed)
+      - max_trivial: max-trivial complex (max of SW1/Euler codeath k_removed)
+    """
+    stage = str(stage)
+
+    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges)
+
+    if stage == "pre_projection":
+        Phi_stage = tf.Phi
+    elif stage in {"post_projection", "post_projection_pre_reduction"}:
+        Phi_stage = tf.Phi_true
+    elif stage == "post_reduction":
+        if reducer is None or getattr(reducer, "method", "none") == "none":
+            Phi_stage = tf.Phi_true
+        else:
+            Phi_stage, _rep = apply_frame_reduction(Phi_true=tf.Phi_true, U=U, reducer=reducer)
+    else:
+        raise ValueError(
+            "stage must be one of: 'pre_projection', 'post_projection', 'post_reduction'. "
+            f"Got: {stage!r}"
+        )
+
+    allowed_vertices: Optional[Set[int]] = None
+    if persistence is not None and subcomplex != "full":
+        kept_edges = _edges_for_subcomplex_from_persistence(persistence, subcomplex)
+        allowed_vertices = _vertices_from_edges(kept_edges)
+
+    rng = None if rng_seed is None else np.random.default_rng(int(rng_seed))
+    Y, idx = stack_active_frames(
+        Phi=Phi_stage,
+        U=U,
+        max_frames=max_frames,
+        rng=rng,
+        allowed_vertices=allowed_vertices,   # NEW
+    )
+
+    n_sets, n_samples = U.shape
+    D = int(Phi_stage.shape[2])
+    return FrameDataset(
+        Y=Y,
+        idx=idx,
+        stage=stage,
+        D=D,
+        n_sets=int(n_sets),
+        n_samples=int(n_samples),
+    )
+
+    
+        
+    
 
 @dataclass
 class BundleMapReport:
@@ -616,6 +782,9 @@ class BundleMapReport:
     reduction_method: Optional[str] = None
     reduction_d_out: Optional[int] = None
 
+    def has_reduction(self) -> bool:
+        return self.reduction_mean_proj_err is not None
+        
     def to_text(self, r: int = 3) -> str:
         IND = "  "
         LABEL_W = 30
@@ -633,15 +802,22 @@ class BundleMapReport:
         if self.chart_disagreement_max is not None:
             lines.append(_tline("chart disagreement max:", f"{float(self.chart_disagreement_max):.{r}f}"))
 
+        # --- NEW: separate reduction section ---
         if self.reduction_mean_proj_err is not None:
             meth = self.reduction_method or "reduction"
             d_out = self.reduction_d_out
+
+            lines.append("")  # spacing
+            lines.append("=== Dimensionality Reduction ===")
             if d_out is None:
-                lines.append(_tline(f"{meth} mean proj err:", f"{float(self.reduction_mean_proj_err):.{r}f}"))
+                lines.append(_tline("method:", f"{meth}"))
             else:
-                lines.append(_tline(f"{meth} mean proj err:", f"{float(self.reduction_mean_proj_err):.{r}f}  (d={int(d_out)})"))
+                lines.append(_tline("method:", f"{meth} (d={int(d_out)})"))
+
+            lines.append(_tline("mean proj err:", f"{float(self.reduction_mean_proj_err):.{r}f}"))
 
         return "\n".join(lines)
+
 
     def to_markdown(self, r: int = 3) -> str:
         md = (
@@ -689,7 +865,6 @@ class BundleMapReport:
         return md
 
 
-    
 def show_bundle_map_summary(
     report: BundleMapReport,
     *,
@@ -714,7 +889,7 @@ def show_bundle_map_summary(
     did_latex = False
     if mode in {"latex", "auto", "both"}:
         did_latex = _display_bundle_map_summary_latex(report, rounding=rounding)
-
+    
     if mode == "both" or mode == "text" or (mode == "auto" and not did_latex) or (mode == "latex" and not did_latex):
         print("\n" + text + "\n")
 
@@ -722,18 +897,77 @@ def show_bundle_map_summary(
 
 
 def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int = 3) -> bool:
-    """Best-effort Math display; returns True iff succeeded."""
     try:
-        from IPython.display import display, Markdown  # type: ignore
+        from IPython.display import display, Math  # type: ignore
     except Exception:
         return False
 
+    r = int(rounding)
+
+    coord_rows = []
+    coord_rows.append((
+        r"\text{Cocycle projection dist.}",
+        r"d_{\infty}(\Omega,\Pi(\Omega))"
+        r"=\sup_{(jk)}\sup_{b\in\pi(X)\cap(U_j\cap U_k)}"
+        r"\ \|\Omega_{jk}(b)-\Pi(\Omega)_{jk}(b)\|_{F}"
+        + r" \approx " + f"{float(report.cocycle_proj_dist):.{r}f}"
+    ))
+    coord_rows.append((
+        r"\text{Witness quality}",
+        r"\sup_{(jk)}\sup_{x:\ \pi(x)\in U_j\cap U_k}"
+        r"\ d_{\mathbb{S}^{1}}\!\left(f_j(x),\ \Omega_{jk}(\pi(x))f_k(x)\right)"
+        + r" \approx " + f"{float(report.witness_err):.{r}f}" + r"\ \text{rad}"
+    ))
+    coord_rows.append((r"\text{Grassmann proj. dist.}", r"\approx " + f"{float(report.cl_proj_dist):.{r}f}"))
+    coord_rows.append((r"\text{Stiefel proj. dist.}",   r"\approx " + f"{float(report.frame_proj_dist):.{r}f}"))
+
+    if report.chart_disagreement_max is not None:
+        coord_rows.append((
+            r"\text{Chart disagreement (max)}",
+            r"\max_{s}\ \Delta(s),\quad \Delta(s)=\max_{j,j'\in J_s}\|F_j(s)-F_{j'}(s)\|_2"
+            + r" \approx " + f"{float(report.chart_disagreement_max):.{r}f}"
+        ))
+
+    red_rows = []
+    if report.reduction_mean_proj_err is not None:
+        meth = report.reduction_method or "reduction"
+        d_out = report.reduction_d_out
+
+        if d_out is None:
+            red_rows.append((r"\text{method}", rf"\texttt{{{meth}}}"))
+        else:
+            red_rows.append((r"\text{method}", rf"\texttt{{{meth}}},\ d={int(d_out)}"))
+
+        red_rows.append((
+            r"\text{mean projection err.}",
+            r"\mathbb{E}\,\|Y - BB^{\mathsf{T}}Y\|_{F}"
+            + r" \approx " + f"{float(report.reduction_mean_proj_err):.{r}f}"
+        ))
+
+    def _rows_to_aligned(rows):
+        return r"\\[3pt]".join(r"\quad " + lab + r" &:\quad " + expr for lab, expr in rows)
+
+    latex = (
+        r"\begin{aligned}"
+        r"\textbf{Coordinatization} & \\[6pt]"
+        + _rows_to_aligned(coord_rows)
+    )
+
+    if red_rows:
+        latex += (
+            r"\\[14pt]"
+            r"\textbf{Dimensionality Reduction} & \\[6pt]"
+            + _rows_to_aligned(red_rows)
+        )
+
+    latex += r"\end{aligned}"
+
     try:
-        display(Markdown(report.to_markdown(r=rounding)))
+        display(Math(latex))
         return True
     except Exception:
         return False
-    
+
 
 def get_bundle_map(
     *,
@@ -804,23 +1038,18 @@ def get_bundle_map(
         semicircle_tol=float(semicircle_tol),
     )
 
-    # ----------------------------
-    # (E) chart disagreement summary 
-    # ----------------------------
+    # (E) chart disagreement summary
     cd_max: Optional[float] = None
     if compute_chart_disagreement:
         cd = chart_disagreement_stats(U=U, pre_F=pre_F)
         cd_max = float(cd.max)
 
-    # ----------------------------
-    # (F) reduction summary fields 
-    # ----------------------------
+    # (F) reduction summary fields
     red_mean: Optional[float] = None
     red_method: Optional[str] = None
     red_d: Optional[int] = None
 
     if reduction_report is not None:
-        # Be robust to whatever attribute names your FrameReductionReport uses
         red_mean = getattr(reduction_report, "mean_proj_err", None)
         if red_mean is None:
             red_mean = getattr(reduction_report, "mean_projection_error", None)

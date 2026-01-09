@@ -12,7 +12,7 @@ This module is intentionally separate from bundle_map.py so that:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Sequence, Tuple, Literal
+from typing import List, Optional, Sequence, Tuple, Literal, Union
 
 import numpy as np
 
@@ -86,26 +86,46 @@ def _polar_orthonormalize_2cols(Yd: np.ndarray, *, eps: float = 1e-12) -> np.nda
 
 def _collect_frames_as_list(
     Phi_true: np.ndarray,
-    U: np.ndarray,
+    U: Optional[np.ndarray] = None,
     *,
     max_frames: Optional[int] = None,
     rng_seed: int = 0,
 ) -> List[np.ndarray]:
     """
-    Collect frames Y = Phi_true[j,s] (D,2) for which U[j,s]=True.
-    Optionally subsample to at most max_frames.
+    Collect frames as a Python list of (D,2) arrays.
+
+    Accepts either:
+      - Phi_true with shape (n_sets,n_samples,D,2) plus U (n_sets,n_samples), OR
+      - Phi_true with shape (m,D,2) (packed dataset), in which case U is ignored.
     """
     Phi_true = np.asarray(Phi_true, dtype=float)
-    U = np.asarray(U, dtype=bool)
 
-    n_sets, n_samples, D, two = Phi_true.shape
-    if two != 2:
-        raise ValueError("Expected frames in V(2,D): last dim must be 2.")
+    # Case A: packed dataset (m,D,2)
+    if Phi_true.ndim == 3:
+        m, D, two = Phi_true.shape
+        if two != 2:
+            raise ValueError("Packed frames must have shape (m,D,2).")
+        frames = [Phi_true[i] for i in range(m)]
 
-    Js, Ss = np.where(U)
-    frames = [Phi_true[int(j), int(s)] for (j, s) in zip(Js, Ss)]
+    # Case B: grid of frames (n_sets,n_samples,D,2)
+    elif Phi_true.ndim == 4:
+        if U is None:
+            raise ValueError("U must be provided when Phi_true has shape (n_sets,n_samples,D,2).")
+        U = np.asarray(U, dtype=bool)
 
-    if max_frames is not None and len(frames) > max_frames:
+        n_sets, n_samples, D, two = Phi_true.shape
+        if two != 2:
+            raise ValueError("Expected frames in V(2,D): last dim must be 2.")
+        if U.shape != (n_sets, n_samples):
+            raise ValueError("U shape mismatch with Phi_true.")
+
+        Js, Ss = np.where(U)
+        frames = [Phi_true[int(j), int(s)] for (j, s) in zip(Js, Ss)]
+
+    else:
+        raise ValueError(f"Phi_true must have ndim 3 or 4. Got shape {Phi_true.shape}.")
+
+    if max_frames is not None and len(frames) > int(max_frames):
         rng = np.random.default_rng(int(rng_seed))
         idx = rng.choice(len(frames), size=int(max_frames), replace=False)
         frames = [frames[int(i)] for i in idx]
