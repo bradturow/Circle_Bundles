@@ -18,39 +18,57 @@ then taking an *anchored* weighted mean (strict semicircle by default).
 If semicircle hypothesis holds, these chart formulas glue exactly on overlaps.
 """
 
-
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, List, Optional, Tuple, Literal, Any, Set
+from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, Tuple
 
 import numpy as np
 
+from .class_persistence import (
+    PersistenceResult,
+    SubcomplexMode,
+    _edges_for_subcomplex_from_persistence,
+)
 from .combinatorics import Edge, canon_edge
-from .o2_cocycle import angles_to_unit
-from .class_persistence import PersistenceResult, SubcomplexMode, _edges_for_subcomplex_from_persistence
-
 from .frame_reduction import (
     FrameReducerConfig,
     FrameReductionReport,
-    reduce_frames_subspace_pca,
     reduce_frames_psc,
+    reduce_frames_subspace_pca,
 )
+from .o2_cocycle import angles_to_unit
 
 Mat2 = np.ndarray
-
 SummaryMode = Literal["auto", "text", "latex", "both"]
 
 __all__ = [
+    # angle utilities
     "weighted_angle_mean_anchored",
     "infer_edges_from_U",
+    # main pipeline pieces
     "build_true_frames",
     "apply_frame_reduction",
     "build_bundle_map",
     "get_bundle_map",
+    # frame dataset helper
+    "FrameDataset",
+    "get_frame_dataset",
+    # reporting
     "BundleMapReport",
     "TrueFramesResult",
+    "ChartDisagreementStats",
+    "chart_disagreement_stats",
     "show_bundle_map_summary",
+    # diagnostics helpers (exported because useful)
+    "cocycle_projection_distance",
+    "witness_error_stats",
+    "project_to_rank2_projection",
+    "polar_stiefel_projection",
+    "project_frames_to_stiefel",
+    "get_classifying_map",
+    "get_local_frames",
+    "cocycle_from_frames",
 ]
 
 
@@ -68,6 +86,17 @@ def _circle_dist(a: float, b: float) -> float:
     return abs(_wrap_to_pi(a - b))
 
 
+def _geo_to_chordal(d_geo: np.ndarray) -> np.ndarray:
+    """Chordal distance in R^2 for S^1 geodesic angle: d_C = 2 sin(d_geo/2)."""
+    return 2.0 * np.sin(d_geo / 2.0)
+
+
+def _chordal_to_geo(d_c: float) -> float:
+    """Inverse of d_C = 2 sin(d_geo/2), returning d_geo in [0, pi]."""
+    x = float(np.clip(float(d_c) / 2.0, 0.0, 1.0))
+    return float(2.0 * np.arcsin(x))
+
+
 def weighted_angle_mean_anchored(
     angles: np.ndarray,
     weights: np.ndarray,
@@ -82,7 +111,7 @@ def weighted_angle_mean_anchored(
         diff_k = wrap_to_pi(a_k - anchor)
         a_lift_k = anchor + diff_k
 
-    Semicircle test (anchored):
+    Anchored semicircle test:
         max_k |diff_k| < pi  (up to tol)
 
     Returns:
@@ -106,10 +135,9 @@ def weighted_angle_mean_anchored(
 
     diffs = ((angles - anchor + np.pi) % (2.0 * np.pi)) - np.pi  # (-pi,pi]
     max_abs = float(np.max(np.abs(diffs)))
-
-    if max_abs >= np.pi - tol:
+    if max_abs >= np.pi - float(tol):
         raise ValueError(
-            f"Angles are not contained in an open semicircle around the anchor "
+            "Angles are not contained in an open semicircle around the anchor "
             f"(max_abs={max_abs:.6f} >= pi)."
         )
 
@@ -241,6 +269,10 @@ def get_classifying_map(
     cl[s] = sum_j pou[j,s] * Phi[j,s] Phi[j,s]^T  (D×D).
 
     If project=True, replace by nearest rank-2 projection via top-2 eigenspace.
+
+    Returns:
+      P: (n_samples, D, D) if project=True, else cl
+      cl_proj_dist: sup_s || sym(cl[s]) - P[s] ||_F   (0 if project=False)
     """
     Phi = np.asarray(Phi, dtype=float)
     pou = np.asarray(pou, dtype=float)
@@ -264,12 +296,12 @@ def get_classifying_map(
         return cl, 0.0
 
     P = np.zeros_like(cl)
-    max_dist = 0.0
+    sup_dist = 0.0
     for s in range(n_samples):
         Ps, dist = project_to_rank2_projection(cl[s])
         P[s] = Ps
-        max_dist = max(max_dist, dist)
-    return P, float(max_dist)
+        sup_dist = max(sup_dist, dist)
+    return P, float(sup_dist)
 
 
 def project_frames_to_stiefel(
@@ -278,7 +310,13 @@ def project_frames_to_stiefel(
     Phi: np.ndarray,
     P: np.ndarray,
 ) -> Tuple[np.ndarray, float]:
-    """Project Phi[j,s] onto V(2,D) over the plane P[s] via polar factor."""
+    """
+    Project Phi[j,s] onto V(2,D) over the plane P[s] via polar factor.
+
+    Returns:
+      Phi_true: (n_sets,n_samples,D,2)
+      frame_proj_dist: sup_{j,s: U[j,s]=1} || Phi_true[j,s] - Phi[j,s] ||_F
+    """
     U = np.asarray(U, dtype=bool)
     Phi = np.asarray(Phi, dtype=float)
     P = np.asarray(P, dtype=float)
@@ -288,7 +326,7 @@ def project_frames_to_stiefel(
         raise ValueError("P shape mismatch with Phi.")
 
     out = np.zeros_like(Phi)
-    max_dist = 0.0
+    sup_dist = 0.0
     for j in range(n_sets):
         for s in range(n_samples):
             if not U[j, s]:
@@ -296,8 +334,8 @@ def project_frames_to_stiefel(
             A = Phi[j, s]
             Uproj = polar_stiefel_projection(P[s], A)
             out[j, s] = Uproj
-            max_dist = max(max_dist, float(np.linalg.norm(Uproj - A, ord="fro")))
-    return out, float(max_dist)
+            sup_dist = max(sup_dist, float(np.linalg.norm(Uproj - A, ord="fro")))
+    return out, float(sup_dist)
 
 
 def cocycle_from_frames(
@@ -330,11 +368,15 @@ def cocycle_projection_distance(
     Omega_true: Dict[Edge, np.ndarray],
     edges: Iterable[Edge],
 ) -> float:
-    """max over overlaps of ||Omega_simplicial - Omega_true(s)||_F."""
+    """
+    d_\infty(Ω, Π(Ω)) := sup_{(jk)} sup_{b in U_j∩U_k} || Ω_{jk} - Π(Ω)_{jk}(b) ||_F.
+
+    (Here Π(Ω) is realized as Omega_true[(j,k)][s] built from the projected Stiefel frames.)
+    """
     U = np.asarray(U, dtype=bool)
     E = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
 
-    max_diff = 0.0
+    sup_diff = 0.0
     for (j, k) in E:
         if (j, k) not in Omega_simplicial or (j, k) not in Omega_true:
             continue
@@ -343,20 +385,30 @@ def cocycle_projection_distance(
         overlap = U[j] & U[k]
         idx = np.where(overlap)[0]
         for s in idx:
-            max_diff = max(max_diff, float(np.linalg.norm(O - Ot[s], ord="fro")))
-    return float(max_diff)
+            sup_diff = max(sup_diff, float(np.linalg.norm(O - Ot[s], ord="fro")))
+    return float(sup_diff)
 
 
-def witness_error(
+def witness_error_stats(
     *,
     U: np.ndarray,
     f: np.ndarray,
     Omega_true: Dict[Edge, np.ndarray],
     edges: Iterable[Edge],
-) -> float:
+) -> Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]:
     """
-    sup over overlaps of circular distance:
-        dist( f[j,s], arg( Omega_{j<-k}(s) * unit(f[k,s]) ) )
+    Trivialization error statistics computed using Π(Ω) (i.e., Omega_true):
+
+    For each overlap (j,k) and each sample s with b_s in U_j ∩ U_k, compare:
+      - unit(f_j(s))   vs   Π(Ω)_{j<-k}(b_s) unit(f_k(s)).
+
+    Returns:
+      (eps_geo_sup, eps_geo_mean, eps_C_sup, eps_C_mean)
+
+    where:
+      eps_geo: geodesic distance on S^1 (radians) in [0, pi]
+      eps_C:   chordal distance d_C on the unit circle in C (equivalently R^2),
+               d_C(u,v) = |u - v| = 2 sin(eps_geo/2) in [0, 2]
     """
     U = np.asarray(U, dtype=bool)
     f = np.asarray(f, dtype=float)
@@ -365,20 +417,54 @@ def witness_error(
         raise ValueError("f shape mismatch with U.")
 
     E = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
-    max_err = 0.0
+
+    geo_sup = 0.0
+    c_sup = 0.0
+    geo_sum = 0.0
+    c_sum = 0.0
+    n = 0
+    got_any = False
+
+    def omega_dir(j: int, k: int, s: int) -> Optional[np.ndarray]:
+        """Π(Ω)_{j<-k}(b_s) from undirected store (a<b)."""
+        if j == k:
+            return np.eye(2)
+        a, b = canon_edge(j, k)
+        if (a, b) not in Omega_true:
+            return None
+        Oab = Omega_true[(a, b)][s]
+        return Oab if (j == a and k == b) else Oab.T
 
     for (j, k) in E:
-        if (j, k) not in Omega_true:
-            continue
-        Ojk = Omega_true[(j, k)]  # (n_samples,2,2) mapping k->j when (j,k) is canonical
         overlap = U[j] & U[k]
         idx = np.where(overlap)[0]
+        if idx.size == 0:
+            continue
+
         for s in idx:
-            v = angles_to_unit(np.array([f[k, s]], dtype=float))[0]
-            w = Ojk[s] @ v
-            th = float(np.arctan2(w[1], w[0]))
-            max_err = max(max_err, _circle_dist(float(f[j, s]), th))
-    return float(max_err)
+            O = omega_dir(j, k, int(s))
+            if O is None:
+                continue
+
+            vj = angles_to_unit(np.array([f[j, s]], dtype=float))[0]  # (2,)
+            vk = angles_to_unit(np.array([f[k, s]], dtype=float))[0]  # (2,)
+            wk = O @ vk
+
+            # chordal on unit circle in C is Euclidean in R^2:
+            dc = float(np.linalg.norm(vj - wk))
+            dgeo = _chordal_to_geo(dc)
+
+            geo_sup = max(geo_sup, dgeo)
+            c_sup = max(c_sup, dc)
+            geo_sum += dgeo
+            c_sum += dc
+            n += 1
+            got_any = True
+
+    if (not got_any) or (n == 0):
+        return None, None, None, None
+
+    return float(geo_sup), float(geo_sum / n), float(c_sup), float(c_sum / n)
 
 
 # ============================================================
@@ -444,7 +530,6 @@ def build_bundle_map(
         if active.size == 0:
             continue
 
-        # Compute all chartwise formulas F_j(s)
         for j_ in active:
             j = int(j_)
             transported_angles: List[float] = []
@@ -466,20 +551,18 @@ def build_bundle_map(
                 transported_angles.append(th)
                 weights.append(w)
 
-            if len(weights) == 0:
+            if not weights:
                 continue
 
             ang = np.asarray(transported_angles, dtype=float)
             wts = np.asarray(weights, dtype=float)
 
-            # Renormalize weights over the contributing charts for this (j,s)
             ws = float(wts.sum())
             if ws <= 0.0:
                 continue
             wts = wts / ws
 
             if strict_semicircle:
-                # Deterministic anchor: transported angle corresponding to largest weight
                 idx_max = int(np.argmax(wts))
                 anchor = float(ang[idx_max])
                 mean_theta = weighted_angle_mean_anchored(ang, wts, anchor=anchor, tol=semicircle_tol)
@@ -490,7 +573,6 @@ def build_bundle_map(
             out = Phi_true[j, s] @ np.array([np.cos(mean_theta), np.sin(mean_theta)], dtype=float)
             pre_F[j, s] = out
 
-        # Define global F using the first active chart
         j0 = int(active[0])
         F[s] = pre_F[j0, s]
 
@@ -509,13 +591,16 @@ class ChartDisagreementStats:
         r = int(decimals)
         return (
             "Chart disagreement:\n"
-            "  Δ = max_{j,j'∈J_s} ||F_j(s) - F_{j'}(s)||_2\n"
-            f"  max ≈ {self.max:.{r}f}\n"
+            "  Δ := sup_{(jk)∈N(U)} sup_{b∈U_j∩U_k} ||F_j(b) - F_k(b)||_2\n"
+            f"  sup = {self.max:.{r}f}\n"
         )
 
 
 def chart_disagreement_stats(*, U: np.ndarray, pre_F: np.ndarray) -> ChartDisagreementStats:
-    """Compute only max Δ(s) over samples."""
+    """
+    Compute Δ = sup_{(jk)∈N(U)} sup_{b∈U_j∩U_k} ||F_j(b) - F_k(b)||_2
+    using the discrete samples / pre_F chart values.
+    """
     U = np.asarray(U, dtype=bool)
     pre_F = np.asarray(pre_F, dtype=float)
 
@@ -523,8 +608,7 @@ def chart_disagreement_stats(*, U: np.ndarray, pre_F: np.ndarray) -> ChartDisagr
     if pre_F.shape[0] != n_sets or pre_F.shape[1] != n_samples:
         raise ValueError("pre_F shape mismatch with U.")
 
-    max_delta = 0.0
-
+    sup_delta = 0.0
     for s in range(n_samples):
         active = np.where(U[:, s])[0]
         if active.size <= 1:
@@ -533,14 +617,14 @@ def chart_disagreement_stats(*, U: np.ndarray, pre_F: np.ndarray) -> ChartDisagr
         mx = 0.0
         for a in range(V.shape[0]):
             for b in range(a + 1, V.shape[0]):
-                mx = max(mx, float(np.linalg.norm(V[a] - V[b])))
-        max_delta = max(max_delta, mx)
+                mx = max(mx, float(np.linalg.norm(V[a] - V[b], ord=2)))
+        sup_delta = max(sup_delta, mx)
 
-    return ChartDisagreementStats(max=float(max_delta))
+    return ChartDisagreementStats(max=float(sup_delta))
 
 
 # ============================================================
-# Public pipeline 
+# Public pipeline: true frames + optional reduction
 # ============================================================
 
 @dataclass
@@ -619,14 +703,17 @@ def apply_frame_reduction(
 
     raise ValueError(f"Unknown reducer.method: {reducer.method}")
 
-    
-    
+
+# ============================================================
+# Frame dataset helper (for reducers / curve fitting / diagnostics)
+# ============================================================
+
 @dataclass
 class FrameDataset:
     """
     Packed dataset of frames for downstream reducers/curves.
 
-    Y: (m, D, 2) frames (only from active charts/samples)
+    Y:   (m, D, 2) frames (only from active charts/samples)
     idx: (m, 2) integer pairs (j, s) telling where each frame came from
     """
     Y: np.ndarray
@@ -637,17 +724,13 @@ class FrameDataset:
     n_samples: int
 
 
-# in circle_bundles/bundle_map.py
-
-from typing import Optional, Set, Tuple
-
 def stack_active_frames(
     *,
     Phi: np.ndarray,
     U: np.ndarray,
     max_frames: Optional[int] = None,
     rng: Optional[np.random.Generator] = None,
-    allowed_vertices: Optional[Set[int]] = None,   # NEW
+    allowed_vertices: Optional[Set[int]] = None,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Convert Phi[j,s] (only meaningful where U[j,s]=True) into a packed dataset.
@@ -668,9 +751,9 @@ def stack_active_frames(
     js, ss = np.where(U)
 
     if allowed_vertices is not None:
-        allowed = np.array([int(j) in allowed_vertices for j in js], dtype=bool)
-        js = js[allowed]
-        ss = ss[allowed]
+        keep_mask = np.array([int(j) in allowed_vertices for j in js], dtype=bool)
+        js = js[keep_mask]
+        ss = ss[keep_mask]
 
     idx = np.stack([js, ss], axis=1).astype(int)  # (m,2)
 
@@ -686,34 +769,34 @@ def stack_active_frames(
     return np.asarray(Y, dtype=float), np.asarray(idx, dtype=int)
 
 
-
-def _vertices_from_edges(edges: list[tuple[int,int]]) -> Set[int]:
+def _vertices_from_edges(edges: Sequence[Tuple[int, int]]) -> Set[int]:
     V: Set[int] = set()
     for (a, b) in edges:
-        V.add(int(a)); V.add(int(b))
+        V.add(int(a))
+        V.add(int(b))
     return V
+
 
 def get_frame_dataset(
     *,
     U: np.ndarray,
     pou: np.ndarray,
-    Omega: dict,
-    edges=None,
-    reducer=None,
-    stage: str = "post_projection_pre_reduction",          # default
+    Omega: Dict[Edge, Mat2],
+    edges: Optional[Iterable[Edge]] = None,
+    reducer: Optional[FrameReducerConfig] = None,
+    stage: str = "post_projection",
     max_frames: Optional[int] = None,
     rng_seed: Optional[int] = None,
-
-    subcomplex: SubcomplexMode = "full",     # "full" | "cocycle" | "max_trivial"
+    subcomplex: SubcomplexMode = "full",
     persistence: Optional[PersistenceResult] = None,
 ) -> FrameDataset:
     """
     Build and return a packed frame dataset at a specified pipeline stage.
 
     stage ∈ {
-      "pre_projection",          # tf.Phi
-      "post_projection",         # tf.Phi_true (DEFAULT)
-      "post_reduction"           # Phi after reducer (if reducer provided)
+      "pre_projection",   # TrueFramesResult.Phi
+      "post_projection",  # TrueFramesResult.Phi_true
+      "post_reduction"    # Phi after reducer (if reducer provided; else Phi_true)
     }
 
     subcomplex ∈ {"full","cocycle","max_trivial"}:
@@ -727,7 +810,7 @@ def get_frame_dataset(
 
     if stage == "pre_projection":
         Phi_stage = tf.Phi
-    elif stage in {"post_projection", "post_projection_pre_reduction"}:
+    elif stage == "post_projection":
         Phi_stage = tf.Phi_true
     elif stage == "post_reduction":
         if reducer is None or getattr(reducer, "method", "none") == "none":
@@ -751,11 +834,12 @@ def get_frame_dataset(
         U=U,
         max_frames=max_frames,
         rng=rng,
-        allowed_vertices=allowed_vertices,   # NEW
+        allowed_vertices=allowed_vertices,
     )
 
-    n_sets, n_samples = U.shape
+    n_sets, n_samples = np.asarray(U, dtype=bool).shape
     D = int(Phi_stage.shape[2])
+
     return FrameDataset(
         Y=Y,
         idx=idx,
@@ -765,26 +849,37 @@ def get_frame_dataset(
         n_samples=int(n_samples),
     )
 
-    
-        
-    
+
+# ============================================================
+# Reporting
+# ============================================================
 
 @dataclass
 class BundleMapReport:
-    cl_proj_dist: float
-    frame_proj_dist: float
-    cocycle_proj_dist: float
-    witness_err: float
+    # core diagnostics
+    cl_proj_dist: float                # Grassmann projection dist (see LaTeX)
+    frame_proj_dist: float             # Stiefel projection dist (see LaTeX)
+    cocycle_proj_dist: float           # d_infty(Ω, Π(Ω))
+
+    # trivialization error (computed using Π(Ω))
+    eps_triv: Optional[float]          # ε_triv   (chordal d_C sup)
+    eps_triv_geo: Optional[float]      # ε_triv^geo (radians sup)
+    eps_triv_mean: Optional[float]     # \bar{ε}_triv (chordal mean)
+    eps_triv_geo_mean: Optional[float] # \bar{ε}_triv^geo (radians mean)
 
     # optional extras
-    chart_disagreement_max: Optional[float] = None
-    reduction_mean_proj_err: Optional[float] = None
+    chart_disagreement: Optional[float] = None
+
+    # dimensionality reduction (optional)
     reduction_method: Optional[str] = None
+    reduction_D_in: Optional[int] = None
     reduction_d_out: Optional[int] = None
+    eps_red: Optional[float] = None         # ε_red (sup projection error)
+    eps_red_mean: Optional[float] = None    # \bar{ε}_red (mean projection error)
 
     def has_reduction(self) -> bool:
-        return self.reduction_mean_proj_err is not None
-        
+        return self.eps_red_mean is not None or self.eps_red is not None
+
     def to_text(self, r: int = 3) -> str:
         IND = "  "
         LABEL_W = 30
@@ -792,77 +887,44 @@ class BundleMapReport:
         def _tline(label: str, content: str) -> str:
             return f"{IND}{label:<{LABEL_W}} {content}"
 
+        def _fmt_eps(eps_c: Optional[float], eps_geo: Optional[float]) -> str:
+            if eps_c is None:
+                return "—"
+            if eps_geo is None:
+                return f"{float(eps_c):.{r}f}"
+            return f"{float(eps_c):.{r}f} (geo = {float(eps_geo)/np.pi:.{r}f}π rad)"
+
         lines: List[str] = []
-        lines.append("=== Coordinatization ===")
+        lines.append("=== Diagnostics ===")
         lines.append(_tline("cocycle proj dist:", f"{float(self.cocycle_proj_dist):.{r}f}"))
-        lines.append(_tline("witness error (S^1):", f"{float(self.witness_err):.{r}f} rad"))
+        lines.append(_tline("trivialization error:", _fmt_eps(self.eps_triv, self.eps_triv_geo)))
+        lines.append(_tline("mean triv error:", _fmt_eps(self.eps_triv_mean, self.eps_triv_geo_mean)))
         lines.append(_tline("Grassmann proj dist:", f"{float(self.cl_proj_dist):.{r}f}"))
         lines.append(_tline("Stiefel proj dist:", f"{float(self.frame_proj_dist):.{r}f}"))
 
-        if self.chart_disagreement_max is not None:
-            lines.append(_tline("chart disagreement max:", f"{float(self.chart_disagreement_max):.{r}f}"))
+        if self.chart_disagreement is not None:
+            lines.append(_tline("chart disagreement:", f"{float(self.chart_disagreement):.{r}f}"))
 
-        # --- NEW: separate reduction section ---
-        if self.reduction_mean_proj_err is not None:
+        if self.has_reduction():
             meth = self.reduction_method or "reduction"
-            d_out = self.reduction_d_out
+            Din = self.reduction_D_in
+            dout = self.reduction_d_out
 
-            lines.append("")  # spacing
+            lines.append("")
             lines.append("=== Dimensionality Reduction ===")
-            if d_out is None:
-                lines.append(_tline("method:", f"{meth}"))
+            if (Din is not None) and (dout is not None):
+                lines.append(_tline("method:", f"{meth} (D={int(Din)} → d={int(dout)})"))
+            elif dout is not None:
+                lines.append(_tline("method:", f"{meth} (d={int(dout)})"))
             else:
-                lines.append(_tline("method:", f"{meth} (d={int(d_out)})"))
+                lines.append(_tline("method:", f"{meth}"))
 
-            lines.append(_tline("mean proj err:", f"{float(self.reduction_mean_proj_err):.{r}f}"))
+            if self.eps_red is not None:
+                lines.append(_tline("proj err (sup):", f"{float(self.eps_red):.{r}f}"))
+            if self.eps_red_mean is not None:
+                lines.append(_tline("proj err (mean):", f"{float(self.eps_red_mean):.{r}f}"))
 
         return "\n".join(lines)
-
-
-    def to_markdown(self, r: int = 3) -> str:
-        md = (
-            "### Coordinatization\n\n"
-            r"**Cocycle projection distance**  " "\n"
-            r"$d_{\infty}(\Omega,\Pi(\Omega))"
-            r"=\sup_{(jk)}\sup_{b\in\pi(X)\cap(U_j\cap U_k)}"
-            r"\ \|\Omega_{jk}(b)-\Pi(\Omega)_{jk}(b)\|_{F}$"
-            f"\n\n- $\\approx {float(self.cocycle_proj_dist):.{r}f}$\n\n"
-            r"**Witness quality**  " "\n"
-            r"$\sup_{(jk)}\sup_{x:\ \pi(x)\in U_j\cap U_k}"
-            r"\ d_{\mathbb{S}^{1}}\!\left(f_j(x),\ \Omega_{jk}(\pi(x))f_k(x)\right)$"
-            f"\n\n- $\\approx {float(self.witness_err):.{r}f}$ (rad)\n\n"
-            r"**Auxiliary diagnostics**"
-            f"\n\n- Grassmann projection distance $\\approx {float(self.cl_proj_dist):.{r}f}$"
-            f"\n- Stiefel projection distance $\\approx {float(self.frame_proj_dist):.{r}f}$\n"
-        )
-
-        if self.chart_disagreement_max is not None:
-            md += (
-                "\n"
-                r"**Chart disagreement (max)**  " "\n"
-                r"$\max_{s}\ \Delta(s),\quad \Delta(s)=\max_{j,j'\in J_s}\|F_j(s)-F_{j'}(s)\|_2$"
-                f"\n\n- $\\approx {float(self.chart_disagreement_max):.{r}f}$\n"
-            )
-
-        if self.reduction_mean_proj_err is not None:
-            meth = self.reduction_method or "reduction"
-            d_out = self.reduction_d_out
-            if d_out is None:
-                md += (
-                    "\n"
-                    f"**Frame reduction** (`{meth}`)\n\n"
-                    r"- Mean projection error $\mathbb{E}\,\|Y - BB^{\mathsf{T}}Y\|_{F}$"
-                    f" $\\approx {float(self.reduction_mean_proj_err):.{r}f}$\n"
-                )
-            else:
-                md += (
-                    "\n"
-                    f"**Frame reduction** (`{meth}`, $d={int(d_out)}$)\n\n"
-                    r"- Mean projection error $\mathbb{E}\,\|Y - BB^{\mathsf{T}}Y\|_{F}$"
-                    f" $\\approx {float(self.reduction_mean_proj_err):.{r}f}$\n"
-                )
-
-        return md
 
 
 def show_bundle_map_summary(
@@ -889,7 +951,7 @@ def show_bundle_map_summary(
     did_latex = False
     if mode in {"latex", "auto", "both"}:
         did_latex = _display_bundle_map_summary_latex(report, rounding=rounding)
-    
+
     if mode == "both" or mode == "text" or (mode == "auto" and not did_latex) or (mode == "latex" and not did_latex):
         print("\n" + text + "\n")
 
@@ -898,53 +960,118 @@ def show_bundle_map_summary(
 
 def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int = 3) -> bool:
     try:
-        from IPython.display import display, Math  # type: ignore
+        from IPython.display import Math, display  # type: ignore
     except Exception:
         return False
 
     r = int(rounding)
 
-    coord_rows = []
-    coord_rows.append((
-        r"\text{Cocycle projection dist.}",
-        r"d_{\infty}(\Omega,\Pi(\Omega))"
-        r"=\sup_{(jk)}\sup_{b\in\pi(X)\cap(U_j\cap U_k)}"
-        r"\ \|\Omega_{jk}(b)-\Pi(\Omega)_{jk}(b)\|_{F}"
-        + r" \approx " + f"{float(report.cocycle_proj_dist):.{r}f}"
-    ))
-    coord_rows.append((
-        r"\text{Witness quality}",
-        r"\sup_{(jk)}\sup_{x:\ \pi(x)\in U_j\cap U_k}"
-        r"\ d_{\mathbb{S}^{1}}\!\left(f_j(x),\ \Omega_{jk}(\pi(x))f_k(x)\right)"
-        + r" \approx " + f"{float(report.witness_err):.{r}f}" + r"\ \text{rad}"
-    ))
-    coord_rows.append((r"\text{Grassmann proj. dist.}", r"\approx " + f"{float(report.cl_proj_dist):.{r}f}"))
-    coord_rows.append((r"\text{Stiefel proj. dist.}",   r"\approx " + f"{float(report.frame_proj_dist):.{r}f}"))
+    coord_rows: List[Tuple[str, str]] = []
 
-    if report.chart_disagreement_max is not None:
-        coord_rows.append((
-            r"\text{Chart disagreement (max)}",
-            r"\max_{s}\ \Delta(s),\quad \Delta(s)=\max_{j,j'\in J_s}\|F_j(s)-F_{j'}(s)\|_2"
-            + r" \approx " + f"{float(report.chart_disagreement_max):.{r}f}"
-        ))
+    # Cocycle projection distance: uses Π(Ω)
+    coord_rows.append(
+        (
+            r"\text{Cocycle projection dist.}",
+            r"d_{\infty}(\Omega,\Pi(\Omega))"
+            r":=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}"
+            r"\ \|\Omega_{jk}-\Pi(\Omega)_{jk}(b)\|_{F}"
+            + r" = " + f"{float(report.cocycle_proj_dist):.{r}f}",
+        )
+    )
 
-    red_rows = []
-    if report.reduction_mean_proj_err is not None:
+    # Trivialization error in d_C, with geo conversion labeled in radians
+    if report.eps_triv is not None:
+        geo_pi = None if report.eps_triv_geo is None else float(report.eps_triv_geo) / np.pi
+        rhs = f"{float(report.eps_triv):.{r}f}"
+        if geo_pi is not None:
+            rhs += rf"\ \ (\varepsilon_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi:.{r}f}\pi\ \mathrm{{rad}})"
+        coord_rows.append(
+            (
+                r"\text{Trivialization error}",
+                r"\varepsilon_{\mathrm{triv}}"
+                r":=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}"
+                r"\ d_{\mathbb{C}}\!\left(f_j(x),\ \Pi(\Omega)_{jk}(b)f_k(x)\right)"
+                + r" = " + rhs,
+            )
+        )
+
+    # Mean trivialization error
+    if report.eps_triv_mean is not None:
+        geo_pi_m = None if report.eps_triv_geo_mean is None else float(report.eps_triv_geo_mean) / np.pi
+        rhs = f"{float(report.eps_triv_mean):.{r}f}"
+        if geo_pi_m is not None:
+            rhs += rf"\ \ (\bar{{\varepsilon}}_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi_m:.{r}f}\pi\ \mathrm{{rad}})"
+        coord_rows.append(
+            (
+                r"\text{Mean triv error}",
+                r"\bar{\varepsilon}_{\mathrm{triv}} = " + rhs,
+            )
+        )
+
+    # Grassmann / Stiefel distances
+    coord_rows.append(
+        (
+            r"\text{Grassmann proj. dist.}",
+            r"d_{\mathrm{Gr}}"
+            r":=\sup_{b\in \cup_{U_j\in\mathcal{U}}U_j}\ \left\|\operatorname{sym}(C(b))-\Pi_{\mathrm{Gr}}(C(b))\right\|_F"
+            + r" = " + f"{float(report.cl_proj_dist):.{r}f}",
+        )
+    )
+    coord_rows.append(
+        (
+            r"\text{Stiefel proj. dist.}",
+            r"d_{\mathrm{St}}"
+            r":=\sup_{U_j\in\mathcal{U}}\sup_{b\in U_j}\ \left\|\Pi_{\mathrm{St}}\!\big(\Phi_j(b)\big)-\Phi_j(b)\right\|_F"
+            + r" = " + f"{float(report.frame_proj_dist):.{r}f}",
+        )
+    )
+
+    # Chart disagreement (sup over overlaps)
+    if report.chart_disagreement is not None:
+        coord_rows.append(
+            (
+                r"\text{Chart disagreement}",
+                r"\Delta"
+                r":=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ \|F_j(b)-F_k(b)\|_2"
+                + r" = " + f"{float(report.chart_disagreement):.{r}f}",
+            )
+        )
+
+    # ----------------------------
+    # Dimensionality reduction rows
+    # ----------------------------
+    red_rows: List[Tuple[str, str]] = []
+    if report.has_reduction():
         meth = report.reduction_method or "reduction"
-        d_out = report.reduction_d_out
+        Din = report.reduction_D_in
+        dout = report.reduction_d_out
 
-        if d_out is None:
-            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}}"))
+        if (Din is not None) and (dout is not None):
+            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}},\ D={int(Din)}\to d={int(dout)}"))
+        elif dout is not None:
+            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}},\ d={int(dout)}"))
         else:
-            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}},\ d={int(d_out)}"))
+            red_rows.append((r"\text{Method}", rf"\texttt{{{meth}}}"))
 
-        red_rows.append((
-            r"\text{Mean projection err.}",
-            r"\mathbb{E}\,\|Y - BB^{\mathsf{T}}Y\|_{F}"
-            + r" \approx " + f"{float(report.reduction_mean_proj_err):.{r}f}"
-        ))
+        if report.eps_red is not None:
+            red_rows.append(
+                (
+                    r"\text{Projection err. (sup)}",
+                    r"\varepsilon_{\mathrm{red}}"
+                    r":=\sup_{U_j\in\mathcal{U}}\sup_{b\in U_j}\ \|\Phi_j(b)-\Pi(\Phi_j(b))\|_{F}"
+                    + r" = " + f"{float(report.eps_red):.{r}f}",
+                )
+            )
+        if report.eps_red_mean is not None:
+            red_rows.append(
+                (
+                    r"\text{Projection err. (mean)}",
+                    r"\bar{\varepsilon}_{\mathrm{red}}"
+                    + r" = " + f"{float(report.eps_red_mean):.{r}f}",
+                )
+            )
 
-    def _rows_to_aligned(rows):
+    def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:
         return r"\\[3pt]".join(r"\quad " + lab + r" &:\quad " + expr for lab, expr in rows)
 
     latex = (
@@ -968,6 +1095,10 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
     except Exception:
         return False
 
+
+# ============================================================
+# End-to-end coordinatization
+# ============================================================
 
 def get_bundle_map(
     *,
@@ -1015,7 +1146,9 @@ def get_bundle_map(
     cocycle_proj_dist = cocycle_projection_distance(
         U=U, Omega_simplicial=Omega, Omega_true=tf.Omega_true, edges=edges_list
     )
-    wit_err = witness_error(U=U, f=f, Omega_true=tf.Omega_true, edges=edges_list)
+    eps_geo, eps_geo_mean, eps_c, eps_c_mean = witness_error_stats(
+        U=U, f=f, Omega_true=tf.Omega_true, edges=edges_list
+    )
 
     # (C) optional reduction
     Phi_used = tf.Phi_true
@@ -1025,6 +1158,11 @@ def get_bundle_map(
     if reducer is not None and reducer.method != "none":
         Phi_used, reduction_report = apply_frame_reduction(Phi_true=tf.Phi_true, U=U, reducer=reducer)
         Omega_used = cocycle_from_frames(Phi_true=Phi_used, edges=edges_list)
+
+        # recompute triv error stats using reduced Π(Ω)
+        eps_geo, eps_geo_mean, eps_c, eps_c_mean = witness_error_stats(
+            U=U, f=f, Omega_true=Omega_used, edges=edges_list
+        )
 
     # (D) bundle map (with anchored averaging)
     F, pre_F = build_bundle_map(
@@ -1038,44 +1176,63 @@ def get_bundle_map(
         semicircle_tol=float(semicircle_tol),
     )
 
-    # (E) chart disagreement summary
-    cd_max: Optional[float] = None
+    # (E) chart disagreement
+    cd_val: Optional[float] = None
     if compute_chart_disagreement:
-        cd = chart_disagreement_stats(U=U, pre_F=pre_F)
-        cd_max = float(cd.max)
+        cd_val = float(chart_disagreement_stats(U=U, pre_F=pre_F).max)
 
-    # (F) reduction summary fields
-    red_mean: Optional[float] = None
+    # (F) reduction summary fields 
     red_method: Optional[str] = None
+    red_D_in: Optional[int] = None
     red_d: Optional[int] = None
+    eps_red: Optional[float] = None
+    eps_red_mean: Optional[float] = None
 
     if reduction_report is not None:
-        red_mean = getattr(reduction_report, "mean_proj_err", None)
-        if red_mean is None:
-            red_mean = getattr(reduction_report, "mean_projection_error", None)
-
         red_method = getattr(reduction_report, "method", None)
         if red_method is None:
             red_method = getattr(reduction_report, "name", None)
+        if red_method is not None:
+            red_method = str(red_method)
+
+        red_D_in = getattr(reduction_report, "D_in", None)
+        if red_D_in is not None:
+            red_D_in = int(red_D_in)
 
         red_d = getattr(reduction_report, "d_out", None)
         if red_d is None:
             red_d = getattr(reduction_report, "d", None)
-
-        if red_mean is not None:
-            red_mean = float(red_mean)
         if red_d is not None:
             red_d = int(red_d)
 
+        eps_red_mean = getattr(reduction_report, "mean_proj_err", None)
+        if eps_red_mean is None:
+            eps_red_mean = getattr(reduction_report, "mean_projection_error", None)
+        if eps_red_mean is not None:
+            eps_red_mean = float(eps_red_mean)
+
+        # Optional sup field 
+        eps_red = getattr(reduction_report, "sup_proj_err", None)
+        if eps_red is None:
+            eps_red = getattr(reduction_report, "sup_projection_error", None)
+        if eps_red is not None:
+            eps_red = float(eps_red)
+
+    # (G) Assemble report
     report = BundleMapReport(
         cl_proj_dist=float(tf.cl_proj_dist),
         frame_proj_dist=float(tf.frame_proj_dist),
         cocycle_proj_dist=float(cocycle_proj_dist),
-        witness_err=float(wit_err),
-        chart_disagreement_max=cd_max,
-        reduction_mean_proj_err=red_mean,
+        eps_triv=eps_c,
+        eps_triv_geo=eps_geo,
+        eps_triv_mean=eps_c_mean,
+        eps_triv_geo_mean=eps_geo_mean,
+        chart_disagreement=cd_val,
         reduction_method=red_method,
+        reduction_D_in=red_D_in,
         reduction_d_out=red_d,
+        eps_red=eps_red,
+        eps_red_mean=eps_red_mean,
     )
 
     if show_summary:

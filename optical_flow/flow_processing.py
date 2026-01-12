@@ -25,7 +25,10 @@ __all__ = [
 def read_flo(file: PathLike) -> np.ndarray:
     """
     Read a Middlebury/Sintel .flo optical flow file.
-    Returns: (H, W, 2) float32 array.
+
+    Returns
+    -------
+    flow : (H, W, 2) float32 array
     """
     file = Path(file)
     if not file.is_file():
@@ -35,7 +38,7 @@ def read_flo(file: PathLike) -> np.ndarray:
 
     with file.open("rb") as f:
         magic = np.fromfile(f, np.float32, count=1)[0]
-        if magic != TAG_FLOAT:
+        if float(magic) != float(TAG_FLOAT):
             raise ValueError(f"Invalid .flo file (bad magic {magic}) for {file}")
         w = int(np.fromfile(f, np.int32, count=1)[0])
         h = int(np.fromfile(f, np.int32, count=1)[0])
@@ -61,6 +64,10 @@ def sample_from_frame(
         [d*d : 2*d*d)   : v components
         [-2], [-1]      : (row, col) top-left corner in the frame
     """
+    n_patches = int(n_patches)
+    d = int(d)
+    if n_patches <= 0:
+        raise ValueError("n_patches must be positive.")
     if rng is None:
         rng = np.random.default_rng()
 
@@ -69,8 +76,8 @@ def sample_from_frame(
     if d <= 0 or d > H or d > W:
         raise ValueError(f"Invalid patch size d={d} for flow of shape {(H, W)}")
 
-    patchrows = rng.integers(0, H - d + 1, size=int(n_patches), endpoint=False)
-    patchcols = rng.integers(0, W - d + 1, size=int(n_patches), endpoint=False)
+    patchrows = rng.integers(0, H - d + 1, size=n_patches, endpoint=False)
+    patchcols = rng.integers(0, W - d + 1, size=n_patches, endpoint=False)
 
     n_patch_cols = 2 * (d * d)
     patches = np.zeros((n_patches, n_patch_cols), dtype=np.float32)
@@ -103,6 +110,8 @@ def get_patch_sample(
     if not flow_root.is_dir():
         raise NotADirectoryError(str(flow_root))
 
+    patches_per_frame = int(patches_per_frame)
+    d = int(d)
     rng = np.random.default_rng(int(random_state))
 
     file_paths: List[List[Path]] = []
@@ -182,14 +191,16 @@ def preprocess_flow_patches(
     """
     if "patch" not in patch_df.columns:
         raise ValueError("patch_df must contain a 'patch' column.")
-    if not (0 < hc_frac <= 1):
+    if not (0 < float(hc_frac) <= 1):
         raise ValueError("hc_frac must be in (0,1].")
 
     patch_df = patch_df.copy().reset_index(drop=True)
 
     # infer n
     sample_patch = patch_df["patch"].iloc[0]
-    total_len = len(sample_patch)
+    total_len = int(len(sample_patch))
+    if total_len % 2 != 0:
+        raise ValueError(f"Patch length {total_len} is not even; expected 2*n^2.")
     d2 = total_len // 2
     n = int(np.sqrt(d2))
     if 2 * n * n != total_len:
@@ -201,16 +212,20 @@ def preprocess_flow_patches(
     patch_df["x mean"] = patches[:, :d2].mean(axis=1)
     patch_df["y mean"] = patches[:, d2:].mean(axis=1)
 
-    # contrast norms (note keyword-only patch_type in contrast.py)
+    # contrast norms
     patch_df["norm"] = get_contrast_norms(patches, patch_type="opt_flow")
 
     # keep top hc_frac
-    keep = int(np.ceil(hc_frac * len(patch_df)))
+    keep = int(np.ceil(float(hc_frac) * len(patch_df)))
     patch_df = patch_df.sort_values("norm", ascending=False).head(keep).reset_index(drop=True)
 
     # downsample
+    max_samples = int(max_samples)
     if len(patch_df) > max_samples:
         patch_df = patch_df.sample(n=max_samples, random_state=int(random_state)).reset_index(drop=True)
+
+    if len(patch_df) == 0:
+        raise ValueError("After filtering/downsampling, patch_df is empty.")
 
     # mean-center + normalize
     patches = np.vstack(patch_df["patch"].values)
@@ -225,7 +240,14 @@ def preprocess_flow_patches(
 
     # densities via kNN distances
     k_list = sorted(set(int(k) for k in k_list))
+    if len(k_list) == 0:
+        return patch_df
+
     K = k_list[-1]
+    if K >= len(patch_df):
+        raise ValueError(
+            f"max(k_list)={K} must be < number of samples after preprocessing ({len(patch_df)})."
+        )
 
     kdt = KDTree(normalized, leaf_size=30, metric="euclidean")
     dist, _ = kdt.query(normalized, k=K + 1, return_distance=True)  # dist[:,0]=0 self

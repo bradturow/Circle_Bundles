@@ -1,4 +1,3 @@
-# viz/nerve_circle.py
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -6,12 +5,17 @@ from typing import Any, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
-from ..combinatorics import canon_edge  # project-wide canonical edge
+from ..combinatorics import canon_edge
 
+__all__ = [
+    "show_circle_nerve",
+    "is_single_cycle_graph",
+    "cycle_order_from_edges",
+    "reindex_edges",
+    "reindex_vertex_dict",
+    "reindex_edge_dict",
+]
 
-# ============================================================
-# Circle-layout nerve plot
-# ============================================================
 
 def show_circle_nerve(
     *,
@@ -39,9 +43,9 @@ def show_circle_nerve(
     fontsize_phi: int = 12,
     fontsize_weights: int = 9,
     # label offsets (relative to radius)
-    omega_offset: float = 0.09,     # outside midpoint
-    weights_offset: float = 0.09,   # inside midpoint
-    phi_offset: float = 0.14,       # outside node
+    omega_offset: float = 0.09,
+    weights_offset: float = 0.09,
+    phi_offset: float = 0.14,
     title: str | None = None,
     ax=None,
     save_path: str | None = None,
@@ -50,29 +54,14 @@ def show_circle_nerve(
     """
     Circle-layout nerve plot.
 
-    Parameters
-    ----------
-    n_vertices:
-        Number of cover sets / nerve vertices.
-    edges:
-        Full edge list (i,j) for the nerve.
-    kept_edges:
-        Subcomplex edges to highlight (thick). If None, all edges are kept.
-    omega:
-        Optional dict edge->int label (e.g., ±1) drawn outside midpoints.
-    weights:
-        Optional dict edge->float label drawn inside midpoints.
-    phi:
-        Optional dict vertex->int label drawn outside nodes.
-
     Notes
     -----
-    - Canonicalizes edge keys via project-wide canon_edge(a,b).
+    - Canonicalizes edge keys via canon_edge(a,b).
     - Supports omega/weights dicts keyed by either orientation.
     """
-
-    if n_vertices <= 0:
+    if int(n_vertices) <= 0:
         raise ValueError("n_vertices must be positive.")
+    n_vertices = int(n_vertices)
 
     # canonicalize edge lists
     E_all = sorted({canon_edge(int(i), int(j)) for (i, j) in edges if int(i) != int(j)})
@@ -80,10 +69,8 @@ def show_circle_nerve(
         E_keep = set(E_all)
     else:
         E_keep = {canon_edge(int(i), int(j)) for (i, j) in kept_edges if int(i) != int(j)}
-
     E_rem = [e for e in E_all if e not in E_keep]
 
-    # canonicalize dict keys (if provided)
     def _canon_edge_dict(d):
         if d is None:
             return None
@@ -100,7 +87,7 @@ def show_circle_nerve(
 
     # node positions on circle
     ang = np.linspace(0, 2 * np.pi, n_vertices, endpoint=False)
-    P = np.c_[r * np.cos(ang), r * np.sin(ang)]  # (n,2)
+    P = np.c_[float(r) * np.cos(ang), float(r) * np.sin(ang)]
 
     # set up axes
     if ax is None:
@@ -108,25 +95,23 @@ def show_circle_nerve(
     else:
         fig = ax.figure
 
-    # ---- draw edges ----
+    # edges
     def draw_edges(edgelist, *, color, lw, zorder):
         for (i, j) in edgelist:
             if not (0 <= i < n_vertices and 0 <= j < n_vertices):
                 continue
-            xs = [P[i, 0], P[j, 0]]
-            ys = [P[i, 1], P[j, 1]]
-            ax.plot(xs, ys, color=color, linewidth=lw, zorder=zorder)
+            ax.plot([P[i, 0], P[j, 0]], [P[i, 1], P[j, 1]], color=color, linewidth=lw, zorder=zorder)
 
-    draw_edges(E_rem, color=removed_edge_color, lw=removed_edge_lw, zorder=1)
-    draw_edges(sorted(E_keep), color=kept_edge_color, lw=kept_edge_lw, zorder=2)
+    draw_edges(E_rem, color=removed_edge_color, lw=float(removed_edge_lw), zorder=1)
+    draw_edges(sorted(E_keep), color=kept_edge_color, lw=float(kept_edge_lw), zorder=2)
 
-    # ---- draw nodes ----
+    # nodes
     ax.scatter(
         P[:, 0], P[:, 1],
-        s=node_size,
+        s=float(node_size),
         c=node_facecolor,
         edgecolors=node_edgecolor,
-        zorder=3
+        zorder=3,
     )
 
     # node labels U_i
@@ -135,75 +120,73 @@ def show_circle_nerve(
             P[i, 0], P[i, 1],
             f"$U_{{{i+1}}}$",
             ha="center", va="center",
-            fontsize=fontsize_node,
+            fontsize=int(fontsize_node),
             color=node_label_color,
             fontweight="bold",
-            zorder=4
+            zorder=4,
         )
 
-    # ---- omega labels (outside midpoints) ----
+    # omega labels (outside midpoints)
     if omega is not None:
         for (i, j) in E_all:
             if (i, j) not in omega:
                 continue
             mid = 0.5 * (P[i] + P[j])
             norm = float(np.linalg.norm(mid))
-            if norm == 0:
+            if norm <= 1e-15:
                 continue
-            u = mid / norm  # outward direction
-            pos = mid + (omega_offset * r) * u
+            u = mid / norm
+            pos = mid + (float(omega_offset) * float(r)) * u
             ax.text(
                 pos[0], pos[1],
                 str(int(omega[(i, j)])),
                 ha="center", va="center",
-                fontsize=fontsize_omega,
+                fontsize=int(fontsize_omega),
                 color=omega_color,
-                zorder=5
+                zorder=5,
             )
 
-    # ---- phi labels (outside nodes) ----
+    # phi labels (outside nodes)
     if phi is not None:
         for v, val in phi.items():
             v = int(v)
             if not (0 <= v < n_vertices):
                 continue
             u = P[v] / (float(np.linalg.norm(P[v])) + 1e-12)
-            pos = P[v] + (phi_offset * r) * u
+            pos = P[v] + (float(phi_offset) * float(r)) * u
             ax.text(
                 pos[0], pos[1],
                 str(int(val)),
                 ha="center", va="center",
-                fontsize=fontsize_phi,
+                fontsize=int(fontsize_phi),
                 color=phi_color,
-                zorder=6
+                zorder=6,
             )
 
-    # ---- weights labels (inside midpoints) ----
+    # weights labels (inside midpoints)
     if weights is not None:
         for (i, j) in E_all:
             if (i, j) not in weights:
                 continue
             mid = 0.5 * (P[i] + P[j])
             norm = float(np.linalg.norm(mid))
-            if norm == 0:
+            if norm <= 1e-15:
                 continue
-            u_in = -mid / norm  # inward direction
-            pos = mid + (weights_offset * r) * u_in
+            u_in = -mid / norm
+            pos = mid + (float(weights_offset) * float(r)) * u_in
             ax.text(
                 pos[0], pos[1],
                 f"{float(weights[(i, j)]):.3g}",
                 ha="center", va="center",
-                fontsize=fontsize_weights,
+                fontsize=int(fontsize_weights),
                 color=weights_color,
-                zorder=5
+                zorder=5,
             )
 
-    # ---- finalize ----
     ax.set_aspect("equal")
     ax.axis("off")
     if title is not None:
-        ax.set_title(title)
-        ax.set_title(title, pad=18, y=1.03)  
+        ax.set_title(title, pad=18, y=1.03)
 
     if save_path is not None:
         fig.savefig(save_path, bbox_inches="tight")
@@ -213,10 +196,6 @@ def show_circle_nerve(
 
     return fig, ax
 
-
-# ============================================================
-# Helpers (used by bundle wrappers)
-# ============================================================
 
 def _edges_to_adj(n: int, edges: list[tuple[int, int]]) -> list[set[int]]:
     adj = [set() for _ in range(n)]
@@ -232,14 +211,9 @@ def _edges_to_adj(n: int, edges: list[tuple[int, int]]) -> list[set[int]]:
 
 
 def is_single_cycle_graph(n: int, edges: list[tuple[int, int]]) -> tuple[bool, str]:
-    """
-    Check whether the undirected graph is a single cycle on all n vertices.
-    Conditions:
-      - connected
-      - every vertex degree == 2
-      - |E| == n
-    """
-    E = {canon_edge(a, b) for (a, b) in edges if int(a) != int(b)}
+    """Check whether the undirected graph is a single cycle on all n vertices."""
+    n = int(n)
+    E = {canon_edge(int(a), int(b)) for (a, b) in edges if int(a) != int(b)}
     if n == 0:
         return False, "n=0"
     if len(E) != n:
@@ -251,7 +225,6 @@ def is_single_cycle_graph(n: int, edges: list[tuple[int, int]]) -> tuple[bool, s
         bad = [i for i, d in enumerate(degs) if d != 2]
         return False, f"not 2-regular (bad vertices: {bad[:10]}...)"
 
-    # connectivity via DFS
     seen = set()
     stack = [0]
     while stack:
@@ -267,12 +240,12 @@ def is_single_cycle_graph(n: int, edges: list[tuple[int, int]]) -> tuple[bool, s
 
 
 def cycle_order_from_edges(n: int, edges: list[tuple[int, int]], start: int = 0) -> list[int]:
-    """
-    Given a single cycle graph on {0..n-1}, return cyclic order of vertices.
-    """
-    E = {canon_edge(a, b) for (a, b) in edges if int(a) != int(b)}
+    """Given a single-cycle graph on {0..n-1}, return a cyclic order of vertices."""
+    n = int(n)
+    E = {canon_edge(int(a), int(b)) for (a, b) in edges if int(a) != int(b)}
     adj = _edges_to_adj(n, list(E))
 
+    start = int(start)
     if not (0 <= start < n):
         start = 0
 
@@ -291,21 +264,30 @@ def cycle_order_from_edges(n: int, edges: list[tuple[int, int]], start: int = 0)
     return order
 
 
-def reindex_edges(edges: Optional[list[tuple[int, int]]], old_to_new: dict[int, int]) -> Optional[list[tuple[int, int]]]:
+def reindex_edges(
+    edges: Optional[list[tuple[int, int]]],
+    old_to_new: dict[int, int],
+) -> Optional[list[tuple[int, int]]]:
     if edges is None:
         return None
     out = []
     for (a, b) in edges:
-        a2 = old_to_new[int(a)]
-        b2 = old_to_new[int(b)]
-        out.append(canon_edge(a2, b2))
+        if int(a) not in old_to_new or int(b) not in old_to_new:
+            raise KeyError(f"Missing vertex in old_to_new for edge {(a, b)}")
+        out.append(canon_edge(old_to_new[int(a)], old_to_new[int(b)]))
     return out
 
 
 def reindex_vertex_dict(d: dict[int, Any] | None, old_to_new: dict[int, int]) -> dict[int, Any] | None:
     if d is None:
         return None
-    return {old_to_new[int(k)]: v for k, v in d.items()}
+    out: dict[int, Any] = {}
+    for k, v in d.items():
+        kk = int(k)
+        if kk not in old_to_new:
+            raise KeyError(f"Missing vertex in old_to_new for vertex {kk}")
+        out[old_to_new[kk]] = v
+    return out
 
 
 def reindex_edge_dict(
@@ -316,7 +298,8 @@ def reindex_edge_dict(
         return None
     out: dict[tuple[int, int], Any] = {}
     for (a, b), v in d.items():
-        a2 = old_to_new[int(a)]
-        b2 = old_to_new[int(b)]
-        out[canon_edge(a2, b2)] = v
+        aa, bb = int(a), int(b)
+        if aa not in old_to_new or bb not in old_to_new:
+            raise KeyError(f"Missing vertex in old_to_new for edge {(a, b)}")
+        out[canon_edge(old_to_new[aa], old_to_new[bb])] = v
     return out

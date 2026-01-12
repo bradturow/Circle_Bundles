@@ -1,6 +1,8 @@
+# synthetic/tori_and_kb.py
 from __future__ import annotations
 
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, Union
+
 import numpy as np
 
 __all__ = [
@@ -26,6 +28,11 @@ def const(value: float) -> AngleFunc:
 
 
 def small_to_big(smallest: float, largest: float) -> AngleFunc:
+    """
+    V-shaped function with maximum at angle=pi and minimum at angle=0,2pi.
+
+    Returns values in [smallest, largest] for angles in [0,2pi].
+    """
     smallest_f = float(smallest)
     largest_f = float(largest)
     slope = (smallest_f - largest_f) / np.pi
@@ -45,7 +52,10 @@ def sample_R3_torus(
     r_func: AngleFunc = const(2.0),
     rng: Optional[np.random.Generator] = None,
     return_theta: bool = False,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Union[
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
     """
     Sample a (possibly variable radii) torus in R^3.
 
@@ -56,25 +66,25 @@ def sample_R3_torus(
     alpha : (n_points,)
     theta : (n_points,)  (if return_theta=True)
     """
+    n_points = int(n_points)
     if n_points <= 0:
         raise ValueError(f"n_points must be positive. Got {n_points}.")
 
     rng = np.random.default_rng() if rng is None else rng
 
-    angles = 2 * np.pi * rng.random((n_points, 2))
+    angles = 2.0 * np.pi * rng.random((n_points, 2))
     alpha = angles[:, 0]
     theta = angles[:, 1]
 
     R_vals = np.asarray(R_func(alpha), dtype=float)
     r_vals = np.asarray(r_func(theta), dtype=float)
-
     if R_vals.shape != (n_points,) or r_vals.shape != (n_points,):
         raise ValueError(
             "R_func and r_func must return arrays of shape (n_points,) "
             "when given (n_points,) input."
         )
 
-    if noise_sigma != 0:
+    if noise_sigma != 0.0:
         r_vals = r_vals + rng.normal(loc=0.0, scale=float(noise_sigma), size=n_points)
 
     cth = np.cos(theta)
@@ -101,7 +111,10 @@ def sample_S3_torus(
     rng: Optional[np.random.Generator] = None,
     project_back: bool = False,
     return_theta: bool = False,
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray] | Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Union[
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
     """
     Sample a Clifford-torus-style embedding in S^3 ⊂ R^4 with base angle theta ∈ [0, π).
 
@@ -112,18 +125,20 @@ def sample_S3_torus(
     alpha : (n_points,)
     theta : (n_points,) (if return_theta=True)
     """
+    n_points = int(n_points)
     if n_points <= 0:
         raise ValueError(f"n_points must be positive. Got {n_points}.")
 
     rng = np.random.default_rng() if rng is None else rng
 
-    angles = 2 * np.pi * rng.random((n_points, 2))
+    angles = 2.0 * np.pi * rng.random((n_points, 2))
     alpha = angles[:, 0].copy()
     theta = angles[:, 1].copy()
 
+    # Fold theta into [0, pi) and adjust alpha accordingly.
     mask = theta > np.pi
     theta[mask] = theta[mask] - np.pi
-    alpha[mask] = (alpha[mask] - np.pi) % (2 * np.pi)
+    alpha[mask] = (alpha[mask] - np.pi) % (2.0 * np.pi)
 
     ca = np.cos(alpha)
     sa = np.sin(alpha)
@@ -136,7 +151,7 @@ def sample_S3_torus(
     data[:, 2] = st * ca
     data[:, 3] = st * sa
 
-    if noise_sigma != 0:
+    if noise_sigma != 0.0:
         data = data + rng.normal(loc=0.0, scale=float(noise_sigma), size=data.shape)
 
     if project_back:
@@ -159,7 +174,11 @@ def sample_R4_kb(
     rng: Optional[np.random.Generator] = None,
     return_theta: bool = False,
     return_alpha: bool = False,
-) -> Tuple[np.ndarray, np.ndarray] | Tuple[np.ndarray, np.ndarray, np.ndarray] | Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> Union[
+    Tuple[np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
     """
     Sample a (variable radii) Klein bottle embedding in R^4.
 
@@ -170,25 +189,25 @@ def sample_R4_kb(
     theta : (n_points,) (optional)
     alpha : (n_points,) (optional)
     """
+    n_points = int(n_points)
     if n_points <= 0:
         raise ValueError(f"n_points must be positive. Got {n_points}.")
 
     rng = np.random.default_rng() if rng is None else rng
 
-    angles = 2 * np.pi * rng.random((n_points, 2))
+    angles = 2.0 * np.pi * rng.random((n_points, 2))
     alpha = angles[:, 0]
     theta = angles[:, 1]
 
     R_vals = np.asarray(R_func(alpha), dtype=float)
     r_vals = np.asarray(r_func(theta), dtype=float)
-
     if R_vals.shape != (n_points,) or r_vals.shape != (n_points,):
         raise ValueError(
             "R_func and r_func must return arrays of shape (n_points,) "
             "when given (n_points,) input."
         )
 
-    if noise_sigma != 0:
+    if noise_sigma != 0.0:
         r_vals = r_vals + rng.normal(loc=0.0, scale=float(noise_sigma), size=n_points)
 
     ct = np.cos(theta)
@@ -206,9 +225,10 @@ def sample_R4_kb(
 
     base_points = np.column_stack([ct, st])
 
-    out = (data, base_points)
+    if return_theta and return_alpha:
+        return data, base_points, theta, alpha
     if return_theta:
-        out = (*out, theta)
+        return data, base_points, theta
     if return_alpha:
-        out = (*out, alpha)
-    return out
+        return data, base_points, alpha
+    return data, base_points

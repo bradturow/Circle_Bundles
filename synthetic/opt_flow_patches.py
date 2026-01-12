@@ -1,3 +1,4 @@
+# synthetic/opt_flow_patches.py
 from __future__ import annotations
 
 from typing import Optional, Tuple
@@ -7,14 +8,11 @@ import numpy as np
 __all__ = ["sample_opt_flow_torus", "make_flow_patches"]
 
 
-def _fold_theta_alpha_to_rp1(
-    alpha: np.ndarray,
-    theta: np.ndarray,
-) -> Tuple[np.ndarray, np.ndarray]:
+def _fold_theta_alpha_to_rp1(alpha: np.ndarray, theta: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     """
     Fold theta into [0, pi) (RP^1 base angle), and adjust alpha so the map is consistent.
 
-    Convention (matches your code):
+    Convention:
       if theta > pi:
           theta <- theta - pi
           alpha <- (alpha - pi) mod 2pi
@@ -39,10 +37,6 @@ def sample_opt_flow_torus(
     Sample a torus embedded in S^{2*dim^2 - 1} (optical-flow patch model),
     with RP^1 base angle theta folded to [0, pi).
 
-    Assumes you have:
-        get_dct_basis(dim, normalize=True, opt_flow=True, top_two=True)
-    returning (e1u, e2u, e1v, e2v) as flat vectors of length dim^2.
-
     Returns
     -------
     data : (n_points, 2*dim^2) ndarray
@@ -52,6 +46,8 @@ def sample_opt_flow_torus(
     alpha : (n_points,) ndarray
         Fiber angle used for each sample (after folding adjustment).
     """
+    n_points = int(n_points)
+    dim = int(dim)
     if n_points <= 0:
         raise ValueError(f"n_points must be positive. Got {n_points}.")
     if dim <= 0:
@@ -64,11 +60,11 @@ def sample_opt_flow_torus(
     theta0 = angles[:, 1]
     alpha, theta = _fold_theta_alpha_to_rp1(alpha0, theta0)
 
+    # Local import keeps synthetic usable even if optical_flow isn't installed.
     from optical_flow.contrast import get_dct_basis
 
     e1u, e2u, e1v, e2v = get_dct_basis(dim, normalize=True, opt_flow=True, top_two=True)
 
-    # u,v are (n_points, dim^2) each
     u = np.outer(np.cos(alpha), e1u) + np.outer(np.sin(alpha), e2u)
     v = np.outer(np.cos(alpha), e1v) + np.outer(np.sin(alpha), e2v)
 
@@ -96,7 +92,7 @@ _E1U_3x3 = (1 / np.sqrt(6)) * np.array(
 _E2U_3x3 = (1 / np.sqrt(6)) * np.array(
     [1, 1,  1,
      0, 0,  0,
-    -1,-1, -1,
+    -1, -1, -1,
      0, 0,  0,
      0, 0,  0,
      0, 0,  0],
@@ -107,9 +103,9 @@ _E1V_3x3 = (1 / np.sqrt(6)) * np.array(
     [0, 0, 0,
      0, 0, 0,
      0, 0, 0,
-     1, 0,-1,
-     1, 0,-1,
-     1, 0,-1],
+     1, 0, -1,
+     1, 0, -1,
+     1, 0, -1],
     dtype=float,
 )
 
@@ -119,7 +115,7 @@ _E2V_3x3 = (1 / np.sqrt(6)) * np.array(
      0, 0, 0,
      1, 1, 1,
      0, 0, 0,
-    -1,-1,-1],
+    -1, -1, -1],
     dtype=float,
 )
 
@@ -130,23 +126,13 @@ def make_flow_patches(
     r: Optional[np.ndarray] = None,
 ) -> np.ndarray:
     """
-    Generate samples from your extended torus optical-flow patch model (3x3, length 18).
+    Generate samples from the extended torus optical-flow patch model (3x3, length 18).
 
-    This matches the hardwired basis you had in the notebook. It folds theta into [0, pi)
-    (RP^1 base) and adjusts alpha accordingly.
+    Folds theta into [0, pi) (RP^1 base) and adjusts alpha accordingly.
 
     If r is provided, it mixes a patch with a perpendicular patch:
         patches_mix = λ * patches + sqrt(1-λ^2) * patches_perp
-    where λ = 1/sqrt(2-r). (Same formula you used.)
-
-    Parameters
-    ----------
-    alpha, theta : (N,) arrays
-    r : (N,) array or None
-
-    Returns
-    -------
-    data : (N, 18) ndarray
+    where λ = 1/sqrt(2-r).
     """
     alpha, theta = _fold_theta_alpha_to_rp1(alpha, theta)
 
@@ -166,15 +152,20 @@ def make_flow_patches(
         return patches
 
     r = np.asarray(r, dtype=float).reshape(-1)
-    if r.shape[0] != patches.shape[0]:
-        raise ValueError(f"r must have shape (N,), got {r.shape} vs N={patches.shape[0]}.")
+    N = patches.shape[0]
+    if r.shape != (N,):
+        raise ValueError(f"r must have shape (N,), got {r.shape} vs N={N}.")
 
-    # Perp patch = (alpha + pi/2, theta - pi/2), using same folding convention.
+    # Perp patch = (alpha + pi/2, theta - pi/2), then re-fold.
     alpha_perp = alpha + (np.pi / 2.0)
     theta_perp = theta - (np.pi / 2.0)
     alpha_perp, theta_perp = _fold_theta_alpha_to_rp1(alpha_perp, theta_perp)
     perp = _core(alpha_perp, theta_perp)
 
-    lamb = 1.0 / np.sqrt(2.0 - r)
-    lamb2 = np.sqrt(np.maximum(0.0, 1.0 - lamb ** 2))
+    denom = 2.0 - r
+    if np.any(denom <= 0.0):
+        raise ValueError("r must satisfy r < 2 everywhere (so that 2-r is positive).")
+
+    lamb = 1.0 / np.sqrt(denom)
+    lamb2 = np.sqrt(np.maximum(0.0, 1.0 - lamb**2))
     return patches * lamb[:, None] + perp * lamb2[:, None]

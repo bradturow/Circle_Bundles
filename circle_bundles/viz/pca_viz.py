@@ -1,6 +1,7 @@
+# circle_bundles/viz/pca_viz.py
 from __future__ import annotations
 
-from typing import List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
 import plotly.graph_objects as go
@@ -24,88 +25,69 @@ def show_pca(
     jitter_eps: float = 1e-3,
     tol_flat_z: float = 1e-6,
     random_state: int = 0,
-) -> None:
+    # --- behavior ---
+    show: bool = True,
+    return_figs: bool = False,
+) -> Tuple[go.Figure, plt.Figure] | None:
     """
-    Fast-ish PCA visualization:
+    PCA visualization:
 
-    1) Fits PCA (optionally randomized) on the full dataset, but only up to
-       `max_components` components (or fewer if limited by n_samples/dim).
-    2) 3D Plotly scatter of the first 3 PCs, plotting at most `max_points` points
-       (downsampled uniformly at random if needed).
-    3) Minimal Matplotlib plot: k vs cumulative explained variance (for the
-       computed components only).
-    4) Prints cumulative explained variance for k=1,2,3 (within computed range).
+    - Fit PCA on full data (up to max_components).
+    - Plot first 3 PCs in Plotly, using up to max_points points.
+    - Plot cumulative explained variance (up to computed components) in Matplotlib.
+    - Print CEV for k=1,2,3 (if available).
 
-    Notes
-    -----
-    - If d is huge (e.g. 32^3 = 32768), exact PCA is expensive. Randomized PCA
-      is usually much faster and accurate for the top components.
-    - The cumulative explained variance curve is only computed up to
-      `max_components`, not all the way to 100% unless you set max_components
-      very large (which will be slow).
-
-    Parameters
-    ----------
-    data : (n_samples, d)
-    colors : optional length-n_samples, Plotly-accepted colors (numbers or strings).
-             If U is provided and colors is None, we color per-set.
-    U : optional (n_sets, n_samples) boolean mask for subset traces.
-        If provided, trace toggling works; downsampling is applied consistently.
-    titles : optional list of trace names (length n_sets).
-    max_points : maximum number of points to plot in the 3D scatter.
-    max_components : maximum number of PCA components to compute (for EV curve).
-    use_randomized : if True, uses randomized SVD solver.
-    n_iter : power iterations for randomized SVD (higher = more accurate, slower).
+    If U is provided, renders one trace per set (toggleable).
     """
+
     X = np.asarray(data, dtype=float)
     if X.ndim != 2:
         raise ValueError("show_pca expects a 2D array of shape (n_samples, d).")
     n, d = X.shape
-    if n == 0:
+    if n <= 0:
         raise ValueError("show_pca received empty data (n_samples=0).")
 
-    # Ensure at least 3 columns for plotting
+    # pad to at least 3 dims so we can always plot 3 PCs
     if d < 3:
         X = np.hstack([X, np.zeros((n, 3 - d), dtype=float)])
         d = 3
 
-    # Decide number of components to compute
     n_components = int(min(max_components, n, d))
     if n_components < 1:
         raise ValueError("Not enough samples/dimensions to compute PCA.")
 
-    # Fit PCA on full X
-    if use_randomized:
-        pca = PCA(
-            n_components=n_components,
-            svd_solver="randomized",
-            random_state=random_state,
-            iterated_power=n_iter,
-        )
-    else:
-        pca = PCA(n_components=n_components)
-
+    pca = PCA(
+        n_components=n_components,
+        svd_solver="randomized" if use_randomized else "auto",
+        random_state=random_state if use_randomized else None,
+        iterated_power=n_iter if use_randomized else "auto",
+    )
     pca.fit(X)
-    ev = pca.explained_variance_ratio_
+
+    ev = np.asarray(pca.explained_variance_ratio_, dtype=float)
     cev = np.cumsum(ev)
 
-    # Downsample for plotting (but keep EV computed on full data)
-    if max_points is not None and n > max_points:
+    # ---------- choose plot subset ----------
+    if max_points is not None and n > int(max_points):
         rng = np.random.default_rng(random_state)
         idx_plot = rng.choice(n, size=int(max_points), replace=False)
-        idx_plot.sort()  # stable ordering for nicer toggling behavior
+        idx_plot.sort()
     else:
         idx_plot = np.arange(n)
 
     X_plot = X[idx_plot]
-    Z = pca.transform(X_plot)[:, :3]
+    Z = pca.transform(X_plot)
+    # ensure we have at least 3 columns
+    if Z.shape[1] < 3:
+        Z = np.hstack([Z, np.zeros((Z.shape[0], 3 - Z.shape[1]), dtype=float)])
+    Z3 = Z[:, :3]
 
     # Jitter if z is basically constant
-    if np.std(Z[:, 2]) < tol_flat_z:
+    if np.std(Z3[:, 2]) < float(tol_flat_z):
         rng = np.random.default_rng(random_state)
-        Z[:, 2] += jitter_eps * rng.standard_normal(Z.shape[0])
+        Z3[:, 2] += float(jitter_eps) * rng.standard_normal(Z3.shape[0])
 
-    # Handle U / titles / colors for plotting (on the downsampled subset)
+    # ---------- handle U / colors ----------
     use_U = U is not None and np.size(U) > 0
     if use_U:
         U_bool = np.asarray(U, dtype=bool)
@@ -134,6 +116,7 @@ def show_pca(
             set_colors = None
     else:
         U_plot = None
+        set_colors = None
         if colors is not None:
             colors_arr = np.asarray(colors, dtype=object)
             if colors_arr.shape[0] != n:
@@ -142,8 +125,8 @@ def show_pca(
         else:
             colors_plot = None
 
-    # ----- Plotly 3D scatter -----
-    fig = go.Figure()
+    # ---------- Plotly 3D scatter ----------
+    fig3d = go.Figure()
 
     if use_U and U_plot is not None:
         for j in range(U_plot.shape[0]):
@@ -151,49 +134,42 @@ def show_pca(
             if idx.size == 0:
                 continue
 
-            if colors is None:
-                c = set_colors[j]
-            else:
-                c = colors_plot[idx]
-
-            fig.add_trace(
+            c = set_colors[j] if colors is None else colors_plot[idx]
+            fig3d.add_trace(
                 go.Scatter3d(
-                    x=Z[idx, 0], y=Z[idx, 1], z=Z[idx, 2],
+                    x=Z3[idx, 0], y=Z3[idx, 1], z=Z3[idx, 2],
                     mode="markers",
-                    marker=dict(size=size, color=c, opacity=0.85),
+                    marker=dict(size=float(size), color=c, opacity=0.85),
                     name=titles[j],
                 )
             )
     else:
-        fig.add_trace(
+        fig3d.add_trace(
             go.Scatter3d(
-                x=Z[:, 0], y=Z[:, 1], z=Z[:, 2],
+                x=Z3[:, 0], y=Z3[:, 1], z=Z3[:, 2],
                 mode="markers",
-                marker=dict(size=size, color=colors_plot, opacity=0.85),
+                marker=dict(size=float(size), color=colors_plot, opacity=0.85),
                 name="data",
             )
         )
 
-    fig.update_layout(
+    fig3d.update_layout(
         scene=dict(aspectmode="data"),
         legend=dict(x=0, y=1),
         margin=dict(l=0, r=0, t=30, b=0),
-        title=f"PCA (first 3 components) | fit k={n_components} | plotted n={len(idx_plot)}",
+        title=f"PCA (first 3 PCs) | fit k={n_components} | plotted n={len(idx_plot)}",
     )
-    fig.show()
 
-    # ----- Minimal cumulative EV plot (up to n_components) -----
+    # ---------- Matplotlib CEV ----------
     ks = np.arange(1, n_components + 1)
-    plt.figure()
+    fig_ev = plt.figure()
     plt.plot(ks, cev)
     plt.xlabel("Number of Components (k)")
     plt.ylabel("Cumulative Explained Variance")
     plt.ylim(0.0, 1.01)
     plt.title("Cumulative Explained Variance vs k")
     plt.grid(True)
-    plt.show()
 
-    # ----- Print cumulative EV for first three components (if available) -----
     def _cev_at(k: int) -> float:
         return float(cev[k - 1]) if len(cev) >= k else float("nan")
 
@@ -201,6 +177,14 @@ def show_pca(
     print(f"  k=1: {_cev_at(1):.4f}")
     print(f"  k=2: {_cev_at(2):.4f}")
     print(f"  k=3: {_cev_at(3):.4f}")
-
     if n_components < 3:
         print(f"(Note: only computed up to k={n_components} components.)")
+
+    if show:
+        fig3d.show()
+        plt.show()
+
+    if return_figs:
+        return fig3d, fig_ev
+
+    return None

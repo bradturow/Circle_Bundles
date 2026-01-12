@@ -1,4 +1,4 @@
-# circle_bundles/synthetic/meshes.py
+# synthetic/meshes.py
 from __future__ import annotations
 
 from typing import List, Tuple
@@ -62,16 +62,12 @@ def make_tri_prism(
         end = len(faces)
         face_groups.append((start, end))
 
-    # Bottom face
-    add_face([[A, B, C]])
+    add_face([[A, B, C]])          # bottom
+    add_face([[A_, C_, B_]])       # top (flip winding)
 
-    # Top face (flip winding for outward normals)
-    add_face([[A_, C_, B_]])
-
-    # Side faces (quads triangulated into 2 triangles)
-    add_face([[A, B, B_], [A, B_, A_]])  # AB
-    add_face([[B, C, C_], [B, C_, B_]])  # BC
-    add_face([[C, A, A_], [C, A_, C_]])  # CA
+    add_face([[A, B, B_], [A, B_, A_]])  # side AB
+    add_face([[B, C, C_], [B, C_, B_]])  # side BC
+    add_face([[C, A, A_], [C, A_, C_]])  # side CA
 
     mesh = trimesh.Trimesh(vertices=vertices, faces=np.asarray(faces, dtype=int), process=False)
     return mesh, face_groups
@@ -98,11 +94,11 @@ def make_star_pyramid(
     -------
     mesh : trimesh.Trimesh
     """
+    n_points = int(n_points)
     if n_points < 3 or (n_points % 2 != 1):
         raise ValueError("n_points must be odd and >= 3.")
 
-    n_outer = int(n_points)
-    m = 2 * n_outer
+    m = 2 * n_points
 
     angles = np.linspace(0.0, 2 * np.pi, num=m, endpoint=False)
     radii = np.empty(m, dtype=float)
@@ -156,7 +152,6 @@ def make_star_pyramid(
         j = (i + 1) % m
         vi = int(boundary_indices[i])
         vj = int(boundary_indices[j])
-        # (apex, vj, vi) gives consistent winding if boundary is CCW in yz-plane
         side_faces.append([apex_idx, vj, vi])
 
     faces = np.vstack([base_faces, np.asarray(side_faces, dtype=int)])

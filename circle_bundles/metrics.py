@@ -1,7 +1,7 @@
 # circle_bundles/metrics.py
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Callable, Optional, Protocol, Union
 
 import numpy as np
@@ -13,7 +13,7 @@ except Exception:  # pragma: no cover
 
 
 # ============================================================
-# Vectorized metric objects 
+# Vectorized metric objects
 # ============================================================
 
 class Metric(Protocol):
@@ -98,10 +98,9 @@ class RP2UnitVectorMetric:
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
 
-        if _cdist is None:
-            raise ImportError("SciPy not available, but RP2UnitVectorMetric uses scipy.spatial.distance.cdist.")
-        Dpos = _cdist(X, Y)
-        Dneg = _cdist(X, -Y)
+        # Pure numpy (no SciPy dependency)
+        Dpos = np.linalg.norm(X[:, None, :] - Y[None, :, :], axis=-1)
+        Dneg = np.linalg.norm(X[:, None, :] + Y[None, :, :], axis=-1)
         return np.minimum(Dpos, Dneg)
 
 
@@ -144,12 +143,11 @@ def as_metric(metric: Union["Metric", Callable, None]) -> "Metric":
     if hasattr(metric, "pairwise"):
         return metric  # type: ignore[return-value]
     return SciPyCdistMetric(metric=metric, name=getattr(metric, "__name__", "custom_metric"))
-    
-    
+
+
 # ============================================================
-# Quotient metrics 
+# Quotient metrics
 # ============================================================
-    
 
 ActionFn = Callable[[np.ndarray], np.ndarray]
 
@@ -234,9 +232,11 @@ def RP2_TrivialMetric() -> Z2QuotientMetricR5:
     """Trivial circle bundle over RP^2: (v,z)~(-v,z)."""
     return Z2QuotientMetricR5(action=act_base_only, name="RP2xS1")
 
+
 def RP2_TwistMetric() -> Z2QuotientMetricR5:
     """Orientable nontrivial (monodromy -1): (v,z)~(-v,-z)."""
     return Z2QuotientMetricR5(action=act_pi_twist, name="RP2_Twist")
+
 
 def RP2_FlipMetric() -> Z2QuotientMetricR5:
     """Non-orientable (reflection on fiber): (v,z)~(-v,conj z)."""
@@ -305,6 +305,11 @@ def _unit_quat_from_axis_angle(v: np.ndarray, theta: float, *, eps: float = 1e-1
     return np.array([np.cos(theta), *(np.sin(theta) * vhat)], dtype=float)
 
 
+def _default_v_axis() -> np.ndarray:
+    # default v = e1 (consistent with your hopf_projection default)
+    return np.array([1.0, 0.0, 0.0], dtype=float)
+
+
 @dataclass(frozen=True)
 class ZpHopfQuotientMetricS3:
     """
@@ -319,16 +324,24 @@ class ZpHopfQuotientMetricS3:
     Inputs are unit quaternions in R^4 with convention (a,b,c,d).
     """
     p: int
-    v_axis: np.ndarray = np.array([1.0, 0.0, 0.0])  # matches your hopf_projection default v=e1
+    v_axis: np.ndarray = field(default_factory=_default_v_axis)
     base: str = "geodesic"  # "geodesic" or "chordal"
     name: str = "ZpHopfQuotientMetricS3"
     eps: float = 1e-12
 
     def __post_init__(self) -> None:
-        if int(self.p) <= 0:
+        p = int(self.p)
+        if p <= 0:
             raise ValueError(f"p must be positive. Got {self.p}.")
         if self.base not in ("geodesic", "chordal"):
             raise ValueError(f"base must be 'geodesic' or 'chordal'. Got {self.base}.")
+
+        v = np.asarray(self.v_axis, dtype=float).reshape(3,)
+        nv = max(np.linalg.norm(v), self.eps)
+        v = v / nv
+
+        object.__setattr__(self, "p", p)
+        object.__setattr__(self, "v_axis", v)
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
@@ -344,13 +357,9 @@ class ZpHopfQuotientMetricS3:
         Yn = _safe_normalize_rows(Y0, eps=self.eps)
 
         # Choose base distance on S^3
-        if self.base == "geodesic":
-            dist_fn = _s3_geodesic_pairwise
-        else:
-            dist_fn = _s3_chordal_pairwise
+        dist_fn = _s3_geodesic_pairwise if self.base == "geodesic" else _s3_chordal_pairwise
 
-        # Precompute powers g^m (as unit quaternions)
-        # g = exp(v * 2pi/p)
+        # Precompute powers g^m (as unit quaternions): g = exp(v * 2pi/p)
         theta0 = 2.0 * np.pi / float(self.p)
         gs = np.stack(
             [_unit_quat_from_axis_angle(self.v_axis, m * theta0, eps=self.eps) for m in range(self.p)],
@@ -366,6 +375,7 @@ class ZpHopfQuotientMetricS3:
 
         return Dmin
 
+
 def _pick_u_perp_v(v_axis: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     """
     Choose a unit 3-vector u ⟂ v_axis in a deterministic way.
@@ -375,7 +385,6 @@ def _pick_u_perp_v(v_axis: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     nv = max(np.linalg.norm(v), eps)
     v = v / nv
 
-    # pick a helper vector not parallel to v
     a = np.array([1.0, 0.0, 0.0])
     if abs(np.dot(a, v)) > 0.9:
         a = np.array([0.0, 1.0, 0.0])
@@ -407,7 +416,7 @@ class Z2LensAntipodalQuotientMetricS3:
         d([x],[y]) = min_{e in {id,tau}} min_{m=0..p-1} d_S3(x, e(y) * g^m)
     """
     p: int
-    v_axis: np.ndarray = np.array([1.0, 0.0, 0.0])
+    v_axis: np.ndarray = field(default_factory=_default_v_axis)
     base: str = "geodesic"  # "geodesic" or "chordal"
     name: str = "Z2LensAntipodalQuotientMetricS3"
     eps: float = 1e-12
@@ -422,6 +431,20 @@ class Z2LensAntipodalQuotientMetricS3:
         if self.base not in ("geodesic", "chordal"):
             raise ValueError(f"base must be 'geodesic' or 'chordal'. Got {self.base}.")
 
+        v = np.asarray(self.v_axis, dtype=float).reshape(3,)
+        nv = max(np.linalg.norm(v), self.eps)
+        v = v / nv
+
+        ua = None
+        if self.u_axis is not None:
+            ua = np.asarray(self.u_axis, dtype=float).reshape(3,)
+            nua = max(np.linalg.norm(ua), self.eps)
+            ua = ua / nua
+
+        object.__setattr__(self, "p", p)
+        object.__setattr__(self, "v_axis", v)
+        object.__setattr__(self, "u_axis", ua)
+
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
         Y0 = X if Y is None else np.asarray(Y, dtype=float)
@@ -434,7 +457,6 @@ class Z2LensAntipodalQuotientMetricS3:
         Xn = _safe_normalize_rows(X, eps=self.eps)
         Yn = _safe_normalize_rows(Y0, eps=self.eps)
 
-        # base S^3 distance
         dist_fn = _s3_geodesic_pairwise if self.base == "geodesic" else _s3_chordal_pairwise
 
         # generator g = exp(v * 2pi/p)
@@ -444,8 +466,9 @@ class Z2LensAntipodalQuotientMetricS3:
             axis=0,
         )  # (p,4)
 
-        # choose u ⟂ v so that u v u^{-1} = -v
-        u_axis = _pick_u_perp_v(self.v_axis, eps=self.eps) if self.u_axis is None else np.asarray(self.u_axis, dtype=float).reshape(3,)
+        # choose u ⟂ v
+        u_axis = _pick_u_perp_v(self.v_axis, eps=self.eps) if self.u_axis is None else self.u_axis
+        assert u_axis is not None
         u_axis = u_axis / max(np.linalg.norm(u_axis), self.eps)
 
         # Two representatives for Y-orbit: Y and tau(Y)=Y*u
@@ -462,9 +485,8 @@ class Z2LensAntipodalQuotientMetricS3:
         D0 = min_over_zp(Yn)
         D1 = min_over_zp(Ytau)
         return np.minimum(D0, D1)
-    
 
-    
+
 def S3QuotientMetric(
     p: int,
     *,
@@ -524,32 +546,38 @@ def S3QuotientMetric(
         base=base,
         name=name or f"S3/Z_{p}",
     )
-    
-    
+
+
 # ============================================================
-# Old existing scalar / vector metric functions 
+# Old existing scalar / vector metric functions
 # ============================================================
 
 def S1_dist(theta1, theta2):
     d = np.abs(theta2 - theta1)
     return np.minimum(d, 2 * np.pi - d)
 
+
 def RP1_dist(theta1, theta2):
     d = np.abs(theta2 - theta1)
     return np.minimum(d, np.pi - d)
 
+
 def S1_dist2(p, q):
     return np.arccos(np.clip(np.dot(p, q), -1.0, 1.0))
+
 
 def RP1_dist2(p, q):
     ang = np.arccos(np.clip(np.dot(p, q), -1.0, 1.0))
     return np.minimum(ang, np.pi - ang)
 
+
 def Euc_met(p, q):
     return np.linalg.norm(p - q)
 
+
 def RP2_dist(p, q):
     return min(np.linalg.norm(p - q), np.linalg.norm(p + q))
+
 
 def T2_dist(p, q):
     diff = np.abs(p - q)

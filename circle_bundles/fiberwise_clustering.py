@@ -2,13 +2,9 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
-import networkx as nx
-from sklearn.cluster import DBSCAN
-from sklearn.decomposition import PCA
 
 __all__ = [
     "safe_add_edges",
@@ -22,13 +18,41 @@ __all__ = [
 
 
 # ---------------------------------
+# Internal: dependency guards
+# ---------------------------------
+
+def _require_networkx():
+    try:
+        import networkx as nx  # type: ignore
+    except Exception as e:  # pragma: no cover
+        raise ImportError(
+            "fiberwise_clustering requires networkx. Install with `pip install networkx`."
+        ) from e
+    return nx
+
+
+def _require_sklearn():
+    try:
+        from sklearn.cluster import DBSCAN  # type: ignore
+        from sklearn.decomposition import PCA  # type: ignore
+    except Exception as e:  # pragma: no cover
+        raise ImportError(
+            "fiberwise_clustering requires scikit-learn. Install with `pip install scikit-learn`."
+        ) from e
+    return DBSCAN, PCA
+
+
+# ---------------------------------
 # Graph construction helpers
 # ---------------------------------
 
-def safe_add_edges(G: nx.Graph, U: np.ndarray, cl: np.ndarray) -> None:
+def safe_add_edges(G, U: np.ndarray, cl: np.ndarray) -> None:
     """
     Add edges between cluster-nodes (j, c_j) and (k, c_k) when fibers j,k
     share at least one sample that is non-noise in BOTH fibers.
+
+    Node convention:
+      node = (fiber_index, cluster_label)
 
     Edge attributes:
       - indices_shared : sorted list of sample indices supporting the edge
@@ -39,6 +63,7 @@ def safe_add_edges(G: nx.Graph, U: np.ndarray, cl: np.ndarray) -> None:
     if cl.shape != (n_fibers, n_samples):
         raise ValueError(f"cl must have shape {U.shape}, got {cl.shape}")
 
+    # Accumulate shared indices per (u,v) edge deterministically
     shared: Dict[Tuple[Tuple[int, int], Tuple[int, int]], List[int]] = defaultdict(list)
 
     for k in range(n_fibers):
@@ -63,6 +88,7 @@ def safe_add_edges(G: nx.Graph, U: np.ndarray, cl: np.ndarray) -> None:
             for idx, a, b in zip(inds, cj, ck):
                 u = (j, int(a))
                 v = (k, int(b))
+                # Only connect clusters that exist as nodes
                 if (u not in G) or (v not in G):
                     continue
                 key = (u, v) if u <= v else (v, u)  # deterministic undirected key
@@ -78,7 +104,7 @@ def safe_add_edges(G: nx.Graph, U: np.ndarray, cl: np.ndarray) -> None:
             G.add_edge(u, v, indices_shared=idxs_sorted)
 
 
-def get_weights(G: nx.Graph, method: str = "cardinality") -> nx.Graph:
+def get_weights(G, method: str = "cardinality"):
     """
     Assign/overwrite edge 'weight' based on overlap of endpoint node memberships.
 
@@ -86,25 +112,39 @@ def get_weights(G: nx.Graph, method: str = "cardinality") -> nx.Graph:
       - 'cardinality' : |A ∩ B|
       - 'rel_card'    : |A ∩ B| / min(|A|,|B|)
       - 'rel_card2'   : |A ∩ B| / ((|A|+|B|)/2)
+
+    Notes
+    -----
+    If present, uses edge attribute 'indices_shared' as the overlap evidence
+    (faster + consistent with safe_add_edges()).
     """
     if method not in {"cardinality", "rel_card", "rel_card2"}:
         raise ValueError("method must be one of: 'cardinality', 'rel_card', 'rel_card2'")
 
     for u, v, data in G.edges(data=True):
-        Au = set(G.nodes[u].get("indices", []))
-        Av = set(G.nodes[v].get("indices", []))
-        inter = Au & Av
-        inter_size = float(len(inter))
+        # overlap size: prefer indices_shared (created by safe_add_edges)
+        shared = data.get("indices_shared", None)
+        if shared is not None:
+            inter_size = float(len(shared))
+        else:
+            # fallback: compute from node indices
+            Au = set(G.nodes[u].get("indices", []))
+            Av = set(G.nodes[v].get("indices", []))
+            inter_size = float(len(Au & Av))
 
         if method == "cardinality":
             data["weight"] = inter_size
+            continue
 
-        elif method == "rel_card":
-            denom = float(min(len(Au), len(Av)))
+        # endpoint sizes
+        size_u = float(len(G.nodes[u].get("indices", [])))
+        size_v = float(len(G.nodes[v].get("indices", [])))
+
+        if method == "rel_card":
+            denom = float(min(size_u, size_v))
             data["weight"] = inter_size / denom if denom > 0 else 0.0
-
-        elif method == "rel_card2":
-            denom = float((len(Au) + len(Av)) / 2.0)
+        else:  # rel_card2
+            denom = float((size_u + size_v) / 2.0)
             data["weight"] = inter_size / denom if denom > 0 else 0.0
 
     return G
@@ -122,7 +162,7 @@ def fiberwise_clustering(
     *,
     build_pca_embeddings: bool = True,
     pca_dim: int = 2,
-) -> tuple[np.ndarray, nx.Graph, dict, np.ndarray, dict]:
+):
     """
     Fiberwise DBSCAN clustering, then a global cluster-graph built from overlaps.
 
@@ -137,9 +177,10 @@ def fiberwise_clustering(
     -------
     components : (n_samples,) int
         Global component label per sample (based on connected components of the cluster-graph).
+        Unassigned samples remain -1.
     G : nx.Graph
         Nodes are (fiber_idx, cluster_label) with attribute 'indices' (sample indices).
-        Edges indicate overlap; may include 'indices_shared' and later 'weight'.
+        Edges indicate overlap; includes 'indices_shared'.
     graph_dict : dict
         Simple serialization-friendly summary.
     cl : (n_fibers, n_samples) int
@@ -147,22 +188,29 @@ def fiberwise_clustering(
     summary : dict
         Useful arrays and optional PCA embeddings for plotting.
     """
+    nx = _require_networkx()
+    DBSCAN, PCA = _require_sklearn()
+
     U = np.asarray(U, dtype=bool)
     data = np.asarray(data)
     eps_values = np.asarray(eps_values, dtype=float)
     min_sample_values = np.asarray(min_sample_values, dtype=int)
 
     n_fibers, n_samples = U.shape
+    if data.ndim != 2:
+        raise ValueError(f"data must be 2D (n_samples, d). Got shape {data.shape}.")
     if data.shape[0] != n_samples:
         raise ValueError(f"data must have n_samples={n_samples} rows, got {data.shape[0]}")
-    if eps_values.shape[0] != n_fibers or min_sample_values.shape[0] != n_fibers:
-        raise ValueError("eps_values and min_sample_values must have length n_fibers")
+    if eps_values.shape != (n_fibers,):
+        raise ValueError(f"eps_values must have shape ({n_fibers},), got {eps_values.shape}")
+    if min_sample_values.shape != (n_fibers,):
+        raise ValueError(f"min_sample_values must have shape ({n_fibers},), got {min_sample_values.shape}")
 
     cl = -1 * np.ones((n_fibers, n_samples), dtype=int)
     G = nx.Graph()
 
     fiber_component_counts = np.zeros(n_fibers, dtype=int)
-    pca_store: dict[int, dict[str, Any]] = {}
+    pca_store: Dict[int, Dict[str, Any]] = {}
 
     # --- Fiberwise DBSCAN + graph nodes ---
     for r in range(n_fibers):
@@ -184,7 +232,7 @@ def fiberwise_clustering(
             cluster_indices = row_inds[mask]
             G.add_node((r, int(lab)), indices=cluster_indices.tolist())
 
-        if build_pca_embeddings and fiber_pts.shape[0] > 1 and pca_dim > 0:
+        if build_pca_embeddings and fiber_pts.shape[0] > 1 and int(pca_dim) > 0:
             pca = PCA(n_components=int(pca_dim))
             pca_data = pca.fit_transform(fiber_pts)
             pca_store[r] = {"pca": pca_data, "clusters": labels, "row_inds": row_inds}
@@ -192,29 +240,29 @@ def fiberwise_clustering(
     # --- Overlap edges ---
     safe_add_edges(G, U, cl)
 
-    # --- Global components ---
+    # --- Global components: map nodes -> union of their sample indices ---
     components = -1 * np.ones(n_samples, dtype=int)
-    global_component_counts: list[int] = []
-    point_counts: list[int] = []
+    global_component_counts: List[int] = []
+    point_counts: List[int] = []
 
     connected_components = list(nx.connected_components(G))
     for comp_id, comp_nodes in enumerate(connected_components):
         global_component_counts.append(len(comp_nodes))
 
-        all_inds: list[int] = []
+        all_inds: List[int] = []
         for node in comp_nodes:
-            all_inds.extend(G.nodes[node]["indices"])
+            all_inds.extend(G.nodes[node].get("indices", []))
         all_inds = np.unique(all_inds).astype(int)
 
         components[all_inds] = comp_id
         point_counts.append(int(len(all_inds)))
 
-    # --- graph_dict (fix links accumulation!) ---
+    # --- graph_dict (simple serialization) ---
     nodes_dict = {
-        f"fiber{node[0]}_cluster{node[1]}": G.nodes[node]["indices"]
+        f"fiber{node[0]}_cluster{node[1]}": G.nodes[node].get("indices", [])
         for node in G.nodes
     }
-    links_dict: dict[str, list[str]] = defaultdict(list)
+    links_dict: Dict[str, List[str]] = defaultdict(list)
     for u, v in G.edges:
         ku = f"fiber{u[0]}_cluster{u[1]}"
         kv = f"fiber{v[0]}_cluster{v[1]}"
@@ -241,8 +289,8 @@ def fiberwise_clustering(
         "global_component_counts": np.array(global_component_counts, dtype=int),
         "point_counts": np.array(point_counts, dtype=int),
         "pca_store": pca_store,
-        "n_fibers": n_fibers,
-        "n_samples": n_samples,
+        "n_fibers": int(n_fibers),
+        "n_samples": int(n_samples),
     }
 
     return components, G, graph_dict, cl, summary
@@ -355,8 +403,20 @@ def plot_fiberwise_summary_bars(
 # Edge-threshold "persistence" + filtering
 # ---------------------------------
 
+def _ensure_has_weights(G) -> None:
+    # If there are edges but none have a 'weight', warn loudly (or raise).
+    if G.number_of_edges() == 0:
+        return
+    has_any = any(("weight" in data) for _, _, data in G.edges(data=True))
+    if not has_any:
+        raise ValueError(
+            "Graph has no edge weights. Run `get_weights(G, method=...)` first "
+            "or add a 'weight' attribute to each edge."
+        )
+
+
 def get_cluster_persistence(
-    G: nx.Graph,
+    G,
     *,
     show_results: bool = True,
     save_path: Optional[str] = None,
@@ -364,18 +424,23 @@ def get_cluster_persistence(
     """
     Track number of connected components as we remove edges by nondecreasing weight.
 
+    Requires that G edges have 'weight' (e.g. computed by get_weights()).
+
     Returns a list of dicts:
       {'weight': w, 'n_components': int, 'components': [set(nodes), ...]}
     """
+    nx = _require_networkx()
+    _ensure_has_weights(G)
+
     import matplotlib.pyplot as plt
 
     Gc = G.copy()
-    history = []
+    history: List[Dict[str, Any]] = []
 
     comps0 = list(nx.connected_components(Gc))
     history.append({"weight": -np.inf, "n_components": len(comps0), "components": comps0})
 
-    edges_by_w = defaultdict(list)
+    edges_by_w: Dict[float, List[Tuple[Any, Any]]] = defaultdict(list)
     for u, v, data in Gc.edges(data=True):
         w = float(data.get("weight", 0.0))
         edges_by_w[w].append((u, v))
@@ -406,12 +471,12 @@ def get_cluster_persistence(
 
 
 def _separate_intersections_on_removed_edges(
-    G: nx.Graph,
+    G,
     cl: np.ndarray,
     *,
     thresh: float,
     rule: str = "to_smaller_cluster",
-) -> tuple[nx.Graph, np.ndarray, nx.Graph]:
+):
     """
     For each edge with weight <= thresh, split intersection samples so that those samples
     belong to ONLY ONE endpoint cluster (chosen by rule).
@@ -420,19 +485,23 @@ def _separate_intersections_on_removed_edges(
       - 'to_smaller_cluster': keep shared samples in smaller cluster, remove from larger
       - 'to_larger_cluster' : keep shared samples in larger cluster, remove from smaller
     """
+    nx = _require_networkx()
+
     if rule not in ("to_smaller_cluster", "to_larger_cluster"):
         raise ValueError("rule must be 'to_smaller_cluster' or 'to_larger_cluster'")
+
+    _ensure_has_weights(G)
 
     G_clean = G.copy()
     cl_clean = np.array(cl, copy=True)
 
-    edges_to_remove = []
+    edges_to_remove: List[Tuple[Any, Any]] = []
     for u, v, data in G_clean.edges(data=True):
         w = float(data.get("weight", 0.0))
         if w <= float(thresh):
             edges_to_remove.append((u, v))
 
-    removed_from_node: dict[tuple[int, int], set[int]] = defaultdict(set)
+    removed_from_node: Dict[Tuple[int, int], set[int]] = defaultdict(set)
 
     for u, v in edges_to_remove:
         inds_u = set(G_clean.nodes[u].get("indices", []))
@@ -475,7 +544,7 @@ def _separate_intersections_on_removed_edges(
 
 def get_filtered_cluster_graph(
     data: np.ndarray,
-    G: nx.Graph,
+    G,
     cl: np.ndarray,
     *,
     thresh: float,
@@ -488,6 +557,8 @@ def get_filtered_cluster_graph(
     Threshold the weighted cluster graph, separate intersections for removed edges,
     and recompute global components.
 
+    Requires that G edges have 'weight' (e.g. computed by get_weights()).
+
     Returns
     -------
     components_filtered : (n_samples,) int
@@ -496,9 +567,13 @@ def get_filtered_cluster_graph(
     cl_clean : (n_fibers, n_samples) int
     comp_inds : (n_components, n_samples) bool
     """
+    nx = _require_networkx()
+
     import matplotlib.pyplot as plt
 
     data = np.asarray(data)
+    if data.ndim != 2:
+        raise ValueError(f"data must be 2D (n_samples, d). Got {data.shape}.")
     n_samples = data.shape[0]
 
     G_clean, cl_clean, filtered_G = _separate_intersections_on_removed_edges(
@@ -508,12 +583,12 @@ def get_filtered_cluster_graph(
     comps = list(nx.connected_components(filtered_G))
     components_filtered = -1 * np.ones(n_samples, dtype=int)
 
-    global_component_counts: list[int] = []
-    point_counts: list[int] = []
+    global_component_counts: List[int] = []
+    point_counts: List[int] = []
 
     for comp_id, component in enumerate(comps):
         global_component_counts.append(len(component))
-        all_inds: list[int] = []
+        all_inds: List[int] = []
         for node in component:
             all_inds.extend(filtered_G.nodes[node].get("indices", []))
         all_inds = np.unique(all_inds).astype(int)
@@ -552,7 +627,7 @@ def get_filtered_cluster_graph(
             print(f"✅ Saved filtered summary figure to {out}")
         plt.show()
 
-    links_dict: dict[str, list[str]] = defaultdict(list)
+    links_dict: Dict[str, List[str]] = defaultdict(list)
     for u, v in filtered_G.edges:
         ku = f"fiber{u[0]}_cluster{u[1]}"
         kv = f"fiber{v[0]}_cluster{v[1]}"

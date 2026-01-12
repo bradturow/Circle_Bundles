@@ -1,10 +1,9 @@
+# local_analysis.py
 from __future__ import annotations
 
-from typing import Sequence
+from typing import Sequence, Tuple, List
 
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.decomposition import PCA
 
 __all__ = [
     "get_dense_fiber_indices",
@@ -14,6 +13,63 @@ __all__ = [
     "plot_local_rips",
 ]
 
+
+# ============================================================
+# Small internal helpers
+# ============================================================
+
+def _as_bool_U(U: np.ndarray) -> np.ndarray:
+    U = np.asarray(U, dtype=bool)
+    if U.ndim != 2:
+        raise ValueError(f"U must be 2D (n_fibers, n_points). Got shape {U.shape}.")
+    return U
+
+
+def _as_p_values(p_values: np.ndarray | Sequence[float] | None, n_fibers: int) -> np.ndarray:
+    if p_values is None:
+        return np.ones(n_fibers, dtype=float)
+    p = np.asarray(p_values, dtype=float).reshape(-1)
+    if p.shape[0] != n_fibers:
+        raise ValueError("p_values must have length equal to number of fibers (rows of U).")
+    return p
+
+
+def _as_fiber_ids(to_view: Sequence[int] | None, n_fibers: int) -> list[int]:
+    if to_view is None or len(to_view) == 0:
+        return list(range(n_fibers))
+    fiber_ids = list(map(int, to_view))
+    for j in fiber_ids:
+        if j < 0 or j >= n_fibers:
+            raise ValueError(f"to_view contains out-of-range fiber index {j} (n_fibers={n_fibers}).")
+    return fiber_ids
+
+
+def _subplots_grid(n_items: int, *, n_cols: int, figsize_per: float = 4.0):
+    """
+    Create a grid of subplots and return (fig, axes_flat).
+
+    Lazy-imports matplotlib so importing this module doesn't pull it in.
+    """
+    import matplotlib.pyplot as plt  # lazy
+
+    n_cols = max(1, int(n_cols))
+    n_rows = int(np.ceil(n_items / n_cols)) if n_items > 0 else 1
+    fig, axes = plt.subplots(
+        n_rows,
+        n_cols,
+        figsize=(figsize_per * n_cols, figsize_per * n_rows),
+    )
+    axes_flat = np.atleast_1d(axes).ravel()
+    return fig, axes_flat
+
+
+def _default_titles(fiber_ids: Sequence[int]) -> list[str]:
+    return [rf"$\pi^{{-1}}(U_{{{int(j)}}})$" for j in fiber_ids]
+
+
+# ============================================================
+# Public functions
+# ============================================================
 
 def get_dense_fiber_indices(
     U: np.ndarray,
@@ -36,31 +92,21 @@ def get_dense_fiber_indices(
     fiber_ids : list of fiber indices processed
     idx_list  : list of integer index arrays into the point set, one per fiber
     """
-    U = np.asarray(U, dtype=bool)
+    U = _as_bool_U(U)
     n_fibers, _ = U.shape
 
-    if p_values is None:
-        p_values_arr = np.ones(n_fibers, dtype=float)
-    else:
-        p_values_arr = np.asarray(p_values, dtype=float)
-        if p_values_arr.shape[0] != n_fibers:
-            raise ValueError("p_values must have length equal to number of fibers (rows of U).")
+    p_values_arr = _as_p_values(p_values, n_fibers)
+    fiber_ids = _as_fiber_ids(to_view, n_fibers)
 
-    if to_view is not None and len(to_view) > 0:
-        fiber_ids = list(map(int, to_view))
-        U_sub = U[fiber_ids]
-        p_sub = p_values_arr[fiber_ids]
-    else:
-        fiber_ids = list(range(n_fibers))
-        U_sub = U
-        p_sub = p_values_arr
+    U_sub = U[fiber_ids]
+    p_sub = p_values_arr[fiber_ids]
 
     rng = np.random.default_rng(random_state)
     idx_list: list[np.ndarray] = []
 
     for row, p in zip(U_sub, p_sub):
         fiber_indices = np.where(row)[0].astype(int)
-        m = fiber_indices.size
+        m = int(fiber_indices.size)
 
         if m == 0:
             idx_list.append(np.array([], dtype=int))
@@ -96,7 +142,11 @@ def get_local_pca(
     idx_list  : list[np.ndarray]          indices used in each fiber
     proj_list : list[np.ndarray | None]   PCA projections (m_i, n_components) or None
     """
+    # lazy import so this module doesn't require sklearn unless used
+    from sklearn.decomposition import PCA  # type: ignore
+
     data = np.asarray(data)
+    U = _as_bool_U(U)
 
     fiber_ids, idx_list = get_dense_fiber_indices(
         U, p_values=p_values, to_view=to_view, random_state=random_state
@@ -127,20 +177,20 @@ def plot_local_pca(
     """
     Grid of PCA scatterplots. Returns (fig, axes).
     """
+    # lazy import
+    import matplotlib.pyplot as plt  # noqa: F401  # (used via axes methods)
+
     fiber_ids = list(map(int, fiber_ids))
     n_fibers = len(fiber_ids)
 
     if titles == "default":
-        titles_list = [rf"$\pi^{{-1}}(U_{{{j}}})$" for j in fiber_ids]
+        titles_list = _default_titles(fiber_ids)
     elif titles is None:
         titles_list = None
     else:
         titles_list = list(titles)
 
-    n_cols = max(1, int(n_cols))
-    n_rows = int(np.ceil(n_fibers / n_cols)) if n_fibers > 0 else 1
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4 * n_cols, 4 * n_rows))
-    axes = np.atleast_1d(axes).ravel()
+    fig, axes = _subplots_grid(n_fibers, n_cols=int(n_cols), figsize_per=4.0)
 
     last_k = -1
     for k, (fiber_idx, proj) in enumerate(zip(fiber_ids, proj_list)):
@@ -156,7 +206,6 @@ def plot_local_pca(
         ax.grid(True, alpha=0.3)
 
         if titles_list is not None:
-            # titles_list is either aligned with fiber_ids ("default") or provided explicitly
             title = titles_list[k] if k < len(titles_list) else f"Fiber {fiber_idx}"
             ax.set_title(title, fontsize=int(font_size))
 
@@ -190,10 +239,10 @@ def get_local_rips(
     -----
     Imports ripser lazily so importing this module doesn't require ripser.
     """
-    # lazy import
-    from ripser import ripser  # type: ignore
+    from ripser import ripser  # type: ignore  # lazy import
 
     data = np.asarray(data)
+    U = _as_bool_U(U)
 
     fiber_ids, idx_list = get_dense_fiber_indices(
         U, p_values=p_values, to_view=to_view, random_state=random_state
@@ -209,7 +258,7 @@ def get_local_rips(
             continue
 
         fiber_pts = data[idx]
-        n_use = int(min(n_perm, fiber_pts.shape[0]))
+        n_use = int(min(int(n_perm), fiber_pts.shape[0]))
         res = ripser(fiber_pts, maxdim=int(maxdim), n_perm=n_use, **ripser_kwargs)
         rips_list.append(res)
 
@@ -232,7 +281,7 @@ def plot_local_rips(
     -----
     Imports persim lazily so importing this module doesn't require persim.
     """
-    from persim import plot_diagrams  # type: ignore
+    from persim import plot_diagrams  # type: ignore  # lazy import
 
     fiber_ids = list(map(int, fiber_ids))
     n_fibers = len(fiber_ids)
@@ -240,16 +289,13 @@ def plot_local_rips(
         raise ValueError("No fibers to plot.")
 
     if titles == "default":
-        titles_list = [rf"$\pi^{{-1}}(U_{{{j}}})$" for j in fiber_ids]
+        titles_list = _default_titles(fiber_ids)
     elif titles is None:
         titles_list = None
     else:
         titles_list = list(titles)
 
-    n_cols = max(1, int(n_cols))
-    n_rows = int(np.ceil(n_fibers / n_cols))
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(4 * n_cols, 4 * n_rows))
-    axes = np.atleast_1d(axes).ravel()
+    fig, axes = _subplots_grid(n_fibers, n_cols=int(n_cols), figsize_per=4.0)
 
     last_k = -1
     for k, (fiber_idx, res) in enumerate(zip(fiber_ids, rips_list)):

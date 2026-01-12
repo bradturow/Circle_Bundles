@@ -1,12 +1,9 @@
 # synthetic/step_edges.py
 from __future__ import annotations
 
-from typing import List, Sequence, Tuple, Optional
+from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
-
-from optical_flow.contrast import get_contrast_norms
-
 
 __all__ = [
     "get_patch_types_list",
@@ -17,6 +14,65 @@ __all__ = [
     "sample_step_edge_torus",
 ]
 
+
+
+def get_contrast_norms(data: np.ndarray, *, patch_type: str = "opt_flow") -> np.ndarray:
+    """
+    Vectorized contrast norms.
+
+    Parameters
+    ----------
+    data : array of shape (N, n^2) for intensity patches,
+           or (N, 2*n^2) for optical flow (u then v).
+    patch_type : {'img','opt_flow','flow'}
+        'flow' is accepted as an alias for 'opt_flow'.
+
+    Returns
+    -------
+    norms : (N,) array, sqrt( x^T D x ) (and sum across u,v for flow)
+    """
+    X = np.asarray(data, dtype=float)
+    if X.ndim != 2:
+        raise ValueError("data must be a 2D array of shape (N, d)")
+
+    if patch_type == "flow":
+        patch_type = "opt_flow"
+
+    if patch_type not in {"img", "opt_flow"}:
+        raise ValueError("patch_type must be one of {'img','opt_flow','flow'}")
+
+    if patch_type == "opt_flow":
+        if X.shape[1] % 2 != 0:
+            raise ValueError("opt_flow patches must have even length 2*n^2")
+        n2 = X.shape[1] // 2
+    else:
+        n2 = X.shape[1]
+
+    n = int(np.sqrt(n2))
+    if n * n != n2:
+        raise ValueError(f"Expected n^2 columns; got {n2} which isn't a perfect square.")
+    d = n * n
+
+    D = get_D_matrix(n)
+
+    if patch_type == "opt_flow":
+        u = X[:, :d]
+        v = X[:, d:2 * d]
+        quad = (
+            np.einsum("ni,ij,nj->n", u, D, u) +
+            np.einsum("ni,ij,nj->n", v, D, v)
+        )
+    else:
+        quad = np.einsum("ni,ij,nj->n", X, D, X)
+
+    quad = np.maximum(quad, 0.0)  # numerical safety
+    return np.sqrt(quad)
+
+
+
+# ----------------------------
+# Legacy filament patterns (3x3)
+# ----------------------------
 
 def get_patch_types_list() -> List[List[List[int]]]:
     """
@@ -66,6 +122,10 @@ def get_patch_types_list() -> List[List[List[int]]]:
     return ones_list + twos_list + threes_list + fours_list
 
 
+# ----------------------------
+# Step-edge flow patches
+# ----------------------------
+
 def make_step_edges(
     n_patches: int,
     spots: Sequence[Sequence[int]],
@@ -73,6 +133,7 @@ def make_step_edges(
     angle_range: Tuple[float, float] = (0.0, 2.0 * np.pi),
     normalize: bool = True,
     rng: Optional[np.random.Generator] = None,
+    eps: float = 1e-12,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate optical-flow step edge patches as flattened vectors of length 18 (3x3x2).
@@ -90,23 +151,35 @@ def make_step_edges(
         Pixel coordinates where the flow vector is placed.
     angle_range : (float, float)
         Sample directions uniformly from [a_min, a_max].
+        If a_min == a_max, all patches use that fixed angle.
     normalize : bool
         If True, contrast-normalize using get_contrast_norms and mean-center each channel.
     rng : np.random.Generator, optional
         Random generator for reproducibility.
+    eps : float
+        Stability floor for normalization.
 
     Returns
     -------
     patch_vectors : (n_patches, 18)
     angles : (n_patches,)
     """
+    n_patches = int(n_patches)
     if n_patches <= 0:
         raise ValueError(f"n_patches must be positive. Got {n_patches}.")
 
     rng = np.random.default_rng() if rng is None else rng
+    eps = float(eps)
 
     a0, a1 = float(angle_range[0]), float(angle_range[1])
-    angles = a0 + (a1 - a0) * rng.random(n_patches)
+    if not np.isfinite(a0) or not np.isfinite(a1):
+        raise ValueError(f"angle_range must be finite. Got {angle_range}.")
+
+    if a0 == a1:
+        angles = np.full(n_patches, a0, dtype=float)
+    else:
+        angles = a0 + (a1 - a0) * rng.random(n_patches)
+
     long_vecs = np.column_stack([np.cos(angles), np.sin(angles)])  # (n,2)
 
     patch_array = np.zeros((n_patches, 3, 3, 2), dtype=float)
@@ -117,11 +190,11 @@ def make_step_edges(
         patch_array[:, ii, jj, :] = long_vecs
 
     # Legacy flattening convention
-    patch_vectors = patch_array.reshape(n_patches, -1, order="F")
+    patch_vectors = patch_array.reshape(n_patches, -1, order="F")  # (n,18)
 
     if normalize:
         norms = get_contrast_norms(patch_vectors)
-        norms = np.maximum(norms, 1e-12)
+        norms = np.maximum(norms, eps)
         patch_vectors = patch_vectors / norms[:, None]
 
         # Mean-center each channel separately (first 9 = u, last 9 = v)
@@ -131,7 +204,11 @@ def make_step_edges(
     return patch_vectors, angles
 
 
-def make_all_step_edges(angle: Optional[float] = None, *, normalize: bool = True) -> np.ndarray:
+def make_all_step_edges(
+    angle: Optional[float] = None,
+    *,
+    normalize: bool = True,
+) -> np.ndarray:
     """
     Return the 56 canonical step-edge patterns (28 types + sign flips).
 
@@ -150,8 +227,8 @@ def make_all_step_edges(angle: Optional[float] = None, *, normalize: bool = True
         patch_array[28:] = -patch_array[:28]
         return patch_array.reshape(56, -1, order="F")
 
-    patch_vectors = np.zeros((56, 18), dtype=float)
     ang = float(angle)
+    patch_vectors = np.zeros((56, 18), dtype=float)
     for t, spots in enumerate(types_list):
         patch_vectors[t] = make_step_edges(
             1,
@@ -176,14 +253,18 @@ def sample_binary_step_edges(
     patches : (28*samples_per_filament, 18)
     angles : (28*samples_per_filament,)
     """
+    samples_per_filament = int(samples_per_filament)
     if samples_per_filament <= 0:
-        raise ValueError(f"samples_per_filament must be positive. Got {samples_per_filament}.")
+        raise ValueError(
+            f"samples_per_filament must be positive. Got {samples_per_filament}."
+        )
 
     rng = np.random.default_rng() if rng is None else rng
 
     types_list = get_patch_types_list()
-    patches_list = []
-    angles_list = []
+    patches_list: List[np.ndarray] = []
+    angles_list: List[np.ndarray] = []
+
     for spots in types_list:
         pv, ang = make_step_edges(samples_per_filament, spots, rng=rng)
         patches_list.append(pv)
@@ -202,19 +283,24 @@ def mean_center(patch_vector: np.ndarray, *, copy: bool = True) -> np.ndarray:
       - mean-center u-channel entries (first 9)
       - mean-center v-channel entries (last 9)
     """
-    x = patch_vector.copy() if copy else patch_vector
-    x = np.asarray(x, dtype=float)
-
+    x = np.asarray(patch_vector, dtype=float)
     if x.ndim != 1:
         raise ValueError(f"patch_vector must be 1D. Got shape {x.shape}.")
     if x.shape[0] not in (9, 18):
         raise ValueError(f"patch_vector must have length 9 or 18. Got {x.shape[0]}.")
 
-    x[:9] -= x[:9].mean()
+    if copy:
+        x = x.copy()
+
+    x[:9] -= float(x[:9].mean())
     if x.shape[0] == 18:
-        x[9:] -= x[9:].mean()
+        x[9:] -= float(x[9:].mean())
     return x
 
+
+# ----------------------------
+# Legacy step-edge torus sampler
+# ----------------------------
 
 def sample_step_edge_torus(
     n_samples: int,
@@ -223,6 +309,7 @@ def sample_step_edge_torus(
     m: int = 10,
     thresh: float = 0.01,
     rng: Optional[np.random.Generator] = None,
+    eps: float = 1e-12,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Generate step-edge torus samples.
@@ -245,6 +332,8 @@ def sample_step_edge_torus(
     thresh : float
         Keep only samples with contrast norm > thresh.
     rng : np.random.Generator, optional
+    eps : float
+        Stability floor.
 
     Returns
     -------
@@ -253,6 +342,9 @@ def sample_step_edge_torus(
     range_patches : (N_kept, d^2)
     norms : (N_kept,) contrast norms (pre-normalization)
     """
+    n_samples = int(n_samples)
+    d = int(d)
+    m = int(m)
     if n_samples <= 0:
         raise ValueError(f"n_samples must be positive. Got {n_samples}.")
     if d <= 0:
@@ -263,22 +355,25 @@ def sample_step_edge_torus(
         raise ValueError(f"thresh must be >= 0. Got {thresh}.")
 
     rng = np.random.default_rng() if rng is None else rng
+    eps = float(eps)
 
     range_patches = np.zeros((n_samples, d * d), dtype=float)
 
-    # sample points in disk radius sqrt(2)
-    Rdisc = np.sqrt(2.0)
+    # Sample points in disk of radius sqrt(2)
+    Rdisc = float(np.sqrt(2.0))
     coords = np.zeros((n_samples, 2), dtype=float)
+
     k = 0
     while k < n_samples:
         p = Rdisc * (2.0 * rng.random(2) - 1.0)
-        r = np.linalg.norm(p)
+        r = float(np.linalg.norm(p))
         if r < Rdisc:
-            coords[k, 0] = r * rng.choice([-1.0, 1.0])  # signed offset
-            coords[k, 1] = np.mod(np.arctan2(p[1], p[0]), 2.0 * np.pi)  # phi
+            coords[k, 0] = r * float(rng.choice([-1.0, 1.0]))  # signed offset
+            coords[k, 1] = float(np.mod(np.arctan2(p[1], p[0]), 2.0 * np.pi))  # phi
             k += 1
 
-    # build range patch per sample
+    # Build range patch per sample
+    # NOTE: This loop is intentionally "simple/legacy" (not optimized).
     for idx, (offset, phi) in enumerate(coords):
         n_vec = np.array([np.cos(phi), np.sin(phi)], dtype=float)
 
@@ -286,19 +381,19 @@ def sample_step_edge_torus(
             x_vals = -1.0 + 2.0 * ii / d + 2.0 / (d * (m - 1)) * np.arange(m)
             for jj in range(d):
                 y_vals = -1.0 + 2.0 * jj / d + 2.0 / (d * (m - 1)) * np.arange(m)
-                a, b = np.meshgrid(x_vals, y_vals)
+                a, b = np.meshgrid(x_vals, y_vals, indexing="xy")
                 pts = np.column_stack([a.ravel(), b.ravel()])
-                inds = (pts @ n_vec) >= offset
-                avg_val = (2.0 * np.sum(inds) - (m * m)) / (m * m)
+                inds = (pts @ n_vec) >= float(offset)
+                avg_val = (2.0 * float(np.sum(inds)) - float(m * m)) / float(m * m)
                 range_patches[idx, d * ii + jj] = avg_val
 
-    # flow patches
+    # Flow patches
     theta = 2.0 * np.pi * rng.random(n_samples)
     coords3 = np.column_stack([coords, theta])
 
     flow_patches = np.zeros((n_samples, 2 * d * d), dtype=float)
-    flow_patches[:, : d * d] = (np.cos(theta)[:, None] * range_patches)
-    flow_patches[:, d * d :] = (np.sin(theta)[:, None] * range_patches)
+    flow_patches[:, : d * d] = np.cos(theta)[:, None] * range_patches
+    flow_patches[:, d * d :] = np.sin(theta)[:, None] * range_patches
 
     norms = get_contrast_norms(flow_patches)
     keep = norms > float(thresh)
@@ -308,10 +403,10 @@ def sample_step_edge_torus(
     coords_kept = coords3[keep]
     norms_kept = norms[keep]
 
-    # mean-center and contrast normalize
+    # Mean-center and contrast normalize
     out = np.empty_like(flow_kept)
     for i in range(flow_kept.shape[0]):
         x = mean_center(flow_kept[i], copy=True)
-        out[i] = x / max(float(norms_kept[i]), 1e-12)
+        out[i] = x / max(float(norms_kept[i]), eps)
 
     return out, coords_kept, range_kept, norms_kept

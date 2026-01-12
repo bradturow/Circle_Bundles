@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple, Union, Callable, Sequence
+from typing import Callable, Optional, Sequence, Tuple, Union
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from .image_utils import render_to_rgba
+
+__all__ = ["lattice_vis"]
 
 
 def lattice_vis(
@@ -33,43 +36,34 @@ def lattice_vis(
     Placement:
       - Each selected point is placed at its *true* (scaled) position, but mapped
         into a "safe center region" so thumbnails don't spill outside the figure.
-
-    Parameters
-    ----------
-    data:
-        Length N container of objects consumed by vis_func.
-    coords:
-        (N,2) array of coordinates.
-    vis_func:
-        datum -> Matplotlib Figure or image array.
-    thumb_px:
-        Thumbnail size in pixels (roughly square).
-    dpi/figsize:
-        Control the final canvas and thus the thumbnail fractions.
-    transparent_border/white_thresh:
-        Forwarded to render_to_rgba.
-
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
     """
-    coords = np.asarray(coords)
+    coords = np.asarray(coords, dtype=float)
     if coords.ndim != 2 or coords.shape[1] != 2:
         raise ValueError(f"coords must be an (N,2) array. Got {coords.shape}.")
 
-    N = coords.shape[0]
+    N = int(coords.shape[0])
     if len(data) != N:
         raise ValueError(f"data length must match coords rows. Got len(data)={len(data)} vs N={N}.")
+    if N == 0:
+        raise ValueError("Empty coords/data.")
+
+    per_row = int(per_row)
+    per_col = int(per_col)
+    if per_row <= 0 or per_col <= 0:
+        raise ValueError("per_row and per_col must be positive.")
 
     # Normalize coords to [0,1]^2 (for selection & placement)
     min_vals = coords.min(axis=0)
     max_vals = coords.max(axis=0)
     denom = (max_vals - min_vals)
-    scaled_coords = (coords - min_vals) / (denom + 1e-12)
+    # avoid division by ~0 in degenerate coordinate sets
+    denom = np.where(np.abs(denom) < 1e-12, 1.0, denom)
+    scaled_coords = (coords - min_vals) / denom
 
     # Build lattice targets (used only for selection)
-    lin_x = np.linspace(padding, 1 - padding, int(per_row))
-    lin_y = np.linspace(padding, 1 - padding, int(per_col))
+    pad = float(np.clip(padding, 0.0, 0.49))
+    lin_x = np.linspace(pad, 1 - pad, per_row)
+    lin_y = np.linspace(pad, 1 - pad, per_col)
     grid_x, grid_y = np.meshgrid(lin_x, lin_y, indexing="xy")
     lattice_pts = np.column_stack([grid_x.ravel(), grid_y.ravel()])
 
@@ -78,7 +72,7 @@ def lattice_vis(
     used: set[int] = set()
 
     for lp in lattice_pts:
-        d = np.linalg.norm(scaled_coords - lp, axis=1)
+        d = np.linalg.norm(scaled_coords - lp[None, :], axis=1)
         for idx in np.argsort(d):
             idx = int(idx)
             if idx not in used:
@@ -93,11 +87,11 @@ def lattice_vis(
         figsize = (float(figsize), float(figsize))
     fig = plt.figure(figsize=figsize, dpi=int(dpi))
 
-    fig_w_px = figsize[0] * dpi
-    fig_h_px = figsize[1] * dpi
+    fig_w_px = float(figsize[0]) * float(dpi)
+    fig_h_px = float(figsize[1]) * float(dpi)
 
-    width_frac = float(thumb_px) / float(fig_w_px)
-    height_frac = float(thumb_px) / float(fig_h_px)
+    width_frac = float(thumb_px) / fig_w_px
+    height_frac = float(thumb_px) / fig_h_px
 
     if width_frac >= 1 or height_frac >= 1:
         raise ValueError(

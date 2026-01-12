@@ -11,27 +11,25 @@ from .combinatorics import Edge, Tri
 
 @dataclass
 class BundleQualityReport:
-    # --- paper-consistent surjectivity proxy (existing) ---
-    delta: float  # NOTE: this is your "max over triangles of min over vertices of covering radius"
-
-    # --- transition consistency ---
+    delta: float
     cocycle_defect: float
 
-    # --- edgewise transition fit summaries (from transitions_report) ---
     max_edge_rms: float
     mean_edge_rms: float
 
-    # --- alignment error on overlaps (NEW naming) ---
-    eps_align_geo: Optional[float]   # ε, geodesic distance on S^1, radians in [0, π]
-    eps_align_euc: Optional[float]   # chordal version: 2 sin(ε/2) in [0, 2]
+    eps_align_geo: Optional[float]
+    eps_align_euc: Optional[float]
 
-    # --- derived stability-ish ratio ---
-    alpha: Optional[float]           # α = ε/(1-δ), +inf if δ>=1
+    # NEW:
+    eps_align_geo_mean: Optional[float]
+    eps_align_euc_mean: Optional[float]
 
-    # --- bookkeeping ---
+    alpha: Optional[float]
+
     n_edges_estimated: int
     n_edges_requested: int
     n_triangles: int
+
 
 
 # ----------------------------
@@ -158,20 +156,19 @@ def compute_O2_cocycle_defect(
 # epsilon alignment sup (geodesic), plus chordal conversion
 # ----------------------------
 
-def compute_eps_alignment_sup_geo(
+def compute_eps_alignment_stats(
     U: np.ndarray,
     f: np.ndarray,
     cocycle,
     edges: Iterable[Edge],
     *,
     min_points: int = 1,
-) -> Optional[float]:
+) -> Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]:
     """
-    ε = sup_{(jk)} sup_{x in overlap} d_{S^1}( Ω_{jk} f_k(x), f_j(x) )
-    where Ω_{jk} maps k -> j.
+    Returns (eps_geo_sup, eps_geo_mean, eps_euc_sup, eps_euc_mean)
 
-    Implemented using unit vectors and arccos(dot) ∈ [0, pi].
-    Returns None if no usable overlaps.
+    geo: geodesic angle in radians in [0, pi]
+    euc: chordal distance in R^2, 2 sin(geo/2) in [0, 2]
     """
     U = np.asarray(U, dtype=bool)
     f = np.asarray(f, dtype=float)
@@ -179,8 +176,13 @@ def compute_eps_alignment_sup_geo(
     coc = cocycle.complete_orientations()
     edges = list(edges)
 
-    worst = 0.0
+    geo_worst = 0.0
+    euc_worst = 0.0
     got_any = False
+
+    geo_sum = 0.0
+    euc_sum = 0.0
+    n = 0
 
     for (j, k) in edges:
         if (j, k) not in coc.Omega:
@@ -195,26 +197,43 @@ def compute_eps_alignment_sup_geo(
         vk = np.stack([np.cos(f[k, idx]), np.sin(f[k, idx])], axis=1)
         vk_trans = (O @ vk.T).T
 
-        dgeo = _s1_geodesic_from_unit_vectors(vj, vk_trans)
-        worst = max(worst, float(np.max(dgeo)))
+        dgeo = _s1_geodesic_from_unit_vectors(vj, vk_trans)          # [0, pi]
+        deuc = 2.0 * np.sin(dgeo / 2.0)                              # [0, 2]
+
+        geo_worst = max(geo_worst, float(np.max(dgeo)))
+        euc_worst = max(euc_worst, float(np.max(deuc)))
+
+        geo_sum += float(np.sum(dgeo))
+        euc_sum += float(np.sum(deuc))
+        n += int(dgeo.size)
+
         got_any = True
 
-    return float(worst) if got_any else None
+    if (not got_any) or (n == 0):
+        return None, None, None, None
+
+    return (
+        float(geo_worst),
+        float(geo_sum / n),
+        float(euc_worst),
+        float(euc_sum / n),
+    )
 
 
-def compute_alpha_from_eps_delta(
-    eps_geo: Optional[float],
+def compute_alpha_from_eps_delta_euc(
+    eps_euc: Optional[float],
     delta: float,
 ) -> Optional[float]:
     """
-    α = ε/(1-δ) with α=+inf if δ>=1.
-    If eps_geo is None, returns None.
+    α = ε/(1-δ) where ε is the *Euclidean/chordal* alignment error in [0,2].
+    α=+inf if δ>=1. If eps_euc is None, returns None.
     """
-    if eps_geo is None:
+    if eps_euc is None:
         return None
     if float(delta) >= 1.0:
         return float("inf")
-    return float(eps_geo) / (1.0 - float(delta))
+    return float(eps_euc) / (1.0 - float(delta))
+
 
 
 # ----------------------------
@@ -240,6 +259,17 @@ def compute_bundle_quality(
 ) -> BundleQualityReport:
     """
     Compute standard diagnostics for a bundle pipeline run.
+
+    Conventions
+    ----------
+    - delta is computed either in chordal (Euclidean in R^2) or geodesic (radians),
+      depending on delta_use_euclidean (default True => chordal).
+    - eps alignment is computed in BOTH:
+        * eps_align_euc / eps_align_euc_mean : chordal in [0,2]
+        * eps_align_geo / eps_align_geo_mean : radians in [0,pi]
+    - alpha is computed using the Euclidean/chordal epsilon:
+        alpha = eps_align_euc / (1 - delta)
+      (so if you set delta_use_euclidean=True, numerator/denominator are in the same style)
     """
     if edges is None:
         edges_list = list(cover.nerve_edges())
@@ -251,7 +281,7 @@ def compute_bundle_quality(
     else:
         triangles_list = list(triangles)
 
-    # paper delta (unchanged)
+    # paper delta (unchanged logic)
     delta = compute_delta_from_triples(
         cover.U,
         local_triv.f,
@@ -261,19 +291,19 @@ def compute_bundle_quality(
         fail_fast=delta_fail_fast,
     )
 
-    # cocycle triangle defect (unchanged)
+    # cocycle triangle defect
     cocycle_defect = compute_O2_cocycle_defect(
         cocycle,
         triangles_list,
         matrix_norm=cocycle_matrix_norm,
     )
 
-    # edge RMS summaries (unchanged)
+    # edge RMS summaries (from transitions_report)
     max_edge_rms = float(getattr(transitions_report, "max_rms_angle_err", 0.0))
     mean_edge_rms = float(getattr(transitions_report, "mean_rms_angle_err", 0.0))
 
-    # ε (geodesic, radians)
-    eps_geo = compute_eps_alignment_sup_geo(
+    # epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)
+    eps_geo, eps_geo_mean, eps_euc, eps_euc_mean = compute_eps_alignment_stats(
         cover.U,
         local_triv.f,
         cocycle,
@@ -281,11 +311,8 @@ def compute_bundle_quality(
         min_points=eps_min_points,
     )
 
-    # ε converted to chordal distance in R^2 (explicitly “witness-style”)
-    eps_euc = None if eps_geo is None else _eps_geo_to_euc(eps_geo)
-
-    # α based on *paper delta*
-    alpha = compute_alpha_from_eps_delta(eps_geo, float(delta))
+    # alpha computed using Euclidean epsilon
+    alpha = compute_alpha_from_eps_delta_euc(eps_euc, float(delta))
 
     n_edges_requested = int(getattr(transitions_report, "n_edges_requested", len(edges_list)))
     n_edges_estimated = int(getattr(transitions_report, "n_edges_estimated", len(getattr(cocycle, "Omega", {}))))
@@ -297,6 +324,8 @@ def compute_bundle_quality(
         mean_edge_rms=mean_edge_rms,
         eps_align_geo=eps_geo,
         eps_align_euc=eps_euc,
+        eps_align_geo_mean=eps_geo_mean,
+        eps_align_euc_mean=eps_euc_mean,
         alpha=alpha,
         n_edges_estimated=n_edges_estimated,
         n_edges_requested=n_edges_requested,

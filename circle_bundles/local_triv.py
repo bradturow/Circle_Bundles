@@ -1,3 +1,4 @@
+# circle_bundles/local_triv.py
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -5,6 +6,8 @@ from typing import Callable, Dict, Optional, Tuple
 
 import numpy as np
 import warnings
+
+from .status_utils import _status, _status_clear  # consistent status printing
 
 
 @dataclass
@@ -24,14 +27,19 @@ def compute_circular_coords_dreimac(
     update_frac: float = 0.25,
     standard_range: bool = False,
     CircularCoords_cls=None,
-    # NEW:
-    dist_mat: Optional[np.ndarray] = None,
+    dist_mat: Optional[np.ndarray] = None,  # optional precomputed distance matrix
 ) -> Tuple[np.ndarray, int, int]:
+    """
+    Compute circular coordinates using Dreimac.
+
+    If dist_mat is provided, it must be (n_points, n_points) and we pass
+    distance_matrix=True to Dreimac.
+    """
     if CircularCoords_cls is None:
         raise ValueError("CircularCoords_cls must be provided (e.g., dreimac.CircularCoords).")
 
     X = np.asarray(X)
-    n_points = X.shape[0]
+    n_points = int(X.shape[0])
     if n_points == 0:
         raise ValueError("Empty patch: cannot compute circular coordinates.")
 
@@ -59,12 +67,19 @@ def compute_circular_coords_dreimac(
                 )
                 angles = cc.get_coordinates(standard_range=standard_range)
 
+                # Dreimac sometimes emits coverage warnings; treat as retry.
                 for w in wlist:
                     msg = str(w.message).lower()
                     if "not covered by a landmark" in msg:
                         raise RuntimeError("Dreimac: not covered by a landmark")
 
-            return np.asarray(angles, dtype=float), n_retries, n_landmarks
+            angles = np.asarray(angles, dtype=float).reshape(-1)
+            if angles.shape != (n_points,):
+                raise ValueError(f"Dreimac returned shape {angles.shape}, expected ({n_points},).")
+
+            # Robust wrap to circle (does not change your convention; just enforces it)
+            angles = np.mod(angles, 2.0 * np.pi)
+            return angles, n_retries, n_landmarks
 
         except Exception as e:
             n_retries += 1
@@ -74,7 +89,7 @@ def compute_circular_coords_dreimac(
                     f"Last error: {type(e).__name__}: {e}"
                 ) from e
 
-            n_landmarks = min(int(np.ceil((1.0 + update_frac) * n_landmarks)), n_points)
+            n_landmarks = min(int(np.ceil((1.0 + float(update_frac)) * n_landmarks)), n_points)
 
 
 def compute_local_triv(
@@ -83,8 +98,8 @@ def compute_local_triv(
     *,
     cc_alg: Optional[Callable[[np.ndarray], np.ndarray]] = None,
 
-    # NEW: total-space metric object (vectorized)
-    total_metric: Optional[object] = None,  # expects .pairwise(X)->(m,m)
+    # total-space metric object (vectorized): expects .pairwise(X)->(m,m)
+    total_metric: Optional[object] = None,
 
     # Dreimac defaults
     landmarks_per_patch: int = 200,
@@ -92,6 +107,7 @@ def compute_local_triv(
     update_frac: float = 0.25,
     standard_range: bool = False,
     CircularCoords_cls=None,
+
     # Robustness knobs
     min_patch_size: int = 10,
     verbose: bool = True,
@@ -100,11 +116,19 @@ def compute_local_triv(
     """
     Compute local circle coordinates f[j, s] on each cover set U[j].
 
+    Conventions (UNCHANGED):
+    - U has shape (n_sets, n_samples) bool
+    - f has shape (n_sets, n_samples) radians
+    - f[j, s] meaningful only when U[j, s] is True
+
     If total_metric is provided, Dreimac runs on the induced distance matrix
     total_metric.pairwise(Xj) with distance_matrix=True.
     """
     data = np.asarray(data)
     U = np.asarray(U, dtype=bool)
+
+    if U.ndim != 2:
+        raise ValueError(f"U must be 2D (n_sets, n_samples). Got shape {U.shape}.")
 
     n_sets, n_samples = U.shape
     if data.shape[0] != n_samples:
@@ -118,17 +142,16 @@ def compute_local_triv(
 
     for j in range(n_sets):
         if verbose:
-            print(f"\r{' '*70}", end="")
-            print(f"\rCoordinatizing set {j+1}/{n_sets}...", end="", flush=True)
+            _status(f"Coordinatizing set {j+1}/{n_sets}...")
 
         mask = U[j]
         m = int(mask.sum())
 
-        if m < min_patch_size:
+        if m < int(min_patch_size):
             msg = f"Patch too small for set j={j}: |U[j]|={m} < min_patch_size={min_patch_size}."
             if fail_fast:
                 if verbose:
-                    print("")
+                    _status_clear()
                 raise ValueError(msg)
             errors[j] = msg
             continue
@@ -137,10 +160,10 @@ def compute_local_triv(
 
         try:
             if cc_alg is not None:
-                ang = np.asarray(cc_alg(Xj), dtype=float)
+                ang = np.asarray(cc_alg(Xj), dtype=float).reshape(-1)
                 if ang.shape != (m,):
                     raise ValueError(f"cc_alg returned shape {ang.shape}, expected ({m},).")
-                ang = np.mod(ang, 2 * np.pi)
+                ang = np.mod(ang, 2.0 * np.pi)
                 f[j, mask] = ang
                 valid[j] = True
 
@@ -165,25 +188,26 @@ def compute_local_triv(
                 if ang.shape != (m,):
                     raise ValueError(f"Dreimac returned shape {ang.shape}, expected ({m},).")
 
+                # Store (radians) on the masked positions
                 f[j, mask] = ang
                 valid[j] = True
-                n_retries[j] = retries
-                n_landmarks[j] = n_lmks
+                n_retries[j] = int(retries)
+                n_landmarks[j] = int(n_lmks)
 
                 if verbose and retries > 0:
-                    print(f"\n  Note: set j={j} required retries={retries} (n_landmarks={n_lmks}).")
+                    _status(f"Coordinatizing set {j+1}/{n_sets}... (retries={retries}, n_landmarks={n_lmks})")
 
         except Exception as e:
             msg = f"Failed on set j={j} (|U[j]|={m}): {type(e).__name__}: {e}"
             if fail_fast:
                 if verbose:
-                    print("")
+                    _status_clear()
                 raise ValueError(msg) from e
             errors[j] = msg
             valid[j] = False
 
     if verbose:
-        print("")
+        _status_clear()
 
     return LocalTrivResult(
         f=f,

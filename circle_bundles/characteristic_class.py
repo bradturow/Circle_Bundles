@@ -906,40 +906,62 @@ def compute_classes(
 
 
 
+def _euc_to_geo_rad(d: Optional[float]) -> Optional[float]:
+    """
+    Convert chordal distance d in [0,2] on S^1 ⊂ C to geodesic angle in radians in [0, π]:
+        d = 2 sin(theta/2)  =>  theta = 2 arcsin(d/2).
+    """
+    if d is None:
+        return None
+    d = float(d)
+    if not np.isfinite(d):
+        return None
+    x = np.clip(d / 2.0, 0.0, 1.0)
+    return float(2.0 * np.arcsin(x))
+
+
+def _fmt_euc_with_geo_pi(d_euc: Optional[float], *, decimals: int = 3) -> str:
+    """
+    Render:
+        <d_euc> (ε_triv^{geo}=<theta/pi>π)
+    where <theta> is the geodesic angle in radians derived from chordal d_euc.
+    """
+    if d_euc is None or not np.isfinite(float(d_euc)):
+        return "—"
+    d_euc = float(d_euc)
+    theta = _euc_to_geo_rad(d_euc)
+    if theta is None:
+        return f"{d_euc:.{decimals}f}"
+    return f"{d_euc:.{decimals}f} (\\varepsilon_{{\\text{{triv}}}}^{{\\text{{geo}}}}={theta/np.pi:.{decimals}f}\\pi)"
+
+
+def _fmt_mean_euc_with_geo_pi(d_euc_mean: Optional[float], *, decimals: int = 3) -> str:
+    """
+    Render:
+        <d_euc_mean> (\bar{ε}_triv^{geo}=<theta/pi>π)
+    """
+    if d_euc_mean is None or not np.isfinite(float(d_euc_mean)):
+        return "—"
+    d_euc_mean = float(d_euc_mean)
+    theta = _euc_to_geo_rad(d_euc_mean)
+    if theta is None:
+        return f"{d_euc_mean:.{decimals}f}"
+    return f"{d_euc_mean:.{decimals}f} (\\bar{{\\varepsilon}}_{{\\text{{triv}}}}^{{\\text{{geo}}}}={theta/np.pi:.{decimals}f}\\pi)"
 
 
 def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto") -> str:
     """
     Pretty summary of (1) diagnostics and (2) characteristic classes.
-
-    Parameters
-    ----------
-    classes : ClassResult
-    quality : BundleQualityReport | None
-    show : bool
-        If True, render output according to `mode`.
-    mode : {"auto","text","latex","both"}
-        - "auto": show LaTeX if available, else print text (DEFAULT; avoids duplicates)
-        - "text": print text only
-        - "latex": show LaTeX only (best-effort; if unavailable, falls back to text)
-        - "both": show LaTeX (if available) AND print text (explicitly allow duplication)
+    (Updated: remove RMS lines; use d_C; use ε_triv (chordal) and show geo in π-parens;
+     use \bar{ε}_triv for mean triv error.)
     """
-
     def _describe_H2_iso_tag(c) -> Optional[str]:
-        """
-        Classify check-H_2(U; Z_omega) coarsely into:
-          0, Z2, Z, or non-cyclic.
-        Uses the already-computed invariants:
-          H2_dim_Q, H2_dim_Z2
-        """
         H2_Q = getattr(c, "H2_dim_Q", None)
         H2_Z2 = getattr(c, "H2_dim_Z2", None)
         if H2_Q is None or H2_Z2 is None:
             return None
-
         H2_Q = int(H2_Q)
         H2_Z2 = int(H2_Z2)
-
         if H2_Q == 0 and H2_Z2 == 0:
             return "0"
         if H2_Q == 0 and H2_Z2 == 1:
@@ -952,58 +974,56 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
         return {"0": "0", "Z2": "ℤ₂", "Z": "ℤ", "non-cyclic": "non-cyclic"}[tag]
 
     # ----------------------------
-    # Pull quantities
+    # Pull quantities (UPDATED)
     # ----------------------------
-    eps_triv = getattr(quality, "eps_align_geo", None) if quality is not None else None
+    eps_triv = getattr(quality, "eps_align_euc", None) if quality is not None else None
+    eps_triv_mean = getattr(quality, "eps_align_euc_mean", None) if quality is not None else None
+
     delta = getattr(quality, "delta", None) if quality is not None else None
     alpha = getattr(quality, "alpha", None) if quality is not None else None
     eps_coc = getattr(quality, "cocycle_defect", None) if quality is not None else None
-    max_rms = getattr(quality, "max_edge_rms", None) if quality is not None else None
-    mean_rms = getattr(quality, "mean_edge_rms", None) if quality is not None else None
 
     rounding_dist = float(getattr(classes, "rounding_dist", 0.0))
-
     orientable = bool(getattr(classes, "orientable", False))
     n_tri = int(getattr(classes, "n_triangles", 0))
 
-    # Cochain-level “all zeros” fallback (only used if coboundary flag missing)
-    euler_rep = getattr(classes, "euler_class", {}) or {}
-    e_trivial_cochain = all(int(v) == 0 for v in euler_rep.values()) if euler_rep else True
-
-    # Prefer cohomological “is coboundary?” flags if present
+    # “is coboundary?” flags
     w1_is_cob = getattr(classes, "sw1_is_coboundary_Z2", None)
     if w1_is_cob is None:
         w1_is_cob = bool(orientable)  # fallback
 
     e_is_cob = getattr(classes, "euler_is_coboundary_Z", None)
-    if e_is_cob is None:
-        # fallback only if the flag isn't available
-        e_zero_for_print = bool(e_trivial_cochain)
-    else:
-        e_zero_for_print = bool(e_is_cob)
+    euler_rep = getattr(classes, "euler_class", {}) or {}
+    e_trivial_cochain = all(int(v) == 0 for v in euler_rep.values()) if euler_rep else True
+    e_zero_for_print = bool(e_is_cob) if e_is_cob is not None else bool(e_trivial_cochain)
 
     H2_tag = _describe_H2_iso_tag(classes)
 
     # ----------------------------
     # Build plain-text summary
     # ----------------------------
-    IND = "  "          # consistent indent for all lines under a title
-    LABEL_W = 28        # align label column
+    IND = "  "
+    LABEL_W = 28
 
     def _tline(label: str, content: str) -> str:
         return f"{IND}{label:<{LABEL_W}} {content}"
 
     lines: List[str] = []
-
     lines.append("=== Diagnostics ===")
+
     if quality is None:
         lines.append(f"{IND}(no quality report provided)")
     else:
         if eps_triv is not None:
             lines.append(_tline(
                 "trivialization error:",
-                "ε_triv := sup_{(j k)∈N(U)} sup_{x∈π^{-1}(U_j∩U_k)} d_{S^1}(Ω_{jk} f_k(x), f_j(x))"
-                f" = {float(eps_triv):.3f}"
+                "ε_triv := sup_{(j k)∈N(U)} sup_{x∈π^{-1}(U_j∩U_k)} d_𝕮(Ω_{jk} f_k(x), f_j(x))"
+                f" = {_fmt_euc_with_geo_pi(eps_triv)}"
+            ))
+        if eps_triv_mean is not None:
+            lines.append(_tline(
+                "mean triv error:",
+                f"\\bar{{ε}}_triv = {_fmt_mean_euc_with_geo_pi(eps_triv_mean)}"
             ))
         if delta is not None:
             lines.append(_tline(
@@ -1023,20 +1043,13 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 f" = {float(eps_coc):.3f}"
             ))
 
-        # Rounding diagnostic: always use tilde-e notation here (per your request)
         lines.append(_tline(
             "Euler rounding diag:",
             f"d_∞(δ_ω θ, ẽ) = {rounding_dist:.6g}"
         ))
 
-        if mean_rms is not None:
-            lines.append(_tline("mean edge RMS:", f"{float(mean_rms):.3f}"))
-        if max_rms is not None:
-            lines.append(_tline("max edge RMS:", f"{float(max_rms):.3f}"))
-
-    lines.append("")  # vertical space
+    lines.append("")
     lines.append("=== Characteristic Classes ===")
-
     lines.append(_tline(
         "Stiefel–Whitney:",
         "w₁ = 0 (orientable)" if bool(w1_is_cob) else "w₁ ≠ 0 (non-orientable)"
@@ -1060,13 +1073,11 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    # Euler class
     if orientable:
         lines.append(_tline("Euler class:", "e = 0 (trivial)" if e_zero_for_print else "e ≠ 0 (non-trivial)"))
     else:
         lines.append(_tline("Euler class:", "ẽ = 0" if e_zero_for_print else "ẽ ≠ 0"))
 
-    # If Euler class is trivial (as a class), suppress Euler number / w2
     if e_zero_for_print:
         bt = getattr(classes, "bundle_trivial_on_this_complex", None)
         if bt is not None:
@@ -1075,7 +1086,6 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
             sp = getattr(classes, "spin_on_this_complex", None)
             if sp is not None:
                 lines.append(_tline("spin:", f"{bool(sp)}"))
-
         text = "\n".join(lines)
         if show:
             did_latex = False
@@ -1092,28 +1102,17 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    # Nontrivial Euler: show check-H2 iso type
     if H2_tag is not None:
         lines.append(_tline("Second homology:", f"Ĥ₂(U; Z_ω) ≅ {_pretty_H2_text(H2_tag)}"))
 
-    # Euler number if available, else brief reason
     eZ = getattr(classes, "twisted_euler_number_Z", None)
     if eZ is not None:
-        if orientable:
-            lines.append(_tline("Euler number:", f"⟨e, [U]⟩ = {eZ}"))
-        else:
-            lines.append(_tline("Euler number:", f"⟨ẽ, [U]⟩ = {eZ}"))
+        lines.append(_tline("Euler number:", f"⟨{'e' if orientable else 'ẽ'}, [U]⟩ = {eZ}"))
 
-    # w2/spin only in orientable case (and e != 0 branch)
     if orientable:
         spin_flag = getattr(classes, "spin_on_this_complex", None)
         if spin_flag is not None:
-            lines.append(
-                _tline(
-                    "mod 2 info:",
-                    "w₂ = 0 (spin)" if bool(spin_flag) else "w₂ ≠ 0 (not spin)"
-                )
-            )
+            lines.append(_tline("mod 2 info:", "w₂ = 0 (spin)" if bool(spin_flag) else "w₂ ≠ 0 (not spin)"))
 
     bt = getattr(classes, "bundle_trivial_on_this_complex", None)
     if bt is not None:
@@ -1148,7 +1147,7 @@ def _display_summary_latex(
     w1_is_zero: bool,
 ) -> bool:
     """
-    Best-effort IPython Math display.
+    Best-effort IPython Math display (UPDATED formatting).
     Returns True iff LaTeX display succeeded.
     """
     try:
@@ -1166,52 +1165,62 @@ def _display_summary_latex(
         return r"\text{non-cyclic}"
 
     # ----------------------------
-    # Pull diagnostics quantities
+    # Pull diagnostics (UPDATED)
     # ----------------------------
-    eps_triv = getattr(quality, "eps_align_geo", None) if quality is not None else None
+    eps_triv = getattr(quality, "eps_align_euc", None) if quality is not None else None
+    eps_triv_mean = getattr(quality, "eps_align_euc_mean", None) if quality is not None else None
+
     delta = getattr(quality, "delta", None) if quality is not None else None
     alpha = getattr(quality, "alpha", None) if quality is not None else None
     eps_coc = getattr(quality, "cocycle_defect", None) if quality is not None else None
-    max_rms = getattr(quality, "max_edge_rms", None) if quality is not None else None
-    mean_rms = getattr(quality, "mean_edge_rms", None) if quality is not None else None
 
     # ----------------------------
-    # Pull class quantities
+    # Class quantities
     # ----------------------------
     orientable = bool(getattr(classes, "orientable", False))
     n_tri = int(getattr(classes, "n_triangles", 0))
-
-    eZ = getattr(classes, "twisted_euler_number_Z", None)   # integer pairing if defined
-    eZ2 = getattr(classes, "euler_number_mod2", None)       # mod 2 pairing if defined
-
-    sw2 = getattr(classes, "sw2_Z2", {}) or {}
+    eZ = getattr(classes, "twisted_euler_number_Z", None)
+    eZ2 = getattr(classes, "euler_number_mod2", None)
 
     w2_trivial = getattr(classes, "spin_on_this_complex", None)
     if w2_trivial is None:
-        # fallback if older objects don’t have it
         w2_trivial = all((int(v) & 1) == 0 for v in (getattr(classes, "sw2_Z2", {}) or {}).values())
-    
-    
-    # Always use tilde-e in the rounding diagnostic 
-    e_sym_round = r"\tilde{e}"
 
-    # In the characteristic class section: use e vs tilde-e by orientability
+    e_sym_round = r"\tilde{e}"
     e_sym = r"e" if orientable else r"\tilde{e}"
 
+    # helpers for latex numeric strings with geo-in-π parentheses
+    def _latex_eps_with_geo_pi(d_euc: Optional[float], *, decimals: int = 3, mean: bool = False) -> str:
+        if d_euc is None or not np.isfinite(float(d_euc)):
+            return r"\text{—}"
+        d_euc = float(d_euc)
+        theta = _euc_to_geo_rad(d_euc)
+        if theta is None:
+            return f"{d_euc:.{decimals}f}"
+        if mean:
+            return f"{d_euc:.{decimals}f}" + r"\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=" + f"{theta/np.pi:.{decimals}f}" + r"\pi\right)"
+        return f"{d_euc:.{decimals}f}" + r"\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=" + f"{theta/np.pi:.{decimals}f}" + r"\pi\right)"
+
     # ----------------------------
-    # Build rows (label, expr)
+    # Rows
     # ----------------------------
-    diag_rows: List[tuple[str, str]] = []
+    diag_rows: List[Tuple[str, str]] = []
     if quality is None:
         diag_rows.append((r"\text{(no quality report provided)}", r""))
     else:
         if eps_triv is not None:
             diag_rows.append((
                 r"\text{Trivialization error}",
-                r"\varepsilon_{\mathrm{triv}} := "
+                r"\varepsilon_{\text{triv}} := "
                 r"\sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} "
-                r"d_{\mathbb{S}^1}(\Omega_{jk}f_k(x),f_j(x))"
-                + r" = " + f"{float(eps_triv):.3f}"
+                r"d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x))"
+                + r" = " + _latex_eps_with_geo_pi(eps_triv, mean=False)
+            ))
+        if eps_triv_mean is not None:
+            diag_rows.append((
+                r"\text{Mean triv error}",
+                r"\bar{\varepsilon}_{\text{triv}}"
+                + r" = " + _latex_eps_with_geo_pi(eps_triv_mean, mean=True)
             ))
         if delta is not None:
             diag_rows.append((
@@ -1222,16 +1231,9 @@ def _display_summary_latex(
             ))
         if alpha is not None:
             if alpha == float("inf"):
-                diag_rows.append((
-                    r"\text{Stability ratio}",
-                    r"\alpha := \varepsilon_{\mathrm{triv}}/(1-\delta) = \infty"
-                ))
+                diag_rows.append((r"\text{Stability ratio}", r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = \infty"))
             else:
-                diag_rows.append((
-                    r"\text{Stability ratio}",
-                    r"\alpha := \varepsilon_{\mathrm{triv}}/(1-\delta)"
-                    + r" = " + f"{float(alpha):.3f}"
-                ))
+                diag_rows.append((r"\text{Stability ratio}", r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = " + f"{float(alpha):.3f}"))
         if eps_coc is not None:
             diag_rows.append((
                 r"\text{Cocycle error}",
@@ -1245,13 +1247,7 @@ def _display_summary_latex(
             r"d_\infty(\delta_\omega\theta," + e_sym_round + r") = " + f"{float(rounding_dist):.3f}"
         ))
 
-        if mean_rms is not None:
-            diag_rows.append((r"\text{Mean edge RMS}", f"{float(mean_rms):.3f}"))
-        if max_rms is not None:
-            diag_rows.append((r"\text{Max edge RMS}", f"{float(max_rms):.3f}"))
-
-    class_rows: List[tuple[str, str]] = []
-
+    class_rows: List[Tuple[str, str]] = []
     class_rows.append((
         r"\text{Stiefel-Whitney}",
         r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})"
@@ -1260,13 +1256,11 @@ def _display_summary_latex(
     if n_tri == 0:
         class_rows.append((r"\text{Euler class}", r"\text{(no 2-simplices)}"))
     else:
-        # Euler class statement
         if orientable:
             class_rows.append((r"\text{Euler class}", r"e = 0\ (\text{trivial})" if e_zero_for_print else r"e \neq 0\ (\text{non-trivial})"))
         else:
             class_rows.append((r"\text{Euler class}", r"\tilde{e} = 0" if e_zero_for_print else r"\tilde{e} \neq 0"))
 
-        # Only show extra invariants if Euler class is nontrivial
         if not e_zero_for_print:
             if H2_tag is not None:
                 class_rows.append((
@@ -1274,15 +1268,12 @@ def _display_summary_latex(
                     r"\check{H}_2(\mathcal{U};\mathbb{Z}_\omega)\cong " + _latex_H2_iso(H2_tag)
                 ))
 
-            # Euler number (integer pairing) if defined
             if eZ is not None:
-                # IMPORTANT: no f-string containing \mathcal{U} braces
                 class_rows.append((
                     r"\text{Euler number}",
                     r"\langle " + e_sym + r",[\mathcal{U}]\rangle = " + str(int(eZ))
                 ))
 
-            # Mod 2 info / pairing
             if orientable:
                 class_rows.append((
                     r"\text{mod 2 info}",
@@ -1300,10 +1291,7 @@ def _display_summary_latex(
                         r"\langle " + e_sym + r",[\mathcal{U}]\rangle = " + str(int(eZ2) & 1) + r"\ (\mathrm{mod}\ 2)"
                     ))
 
-    # ----------------------------
-    # Renderer: single aligned block, consistent indent/labels
-    # ----------------------------
-    def _rows_to_aligned(rows: List[tuple[str, str]]) -> str:
+    def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:
         out: List[str] = []
         for label, expr in rows:
             if expr.strip() == "":

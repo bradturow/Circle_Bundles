@@ -1,9 +1,10 @@
+# synthetic/so3_sampling.py
 from __future__ import annotations
 
-from typing import Literal, Optional, Tuple, Union, overload
+from typing import Literal, Optional, Tuple, overload
 
 import numpy as np
-from scipy.spatial.transform import Rotation as R
+from scipy.spatial.transform import Rotation as Rotation
 
 Rule = Optional[Literal["fiber", "equator"]]
 
@@ -12,8 +13,8 @@ __all__ = ["sample_SO3", "project_O3"]
 
 def _unit(x: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     x = np.asarray(x, dtype=float)
-    n = np.linalg.norm(x)
-    if n <= eps:
+    n = float(np.linalg.norm(x))
+    if n <= float(eps):
         raise ValueError("Cannot normalize near-zero vector.")
     return x / n
 
@@ -44,7 +45,7 @@ def _orthonormal_frame_from_first_column(
     u = np.asarray(u, dtype=float)
     if u.ndim != 2 or u.shape[1] != 3:
         raise ValueError(f"u must have shape (n,3). Got {u.shape}.")
-    n = u.shape[0]
+    n = int(u.shape[0])
 
     angles = np.asarray(angles, dtype=float)
     if angles.shape != (n,):
@@ -59,10 +60,11 @@ def _orthonormal_frame_from_first_column(
 
     orth1 = np.cross(u, a)
     n1 = np.linalg.norm(orth1, axis=1, keepdims=True)
-    if np.any(n1 <= eps):
-        raise ValueError("Failed to build tangent direction; encountered near-parallel configuration.")
+    if np.any(n1 <= float(eps)):
+        raise ValueError(
+            "Failed to build tangent direction; encountered near-parallel configuration."
+        )
     orth1 = orth1 / n1
-
     orth2 = np.cross(u, orth1)
 
     c = np.cos(angles)[:, None]
@@ -74,7 +76,6 @@ def _orthonormal_frame_from_first_column(
     return mats
 
 
-# --- nicer type signatures (optional but helpful) ---
 @overload
 def sample_SO3(
     n_samples: int,
@@ -82,6 +83,7 @@ def sample_SO3(
     rule: None = None,
     v: Optional[np.ndarray] = ...,
     rng: Optional[np.random.Generator] = ...,
+    eps: float = ...,
 ) -> Tuple[np.ndarray, np.ndarray]: ...
 @overload
 def sample_SO3(
@@ -90,14 +92,16 @@ def sample_SO3(
     rule: Literal["fiber"],
     v: Optional[np.ndarray] = ...,
     rng: Optional[np.random.Generator] = ...,
+    eps: float = ...,
 ) -> Tuple[np.ndarray, np.ndarray]: ...
 @overload
 def sample_SO3(
     n_samples: int,
     *,
     rule: Literal["equator"],
-    v: Optional[np.random.Generator] = ...,
+    v: Optional[np.ndarray] = ...,
     rng: Optional[np.random.Generator] = ...,
+    eps: float = ...,
 ) -> Tuple[np.ndarray, np.ndarray]: ...
 
 
@@ -107,6 +111,7 @@ def sample_SO3(
     rule: Rule = None,
     v: Optional[np.ndarray] = None,
     rng: Optional[np.random.Generator] = None,
+    eps: float = 1e-12,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Sample SO(3) (flattened rotation matrices) with optional structured rules.
@@ -122,8 +127,10 @@ def sample_SO3(
         - 'equator': choose u on great circle orthogonal to v via angle φ, then choose fiber angle θ;
                      returns (data, angles) with angles shape (n_samples,2) = (phi, theta).
     v : (3,) array-like, optional
-        If None, sampled randomly.
+        If None, sampled randomly for the structured rules.
     rng : np.random.Generator, optional
+    eps : float
+        Stability floor.
 
     Returns
     -------
@@ -132,12 +139,14 @@ def sample_SO3(
     extra : ndarray
         Depends on rule (base_points / theta / [phi,theta]).
     """
+    n_samples = int(n_samples)
     if n_samples <= 0:
         raise ValueError(f"n_samples must be positive. Got {n_samples}.")
     rng = np.random.default_rng() if rng is None else rng
+    eps = float(eps)
 
     if rule is None:
-        rotations = R.random(n_samples, random_state=rng)
+        rotations = Rotation.random(n_samples, random_state=rng)
         mats = rotations.as_matrix()  # (n,3,3)
         data = mats.reshape(n_samples, 9)
         base_points = mats[:, :, 0]   # first column
@@ -145,35 +154,32 @@ def sample_SO3(
 
     # normalize v (or sample it)
     if v is None:
-        v0 = _unit(rng.normal(size=3))
+        vflat = _unit(rng.normal(size=3), eps=eps)
     else:
-        v0 = _unit(np.asarray(v, dtype=float))
-    v0 = v0.reshape(1, 3)
+        vflat = _unit(np.asarray(v, dtype=float).reshape(3,), eps=eps)
 
     if rule == "fiber":
         theta = rng.uniform(0.0, 2.0 * np.pi, size=n_samples)
-        u = np.repeat(v0, repeats=n_samples, axis=0)  # (n,3)
-        mats = _orthonormal_frame_from_first_column(u, theta)
+        u = np.repeat(vflat[None, :], repeats=n_samples, axis=0)  # (n,3)
+        mats = _orthonormal_frame_from_first_column(u, theta, eps=eps)
         data = mats.reshape(n_samples, 9)
         return data, theta
 
     if rule == "equator":
-        # pick u on great circle orthogonal to v0 via φ
+        # pick u on great circle orthogonal to vflat via φ
         phi = rng.uniform(0.0, 2.0 * np.pi, size=n_samples)
         theta = rng.uniform(0.0, 2.0 * np.pi, size=n_samples)
-
-        vflat = v0.ravel()
 
         # choose an "up" axis not too parallel to v
         up = np.array([0.0, 0.0, 1.0], dtype=float)
         if np.abs(float(vflat @ up)) > 0.95:
             up = np.array([0.0, 1.0, 0.0], dtype=float)
 
-        b1 = _unit(np.cross(vflat, up))
+        b1 = _unit(np.cross(vflat, up), eps=eps)
         b2 = np.cross(vflat, b1)  # unit automatically
 
         u = (np.cos(phi)[:, None] * b1[None, :]) + (np.sin(phi)[:, None] * b2[None, :])
-        mats = _orthonormal_frame_from_first_column(u, theta)
+        mats = _orthonormal_frame_from_first_column(u, theta, eps=eps)
         data = mats.reshape(n_samples, 9)
         angles = np.column_stack([phi, theta])
         return data, angles
@@ -184,6 +190,18 @@ def sample_SO3(
 def project_O3(O3_data: np.ndarray, v: Optional[np.ndarray] = None) -> np.ndarray:
     """
     Given flattened O(3) matrices (N, 9), return the image of v under each matrix.
+
+    Parameters
+    ----------
+    O3_data : (N,9) ndarray
+        Row-major flattened 3x3 matrices.
+    v : (3,) ndarray, optional
+        Vector to project. Default is e1.
+
+    Returns
+    -------
+    out : (N,3) ndarray
+        (M_i @ v) for each matrix M_i.
     """
     O3_data = np.asarray(O3_data, dtype=float)
     if O3_data.ndim != 2 or O3_data.shape[1] != 9:
@@ -194,4 +212,4 @@ def project_O3(O3_data: np.ndarray, v: Optional[np.ndarray] = None) -> np.ndarra
     v = np.asarray(v, dtype=float).reshape(3,)
 
     mats = O3_data.reshape(-1, 3, 3)
-    return mats @ v
+    return np.einsum("nij,j->ni", mats, v)

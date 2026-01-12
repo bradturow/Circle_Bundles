@@ -329,7 +329,7 @@ class BundleResult:
     def get_frame_dataset(
         self,
         *,
-        stage: str = "post_projection_pre_reduction",
+        stage: str = "post_projection",
         reducer=None,
         max_frames: Optional[int] = None,
         rng_seed: Optional[int] = None,
@@ -830,7 +830,7 @@ def bundle_show_max_trivial(
     title: Optional[str] = None,
     show_labels: bool = True,
     show_axes: bool = False,
-    tri_opacity: float = 0.25,
+    tri_opacity: float = 0.5,
     tri_color: str = "pink",
     hide_removed_edges: bool = True,
     highlight_removed: bool = True,

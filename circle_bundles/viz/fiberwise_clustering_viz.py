@@ -4,10 +4,8 @@ from collections import defaultdict
 from typing import Callable, Optional, Tuple, Union
 
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import networkx as nx
+from matplotlib.figure import Figure
 
 from .image_utils import fig_to_rgba, trim_image
 
@@ -31,7 +29,7 @@ def make_patch_cluster_diagram(
     save_path: Optional[str] = None,
     white_thresh: int = 250,
     figsize: Optional[Tuple[float, float]] = None,
-) -> tuple[Figure, plt.Axes]:
+):
     """
     Display patch thumbnails in a grid by (j,k) with graph edges drawn behind.
 
@@ -40,10 +38,11 @@ def make_patch_cluster_diagram(
     - data is (N, d)
     - clusters is (N, 2) with rows (j,k) corresponding to data rows
     - G has nodes labeled (j,k)
-    - vis_func returns either:
-        * a Matplotlib Figure, OR
-        * an image array (H,W,3) or (H,W,4)
+    - vis_func returns either a Matplotlib Figure OR an image array (H,W,3/4)
     """
+    import matplotlib.pyplot as plt
+    from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+
     data = np.asarray(data)
     clusters = np.asarray(clusters)
 
@@ -51,6 +50,9 @@ def make_patch_cluster_diagram(
         raise ValueError(f"clusters must be shape (N,2). Got {clusters.shape}.")
     if data.shape[0] != clusters.shape[0]:
         raise ValueError(f"data and clusters must have same N. Got {data.shape[0]} vs {clusters.shape[0]}.")
+
+    if data.shape[0] == 0:
+        raise ValueError("Empty data.")
 
     unique_js = np.unique(clusters[:, 0].astype(int))
     unique_js.sort()
@@ -61,6 +63,9 @@ def make_patch_cluster_diagram(
         ks.sort()
         for row_idx, k in enumerate(ks):
             coord_map[(int(j), int(k))] = (col_idx * float(col_spacing), -row_idx * float(row_spacing))
+
+    if not coord_map:
+        raise ValueError("No cluster coordinates could be constructed (coord_map empty).")
 
     if figsize is None:
         max_rows = max(len(np.unique(clusters[clusters[:, 0] == j, 1])) for j in unique_js) if len(unique_js) else 1
@@ -92,7 +97,9 @@ def make_patch_cluster_diagram(
             plt.close(rendered)
         else:
             rgba = np.asarray(rendered)
-            if rgba.ndim == 3 and rgba.shape[2] == 3:
+            if rgba.ndim != 3 or rgba.shape[2] not in (3, 4):
+                raise ValueError(f"vis_func returned array with invalid shape {rgba.shape} at idx={idx}.")
+            if rgba.shape[2] == 3:
                 alpha = 255 * np.ones((*rgba.shape[:2], 1), dtype=rgba.dtype)
                 rgba = np.concatenate([rgba, alpha], axis=2)
 
@@ -120,9 +127,13 @@ def get_G_vertex_coords(G: nx.Graph) -> np.ndarray:
     Compute 2D coordinates for nodes labeled (j,k):
       - same j -> same x column
       - within column: y evenly spaced in [0,1]
+
     Returns coords in the same order as list(G.nodes()).
     """
     nodes = list(G.nodes())
+    if len(nodes) == 0:
+        return np.zeros((0, 2), dtype=float)
+
     j_groups: dict[int, list[int]] = defaultdict(list)
     for (j, k) in nodes:
         j_groups[int(j)].append(int(k))

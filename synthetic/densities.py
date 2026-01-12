@@ -1,4 +1,4 @@
-# circle_bundles/synthetic/densities.py
+# synthetic/densities.py
 from __future__ import annotations
 
 from typing import Optional, Tuple, Union
@@ -27,7 +27,7 @@ def mesh_to_density(
     eps: float = 1e-12,
 ) -> np.ndarray:
     """
-    Convert a trimesh object into a flattened density on a cubic grid in [-1,1]^3
+    Convert a mesh into a flattened density on a cubic grid in [-1,1]^3
     by sampling the surface and placing a Gaussian in distance-to-surface.
 
     Notes
@@ -41,11 +41,13 @@ def mesh_to_density(
     density : (grid_size^3,) ndarray
         Flattened density values.
     """
+    grid_size = int(grid_size)
     if grid_size <= 0:
         raise ValueError(f"grid_size must be positive. Got {grid_size}.")
     sigma = float(sigma)
     if sigma <= 0:
         raise ValueError(f"sigma must be > 0. Got {sigma}.")
+    n_surface_samples = int(n_surface_samples)
     if n_surface_samples <= 0:
         raise ValueError(f"n_surface_samples must be positive. Got {n_surface_samples}.")
 
@@ -54,7 +56,7 @@ def mesh_to_density(
     mesh.apply_translation(-mesh.center_mass)
 
     scale = float(np.max(np.linalg.norm(mesh.vertices, axis=1)))
-    if scale <= eps:
+    if scale <= float(eps):
         raise ValueError("Mesh appears degenerate (near-zero scale).")
     mesh.apply_scale(0.99 / scale)
 
@@ -64,9 +66,8 @@ def mesh_to_density(
     voxel_coords = np.stack([X, Y, Z], axis=-1).reshape(-1, 3)
 
     # Sample surface points and build KD-tree
-    # (Older trimesh versions don't accept rng; keep clean/simple.)
-    _ = rng  # best-effort placeholder; avoids unused-arg lint in some setups
-    surface_samples = mesh.sample(int(n_surface_samples))
+    _ = rng  # best-effort placeholder (older trimesh versions don't accept rng)
+    surface_samples = mesh.sample(n_surface_samples)
 
     tree = cKDTree(surface_samples)
     dists, _ = tree.query(voxel_coords, k=1)
@@ -75,7 +76,7 @@ def mesh_to_density(
 
     if normalize:
         s = float(density.sum())
-        if s > eps:
+        if s > float(eps):
             density = density / s
 
     return density
@@ -92,7 +93,7 @@ def get_density_axes(
     """
     Compute principal axes for a batch of 3D densities on a [-1,1]^3 grid.
 
-    For each density rho, compute weighted covariance (inertia):
+    For each density rho, compute weighted covariance/inertia:
         M = Σ rho(x) (x - μ)(x - μ)^T
     and return either:
       - smallest-eigenvalue direction (least spread), or
@@ -102,13 +103,14 @@ def get_density_axes(
     -------
     directions : (N,3)
     ratios : (N,), optional
-        If smallest: (λ_min / λ_mid), else: (λ_max / λ_mid) (with small stabilizer).
+        If smallest: (λ_min / λ_mid), else: (λ_max / λ_mid) with a small stabilizer.
     """
     flat_densities = np.asarray(flat_densities, dtype=float)
     if flat_densities.ndim != 2:
         raise ValueError(f"flat_densities must be 2D. Got shape {flat_densities.shape}.")
 
     N, D = flat_densities.shape
+    grid_size = int(grid_size)
     expected = grid_size**3
     if D != expected:
         raise ValueError(
@@ -122,12 +124,12 @@ def get_density_axes(
 
     directions = np.zeros((N, 3), dtype=float)
     ratios = np.zeros(N, dtype=float)
-
     stab = 1e-6
+
     for i in range(N):
         rho = flat_densities[i]
         s = float(rho.sum())
-        if s <= eps:
+        if s <= float(eps):
             directions[i] = np.array([1.0, 0.0, 0.0])
             ratios[i] = 0.0
             continue
@@ -177,17 +179,17 @@ def rotate_density(
     rotated_densities : (k, grid_size^3)
         Flattened rotated densities.
     """
+    grid_size = int(grid_size)
+
     dens = np.asarray(density, dtype=float)
     if dens.ndim == 1:
         if dens.size != grid_size**3:
-            raise ValueError(
-                f"density size mismatch: got {dens.size}, expected {grid_size**3}."
-            )
+            raise ValueError(f"density size mismatch: got {dens.size}, expected {grid_size**3}.")
         dens = dens.reshape((grid_size, grid_size, grid_size))
     elif dens.shape != (grid_size, grid_size, grid_size):
         raise ValueError(
             f"density must be shape ({grid_size},{grid_size},{grid_size}) "
-            f"or flat length {grid_size**3}."
+            f"or flat length {grid_size**3}. Got {dens.shape}."
         )
 
     rots = np.asarray(rotations, dtype=float)
@@ -215,7 +217,7 @@ def rotate_density(
         Rm = rots[i]
         # sample dens at points corresponding to inverse transform:
         rotated_coords = (Rm.T @ coords) + center  # (3, N) in index space
-        out[i] = map_coordinates(dens, rotated_coords, order=order, mode=mode, cval=cval)
+        out[i] = map_coordinates(dens, rotated_coords, order=int(order), mode=mode, cval=float(cval))
 
     return out
 
@@ -244,6 +246,5 @@ def get_mesh_sample(mesh: trimesh.Trimesh, O3_data: np.ndarray) -> np.ndarray:
     rot_mats = O3_data.reshape(-1, 3, 3)  # (n,3,3)
 
     # rotated[i, v, :] = verts[v, :] @ rot_mats[i].T
-    rotated = np.einsum("vj, nij -> nvi", verts, rot_mats)  # (n,N,3)
-
+    rotated = np.einsum("vj,nij->nvi", verts, rot_mats)  # (n,N,3)
     return rotated.reshape(rotated.shape[0], -1)

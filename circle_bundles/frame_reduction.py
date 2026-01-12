@@ -16,9 +16,19 @@ from typing import List, Optional, Sequence, Tuple, Literal
 
 import numpy as np
 
-from .status_utils import _status, _status_clear  # <- use shared status helpers
+from .status_utils import _status, _status_clear  # shared status helpers
 
 ReduceMethod = Literal["none", "subspace_pca", "psc"]
+
+__all__ = [
+    "ReduceMethod",
+    "FrameReducerConfig",
+    "FrameReductionReport",
+    "reduce_frames_subspace_pca",
+    "reduction_curve_subspace_pca",
+    "reduce_frames_psc",
+    "reduction_curve_psc",
+]
 
 
 # ============================================================
@@ -38,6 +48,12 @@ class FrameReducerConfig:
 
     max_frames:
       optional subsampling for speed (fit reducer on at most max_frames frames).
+
+    rng_seed:
+      used for subsampling.
+
+    psc_verbosity:
+      forwarded to PSC.manopt_alpha.
     """
     method: ReduceMethod = "none"
     d: int = 0
@@ -51,7 +67,8 @@ class FrameReductionReport:
     method: ReduceMethod
     D_in: int
     d_out: int
-    mean_proj_err: float  # mean ||Y - BB^T Y||_F (or alpha alpha^T)
+    sup_proj_err: float   # sup ||Y - Π(Y)||_F   (ε_red)
+    mean_proj_err: float  # mean ||Y - Π(Y)||_F  (\bar{ε}_red)
 
     def to_text(self, *, decimals: int = 3) -> str:
         r = int(decimals)
@@ -63,15 +80,17 @@ class FrameReductionReport:
             + "\n\n"
             + f"Method: {self.method}\n"
             + f"Ambient dim: D={self.D_in} → d={self.d_out}\n"
-            + f"Mean projection error (||Y - BB^T Y||_F): {self.mean_proj_err:.{r}f}\n"
+            + f"Sup projection error (||Y - Π(Y)||_F): {self.sup_proj_err:.{r}f}\n"
+            + f"Mean projection error (||Y - Π(Y)||_F): {self.mean_proj_err:.{r}f}\n"
             + "\n"
             + "=" * 40
             + "\n"
         )
 
 
+
 # ============================================================
-# Internal progress helpers (use status_utils for actual printing)
+# Progress helpers
 # ============================================================
 
 def _maybe_status(progress: bool, msg: str) -> None:
@@ -187,6 +206,8 @@ def subspace_pca_fit(frames: Sequence[np.ndarray], *, d: int) -> Tuple[np.ndarra
     M = np.zeros((D, D), dtype=float)
     for Y in frames:
         Y = np.asarray(Y, dtype=float)
+        if Y.shape != (D, 2):
+            raise ValueError("All frames must share the same ambient dimension D and have shape (D,2).")
         M += Y @ Y.T
     M /= float(len(frames))
 
@@ -219,7 +240,7 @@ def reduce_frames_subspace_pca(
     d: int,
     max_frames: Optional[int] = None,
     rng_seed: int = 0,
-    progress: bool = False,   # NEW
+    progress: bool = False,
 ) -> Tuple[np.ndarray, FrameReductionReport, np.ndarray]:
     """
     Reduce all frames Phi_true[j,s] (D,2) -> Phi_red[j,s] (d,2) using subspace PCA.
@@ -232,10 +253,15 @@ def reduce_frames_subspace_pca(
     Phi_true = np.asarray(Phi_true, dtype=float)
     U = np.asarray(U, dtype=bool)
 
+    if Phi_true.ndim != 4:
+        raise ValueError(f"Expected Phi_true with shape (n_sets,n_samples,D,2). Got {Phi_true.shape}.")
+
     n_sets, n_samples, D, two = Phi_true.shape
     if two != 2:
         raise ValueError("Phi_true last dim must be 2.")
-    if not (2 <= d <= D):
+    if U.shape != (n_sets, n_samples):
+        raise ValueError("U shape mismatch with Phi_true.")
+    if not (2 <= int(d) <= int(D)):
         raise ValueError(f"Need 2 <= d <= D. Got d={d}, D={D}.")
 
     _maybe_status(progress, f"[frame reduction | subspace_pca] collecting frames (max_frames={max_frames})...")
@@ -247,7 +273,7 @@ def reduce_frames_subspace_pca(
     _maybe_status(progress, f"[frame reduction | subspace_pca] fitting basis B (D={D} → d={d}) on {len(frames_fit)} frames...")
     B, _ = subspace_pca_fit(frames_fit, d=int(d))
 
-    Phi_red = np.zeros((n_sets, n_samples, d, 2), dtype=float)
+    Phi_red = np.zeros((n_sets, n_samples, int(d), 2), dtype=float)
     recon_errs: List[float] = []
 
     total = int(np.count_nonzero(U))
@@ -260,7 +286,7 @@ def reduce_frames_subspace_pca(
             if not U[j, s]:
                 continue
             Y = Phi_true[j, s]
-            Yproj = B @ (B.T @ Y)
+            Yproj = B @ (B.T @ Y)  # Π(Y) in ambient space
             recon_errs.append(float(np.linalg.norm(Y - Yproj, ord="fro")))
             Phi_red[j, s] = subspace_pca_transform_frame(B, Y)
 
@@ -269,11 +295,15 @@ def reduce_frames_subspace_pca(
                 _status(f"[frame reduction | subspace_pca] transforming frames: {done}/{total}")
 
     errs = np.asarray(recon_errs, dtype=float)
+    sup_err = float(np.max(errs)) if errs.size else 0.0
+    mean_err = float(np.mean(errs)) if errs.size else 0.0
+
     rep = FrameReductionReport(
         method="subspace_pca",
         D_in=int(D),
         d_out=int(d),
-        mean_proj_err=float(np.mean(errs)) if errs.size else 0.0,
+        sup_proj_err=sup_err,
+        mean_proj_err=mean_err,
     )
     _maybe_clear(progress)
     return Phi_red, rep, B
@@ -286,7 +316,7 @@ def reduction_curve_subspace_pca(
     dims: Sequence[int],
     max_frames: Optional[int] = None,
     rng_seed: int = 0,
-    progress: bool = False,   # NEW
+    progress: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     For each d in dims, fit B_d and compute mean ||Y - B_d B_d^T Y||_F^2
@@ -339,15 +369,10 @@ def reduce_frames_psc(
     max_frames: Optional[int] = None,
     rng_seed: int = 0,
     verbosity: int = 0,
-    progress: bool = False,   # NEW
+    progress: bool = False,
 ) -> Tuple[np.ndarray, FrameReductionReport, np.ndarray]:
     """
-    Reduce frames using the PSC package (HarlinLee/PSC):
-
-      - Collect frames Y ∈ R^{D×2} with orthonormal columns.
-      - Stack into ys with shape (s, D, 2).
-      - Fit alpha ∈ R^{D×d} (orthonormal cols) via PSC.PCA + manopt_alpha.
-      - Transform each frame by Yd = alpha^T Y and polar re-orthonormalize.
+    Reduce frames using the PSC package (HarlinLee/PSC).
 
     Returns:
       Phi_red: (n_sets,n_samples,d,2)
@@ -357,10 +382,15 @@ def reduce_frames_psc(
     Phi_true = np.asarray(Phi_true, dtype=float)
     U = np.asarray(U, dtype=bool)
 
+    if Phi_true.ndim != 4:
+        raise ValueError(f"Expected Phi_true with shape (n_sets,n_samples,D,2). Got {Phi_true.shape}.")
+
     n_sets, n_samples, D, two = Phi_true.shape
     if two != 2:
         raise ValueError("PSC reducer expects k=2 frames (last dim must be 2).")
-    if not (2 <= d <= D):
+    if U.shape != (n_sets, n_samples):
+        raise ValueError("U shape mismatch with Phi_true.")
+    if not (2 <= int(d) <= int(D)):
         raise ValueError(f"Need 2 <= d <= D. Got d={d}, D={D}.")
 
     _maybe_status(progress, f"[frame reduction | psc] collecting frames (max_frames={max_frames})...")
@@ -372,7 +402,7 @@ def reduce_frames_psc(
     ys = np.stack(frames_fit, axis=0)  # (s, D, 2)
 
     try:
-        from PSC.projections import PCA as PSC_PCA, manopt_alpha
+        from PSC.projections import PCA as PSC_PCA, manopt_alpha  # type: ignore
     except Exception as e:
         _maybe_clear(progress)
         raise ImportError(
@@ -387,11 +417,11 @@ def reduce_frames_psc(
     alpha = manopt_alpha(ys, alpha_init, verbosity=int(verbosity))
     alpha = np.asarray(alpha, dtype=float)
 
-    if alpha.shape != (D, d):
+    if alpha.shape != (D, int(d)):
         _maybe_clear(progress)
-        raise ValueError(f"PSC returned alpha with shape {alpha.shape}, expected {(D,d)}.")
+        raise ValueError(f"PSC returned alpha with shape {alpha.shape}, expected {(D,int(d))}.")
 
-    Phi_red = np.zeros((n_sets, n_samples, d, 2), dtype=float)
+    Phi_red = np.zeros((n_sets, n_samples, int(d), 2), dtype=float)
     recon_errs: List[float] = []
 
     total = int(np.count_nonzero(U))
@@ -404,7 +434,7 @@ def reduce_frames_psc(
             if not U[j, s]:
                 continue
             Y = Phi_true[j, s]                      # (D,2)
-            Yproj = alpha @ (alpha.T @ Y)           # (D,2)
+            Yproj = alpha @ (alpha.T @ Y)           # Π(Y) in ambient space
             recon_errs.append(float(np.linalg.norm(Y - Yproj, ord="fro")))
             Phi_red[j, s] = _polar_orthonormalize_2cols(alpha.T @ Y)
 
@@ -413,11 +443,15 @@ def reduce_frames_psc(
                 _status(f"[frame reduction | psc] transforming frames: {done}/{total}")
 
     errs = np.asarray(recon_errs, dtype=float)
+    sup_err = float(np.max(errs)) if errs.size else 0.0
+    mean_err = float(np.mean(errs)) if errs.size else 0.0
+
     rep = FrameReductionReport(
         method="psc",
         D_in=int(D),
         d_out=int(d),
-        mean_proj_err=float(np.mean(errs)) if errs.size else 0.0,
+        sup_proj_err=sup_err,
+        mean_proj_err=mean_err,
     )
     _maybe_clear(progress)
     return Phi_red, rep, alpha
@@ -433,8 +467,8 @@ def reduction_curve_psc(
     psc_verbosity: int = 0,
     use_manopt: bool = True,
     plot: bool = False,
-    progress: bool = False,   # NEW
-):
+    progress: bool = False,
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     PSC reconstruction curve:
       For each d in dims:
@@ -461,7 +495,14 @@ def reduction_curve_psc(
 
     ys = np.stack(frames_fit, axis=0)  # (s, D, 2)
 
-    from PSC.projections import PCA as PSC_PCA, manopt_alpha
+    try:
+        from PSC.projections import PCA as PSC_PCA, manopt_alpha  # type: ignore
+    except Exception as e:
+        _maybe_clear(progress)
+        raise ImportError(
+            "PSC package not importable. Install it so that "
+            "`from PSC.projections import PCA, manopt_alpha` works."
+        ) from e
 
     mean_sq_err = np.zeros_like(dims_arr, dtype=float)
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Dict, Tuple
 
 import networkx as nx
-import gudhi as gd
 
 from ..combinatorics import canon_edge
 
@@ -12,28 +11,32 @@ Edge = Tuple[int, int]
 __all__ = ["graph_to_st", "create_st_dicts"]
 
 
-def graph_to_st(G: nx.Graph, *, max_dim: int = 2, use_weights: bool = False) -> gd.SimplexTree:
+def graph_to_st(G: nx.Graph, *, max_dim: int = 2, use_weights: bool = False):
     """
     Convert a NetworkX graph to a Gudhi SimplexTree by inserting:
       - vertices at filtration 0
       - edges at filtration = weight (if use_weights) else 0
       - cliques up to dimension max_dim (optional)
     """
+    try:
+        import gudhi as gd  # type: ignore
+    except Exception as e:
+        raise ImportError("graph_to_st requires gudhi to be installed.") from e
+
     st = gd.SimplexTree()
 
-    nodes = list(G.nodes())
-    for node in nodes:
+    for node in G.nodes():
         st.insert([node], filtration=0.0)
 
     for u, v, data in G.edges(data=True):
         filt = float(data.get("weight", 0.0)) if use_weights else 0.0
         st.insert([u, v], filtration=filt)
 
-    if max_dim > 1:
+    if int(max_dim) > 1:
         from networkx.algorithms.clique import find_cliques
         for clique in find_cliques(G):
-            if len(clique) <= max_dim + 1:
-                st.insert(clique, filtration=0.0)
+            if len(clique) <= int(max_dim) + 1:
+                st.insert(list(clique), filtration=0.0)
 
     return st
 
@@ -43,17 +46,22 @@ def create_st_dicts(
     filtered_G0: nx.Graph,
     *,
     max_dim: int = 1,
-) -> tuple[gd.SimplexTree, gd.SimplexTree, Dict[int, int], Dict[Edge, int], Dict[object, int]]:
+):
     """
     Convert graphs to simplex trees using integer vertex ids, and build:
       - vertex_dict: vertex id -> component id in filtered_G0 (or -1)
       - edge_dict: canonical (u,v) -> component id if endpoints in same component, else -1
       - node_to_index: original node label -> integer id
     """
+    try:
+        import gudhi as gd  # type: ignore
+    except Exception as e:
+        raise ImportError("create_st_dicts requires gudhi to be installed.") from e
+
     nodes = list(G0.nodes())
     node_to_index = {node: i for i, node in enumerate(nodes)}
 
-    def build_st(G: nx.Graph) -> gd.SimplexTree:
+    def build_st(G: nx.Graph):
         st = gd.SimplexTree()
         for node in G.nodes():
             st.insert([node_to_index[node]], filtration=0.0)
@@ -63,6 +71,15 @@ def create_st_dicts(
                 continue
             a, b = canon_edge(iu, iv)
             st.insert([a, b], filtration=0.0)
+
+        # If you ever want cliques here, we can mirror graph_to_st behavior.
+        if int(max_dim) > 1:
+            # optional: insert triangles etc from cliques
+            from networkx.algorithms.clique import find_cliques
+            for clique in find_cliques(G):
+                if len(clique) <= int(max_dim) + 1:
+                    st.insert([node_to_index[x] for x in clique], filtration=0.0)
+
         return st
 
     G0_st = build_st(G0)

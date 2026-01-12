@@ -1,3 +1,4 @@
+# synthetic/s2_bundles.py
 from __future__ import annotations
 
 from typing import Optional, Tuple
@@ -24,14 +25,10 @@ def _get_rng(rng: Optional[np.random.Generator]) -> np.random.Generator:
 
 
 def _safe_normalize(x: np.ndarray, *, axis: int = -1, eps: float = 1e-12) -> np.ndarray:
-    """
-    Normalize x along `axis`, guarding against near-zero norms.
-
-    Returns an array with the same shape as x.
-    """
+    """Normalize x along `axis`, guarding against near-zero norms."""
     x = np.asarray(x, dtype=float)
     nrm = np.linalg.norm(x, axis=axis, keepdims=True)
-    nrm = np.maximum(nrm, eps)
+    nrm = np.maximum(nrm, float(eps))
     return x / nrm
 
 
@@ -53,6 +50,8 @@ def sample_sphere(
     dim=2 -> S^2 in R^3, output shape (n,3)
     dim=3 -> S^3 in R^4, output shape (n,4)
     """
+    n = int(n)
+    dim = int(dim)
     if n <= 0:
         raise ValueError(f"n must be positive. Got {n}.")
     if dim < 0:
@@ -67,10 +66,12 @@ def sample_sphere(
 # Hopf / Spin(3) / SO(3) helpers
 # ----------------------------
 
-import numpy as np
-from typing import Optional
-
-def hopf_projection(data: np.ndarray, *, v: Optional[np.ndarray] = None, eps: float = 1e-12) -> np.ndarray:
+def hopf_projection(
+    data: np.ndarray,
+    *,
+    v: Optional[np.ndarray] = None,
+    eps: float = 1e-12,
+) -> np.ndarray:
     """
     Generalized Hopf projection defined by q ↦ q v q^{-1}, where v ∈ S^2 ⊂ Im(H).
 
@@ -80,8 +81,6 @@ def hopf_projection(data: np.ndarray, *, v: Optional[np.ndarray] = None, eps: fl
         Quaternion coordinates: q = (a,b,c,d) with z1=a+ib, z2=c+id.
     v : (3,) array-like, optional
         Axis vector in R^3. Will be normalized. Default is e1 = (1,0,0).
-    eps : float
-        Numerical stability epsilon.
 
     Returns
     -------
@@ -95,7 +94,7 @@ def hopf_projection(data: np.ndarray, *, v: Optional[np.ndarray] = None, eps: fl
         v = np.array([1.0, 0.0, 0.0], dtype=float)
     else:
         v = np.asarray(v, dtype=float).reshape(3,)
-    v = v / max(np.linalg.norm(v), eps)
+    v = v / max(np.linalg.norm(v), float(eps))
 
     # Parse quaternion components
     if np.iscomplexobj(data):
@@ -111,25 +110,22 @@ def hopf_projection(data: np.ndarray, *, v: Optional[np.ndarray] = None, eps: fl
         a, b, c, d = data[:, 0], data[:, 1], data[:, 2], data[:, 3]
 
     # Normalize q
-    nrm = np.sqrt(a*a + b*b + c*c + d*d)
-    nrm = np.maximum(nrm, eps)
-    a, b, c, d = a/nrm, b/nrm, c/nrm, d/nrm
+    nrm = np.sqrt(a * a + b * b + c * c + d * d)
+    nrm = np.maximum(nrm, float(eps))
+    a, b, c, d = a / nrm, b / nrm, c / nrm, d / nrm
 
-    # Use the standard vector rotation formula for unit quaternions:
+    # Unit quaternion vector rotation:
     # For q = (a, u) with u=(b,c,d), rotate v by:
     # v' = v + 2a(u×v) + 2(u×(u×v))
-    u = np.stack([b, c, d], axis=1)              # (n,3)
-    v0 = v[None, :]                               # (1,3) broadcasts
+    u = np.stack([b, c, d], axis=1)  # (n,3)
+    v0 = v[None, :]                  # (1,3) broadcasts
 
-    uv = np.cross(u, v0)                          # (n,3)
-    uuv = np.cross(u, uv)                         # (n,3)
+    uv = np.cross(u, v0)
+    uuv = np.cross(u, uv)
 
     out = v0 + 2.0 * a[:, None] * uv + 2.0 * uuv
-    # out should already be unit (up to numerical error), but you can normalize if you like:
-    out = out / np.maximum(np.linalg.norm(out, axis=1, keepdims=True), eps)
+    out = out / np.maximum(np.linalg.norm(out, axis=1, keepdims=True), float(eps))
     return out
-
-
 
 
 def spin3_adjoint_to_so3(data: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
@@ -146,7 +142,7 @@ def spin3_adjoint_to_so3(data: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     """
     data = np.asarray(data)
     if data.ndim != 2:
-        raise ValueError(f"data must be 2D. Got shape {data.shape}.")
+        raise ValueError(f"data must be D. Got shape {data.shape}.")
 
     if np.iscomplexobj(data):
         if data.shape[1] != 2:
@@ -160,9 +156,8 @@ def spin3_adjoint_to_so3(data: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
             raise ValueError(f"real data must have shape (n,4). Got {data.shape}.")
         a, b, c, d = data[:, 0], data[:, 1], data[:, 2], data[:, 3]
 
-    # Normalize to unit quaternions
     nrm = np.sqrt(a * a + b * b + c * c + d * d)
-    nrm = np.maximum(nrm, eps)
+    nrm = np.maximum(nrm, float(eps))
     a, b, c, d = a / nrm, b / nrm, c / nrm, d / nrm
 
     aa, bb, cc, dd = a * a, b * b, c * c, d * d
@@ -188,10 +183,12 @@ def spin3_adjoint_to_so3(data: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     return R_flat
 
 
-import numpy as np
-from typing import Optional
-
-def so3_to_s2_projection(R: np.ndarray, *, v: Optional[np.ndarray] = None, eps: float = 1e-12) -> np.ndarray:
+def so3_to_s2_projection(
+    R: np.ndarray,
+    *,
+    v: Optional[np.ndarray] = None,
+    eps: float = 1e-12,
+) -> np.ndarray:
     """
     Projection SO(3) -> S^2 defined by R ↦ R v, with v ∈ S^2.
 
@@ -209,25 +206,22 @@ def so3_to_s2_projection(R: np.ndarray, *, v: Optional[np.ndarray] = None, eps: 
         v = np.array([1.0, 0.0, 0.0], dtype=float)
     else:
         v = np.asarray(v, dtype=float).reshape(3,)
-    v = v / max(np.linalg.norm(v), eps)
+    v = v / max(np.linalg.norm(v), float(eps))
 
     if R.shape == (3, 3):
         return R @ v
 
     if R.ndim == 3 and R.shape[1:] == (3, 3):
-        # einsum: (n,3,3) dot (3,) -> (n,3)
         return np.einsum("nij,j->ni", R, v)
 
     if R.shape == (9,):
-        M = R.reshape(3, 3)
-        return M @ v
+        return R.reshape(3, 3) @ v
 
     if R.ndim == 2 and R.shape[1] == 9:
         M = R.reshape(-1, 3, 3)
         return np.einsum("nij,j->ni", M, v)
 
     raise ValueError(f"Expected (3,3), (n,3,3), (9,), or (n,9). Got {R.shape}.")
-
 
 
 # ----------------------------
@@ -251,11 +245,12 @@ def sample_S2_trivial(
     base_points : (n_points, 3) points on S^2
     angles : (n_points,) fiber angles in radians
     """
+    n_points = int(n_points)
     if n_points <= 0:
         raise ValueError(f"n_points must be positive. Got {n_points}.")
     rng = _get_rng(rng)
 
-    base_points = sample_sphere(n_points, dim=2, rng=rng)  # <-- S^2 in R^3
+    base_points = sample_sphere(n_points, dim=2, rng=rng)
     angles = 2.0 * np.pi * rng.random(n_points)
 
     radii = rng.normal(loc=float(radius_mean), scale=float(sigma), size=n_points)
@@ -282,13 +277,11 @@ def tangent_frame_on_s2(p: np.ndarray, *, eps: float = 1e-12) -> Tuple[np.ndarra
     x, y, _z = p
     r_xy = np.hypot(x, y)
 
-    if r_xy <= eps:
-        # Near pole: start with +x and Gram-Schmidt it.
+    if r_xy <= float(eps):
         e1 = np.array([1.0, 0.0, 0.0], dtype=float)
         e1 = e1 - np.dot(e1, p) * p
         e1 = _safe_normalize(e1, axis=0)
     else:
-        # Azimuthal direction around z-axis
         phi = np.arctan2(y, x)
         e1 = np.array([-np.sin(phi), np.cos(phi), 0.0], dtype=float)
         e1 = _safe_normalize(e1, axis=0)
@@ -312,6 +305,7 @@ def sample_S2_unit_tangent(
 
     If equator=True, restrict base points to the equator z=0.
     """
+    n_points = int(n_points)
     if n_points <= 0:
         raise ValueError(f"n_points must be positive. Got {n_points}.")
     rng = _get_rng(rng)
@@ -320,15 +314,13 @@ def sample_S2_unit_tangent(
         theta0 = 2.0 * np.pi * rng.random(n_points)
         base_points = np.column_stack([np.cos(theta0), np.sin(theta0), np.zeros(n_points)])
     else:
-        base_points = sample_sphere(n_points, dim=2, rng=rng)  # <-- S^2 in R^3
+        base_points = sample_sphere(n_points, dim=2, rng=rng)
 
     angles = 2.0 * np.pi * rng.random(n_points)
 
     radii = rng.normal(loc=float(radius_mean), scale=float(sigma), size=n_points)
     radii = np.clip(radii, float(radius_clip[0]), float(radius_clip[1]))
 
-    # Vectorized tangent frame construction:
-    # e1 = normalized([-y, x, 0]) unless near poles; near poles fallback to Gram-Schmidt of [1,0,0].
     x = base_points[:, 0]
     y = base_points[:, 1]
     r_xy = np.hypot(x, y)

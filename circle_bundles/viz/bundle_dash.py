@@ -1,4 +1,4 @@
-# viz/bundle_dash.py
+# circle_bundles/viz/bundle_dash.py
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -9,10 +9,6 @@ import numpy as np
 import plotly.graph_objects as go
 from sklearn.decomposition import PCA
 
-import dash
-from dash import dcc, html
-from dash.dependencies import Input, Output
-
 __all__ = [
     "BundleVizInputs",
     "find_free_port",
@@ -20,8 +16,8 @@ __all__ = [
     "prepare_bundle_viz_inputs_from_bundle",
     "make_bundle_app",
     "run_bundle_app",
-    "show_bundle_vis",          # NEW public general entrypoint
-    "save_bundle_snapshot",     # NEW optional offline saving helper
+    "show_bundle_vis",
+    "save_bundle_snapshot",
 ]
 
 
@@ -31,10 +27,10 @@ __all__ = [
 
 @dataclass
 class BundleVizInputs:
-    base_points: np.ndarray               # (m, d_base)
-    data: np.ndarray                      # (m, d_data)
-    dist_mat: np.ndarray                  # (m, m)
-    colors: Optional[np.ndarray] = None   # (m,)
+    base_points: np.ndarray                 # (m, d_base)
+    data: np.ndarray                        # (m, d_data)
+    dist_mat: np.ndarray                    # (m, m)
+    colors: Optional[np.ndarray] = None     # (m,)
     densities: Optional[np.ndarray] = None  # (m,)
     landmark_masks: Optional[List[np.ndarray]] = None  # list of (m,) bool arrays
     sample_inds: Optional[np.ndarray] = None           # (m,) indices into original
@@ -65,7 +61,7 @@ def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndar
         raise ValueError("base_points has zero columns.")
 
     pca = PCA(n_components=min(3, d))
-    emb = pca.fit_transform(base_points)
+    emb = pca.fit_transform(base_points.astype(float))
     explained = np.cumsum(pca.explained_variance_ratio_)[: min(3, d)]
 
     if emb.shape[1] < 3:
@@ -74,7 +70,7 @@ def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndar
 
 
 def _normalize_to_unit_interval(vals: np.ndarray) -> np.ndarray:
-    vals = np.asarray(vals, dtype=float)
+    vals = np.asarray(vals, dtype=float).reshape(-1)
     vmin = float(np.min(vals))
     vmax = float(np.max(vals))
     if vmax <= vmin:
@@ -121,7 +117,7 @@ def _normalize_landmarks(landmark_inds: Any, n: int) -> Optional[List[np.ndarray
 def _subset_landmarks(masks: Optional[List[np.ndarray]], sample_inds: np.ndarray) -> Optional[List[np.ndarray]]:
     if masks is None:
         return None
-    return [m[sample_inds] for m in masks]
+    return [np.asarray(m, bool)[sample_inds] for m in masks]
 
 
 def _parse_click_index(clickData: Any) -> Optional[int]:
@@ -169,9 +165,8 @@ def _call_get_dist_mat(
             return np.asarray(get_dist_mat(bp))
 
     # 3) Library fallback
-    from ..metrics import get_dist_mat as _get_dist_mat  # adjust if your relative path differs
+    from ..metrics import get_dist_mat as _get_dist_mat
     return np.asarray(_get_dist_mat(bp, metric=base_metric))
-
 
 
 # ----------------------------
@@ -194,6 +189,10 @@ def prepare_bundle_viz_inputs(
 ) -> BundleVizInputs:
     """
     Produce a downsampled view of base_points/data plus a distance matrix.
+
+    If full_dist_mat is provided and same_metric=True, we will:
+      - use it directly if no downsampling happened
+      - otherwise subset it via dist_mat = full_dist_mat[sample_inds][:, sample_inds]
     """
     base_points = np.asarray(base_points)
     data = np.asarray(data)
@@ -205,11 +204,11 @@ def prepare_bundle_viz_inputs(
         raise ValueError(f"data and base_points must align: data {data.shape} vs base {base_points.shape}")
 
     if colors is not None:
-        colors = np.asarray(colors)
+        colors = np.asarray(colors).reshape(-1)
         if colors.shape[0] != n:
             raise ValueError("colors must have length n.")
     if densities is not None:
-        densities = np.asarray(densities)
+        densities = np.asarray(densities).reshape(-1)
         if densities.shape[0] != n:
             raise ValueError("densities must have length n.")
 
@@ -220,8 +219,9 @@ def prepare_bundle_viz_inputs(
 
     if n > int(max_samples):
         sample_inds = rng.choice(n, size=int(max_samples), replace=False)
+        sample_inds.sort()  # stable order helps toggling / reproducibility
     else:
-        sample_inds = np.arange(n)
+        sample_inds = np.arange(n, dtype=int)
 
     bp = base_points[sample_inds]
     X = data[sample_inds]
@@ -231,12 +231,16 @@ def prepare_bundle_viz_inputs(
 
     m = int(bp.shape[0])
 
-    # Reuse full dist mat only if it's truly "the same" and we kept all samples
-    if full_dist_mat is not None and same_metric and m == n:
-        dist_mat = np.asarray(full_dist_mat)
+    # Use / subset full dist matrix when available
+    if full_dist_mat is not None and bool(same_metric):
+        full_dist_mat = np.asarray(full_dist_mat)
+        if full_dist_mat.shape != (n, n):
+            raise ValueError(f"full_dist_mat must be (n,n) with n={n}. Got {full_dist_mat.shape}.")
+        dist_mat = full_dist_mat[np.ix_(sample_inds, sample_inds)]
     else:
         dist_mat = _call_get_dist_mat(get_dist_mat, bp, base_metric)
 
+    dist_mat = np.asarray(dist_mat)
     if dist_mat.shape != (m, m):
         raise ValueError(f"dist_mat must be (m,m). Got {dist_mat.shape} for m={m}")
 
@@ -273,7 +277,6 @@ def prepare_bundle_viz_inputs_from_bundle(
     base_points = getattr(cover, "base_points", None)
     if base_points is None:
         raise AttributeError("bundle.cover.base_points is missing (needed for show_bundle).")
-
 
     cover_metric = getattr(cover, "metric", None)
     if base_metric is None:
@@ -340,10 +343,11 @@ def _make_figures(
 
     if selected_index is not None and 0 <= selected_index < n:
         label = f"Selected Point ({selected_index})"
+
         nearby_indices = np.where(dist_mat[selected_index] < float(r))[0]
 
         if densities is not None and density_threshold is not None:
-            keep = densities[nearby_indices] > float(density_threshold)
+            keep = np.asarray(densities[nearby_indices] > float(density_threshold), dtype=bool)
             filtered = nearby_indices[keep]
         else:
             filtered = nearby_indices
@@ -360,20 +364,23 @@ def _make_figures(
                 hoverinfo="none",
             )
         )
-        fig_base.add_trace(
-            go.Scatter3d(
-                x=base_embedded[filtered, 0],
-                y=base_embedded[filtered, 1],
-                z=base_embedded[filtered, 2],
-                mode="markers",
-                marker=dict(size=3, color="blue", opacity=0.8),
-                name="Neighbors",
-                hoverinfo="none",
+        if filtered.size:
+            fig_base.add_trace(
+                go.Scatter3d(
+                    x=base_embedded[filtered, 0],
+                    y=base_embedded[filtered, 1],
+                    z=base_embedded[filtered, 2],
+                    mode="markers",
+                    marker=dict(size=3, color="blue", opacity=0.8),
+                    name="Neighbors",
+                    hoverinfo="none",
+                )
             )
-        )
 
-        nearby_data = data[filtered]
-        if nearby_data.shape[0] > 1:
+        # Fiber PCA
+        nearby_data = data[filtered] if filtered.size else np.zeros((0, data.shape[1]), dtype=float)
+
+        if nearby_data.shape[0] >= 2:
             pca_fiber = PCA(n_components=min(3, nearby_data.shape[1]))
             fiber_pca = pca_fiber.fit_transform(nearby_data)
             if fiber_pca.shape[1] < 3:
@@ -385,7 +392,7 @@ def _make_figures(
             if normalized_colors is not None and colors is not None:
                 cvals = normalized_colors[filtered]
                 orig = colors[filtered]
-                nonzero = orig != 0
+                nonzero = np.asarray(orig != 0, dtype=bool)
 
                 if np.any(nonzero):
                     fig_data.add_trace(
@@ -421,7 +428,8 @@ def _make_figures(
             if landmark_masks is not None:
                 landmark_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow"]
                 for i, mask in enumerate(landmark_masks):
-                    local = np.where(np.asarray(mask, bool)[filtered])[0]
+                    mask = np.asarray(mask, bool)
+                    local = np.where(mask[filtered])[0]
                     if local.size:
                         fig_data.add_trace(
                             go.Scatter3d(
@@ -432,6 +440,20 @@ def _make_figures(
                                 hoverinfo="none",
                             )
                         )
+        elif nearby_data.shape[0] == 1:
+            # still show the single point so the panel isn't empty
+            fig_data.add_trace(
+                go.Scatter3d(
+                    x=[0.0], y=[0.0], z=[0.0],
+                    mode="markers",
+                    marker=dict(size=5, opacity=0.9, color="blue"),
+                    name="Fiber (1 point)",
+                    hoverinfo="none",
+                )
+            )
+            variance_text = "PCA Variance (Fiber): (neighborhood has 1 point)"
+        else:
+            variance_text = "PCA Variance (Fiber): (empty neighborhood)"
 
     fig_base.update_layout(
         title="Base Points",
@@ -458,7 +480,12 @@ def make_bundle_app(
     *,
     initial_r: float = 0.1,
     r_max: float = 2.0,
-) -> dash.Dash:
+):
+    # local imports so importing this module doesn't require dash
+    import dash
+    from dash import dcc, html
+    from dash.dependencies import Input, Output
+
     base_points = np.asarray(viz.base_points)
     data = np.asarray(viz.data)
     dist_mat = np.asarray(viz.dist_mat)
@@ -587,10 +614,13 @@ def make_bundle_app(
     return app
 
 
-def run_bundle_app(app: dash.Dash, *, port: Optional[int] = None, debug: bool = False):
+def run_bundle_app(app, *, port: Optional[int] = None, debug: bool = False):
+    # local import (dash is optional until you run)
     if port is None:
         port = find_free_port()
-    app.run(debug=debug, use_reloader=False, port=int(port))
+    url = f"http://127.0.0.1:{int(port)}/"
+    print(f"Bundle viewer running at: {url}")
+    app.run(debug=bool(debug), use_reloader=False, port=int(port))
 
 
 # ----------------------------
@@ -614,14 +644,13 @@ def show_bundle_vis(
     rng: Optional[np.random.Generator] = None,
     port: Optional[int] = None,
     debug: bool = False,
-) -> dash.Dash:
+):
     """
     General interactive viewer for (data, base_points) where base_points live in some metric space.
 
-    - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat).
+    - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat/base_metric).
     - "Fiber Data" shows PCA of data restricted to the selected neighborhood.
     """
-
     viz = prepare_bundle_viz_inputs(
         base_points=np.asarray(base_points),
         data=np.asarray(data),
@@ -660,12 +689,8 @@ def save_bundle_snapshot(
 
     Notes on saving:
       - HTML always works: fig.write_html("file.html")
-      - Static images (PNG/SVG/PDF) require the 'kaleido' package:
+      - Static images require 'kaleido':
           pip install -U kaleido
-        Then:
-          fig.write_image("out.pdf")  # yes, PDF is supported
-
-    Returns (fig_base, fig_data).
     """
     base_points = np.asarray(viz.base_points)
     data = np.asarray(viz.data)

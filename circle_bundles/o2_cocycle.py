@@ -1,3 +1,4 @@
+# circle_bundles/o2_cocycle.py
 """
 o2_cocycle.py
 
@@ -25,7 +26,22 @@ import numpy as np
 
 Mat2 = np.ndarray
 
-from .combinatorics import Edge, Tri, canon_edge, canon_tri
+from .combinatorics import Edge, canon_edge
+
+__all__ = [
+    "Mat2",
+    "angles_to_unit",
+    "rotation_matrix",
+    "reflection_axis_matrix",
+    "r_from_det",
+    "project_to_O2",
+    "det_sign",
+    "decompose_O2_as_R_times_r",
+    "TransitionReport",
+    "O2Cocycle",
+    "estimate_transitions",
+    "complete_edge_orientations",
+]
 
 
 # ----------------------------
@@ -35,6 +51,8 @@ from .combinatorics import Edge, Tri, canon_edge, canon_tri
 def angles_to_unit(theta: np.ndarray) -> np.ndarray:
     """(n,) angles -> (n,2) unit vectors."""
     theta = np.asarray(theta, dtype=float)
+    if theta.ndim != 1:
+        theta = theta.reshape(-1)
     return np.stack([np.cos(theta), np.sin(theta)], axis=1)
 
 
@@ -47,6 +65,7 @@ def rotation_matrix(theta: float) -> Mat2:
     return np.array([[c, -s],
                      [s,  c]], dtype=float)
 
+
 def reflection_axis_matrix(ref_angle: float) -> Mat2:
     """
     Reflection across the line through the origin making angle ref_angle with +x axis:
@@ -57,10 +76,12 @@ def reflection_axis_matrix(ref_angle: float) -> Mat2:
     return np.array([[ c2,  s2],
                      [ s2, -c2]], dtype=float)
 
+
 def r_from_det(det: int, ref_angle: float) -> Mat2:
     if det not in (+1, -1):
         raise ValueError("det must be ±1")
     return np.eye(2) if det == 1 else reflection_axis_matrix(ref_angle)
+
 
 def project_to_O2(M: Mat2) -> Mat2:
     """Project a near-orthogonal 2x2 matrix to O(2) via SVD."""
@@ -70,9 +91,11 @@ def project_to_O2(M: Mat2) -> Mat2:
     U, _, Vt = np.linalg.svd(M)
     return U @ Vt
 
+
 def det_sign(O: Mat2) -> int:
     d = float(np.linalg.det(O))
     return 1 if d >= 0 else -1
+
 
 def decompose_O2_as_R_times_r(O: Mat2, ref_angle: float = 0.0) -> Tuple[float, int]:
     """
@@ -82,8 +105,7 @@ def decompose_O2_as_R_times_r(O: Mat2, ref_angle: float = 0.0) -> Tuple[float, i
     if O.shape != (2, 2):
         raise ValueError("O must be 2x2.")
 
-    # If you ever feed in near-orthogonal matrices, project first.
-    # Here we just sanity check.
+    # Keep your convention: require approximately orthogonal.
     if not np.allclose(O.T @ O, np.eye(2), atol=1e-7):
         raise ValueError("O must be orthogonal (approximately).")
 
@@ -139,14 +161,14 @@ class O2Cocycle:
             e2 = canon_edge(*e)
             out[e2] = (float(th) / (2.0 * np.pi)) % 1.0
         return out
-    
+
     def restrict(self, edges: Iterable[Edge]) -> "O2Cocycle":
-        edges = {canon_edge(int(a), int(b)) for (a, b) in edges}
+        edges2 = {canon_edge(int(a), int(b)) for (a, b) in edges}
         return O2Cocycle(
-            Omega={e: self.Omega[e] for e in edges if e in self.Omega},
-            theta={e: self.theta[e] for e in edges if e in self.theta},
-            det={e: self.det[e] for e in edges if e in self.det},
-            err={e: self.err[e] for e in edges} if self.err else None,
+            Omega={e: self.Omega[e] for e in edges2 if e in self.Omega},
+            theta={e: self.theta[e] for e in edges2 if e in self.theta},
+            det={e: self.det[e] for e in edges2 if e in self.det},
+            err={e: self.err[e] for e in edges2} if self.err else None,
             ref_angle=self.ref_angle,
         )
 
@@ -166,7 +188,6 @@ class O2Cocycle:
             ref_angle=self.ref_angle,
         )
 
-    
     def orient_if_possible(
         self,
         edges: Iterable[Edge],
@@ -185,28 +206,7 @@ class O2Cocycle:
         g_j = r(ref_angle) if phi_j=-1, and set
             Omega'_{jk} = g_j * Omega_{jk} * g_k^{-1}  (here g_k^{-1}=g_k),
         which forces det(Omega'_{jk}) = +1 on those edges.
-
-        Parameters
-        ----------
-        edges:
-            Iterable of edges (j,k). May be directed or undirected; we canonize.
-        n_vertices:
-            Number of vertices in the cover graph. If None, inferred from edges.
-        require_all_edges_present:
-            If True, fail if any requested edge is missing from self.Omega.
-            If False, ignore missing edges in the constraint system (best-effort).
-
-        Returns
-        -------
-        ok:
-            True iff an orientation potential exists on the (requested) edge graph.
-        coc_oriented:
-            If ok=True, the oriented cocycle (new O2Cocycle). If ok=False, returns self.
-        phi_pm1:
-            (n_vertices,) array with entries ±1 giving the found potential (unvisited
-            vertices default to +1 if the graph is disconnected).
         """
-        # Canonize requested edges as undirected (j<k)
         E = [canon_edge(int(a), int(b)) for (a, b) in edges if a != b]
         E = sorted(set(E))
 
@@ -216,12 +216,9 @@ class O2Cocycle:
             else:
                 n_vertices = 1 + max(max(j, k) for (j, k) in E)
 
-        # Build adjacency with constraint signs s_{jk} = det_{jk} ∈ {+1,-1}
         adj: List[List[Tuple[int, int]]] = [[] for _ in range(n_vertices)]
-        missing: List[Edge] = []
         for (j, k) in E:
             if (j, k) not in self.det:
-                missing.append((j, k))
                 if require_all_edges_present:
                     phi = np.ones(n_vertices, dtype=int)
                     return False, self, phi
@@ -233,7 +230,6 @@ class O2Cocycle:
             adj[j].append((k, s))
             adj[k].append((j, s))
 
-        # Solve phi_k = s_{jk} * phi_j on each component
         phi = np.zeros(n_vertices, dtype=int)  # 0 means unassigned
         ok = True
 
@@ -252,22 +248,18 @@ class O2Cocycle:
                     elif phi[v] != want:
                         ok = False
                         break
-
             if not ok:
                 break
 
-        # Fill any isolated/unreached vertices with +1
         phi_pm1 = phi.copy()
         phi_pm1[phi_pm1 == 0] = 1
 
         if not ok:
             return False, self, phi_pm1
 
-        # Gauge elements: g_j = I or reflection about ref_angle axis
         R = reflection_axis_matrix(self.ref_angle)
         G: List[Mat2] = [np.eye(2) if phi_pm1[j] == 1 else R for j in range(n_vertices)]
 
-        # Gauge-transform all stored edges (these are j<k in your convention)
         Omega_new: Dict[Edge, Mat2] = {}
         det_new: Dict[Edge, int] = {}
         theta_new: Dict[Edge, float] = {}
@@ -283,7 +275,6 @@ class O2Cocycle:
                 det_new[(j, k)] = int(d2)
                 theta_new[(j, k)] = float(th2)
             else:
-                # out-of-range vertex labels: leave untouched
                 Omega_new[(j, k)] = O
                 det_new[(j, k)] = int(self.det[(j, k)])
                 theta_new[(j, k)] = float(self.theta[(j, k)])
@@ -296,8 +287,8 @@ class O2Cocycle:
             ref_angle=self.ref_angle,
         )
         return True, coc_oriented, phi_pm1
-    
-    
+
+
 def estimate_transitions(
     U: np.ndarray,
     f: np.ndarray,
@@ -362,12 +353,11 @@ def estimate_transitions(
         w = w / (wsum if wsum > 0 else 1.0)
 
         # Weighted orthogonal Procrustes: minimize || (O vk) - vj ||
-        # H = (vk_w)^T vj, H = U S V^T => O = U V^T
+        # (Keep your exact convention / formula.)
         H = (vk * w[:, None]).T @ vj
         U_svd, _, Vt_svd = np.linalg.svd(H)
         O = Vt_svd.T @ U_svd.T
 
-        
         # ensure in O(2) numerically
         O = project_to_O2(O)
 
@@ -421,30 +411,67 @@ def complete_edge_orientations(
     thetas: Optional[Dict[Edge, float]] = None,
     errs: Optional[Dict[Edge, float]] = None,
 ) -> Tuple[Dict[Edge, Mat2], Dict[Edge, int], Dict[Edge, float], Optional[Dict[Edge, float]]]:
+    """
+    Given a dict Omega that may contain only canonical edges (j<k) or may already
+    contain some directed edges, return a full dict containing BOTH directions:
+      (j,k) and (k,j) with transpose.
+
+    Also returns det/theta/err dictionaries aligned with the returned Omega_full.
+
+    Conventions are unchanged:
+      If Omega[(j,k)] maps k -> j, then Omega[(k,j)] = Omega[(j,k)]^T maps j -> k.
+    """
     Omega_full: Dict[Edge, Mat2] = {}
     det_full: Dict[Edge, int] = {}
     theta_full: Dict[Edge, float] = {}
     err_full: Optional[Dict[Edge, float]] = {} if errs is not None else None
 
-    for (j, k), O in Omega.items():
+    # Process a deterministic set of base edges to avoid double work if Omega already had both directions.
+    base_edges: List[Edge] = []
+    for (j, k) in Omega.keys():
+        jj, kk = int(j), int(k)
+        if jj == kk:
+            continue
+        base_edges.append(canon_edge(jj, kk))
+    base_edges = sorted(set(base_edges))
+
+    for (j, k) in base_edges:
+        # Prefer stored canonical direction if present; else use whichever is present.
+        if (j, k) in Omega:
+            O = np.asarray(Omega[(j, k)], dtype=float)
+            O_dir = (j, k)
+        elif (k, j) in Omega:
+            O = np.asarray(Omega[(k, j)], dtype=float).T  # convert to (j,k) direction
+            O_dir = (j, k)
+        else:
+            continue
+
         Omega_full[(j, k)] = O
 
         d = int(dets[(j, k)]) if (dets is not None and (j, k) in dets) else det_sign(O)
         det_full[(j, k)] = d
 
-        th = float(thetas[(j, k)]) % (2 * np.pi) if (thetas is not None and (j, k) in thetas) else decompose_O2_as_R_times_r(O, ref_angle)[0]
-        theta_full[(j, k)] = th
+        if thetas is not None and (j, k) in thetas:
+            th = float(thetas[(j, k)]) % (2 * np.pi)
+        else:
+            th = decompose_O2_as_R_times_r(O, ref_angle)[0]
+        theta_full[(j, k)] = float(th)
 
         if err_full is not None:
-            err_full[(j, k)] = float(errs[(j, k)]) if ((errs is not None) and ((j, k) in errs)) else np.nan
+            if errs is not None and (j, k) in errs:
+                err_full[(j, k)] = float(errs[(j, k)])
+            elif errs is not None and (k, j) in errs:
+                err_full[(j, k)] = float(errs[(k, j)])
+            else:
+                err_full[(j, k)] = np.nan
 
-    for (j, k), O in Omega.items():
+        # Reverse
         O_rev = O.T
         Omega_full[(k, j)] = O_rev
         th_rev, d_rev = decompose_O2_as_R_times_r(O_rev, ref_angle=ref_angle)
-        det_full[(k, j)] = d_rev
-        theta_full[(k, j)] = th_rev
+        det_full[(k, j)] = int(d_rev)
+        theta_full[(k, j)] = float(th_rev)
         if err_full is not None:
-            err_full[(k, j)] = float(errs[(j, k)]) if ((errs is not None) and ((j, k) in errs)) else np.nan
+            err_full[(k, j)] = err_full[(j, k)]
 
     return Omega_full, det_full, theta_full, err_full

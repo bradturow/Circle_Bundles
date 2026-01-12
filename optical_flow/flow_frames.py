@@ -1,4 +1,4 @@
-# flow_frames.py
+# optical_flow/flow_frames.py
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,14 +7,7 @@ from typing import Optional, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 
-import matplotlib.colors as mcolors
-import matplotlib.pyplot as plt
-
-import cv2
-import imageio.v3 as iio
-from PIL import Image, ImageDraw
-
-from .flow_processing import read_flo  # <-- unified .flo reader
+from .flow_processing import read_flo  # unified .flo reader
 
 PathLike = Union[str, Path]
 
@@ -61,13 +54,24 @@ def get_labeled_frame(
     dot_radius: int = 3,
     custom_colors: Sequence[str] = ("#4B0082", "#FF4500", "#ADD8E6"),
     show: bool = False,
-) -> Image.Image:
+):
     """
     Draw colored dots at patch locations on a Sintel frame.
 
     patch_df must have columns: ['row', 'column', 'color'].
     'color' can be any hashable ID (ints/strings). IDs are mapped to custom_colors.
     """
+    # Lazy imports (keeps package lightweight)
+    try:
+        import matplotlib.colors as mcolors
+    except Exception as e:  # pragma: no cover
+        raise ImportError("get_labeled_frame requires matplotlib.") from e
+
+    try:
+        from PIL import Image, ImageDraw
+    except Exception as e:  # pragma: no cover
+        raise ImportError("get_labeled_frame requires Pillow (PIL).") from e
+
     required = {"row", "column", "color"}
     missing = required - set(patch_df.columns)
     if missing:
@@ -110,6 +114,11 @@ def write_video_from_frames(
     codec: str = "MJPG",
 ) -> None:
     """Write an AVI video from a sequence of image paths using OpenCV."""
+    try:
+        import cv2
+    except Exception as e:  # pragma: no cover
+        raise ImportError("write_video_from_frames requires opencv-python (cv2).") from e
+
     if len(image_files) == 0:
         raise ValueError("image_files is empty")
 
@@ -148,6 +157,10 @@ def get_labeled_video(
     patch_df must contain at least columns: ['scene','frame','row','column'].
     inds_list is a list of boolean masks (length == len(patch_df)) selecting patches.
     Each mask becomes one color group (0,1,2,...).
+
+    Notes
+    -----
+    Assumes flo_paths are ordered by frame number, corresponding to frames 1..T.
     """
     patch_df = patch_df.reset_index(drop=True)
 
@@ -213,6 +226,16 @@ def annotate_optical_flow(
     Overlay optical flow vectors at lattice points on each frame and save as PDFs.
     Skips the last image in image_dir (since it may not have a .flo match).
     """
+    try:
+        import matplotlib.pyplot as plt
+    except Exception as e:  # pragma: no cover
+        raise ImportError("annotate_optical_flow requires matplotlib.") from e
+
+    try:
+        import imageio.v3 as iio
+    except Exception as e:  # pragma: no cover
+        raise ImportError("annotate_optical_flow requires imageio.") from e
+
     image_dir = Path(image_dir)
     flow_dir = Path(flow_dir)
     save_dir = Path(save_dir)
@@ -224,7 +247,7 @@ def annotate_optical_flow(
 
         try:
             img = iio.imread(img_path)
-            flow = read_flo(flow_path)  # <-- unified reader
+            flow = read_flo(flow_path)
         except Exception as e:
             print(f"❌ Failed to process {img_path.name}: {e}")
             continue

@@ -1,11 +1,8 @@
-# circle_bundles/viz/image_utils.py
 from __future__ import annotations
 
-from io import BytesIO
 from typing import Optional, Tuple, Union
 
 import numpy as np
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
@@ -50,14 +47,34 @@ def trim_image(img: np.ndarray, *, white_thresh: int = 250) -> np.ndarray:
     return arr[y0:y1, x0:x1]
 
 
+def _float_to_uint8(arr: np.ndarray) -> np.ndarray:
+    """
+    Convert float image to uint8.
+    Supports either [0,1] or [0,255] conventions.
+    """
+    arr = np.asarray(arr)
+    if arr.size == 0:
+        return arr.astype(np.uint8)
+
+    amax = float(np.nanmax(arr))
+    # Heuristic: if values look like 0..255, keep them; else assume 0..1.
+    if amax > 1.5:
+        arr = np.clip(arr, 0.0, 255.0)
+        return arr.astype(np.uint8)
+    arr = np.clip(arr, 0.0, 1.0)
+    return (arr * 255.0).astype(np.uint8)
+
+
 def _ensure_uint8_rgba(img: np.ndarray) -> np.ndarray:
     """Coerce image to uint8 RGBA."""
     arr = np.asarray(img)
 
-    # floats -> uint8
     if arr.dtype != np.uint8:
-        arr = np.clip(arr, 0.0, 1.0)
-        arr = (arr * 255.0).astype(np.uint8)
+        if np.issubdtype(arr.dtype, np.floating):
+            arr = _float_to_uint8(arr)
+        else:
+            # int types etc.
+            arr = np.clip(arr, 0, 255).astype(np.uint8)
 
     if arr.ndim == 2:
         arr = np.stack([arr, arr, arr], axis=-1)
@@ -77,36 +94,42 @@ def _transparent_outer_border_rgba(
     *,
     bg_rgb: Optional[Tuple[int, int, int]] = None,
     tol: int = 2,
-    alpha_bg_max: int = 5,   # NEW: only treat near-transparent as background
+    alpha_bg_max: int = 5,
 ) -> np.ndarray:
     """
     Make only the *outer* uniform background transparent (RGBA uint8),
-    but do NOT erase drawn content (like borders).
+    without erasing drawn content.
 
-    We only consider a row/col to be removable background if:
-      1) its RGB is close to bg (within tol), AND
-      2) its alpha is already near-transparent (<= alpha_bg_max).
+    We treat a row/col as removable background if:
+      1) its RGB is close to bg (within tol) for ALL pixels in that row/col, AND
+      2) its alpha is already near-transparent (<= alpha_bg_max) for ALL pixels.
     """
     img = np.array(rgba_u8, copy=True)
-    rgb = img[..., :3]
+    if img.ndim != 3 or img.shape[2] != 4:
+        raise ValueError(f"Expected RGBA (H,W,4). Got {img.shape}.")
+
+    rgb = img[..., :3].astype(np.int16)
     a = img[..., 3]
 
     if bg_rgb is None:
-        bg = rgb[0, 0].astype(int)
+        bg = rgb[0, 0].astype(np.int16)
     else:
-        bg = np.array(bg_rgb, dtype=int)
+        bg = np.array(bg_rgb, dtype=np.int16)
+
+    tol = int(tol)
+    alpha_bg_max = int(alpha_bg_max)
 
     def row_is_bg(r: int) -> bool:
-        rgb_ok = np.all(np.abs(rgb[r].astype(int) - bg) <= tol)
+        rgb_ok = np.all(np.abs(rgb[r, :, :] - bg[None, :]) <= tol)
         a_ok = np.max(a[r, :]) <= alpha_bg_max
         return bool(rgb_ok and a_ok)
 
     def col_is_bg(c: int) -> bool:
-        rgb_ok = np.all(np.abs(rgb[:, c].astype(int) - bg) <= tol)
+        rgb_ok = np.all(np.abs(rgb[:, c, :] - bg[None, :]) <= tol)
         a_ok = np.max(a[:, c]) <= alpha_bg_max
         return bool(rgb_ok and a_ok)
 
-    h, w = rgb.shape[:2]
+    h, w = img.shape[:2]
 
     top = 0
     while top < h and row_is_bg(top):
@@ -132,7 +155,6 @@ def _transparent_outer_border_rgba(
     return img
 
 
-
 def render_to_rgba(
     obj: Union[np.ndarray, Figure],
     *,
@@ -141,6 +163,7 @@ def render_to_rgba(
     border_tol: int = 2,
     trim: bool = False,
     white_thresh: int = 250,
+    close_figure: bool = True,
 ) -> np.ndarray:
     """
     Canonical renderer: returns (H,W,4) uint8 RGBA no matter what.
@@ -149,10 +172,18 @@ def render_to_rgba(
     - If obj is ndarray: coerce to uint8 RGBA.
     - If transparent_border: punch out only the outer uniform background.
     - If trim: crop based on alpha (RGBA) or white_thresh (RGB/gray).
+
+    Parameters
+    ----------
+    close_figure:
+        If True and obj is a Figure, close it after rendering. Default False
+        (callers often want control of figure lifetime).
     """
     if isinstance(obj, Figure):
         rgba = fig_to_rgba(obj)
-        plt.close(obj)
+        if close_figure:
+            import matplotlib.pyplot as plt
+            plt.close(obj)
     else:
         rgba = _ensure_uint8_rgba(obj)
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from typing import Dict, Tuple
 import numpy as np
-import gudhi as gd
 
 from .covers import TriangulationStarCover  # <- this is the CoverBase subclass that has summarize()
 from .triangle_covers import (               # <- your gudhi-based utilities file

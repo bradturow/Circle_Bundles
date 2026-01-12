@@ -24,6 +24,8 @@ __all__ = [
 def mean_center(X: np.ndarray) -> np.ndarray:
     """Row-wise mean centering."""
     X = np.asarray(X, dtype=float)
+    if X.ndim != 2:
+        raise ValueError("X must be a 2D array.")
     return X - X.mean(axis=1, keepdims=True)
 
 
@@ -33,7 +35,10 @@ def get_D_matrix(n: int) -> np.ndarray:
     Dense n^2 × n^2 matrix D such that x^T D x equals the sum of squared
     finite differences (horizontal + vertical) on an n×n grid.
 
-    This is essentially the graph Laplacian quadratic form on the n×n grid.
+    Notes
+    -----
+    This is the graph-Laplacian quadratic form on the n×n grid.
+    It is dense and scales like O(n^4) memory, but is fine for small n (e.g., 3,5,7).
     """
     n = int(n)
     if n <= 0:
@@ -70,8 +75,10 @@ def get_contrast_norms(data: np.ndarray, *, patch_type: str = "opt_flow") -> np.
 
     Parameters
     ----------
-    data : (N, n^2) for grayscale patches, or (N, 2*n^2) for optical flow
-    patch_type : 'img' or 'opt_flow'
+    data : array of shape (N, n^2) for intensity patches,
+           or (N, 2*n^2) for optical flow (u then v).
+    patch_type : {'img','opt_flow','flow'}
+        'flow' is accepted as an alias for 'opt_flow'.
 
     Returns
     -------
@@ -81,8 +88,11 @@ def get_contrast_norms(data: np.ndarray, *, patch_type: str = "opt_flow") -> np.
     if X.ndim != 2:
         raise ValueError("data must be a 2D array of shape (N, d)")
 
+    if patch_type == "flow":
+        patch_type = "opt_flow"
+
     if patch_type not in {"img", "opt_flow"}:
-        raise ValueError("patch_type must be one of {'img','opt_flow'}")
+        raise ValueError("patch_type must be one of {'img','opt_flow','flow'}")
 
     if patch_type == "opt_flow":
         if X.shape[1] % 2 != 0:
@@ -269,6 +279,7 @@ def get_lifted_predom_dirs(flow_patches: np.ndarray, *, eps: float = 1e-12) -> n
     if n * n != n2:
         raise ValueError("Expected length 2*n^2 with n^2 a perfect square.")
 
+    # NOTE: keep Fortran-order convention consistent with your sampling pipeline.
     V = X.reshape(N, n, n, 2, order="F")
     mags = np.linalg.norm(V, axis=3)  # (N,n,n)
 

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List, Set
+
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
-from matplotlib.patches import Circle
 
 from .image_utils import render_to_rgba
+
+
+__all__ = ["circle_vis", "circle_vis_grid"]
 
 
 def _circular_dist(a: np.ndarray, b: float | np.ndarray) -> np.ndarray:
@@ -23,13 +24,25 @@ def circle_vis(
     angle_range: Optional[Tuple[float, float]] = None,
     radius: float = 1.0,
     extent_factor: float = 1.2,
-    figsize: float | Tuple[float, float] = 2.8,
+    figsize: Union[float, Tuple[float, float]] = 2.8,
     dpi: int = 150,
     zoom: float = 0.13,
     circle_linewidth: float = 1.0,
     circle_color: str = "black",
     save_path: Optional[str] = None,
 ):
+    """
+    Visualize representative samples around a circle by rendering vis_func(data[idx])
+    and placing the resulting images on a circle according to coords.
+
+    coords may be:
+      - (N,) angles in radians
+      - (N,2) points on circle (x,y), interpreted as angles via atan2
+    """
+    import matplotlib.pyplot as plt
+    from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+    from matplotlib.patches import Circle
+
     coords = np.asarray(coords)
     N = len(data)
 
@@ -50,7 +63,7 @@ def circle_vis(
     if angle_range is None:
         a_min, a_max = 0.0, two_pi
     else:
-        a_min, a_max = angle_range
+        a_min, a_max = float(angle_range[0]), float(angle_range[1])
 
     if a_max <= a_min:
         raise ValueError("angle_range must satisfy a_min < a_max.")
@@ -67,8 +80,8 @@ def circle_vis(
         proposed.append(idx)
     proposed = np.array(proposed, dtype=int)
 
-    accepted: list[Optional[int]] = [None] * k
-    used: set[int] = set()
+    accepted: List[Optional[int]] = [None] * k
+    used: Set[int] = set()
 
     for t, (ta, idx) in enumerate(zip(target_angles, proposed)):
         if idx in used:
@@ -81,12 +94,13 @@ def circle_vis(
     # --- Figure & axes ---
     if isinstance(figsize, (int, float)):
         figsize = (float(figsize), float(figsize))
+
     fig, ax = plt.subplots(figsize=figsize, dpi=int(dpi))
 
     ax.add_patch(
         Circle(
             (0.0, 0.0),
-            radius,
+            float(radius),
             fill=False,
             linewidth=float(circle_linewidth),
             edgecolor=circle_color,
@@ -97,8 +111,8 @@ def circle_vis(
         if idx is None:
             continue
 
-        x_pos = radius * np.cos(ta)
-        y_pos = radius * np.sin(ta)
+        x_pos = float(radius) * float(np.cos(ta))
+        y_pos = float(radius) * float(np.sin(ta))
 
         rendered = vis_func(data[idx])
         img = render_to_rgba(
@@ -110,7 +124,7 @@ def circle_vis(
         ab = AnnotationBbox(OffsetImage(img, zoom=float(zoom)), (x_pos, y_pos), frameon=False)
         ax.add_artist(ab)
 
-    R = radius * extent_factor
+    R = float(radius) * float(extent_factor)
     ax.set_xlim(-R, R)
     ax.set_ylim(-R, R)
     ax.set_aspect("equal")
@@ -128,7 +142,7 @@ def circle_vis_grid(
     angles_list,
     vis_func,
     *,
-    titles: Optional[list[str]] = None,
+    titles: Optional[List[str]] = None,
     per_circle: int = 8,
     circle_radius: float = 1.0,
     extent_factor: float = 1.2,
@@ -144,14 +158,14 @@ def circle_vis_grid(
     save_path: Optional[str] = None,
 ):
     import math
+    import matplotlib.pyplot as plt
 
-    images = []
+    images: List[np.ndarray] = []
     n_components = len(datasets)
 
     if titles is None:
         titles = [f"Component {i}" for i in range(n_components)]
 
-    # Build each circle_vis and capture as image
     for data, coords in zip(datasets, angles_list):
         fig_cc, _ = circle_vis(
             data,
@@ -195,7 +209,7 @@ def circle_vis_grid(
     for k, img in enumerate(images):
         axes[k].imshow(img)
         axes[k].axis("off")
-        axes[k].set_title(titles[k], fontsize=title_fontsize)
+        axes[k].set_title(titles[k], fontsize=int(title_fontsize))
 
     for k in range(n_plots, len(axes)):
         axes[k].axis("off")

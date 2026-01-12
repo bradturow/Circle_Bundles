@@ -1,21 +1,19 @@
-# circle_bundles/viz/mesh_viz.py
+# synthetic/mesh_viz.py
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Callable, List, Sequence, Tuple, Union, Optional
+from typing import Callable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba
 from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 from mpl_toolkits.mplot3d import proj3d
+from mpl_toolkits.mplot3d.art3d import Line3DCollection, Poly3DCollection
 
-
+# NOTE: we keep using your existing canonical renderer from circle_bundles.
+# If you ever want synthetic to be standalone, we can move fig_to_rgba into synthetic/viz_utils.py.
 from circle_bundles.viz.image_utils import fig_to_rgba
-
-
-
 
 __all__ = [
     # densities
@@ -62,6 +60,7 @@ def make_density_visualizer(
     -------
     vis_func(density) -> matplotlib Figure
     """
+    grid_size = int(grid_size)
     axis_map = {"x": 0, "y": 1, "z": 2}
     if axis not in axis_map:
         raise ValueError("axis must be one of: 'x', 'y', 'z'")
@@ -100,12 +99,13 @@ def make_density_visualizer(
 # ============================
 
 FaceGroup = Union[
-    Sequence[int],          # explicit indices, e.g. [0,5,9]
-    Tuple[int, int],         # range (start, end_exclusive)
+    Sequence[int],      # explicit indices, e.g. [0,5,9]
+    Tuple[int, int],    # range (start, end_exclusive)
 ]
 
 
 def expand_face_groups(face_groups: Sequence[FaceGroup]) -> List[List[int]]:
+    """Expand face_groups into explicit lists of face indices."""
     out: List[List[int]] = []
     for g in face_groups:
         if (
@@ -136,19 +136,30 @@ def make_tri_prism_visualizer(
     azim: float = 0.0,
     figsize: Tuple[float, float] = (4.0, 4.0),
     dpi: int = 150,
-    depth_sort: bool = True,   # <--- new: manual triangle ordering
+    depth_sort: bool = True,
 ) -> Callable[[np.ndarray], Figure]:
+    """
+    Visualize a triangular prism-style mesh with custom face group coloring.
+
+    Parameters
+    ----------
+    mesh : trimesh.Trimesh-like
+        Must have .vertices and .faces.
+    face_groups : groups of face indices (explicit lists or (start,end_excl) ranges)
+    depth_sort : bool
+        If True, manually sorts triangles back-to-front using projected depth
+        (helps with alpha blending / occlusion in Matplotlib).
+
+    Returns
+    -------
+    vis_func(flat_mesh) -> Figure
+        flat_mesh is expected to be (n_vertices*3,) giving vertex positions.
+    """
     if face_colors_list is None:
-        face_colors_list = [
-            "#FF6B6B",
-            "#FFD93D",
-            "#6BCB77",
-            "#4D96FF",
-            "#C780FA",
-        ]
+        face_colors_list = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#C780FA"]
 
     faces = np.asarray(mesh.faces, dtype=int)
-    n_vertices = int(mesh.vertices.shape[0])
+    n_vertices = int(np.asarray(mesh.vertices).shape[0])
 
     groups = expand_face_groups(face_groups)
 
@@ -175,45 +186,35 @@ def make_tri_prism_visualizer(
         ax = fig.add_subplot(111, projection="3d", facecolor="none")
         ax.set_axis_off()
 
-        # View first (important: projection depends on this)
+        # Set view early (projection depends on it)
         ax.view_init(elev=float(elev), azim=float(azim))
 
-        # Face colors aligned with faces
         facecolors = np.array(
             [face_color_map.get(i, (0.7, 0.7, 0.7, alpha)) for i in range(len(faces))],
             dtype=float,
         )
 
-        # ---- Manual depth sort (back-to-front) ----
         if depth_sort:
-            # Project triangle vertices to screen space and sort by projected depth
             M = ax.get_proj()
-
-            # Flatten all triangle vertices for one projection call
             X = tris[:, :, 0].ravel()
             Y = tris[:, :, 1].ravel()
             Z = tris[:, :, 2].ravel()
-            x2, y2, z2 = proj3d.proj_transform(X, Y, Z, M)
+            _x2, _y2, z2 = proj3d.proj_transform(X, Y, Z, M)
 
             z2 = np.asarray(z2).reshape(len(tris), 3)
-            tri_depth = z2.mean(axis=1)   # average projected depth
-
+            tri_depth = z2.mean(axis=1)
             order = np.argsort(tri_depth)  # back-to-front
+
             tris = tris[order]
             facecolors = facecolors[order]
 
-        poly = Poly3DCollection(
-            tris,
-            facecolors=facecolors,
-            edgecolor="none",
-        )
-        # If you want, you can keep this, but don't use "min"
+        poly = Poly3DCollection(tris, facecolors=facecolors, edgecolor="none")
         poly.set_zsort("average")
         ax.add_collection3d(poly)
 
         if show_edges and boundary_edges:
             segments = [(verts[i], verts[j]) for i, j in boundary_edges]
-            lc = Line3DCollection(segments, colors=edge_color, linewidths=edge_width)
+            lc = Line3DCollection(segments, colors=edge_color, linewidths=float(edge_width))
             ax.add_collection3d(lc)
 
         # Equal-ish scaling
@@ -228,7 +229,6 @@ def make_tri_prism_visualizer(
         return fig
 
     return vis_func
-
 
 
 def make_star_pyramid_visualizer(
@@ -248,7 +248,7 @@ def make_star_pyramid_visualizer(
     Uses a stable ordering of side faces based on the base-edge midpoint angle in yz-plane.
     """
     faces = np.asarray(mesh.faces, dtype=int)
-    n_vertices = int(mesh.vertices.shape[0])
+    n_vertices = int(np.asarray(mesh.vertices).shape[0])
     apex_index = n_vertices - 1
     cmap = plt.get_cmap(colormap)
 
@@ -256,10 +256,8 @@ def make_star_pyramid_visualizer(
         verts = np.asarray(flat_mesh, dtype=float).reshape((n_vertices, 3))
         tris = verts[faces]
 
-        # identify side faces (those containing the apex)
         side_idx = np.array([i for i, f in enumerate(faces) if apex_index in f], dtype=int)
 
-        # stable ordering: angle of midpoint of the edge opposite apex, in yz-plane
         if side_idx.size > 0:
             mids = []
             for fi in side_idx:
@@ -272,7 +270,6 @@ def make_star_pyramid_visualizer(
         else:
             side_idx_sorted = side_idx
 
-        # assign colors
         face_colors: List[object] = [base_color] * len(faces)
         if side_idx_sorted.size > 0:
             vals = np.linspace(0.0, 1.0, side_idx_sorted.size, endpoint=True)
@@ -283,7 +280,7 @@ def make_star_pyramid_visualizer(
         ax = fig.add_subplot(111, projection="3d", facecolor="none")
         ax.set_axis_off()
 
-        poly = Poly3DCollection(tris, facecolors=face_colors, edgecolor=edge_color, alpha=alpha)
+        poly = Poly3DCollection(tris, facecolors=face_colors, edgecolor=edge_color, alpha=float(alpha))
         ax.add_collection3d(poly)
 
         max_range = float(np.ptp(verts, axis=0).max() + 1e-12)
@@ -309,8 +306,8 @@ def fig_to_rgb_array(fig: Figure) -> np.ndarray:
     Backend-safe conversion of a Matplotlib figure to an RGB uint8 image.
     Uses circle_bundles.viz.image_utils.fig_to_rgba under the hood.
     """
-    rgba = fig_to_rgba(fig)            # (H,W,4) uint8
-    return rgba[..., :3].copy()        # (H,W,3) uint8
+    rgba = fig_to_rgba(fig)     # (H,W,4) uint8
+    return rgba[..., :3].copy() # (H,W,3) uint8
 
 
 def make_rotating_mesh_clip(
@@ -326,26 +323,7 @@ def make_rotating_mesh_clip(
     fps: int = 24,
 ) -> List[np.ndarray]:
     """
-    Create a rotating 3D clip by changing the *camera view* each frame.
-
-    Parameters
-    ----------
-    flat_mesh : (n_vertices*3,) array
-        Flattened vertex array you pass into your vis_func.
-    vis_func : callable
-        Your mesh visualizer: vis_func(flat_mesh) -> matplotlib Figure.
-        (We override the view each frame by finding a 3D axis and calling view_init.)
-    out_path : str
-        Output path ending with .gif or .mp4.
-    n_frames : int
-    azim_start, azim_end : float
-        Azimuth sweep in degrees.
-    elev : float
-        Constant elevation angle in degrees.
-    close_figs : bool
-        Close each frame figure to avoid memory growth.
-    fps : int
-        Used for mp4; for gif we set frame duration from fps.
+    Create a rotating 3D clip by changing the camera view each frame.
 
     Returns
     -------
@@ -354,12 +332,12 @@ def make_rotating_mesh_clip(
     """
     flat_mesh = np.asarray(flat_mesh)
     frames: List[np.ndarray] = []
+
     azims = np.linspace(float(azim_start), float(azim_end), int(n_frames), endpoint=False)
 
     for a in azims:
         fig = vis_func(flat_mesh)
 
-        # Find the first 3D axis and set view.
         ax3d = None
         for ax in fig.axes:
             if hasattr(ax, "view_init"):
@@ -370,21 +348,16 @@ def make_rotating_mesh_clip(
 
         ax3d.view_init(elev=float(elev), azim=float(a))
 
-        frame = fig_to_rgb_array(fig)
-        frames.append(frame)
-
+        frames.append(fig_to_rgb_array(fig))
         if close_figs:
             plt.close(fig)
 
-    # Write output (optional)
     if out_path is not None:
         lower = out_path.lower()
         try:
             import imageio.v2 as imageio
-        except Exception as e:
-            raise ImportError(
-                "Writing gifs/mp4 requires imageio. Install via `pip install imageio`."
-            ) from e
+        except Exception as e:  # pragma: no cover
+            raise ImportError("Writing gifs/mp4 requires imageio (`pip install imageio`).") from e
 
         if lower.endswith(".gif"):
             imageio.mimsave(out_path, frames, duration=1.0 / float(fps))
