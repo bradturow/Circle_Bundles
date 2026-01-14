@@ -1,4 +1,3 @@
-# circle_bundles/api.py
 from __future__ import annotations
 
 """
@@ -221,13 +220,19 @@ from .metrics import (
     SciPyCdistMetric,
     get_dist_mat,
     as_metric,
-    # S^1 / T^2 / RP^1 / RP^2 metrics
+    # S^1 / T^2 / KB / RP^1 / RP^2 metrics
     S1AngleMetric,
     S1UnitVectorMetric,
     S1_dist,
     S1_dist2,
     T2FlatMetric,
     T2_dist,
+    KleinBottleFlatMetric,
+    KB_flat_dist,
+    # NEW: diagonal torus Z2 quotient in angle coords + factory
+    TorusDiagFlatMetric,
+    T2_Z2QuotientFlatMetric,
+    T2_diag_flat_dist,
     RP1AngleMetric,
     RP1UnitVectorMetric,
     RP1_dist,
@@ -237,6 +242,13 @@ from .metrics import (
     RP2_TrivialMetric,
     RP2_TwistMetric,
     RP2_dist,
+    # Euclidean Z2 quotient + torus->KB/diag quotient in R4
+    Z2QuotientMetricEuclidean,
+    Torus_KleinQuotientMetric_R4,
+    Torus_DiagQuotientMetric_R4,
+    Torus_Z2QuotientMetric_R4,
+    act_klein_C2_torus,
+    act_diag_C2_torus,
     # S^3 quotient metrics
     S3QuotientMetric,
     ZpHopfQuotientMetricS3,
@@ -254,6 +266,7 @@ from .local_triv import (
     LocalTrivResult,
     compute_local_triv,
     compute_circular_coords_dreimac,
+    compute_circular_coords_pca2,
 )
 
 from .local_analysis import (
@@ -294,7 +307,7 @@ from .z2_linear import (
 # ----------------------------
 # Viz re-exports (optional but convenient)
 # ----------------------------
-from .viz.pca_viz import show_pca
+from .viz.pca_vis import show_pca
 from .viz.thumb_grids import show_data_vis
 from .viz.nerve_vis import nerve_vis
 from .viz.nerve_plotly import make_nerve_figure, nerve_with_slider
@@ -313,7 +326,18 @@ from .viz.angles import (
     set_pi_ticks,
 )
 
+from .viz.gudhi_graph_utils import create_st_dicts
 from .viz.nerve_circle import show_circle_nerve
+
+from .viz.fiberwise_clustering_vis import (
+    make_patch_cluster_diagram,
+    get_G_vertex_coords,
+    GraphComponentData,
+    extract_component_subgraph,
+    representative_indices_for_clusters,
+    component_patch_reps,
+    plot_component_patch_diagram,
+)
 
 # ----------------------------
 # __all__ (explicit, curated)
@@ -385,20 +409,35 @@ __all__ = [
     "Metric", "EuclideanMetric", "SciPyCdistMetric", "get_dist_mat", "as_metric",
     "S1AngleMetric", "S1UnitVectorMetric", "S1_dist", "S1_dist2",
     "T2FlatMetric", "T2_dist",
+    "KleinBottleFlatMetric", "KB_flat_dist",
+    "TorusDiagFlatMetric", "T2_Z2QuotientFlatMetric", "T2_diag_flat_dist",
     "RP1AngleMetric", "RP1UnitVectorMetric", "RP1_dist", "RP1_dist2",
     "RP2UnitVectorMetric", "RP2_FlipMetric", "RP2_TrivialMetric", "RP2_TwistMetric", "RP2_dist",
+    "Z2QuotientMetricEuclidean",
+    "Torus_KleinQuotientMetric_R4", "Torus_DiagQuotientMetric_R4", "Torus_Z2QuotientMetric_R4",
+    "act_klein_C2_torus", "act_diag_C2_torus",
     "S3QuotientMetric", "ZpHopfQuotientMetricS3", "Z2LensAntipodalQuotientMetricS3",
     "Z2QuotientMetricR5",
     "act_base_only", "act_pi_twist", "act_reflection_twist",
 
     # local
-    "LocalTrivResult", "compute_local_triv", "compute_circular_coords_dreimac",
+    "LocalTrivResult", "compute_local_triv", "compute_circular_coords_dreimac", "compute_circular_coords_pca2",
     "get_dense_fiber_indices", "get_local_pca", "get_local_rips", "plot_local_pca", "plot_local_rips",
     "get_cocycle_dict", "lift_base_points",
 
     # clustering
     "fiberwise_clustering", "get_cluster_persistence", "get_filtered_cluster_graph",
     "get_weights", "plot_fiberwise_pca_grid", "plot_fiberwise_summary_bars", "safe_add_edges",
+
+    # fiberwise clustering viz helpers
+    "make_patch_cluster_diagram",
+    "get_G_vertex_coords",
+    "GraphComponentData",
+    "extract_component_subgraph",
+    "representative_indices_for_clusters",
+    "component_patch_reps",
+    "plot_component_patch_diagram",
+    "create_st_dicts",
 
     # z2 linear
     "solve_Z2_edge_coboundary", "solve_Z2_linear_system", "phi_Z2_to_pm1",

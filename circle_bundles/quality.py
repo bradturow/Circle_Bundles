@@ -20,7 +20,6 @@ class BundleQualityReport:
     eps_align_geo: Optional[float]
     eps_align_euc: Optional[float]
 
-    # NEW:
     eps_align_geo_mean: Optional[float]
     eps_align_euc_mean: Optional[float]
 
@@ -29,6 +28,14 @@ class BundleQualityReport:
     n_edges_estimated: int
     n_edges_requested: int
     n_triangles: int
+
+    witness_err: Optional[float] = None          # chordal sup
+    witness_err_geo: Optional[float] = None      # geodesic sup (radians)
+    witness_err_mean: Optional[float] = None     # chordal mean
+    witness_err_geo_mean: Optional[float] = None # geodesic mean (radians)
+
+    cocycle_proj_dist: Optional[float] = None
+
 
 
 
@@ -256,6 +263,7 @@ def compute_bundle_quality(
     cocycle_matrix_norm: str = "fro",
     # epsilon settings
     eps_min_points: int = 1,
+    compute_witness: bool = False,
 ) -> BundleQualityReport:
     """
     Compute standard diagnostics for a bundle pipeline run.
@@ -281,7 +289,7 @@ def compute_bundle_quality(
     else:
         triangles_list = list(triangles)
 
-    # paper delta (unchanged logic)
+    # paper delta 
     delta = compute_delta_from_triples(
         cover.U,
         local_triv.f,
@@ -317,6 +325,54 @@ def compute_bundle_quality(
     n_edges_requested = int(getattr(transitions_report, "n_edges_requested", len(edges_list)))
     n_edges_estimated = int(getattr(transitions_report, "n_edges_estimated", len(getattr(cocycle, "Omega", {}))))
 
+    # ------------------------------------------
+    # Optional witness diagnostics (Π(Ω) based)
+    # ------------------------------------------
+    witness_err = None
+    witness_err_geo = None
+    witness_err_mean = None
+    witness_err_geo_mean = None
+    cocycle_proj_dist = None
+
+    if compute_witness:
+        # local import to avoid any import-cycle surprises
+        from .bundle_map import build_true_frames, witness_error_stats, cocycle_projection_distance
+
+        # Use the same edge set you used everywhere else
+        # and the cocycle's Omega (simplicial) as input.
+        Omega = getattr(cocycle, "Omega", None)
+        if Omega is None:
+            raise AttributeError("cocycle.Omega is missing; cannot compute witness diagnostics.")
+
+        tf = build_true_frames(
+            U=cover.U,
+            pou=cover.pou,
+            Omega=Omega,
+            edges=edges_list,
+        )
+
+        # witness stats compare local triv angles using Π(Ω) (Omega_true from frames)
+        w_geo, w_geo_mean, w_c, w_c_mean = witness_error_stats(
+            U=cover.U,
+            f=local_triv.f,
+            Omega_true=tf.Omega_true,
+            edges=edges_list,
+        )
+
+        witness_err_geo = w_geo
+        witness_err_geo_mean = w_geo_mean
+        witness_err = w_c
+        witness_err_mean = w_c_mean
+
+        # optionally record cocycle projection distance d_infty(Ω, Π(Ω))
+        cocycle_proj_dist = cocycle_projection_distance(
+            U=cover.U,
+            Omega_simplicial=Omega,
+            Omega_true=tf.Omega_true,
+            edges=edges_list,
+        )
+
+    
     return BundleQualityReport(
         delta=float(delta),
         cocycle_defect=float(cocycle_defect),
@@ -330,4 +386,11 @@ def compute_bundle_quality(
         n_edges_estimated=n_edges_estimated,
         n_edges_requested=n_edges_requested,
         n_triangles=int(len(triangles_list)),
+        witness_err=witness_err,
+        witness_err_geo=witness_err_geo,
+        witness_err_mean=witness_err_mean,
+        witness_err_geo_mean=witness_err_geo_mean,
+        cocycle_proj_dist=cocycle_proj_dist,
     )
+
+

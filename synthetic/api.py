@@ -5,7 +5,7 @@ from __future__ import annotations
 Public API re-exports for synthetic.
 
 Import style:
-    from synthetic.api import sample_S2_trivial, sample_SO3, make_tri_prism, mesh_to_density, ...
+    from synthetic.api import sample_S2_trivial, sample_SO3, sample_C2_torus, ...
 
 Notes
 -----
@@ -62,15 +62,16 @@ from .so3_sampling import (
 )
 
 # ----------------------------
-# Tori / Klein bottle embeddings
+# Tori / Klein bottle embeddings (data + angle helpers only)
 # ----------------------------
 from .tori_and_kb import (
     AngleFunc,
     const,
     small_to_big,
-    sample_R3_torus,
-    sample_S3_torus,
-    sample_R4_kb,
+    wrap_angle,
+    sample_C2_torus,
+    torus_base_projection_from_data,
+    kb_pairwise_distances_from_data,
 )
 
 # ----------------------------
@@ -101,12 +102,16 @@ from .step_edges import (
     sample_step_edge_torus,
 )
 
+# ----------------------------
+# __all__ (explicit, curated)
+# ----------------------------
 __all__ = [
     # densities
     "mesh_to_density",
     "get_density_axes",
     "rotate_density",
     "get_mesh_sample",
+
     # meshes + viz
     "make_tri_prism",
     "make_star_pyramid",
@@ -116,6 +121,7 @@ __all__ = [
     "make_star_pyramid_visualizer",
     "fig_to_rgb_array",
     "make_rotating_mesh_clip",
+
     # s2 bundles / hopf / tangent
     "sample_sphere",
     "hopf_projection",
@@ -124,22 +130,28 @@ __all__ = [
     "sample_S2_trivial",
     "tangent_frame_on_s2",
     "sample_S2_unit_tangent",
+
     # so3 sampling
     "sample_SO3",
     "project_O3",
-    # tori + kb
+
+    # tori + klein bottle (data-level)
     "AngleFunc",
     "const",
     "small_to_big",
-    "sample_R3_torus",
-    "sample_S3_torus",
-    "sample_R4_kb",
+    "wrap_angle",
+    "sample_C2_torus",
+    "torus_base_projection_from_data",
+    "kb_pairwise_distances_from_data",
+
     # nat img kb
     "sample_nat_img_kb",
     "get_gradient_dirs",
+
     # opt flow patches
     "sample_opt_flow_torus",
     "make_flow_patches",
+
     # step edges
     "get_patch_types_list",
     "make_step_edges",

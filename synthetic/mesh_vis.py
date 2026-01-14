@@ -10,6 +10,8 @@ from matplotlib.colors import to_rgba
 from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d import proj3d
 from mpl_toolkits.mplot3d.art3d import Line3DCollection, Poly3DCollection
+from matplotlib.colors import LinearSegmentedColormap
+
 
 # NOTE: we keep using your existing canonical renderer from circle_bundles.
 # If you ever want synthetic to be standalone, we can move fig_to_rgba into synthetic/viz_utils.py.
@@ -125,13 +127,13 @@ def expand_face_groups(face_groups: Sequence[FaceGroup]) -> List[List[int]]:
 
 def make_tri_prism_visualizer(
     mesh,
-    face_groups: Sequence[FaceGroup],
+    face_groups: Optional[Sequence[FaceGroup]] = None,
     *,
     face_colors_list: Optional[Sequence[str]] = None,
     alpha: float = 1.0,
     show_edges: bool = True,
     edge_color: str = "black",
-    edge_width: float = 2.0,
+    edge_width: float = 2.5,
     elev: float = 0.0,
     azim: float = 0.0,
     figsize: Tuple[float, float] = (4.0, 4.0),
@@ -156,11 +158,28 @@ def make_tri_prism_visualizer(
         flat_mesh is expected to be (n_vertices*3,) giving vertex positions.
     """
     if face_colors_list is None:
-        face_colors_list = ["#FF6B6B", "#FFD93D", "#6BCB77", "#4D96FF", "#C780FA"]
+        face_colors_list = [
+            '#FFB4A2',  # Rectangular Side 2 – coral blush
+            '#FAE3B4',  # Soft buttery yellow
+            '#A8DADC',  # Rectangular Side 1 – seafoam
+            '#E3C8F2',  # Triangle Face 1 (top)
+            '#9BB1FF'   # Rectangular Side 3 – pastel periwinkle
+        ]
 
+    n_vertices = int(np.asarray(mesh.vertices).shape[0])        
     faces = np.asarray(mesh.faces, dtype=int)
-    n_vertices = int(np.asarray(mesh.vertices).shape[0])
+    n_faces = int(faces.shape[0])
 
+    if face_groups is None:
+        # default only when topology matches your canonical tri-prism triangulation
+        if n_faces == 8:
+            face_groups = [(0, 1), (1, 2), (2, 4), (4, 6), (6, 8)]
+        else:
+            raise ValueError(
+                "face_groups=None only supported for the canonical tri-prism mesh "
+                "(expected 8 triangle faces). Please pass face_groups explicitly."
+            )    
+    
     groups = expand_face_groups(face_groups)
 
     # color per triangle face index
@@ -231,13 +250,27 @@ def make_tri_prism_visualizer(
     return vis_func
 
 
+
+def _default_pastel_gradient(n: int) -> LinearSegmentedColormap:
+    """
+    Pastel gradient that exactly matches the 5-color palette when n=5
+    and smoothly interpolates for other n.
+    """
+    base_colors = ['#FFB4A2', '#FAE3B4', '#A8DADC', '#E3C8F2', '#9BB1FF']
+    return LinearSegmentedColormap.from_list(
+        f'pastel_sunset_{n}',
+        base_colors,
+        N=max(n, len(base_colors)),
+    )
+
+
 def make_star_pyramid_visualizer(
     mesh,
     *,
-    base_color: str = "black",
+    base_color: str = "#94A3B8",
     edge_color: str = "gray",
     alpha: float = 1.0,
-    colormap: str = "twilight",
+    colormap: str | LinearSegmentedColormap | None = None,
     figsize: Tuple[float, float] = (4.0, 4.0),
     dpi: int = 150,
     elev: float = 0.0,
@@ -245,19 +278,29 @@ def make_star_pyramid_visualizer(
 ) -> Callable[[np.ndarray], Figure]:
     """
     Visualizer for a star pyramid mesh with a smooth gradient on side faces.
-    Uses a stable ordering of side faces based on the base-edge midpoint angle in yz-plane.
+
+    Side faces are ordered by the angle of the base-edge midpoint
+    in the yz-plane to ensure a stable color assignment.
+
+    Defaults:
+    - base faces: muted slate (#94A3B8)
+    - side faces: pastel sunset gradient
     """
     faces = np.asarray(mesh.faces, dtype=int)
     n_vertices = int(np.asarray(mesh.vertices).shape[0])
     apex_index = n_vertices - 1
-    cmap = plt.get_cmap(colormap)
 
     def vis_func(flat_mesh: np.ndarray) -> Figure:
         verts = np.asarray(flat_mesh, dtype=float).reshape((n_vertices, 3))
         tris = verts[faces]
 
-        side_idx = np.array([i for i, f in enumerate(faces) if apex_index in f], dtype=int)
+        # Identify side faces (those containing the apex)
+        side_idx = np.array(
+            [i for i, f in enumerate(faces) if apex_index in f],
+            dtype=int,
+        )
 
+        # Stable angular ordering of side faces
         if side_idx.size > 0:
             mids = []
             for fi in side_idx:
@@ -265,24 +308,41 @@ def make_star_pyramid_visualizer(
                 base_verts = [v for v in f if int(v) != apex_index]
                 p = 0.5 * (verts[int(base_verts[0])] + verts[int(base_verts[1])])
                 mids.append(np.arctan2(p[2], p[1]))  # angle in yz-plane
+
             order = np.argsort(np.asarray(mids))
             side_idx_sorted = side_idx[order]
         else:
             side_idx_sorted = side_idx
 
+        # Choose colormap
+        if isinstance(colormap, LinearSegmentedColormap):
+            cmap = colormap
+        elif isinstance(colormap, str):
+            cmap = plt.get_cmap(colormap)
+        else:
+            cmap = _default_pastel_gradient(len(side_idx_sorted))
+
+        # Assign colors
         face_colors: List[object] = [base_color] * len(faces)
         if side_idx_sorted.size > 0:
             vals = np.linspace(0.0, 1.0, side_idx_sorted.size, endpoint=True)
             for t, fi in enumerate(side_idx_sorted):
                 face_colors[int(fi)] = cmap(float(vals[t]))
 
+        # Plot
         fig = plt.figure(figsize=figsize, dpi=dpi, facecolor="none")
         ax = fig.add_subplot(111, projection="3d", facecolor="none")
         ax.set_axis_off()
 
-        poly = Poly3DCollection(tris, facecolors=face_colors, edgecolor=edge_color, alpha=float(alpha))
+        poly = Poly3DCollection(
+            tris,
+            facecolors=face_colors,
+            edgecolor=edge_color,
+            alpha=float(alpha),
+        )
         ax.add_collection3d(poly)
 
+        # Equal-ish scaling
         max_range = float(np.ptp(verts, axis=0).max() + 1e-12)
         mid = verts.mean(axis=0)
         lims = [(float(m - max_range / 2), float(m + max_range / 2)) for m in mid]
@@ -290,8 +350,8 @@ def make_star_pyramid_visualizer(
         ax.set_ylim(*lims[1])
         ax.set_zlim(*lims[2])
         ax.set_box_aspect([1, 1, 1])
-        ax.view_init(elev=float(elev), azim=float(azim))
 
+        ax.view_init(elev=float(elev), azim=float(azim))
         return fig
 
     return vis_func

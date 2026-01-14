@@ -6,7 +6,6 @@ import numpy as np
 
 from .image_utils import render_to_rgba
 
-
 __all__ = ["circle_vis", "circle_vis_grid"]
 
 
@@ -30,6 +29,7 @@ def circle_vis(
     circle_linewidth: float = 1.0,
     circle_color: str = "black",
     save_path: Optional[str] = None,
+    ax=None,  # NEW
 ):
     """
     Visualize representative samples around a circle by rendering vis_func(data[idx])
@@ -38,6 +38,9 @@ def circle_vis(
     coords may be:
       - (N,) angles in radians
       - (N,2) points on circle (x,y), interpreted as angles via atan2
+
+    If `ax` is provided, draw into that axis (no new figure created).
+    Returns (fig, ax).
     """
     import matplotlib.pyplot as plt
     from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -91,11 +94,17 @@ def circle_vis(
             accepted[t] = idx
             used.add(idx)
 
-    # --- Figure & axes ---
-    if isinstance(figsize, (int, float)):
-        figsize = (float(figsize), float(figsize))
+    created_fig = False
+    if ax is None:
+        if isinstance(figsize, (int, float)):
+            figsize = (float(figsize), float(figsize))
+        fig, ax = plt.subplots(figsize=figsize, dpi=int(dpi))
+        created_fig = True
+    else:
+        fig = ax.figure
 
-    fig, ax = plt.subplots(figsize=figsize, dpi=int(dpi))
+    # If reusing axes, clear it so repeated calls don't overlay
+    ax.cla()
 
     ax.add_patch(
         Circle(
@@ -121,7 +130,11 @@ def circle_vis(
             trim=True,
         )
 
-        ab = AnnotationBbox(OffsetImage(img, zoom=float(zoom)), (x_pos, y_pos), frameon=False)
+        ab = AnnotationBbox(
+            OffsetImage(img, zoom=float(zoom)),
+            (x_pos, y_pos),
+            frameon=False,
+        )
         ax.add_artist(ab)
 
     R = float(radius) * float(extent_factor)
@@ -129,7 +142,10 @@ def circle_vis(
     ax.set_ylim(-R, R)
     ax.set_aspect("equal")
     ax.axis("off")
-    plt.tight_layout()
+
+    # Only do tight_layout if we created the figure ourselves
+    if created_fig:
+        plt.tight_layout()
 
     if save_path is not None:
         fig.savefig(save_path, dpi=int(dpi), bbox_inches="tight")
@@ -146,8 +162,6 @@ def circle_vis_grid(
     per_circle: int = 8,
     circle_radius: float = 1.0,
     extent_factor: float = 1.2,
-    circle_figsize: float = 5,
-    circle_dpi: int = 150,
     circle_zoom: float = 0.13,
     circle_linewidth: float = 1.0,
     circle_color: str = "black",
@@ -160,41 +174,15 @@ def circle_vis_grid(
     import math
     import matplotlib.pyplot as plt
 
-    images: List[np.ndarray] = []
     n_components = len(datasets)
-
     if titles is None:
         titles = [f"Component {i}" for i in range(n_components)]
 
-    for data, coords in zip(datasets, angles_list):
-        fig_cc, _ = circle_vis(
-            data,
-            coords,
-            vis_func,
-            per_circle=per_circle,
-            angle_range=None,
-            radius=circle_radius,
-            extent_factor=extent_factor,
-            figsize=circle_figsize,
-            dpi=circle_dpi,
-            zoom=circle_zoom,
-            circle_linewidth=circle_linewidth,
-            circle_color=circle_color,
-            save_path=None,
-        )
-        fig_cc.canvas.draw()
-        w, h = fig_cc.canvas.get_width_height()
-        buf = fig_cc.canvas.buffer_rgba()
-        img = np.frombuffer(buf, dtype=np.uint8).reshape(h, w, 4)[..., :3]  # RGB
-        plt.close(fig_cc)
-        images.append(img)
-
-    n_plots = len(images)
-    if n_plots == 0:
+    if n_components == 0:
         return None, None
 
-    n_cols = min(int(n_cols), n_plots)
-    n_rows = int(math.ceil(n_plots / n_cols))
+    n_cols = min(int(n_cols), n_components)
+    n_rows = int(math.ceil(n_components / n_cols))
 
     fig, axes = plt.subplots(
         n_rows,
@@ -202,21 +190,35 @@ def circle_vis_grid(
         figsize=(figsize_per_panel * n_cols, figsize_per_panel * n_rows),
         dpi=int(fig_dpi),
     )
+
+    # normalize axes to flat list
     if n_rows == 1 and n_cols == 1:
         axes = np.array([axes])
     axes = np.ravel(axes)
 
-    for k, img in enumerate(images):
-        axes[k].imshow(img)
-        axes[k].axis("off")
-        axes[k].set_title(titles[k], fontsize=int(title_fontsize))
+    for k, (data, coords) in enumerate(zip(datasets, angles_list)):
+        ax = axes[k]
+        circle_vis(
+            data,
+            coords,
+            vis_func,
+            per_circle=per_circle,
+            angle_range=None,
+            radius=circle_radius,
+            extent_factor=extent_factor,
+            zoom=circle_zoom,
+            circle_linewidth=circle_linewidth,
+            circle_color=circle_color,
+            save_path=None,
+            ax=ax,  # KEY: draw into subplot
+        )
+        ax.set_title(titles[k], fontsize=int(title_fontsize))
 
-    for k in range(n_plots, len(axes)):
+    for k in range(n_components, len(axes)):
         axes[k].axis("off")
 
     plt.tight_layout()
     if save_path is not None:
         fig.savefig(save_path, dpi=int(fig_dpi), bbox_inches="tight")
 
-    plt.show()
     return fig, axes

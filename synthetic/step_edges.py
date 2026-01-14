@@ -15,61 +15,6 @@ __all__ = [
 ]
 
 
-
-def get_contrast_norms(data: np.ndarray, *, patch_type: str = "opt_flow") -> np.ndarray:
-    """
-    Vectorized contrast norms.
-
-    Parameters
-    ----------
-    data : array of shape (N, n^2) for intensity patches,
-           or (N, 2*n^2) for optical flow (u then v).
-    patch_type : {'img','opt_flow','flow'}
-        'flow' is accepted as an alias for 'opt_flow'.
-
-    Returns
-    -------
-    norms : (N,) array, sqrt( x^T D x ) (and sum across u,v for flow)
-    """
-    X = np.asarray(data, dtype=float)
-    if X.ndim != 2:
-        raise ValueError("data must be a 2D array of shape (N, d)")
-
-    if patch_type == "flow":
-        patch_type = "opt_flow"
-
-    if patch_type not in {"img", "opt_flow"}:
-        raise ValueError("patch_type must be one of {'img','opt_flow','flow'}")
-
-    if patch_type == "opt_flow":
-        if X.shape[1] % 2 != 0:
-            raise ValueError("opt_flow patches must have even length 2*n^2")
-        n2 = X.shape[1] // 2
-    else:
-        n2 = X.shape[1]
-
-    n = int(np.sqrt(n2))
-    if n * n != n2:
-        raise ValueError(f"Expected n^2 columns; got {n2} which isn't a perfect square.")
-    d = n * n
-
-    D = get_D_matrix(n)
-
-    if patch_type == "opt_flow":
-        u = X[:, :d]
-        v = X[:, d:2 * d]
-        quad = (
-            np.einsum("ni,ij,nj->n", u, D, u) +
-            np.einsum("ni,ij,nj->n", v, D, v)
-        )
-    else:
-        quad = np.einsum("ni,ij,nj->n", X, D, X)
-
-    quad = np.maximum(quad, 0.0)  # numerical safety
-    return np.sqrt(quad)
-
-
-
 # ----------------------------
 # Legacy filament patterns (3x3)
 # ----------------------------
@@ -193,6 +138,7 @@ def make_step_edges(
     patch_vectors = patch_array.reshape(n_patches, -1, order="F")  # (n,18)
 
     if normalize:
+        from optical_flow.contrast import get_contrast_norms
         norms = get_contrast_norms(patch_vectors)
         norms = np.maximum(norms, eps)
         patch_vectors = patch_vectors / norms[:, None]
@@ -394,6 +340,8 @@ def sample_step_edge_torus(
     flow_patches = np.zeros((n_samples, 2 * d * d), dtype=float)
     flow_patches[:, : d * d] = np.cos(theta)[:, None] * range_patches
     flow_patches[:, d * d :] = np.sin(theta)[:, None] * range_patches
+    
+    from optical_flow.contrast import get_contrast_norms
 
     norms = get_contrast_norms(flow_patches)
     keep = norms > float(thresh)

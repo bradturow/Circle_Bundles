@@ -24,6 +24,8 @@ def lattice_vis(
     save_path: Optional[str] = None,
     transparent_border: bool = True,
     white_thresh: int = 250,
+    ax=None,
+    clear_ax: bool = True,
 ):
     """
     Plot thumbnails at (scaled) coordinates in [0,1]^2 while ensuring thumbnails
@@ -35,7 +37,13 @@ def lattice_vis(
 
     Placement:
       - Each selected point is placed at its *true* (scaled) position, but mapped
-        into a "safe center region" so thumbnails don't spill outside the figure.
+        into a "safe center region" so thumbnails don't spill outside the axes.
+
+    Notes on subplot usage:
+      - If `ax` is provided, thumbnails are placed inside that axis' bounding box.
+      - We overlay small inset axes positioned in *figure fraction* coordinates
+        corresponding to the provided axis' rectangle.
+      - `figsize`/`dpi` are only used if `ax is None`.
     """
     coords = np.asarray(coords, dtype=float)
     if coords.ndim != 2 or coords.shape[1] != 2:
@@ -56,8 +64,7 @@ def lattice_vis(
     min_vals = coords.min(axis=0)
     max_vals = coords.max(axis=0)
     denom = (max_vals - min_vals)
-    # avoid division by ~0 in degenerate coordinate sets
-    denom = np.where(np.abs(denom) < 1e-12, 1.0, denom)
+    denom = np.where(np.abs(denom) < 1e-12, 1.0, denom)  # avoid division by ~0
     scaled_coords = (coords - min_vals) / denom
 
     # Build lattice targets (used only for selection)
@@ -82,36 +89,76 @@ def lattice_vis(
 
     selected_coords = scaled_coords[selected_indices]
 
-    # Create figure
-    if isinstance(figsize, (int, float)):
-        figsize = (float(figsize), float(figsize))
-    fig = plt.figure(figsize=figsize, dpi=int(dpi))
+    # --- Figure / axis handling ---
+    created_fig = False
+    if ax is None:
+        if isinstance(figsize, (int, float)):
+            figsize = (float(figsize), float(figsize))
+        fig = plt.figure(figsize=figsize, dpi=int(dpi))
+        ax = fig.add_subplot(111)
+        created_fig = True
+    else:
+        fig = ax.figure
 
-    fig_w_px = float(figsize[0]) * float(dpi)
-    fig_h_px = float(figsize[1]) * float(dpi)
+    if clear_ax:
+        ax.cla()
+    ax.axis("off")
 
-    width_frac = float(thumb_px) / fig_w_px
-    height_frac = float(thumb_px) / fig_h_px
+    # We need up-to-date positions and pixel sizes
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
 
-    if width_frac >= 1 or height_frac >= 1:
+    # Axis bounding box in figure-fraction coordinates
+    ax_bbox_fig = ax.get_position()  # Bbox in [0,1] figure fraction
+    ax_left, ax_bottom, ax_w, ax_h = (
+        float(ax_bbox_fig.x0),
+        float(ax_bbox_fig.y0),
+        float(ax_bbox_fig.width),
+        float(ax_bbox_fig.height),
+    )
+
+    # Compute figure pixel dimensions from the actual figure
+    fig_w_px = float(fig.bbox.width)
+    fig_h_px = float(fig.bbox.height)
+
+    # Convert desired thumbnail pixel size to figure fractions,
+    # then to fractions of the axis rectangle.
+    width_fig_frac = float(thumb_px) / fig_w_px
+    height_fig_frac = float(thumb_px) / fig_h_px
+
+    if width_fig_frac >= 1 or height_fig_frac >= 1:
         raise ValueError(
-            "thumb_px too large relative to figsize*dpi (thumbnail doesn't fit). "
-            f"width_frac={width_frac:.3f}, height_frac={height_frac:.3f}."
+            "thumb_px too large relative to figure pixel size (thumbnail doesn't fit). "
+            f"width_fig_frac={width_fig_frac:.3f}, height_fig_frac={height_fig_frac:.3f}."
         )
 
-    # Safe center region
-    x0, x1 = width_frac / 2, 1 - width_frac / 2
-    y0, y1 = height_frac / 2, 1 - height_frac / 2
+    width_ax_frac = width_fig_frac / ax_w
+    height_ax_frac = height_fig_frac / ax_h
 
-    # Place thumbnails
+    if width_ax_frac >= 1 or height_ax_frac >= 1:
+        raise ValueError(
+            "thumb_px too large relative to the provided axis size. "
+            f"width_ax_frac={width_ax_frac:.3f}, height_ax_frac={height_ax_frac:.3f}."
+        )
+
+    # Safe center region inside the axis (in axis-fraction coordinates)
+    x0, x1 = width_ax_frac / 2, 1 - width_ax_frac / 2
+    y0, y1 = height_ax_frac / 2, 1 - height_ax_frac / 2
+
+    # Helper: convert an (u,v) in axis-fraction coordinates to figure fraction
+    def _axfrac_to_figfrac(u: float, v: float) -> tuple[float, float]:
+        return (ax_left + u * ax_w, ax_bottom + v * ax_h)
+
+    # Place thumbnails (as inset axes in figure fraction coordinates)
     for idx, (cx, cy) in zip(selected_indices, selected_coords):
-        cx_safe = x0 + float(cx) * (x1 - x0)
-        cy_safe = y0 + float(cy) * (y1 - y0)
+        u = x0 + float(cx) * (x1 - x0)  # axis-fraction x
+        v = y0 + float(cy) * (y1 - y0)  # axis-fraction y
 
-        left = cx_safe - width_frac / 2
-        bottom = cy_safe - height_frac / 2
+        left_fig, bottom_fig = _axfrac_to_figfrac(u, v)
+        left_fig -= width_fig_frac / 2
+        bottom_fig -= height_fig_frac / 2
 
-        ax_in = fig.add_axes([left, bottom, width_frac, height_frac])
+        ax_in = fig.add_axes([left_fig, bottom_fig, width_fig_frac, height_fig_frac])
         rendered = vis_func(data[idx])
         img = render_to_rgba(
             rendered,
@@ -124,6 +171,8 @@ def lattice_vis(
         ax_in.axis("off")
 
     if save_path is not None:
+        # keep the whole figure; bbox_inches tight is usually fine, but can clip
+        # inset axes depending on backend. If you see clipping, remove bbox_inches.
         fig.savefig(save_path, dpi=int(dpi), bbox_inches="tight")
 
-    return fig
+    return fig, ax

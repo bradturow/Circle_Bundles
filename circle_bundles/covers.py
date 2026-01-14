@@ -125,8 +125,8 @@ class NerveSummary:
             md.append("")
             md.append("**Overlap evidence from $U$:**")
             md.append("")
-            md.append(f"- $\\max_s \\sum_i U_{i,s} = {self.max_overlap_order}$")
-            md.append(f"- $\\#\\{{s : \\sum_i U_{i,s} \\ge 5\\}} = {self.n_samples_with_overlap_ge_5}$")
+            md.append(f"- $\\max_s \\sum_i U_{{i,s}} = {self.max_overlap_order}$")
+            md.append(f"- $\\#\\{{s : \\sum_i U_{{i,s}} \\ge 5\\}} = {self.n_samples_with_overlap_ge_5}$")
 
         else:
             last_nonzero = 0
@@ -337,7 +337,7 @@ class CoverBase:
     landmarks: Optional[np.ndarray] = None  # (n_sets, dB) float
     metric: Any = None                 # should be a Metric object (has .pairwise)
     full_dist_mat: Optional[np.ndarray] = None  # optional cache for viz
-
+        
     def ensure_metric(self):
         """
         Normalize self.metric into a vectorized Metric object with .pairwise.
@@ -580,7 +580,7 @@ class MetricBallCover(CoverBase):
         dist = M.pairwise(np.asarray(self.landmarks), np.asarray(self.base_points))  # (n_sets, n_samples)
 
         # optional cache for viz (sample-sample)
-        self.full_dist_mat = M.pairwise(np.asarray(self.base_points))
+#        self.full_dist_mat = M.pairwise(np.asarray(self.base_points))
 
         self.U = dist < self.radius
 

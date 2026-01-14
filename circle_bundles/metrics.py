@@ -54,12 +54,12 @@ class S1AngleMetric:
 
 @dataclass(frozen=True)
 class RP1AngleMetric:
-    """Angles in radians; theta ~ theta+pi."""
+    """Angles in radians; theta ~ theta+pi. Accepts any real angles."""
     name: str = "RP1_angle"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
-        t1 = np.asarray(X).reshape(-1)[:, None]
-        t2 = t1.T if Y is None else np.asarray(Y).reshape(-1)[None, :]
+        t1 = np.mod(np.asarray(X, dtype=float).reshape(-1), np.pi)[:, None]
+        t2 = t1.T if Y is None else np.mod(np.asarray(Y, dtype=float).reshape(-1), np.pi)[None, :]
         d = np.abs(t2 - t1)
         return np.minimum(d, np.pi - d)
 
@@ -78,15 +78,27 @@ class S1UnitVectorMetric:
 
 @dataclass(frozen=True)
 class RP1UnitVectorMetric:
-    """Unit vectors in R^2 with antipodal ID; min(ang, pi-ang)."""
+    """Unit vectors in R^2 with antipodal ID; distance arccos(|<p,q>|)."""
     name: str = "RP1_unitvec"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
-        dots = np.clip(X @ Y.T, -1.0, 1.0)
-        ang = np.arccos(dots)
-        return np.minimum(ang, np.pi - ang)
+
+        # allow (n,) -> (n,1) but RP1UnitVectorMetric really expects (n,2)
+        if X.ndim == 1:
+            X = X.reshape(-1, 1)
+        if Y.ndim == 1:
+            Y = Y.reshape(-1, 1)
+        if X.shape[1] != 2 or Y.shape[1] != 2:
+            raise ValueError(f"RP1UnitVectorMetric expects (n,2) arrays. Got X={X.shape}, Y={Y.shape}.")
+
+        # normalize rows (robust if user passes slightly non-unit vectors)
+        Xn = X / np.maximum(np.linalg.norm(X, axis=1, keepdims=True), 1e-12)
+        Yn = Y / np.maximum(np.linalg.norm(Y, axis=1, keepdims=True), 1e-12)
+
+        dots = np.clip(Xn @ Yn.T, -1.0, 1.0)
+        return np.arccos(np.abs(dots))
 
 
 @dataclass(frozen=True)
@@ -97,25 +109,126 @@ class RP2UnitVectorMetric:
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
-
-        # Pure numpy (no SciPy dependency)
         Dpos = np.linalg.norm(X[:, None, :] - Y[None, :, :], axis=-1)
         Dneg = np.linalg.norm(X[:, None, :] + Y[None, :, :], axis=-1)
         return np.minimum(Dpos, Dneg)
 
 
+def _t2_flat_pairwise_angles(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
+    """
+    Flat torus distance on [0,2pi)^2 using coordinatewise circular distance.
+    X: (n,2), Y: (m,2) -> (n,m)
+    """
+    X = np.asarray(X, dtype=float)
+    Y = np.asarray(Y, dtype=float)
+    diff = np.abs(X[:, None, :] - Y[None, :, :])
+    torus_diff = np.minimum(diff, 2.0 * np.pi - diff)
+    return np.linalg.norm(torus_diff, axis=-1)
+
+
 @dataclass(frozen=True)
 class T2FlatMetric:
-    """Flat torus distance for coords in [0,2pi)^2."""
+    """Flat torus distance for coords in [0,2pi)^2 (angles)."""
     name: str = "T2_flat"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
-        Y = X if Y is None else np.asarray(Y, dtype=float)
-        diff = np.abs(X[:, None, :] - Y[None, :, :])
-        torus_diff = np.minimum(diff, 2 * np.pi - diff)
-        return np.linalg.norm(torus_diff, axis=-1)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+        if X.ndim != 2 or X.shape[1] != 2:
+            raise ValueError(f"X must be (n,2) angles. Got {X.shape}.")
+        if Y0.ndim != 2 or Y0.shape[1] != 2:
+            raise ValueError(f"Y must be (m,2) angles. Got {Y0.shape}.")
+        return _t2_flat_pairwise_angles(X, Y0)
 
+
+# ============================================================
+# Flat Z2 quotient metrics on angle-coordinates (base-first!)
+# ============================================================
+
+@dataclass(frozen=True)
+class KleinBottleFlatMetric:
+    """
+    Flat Klein bottle metric induced as a Z2 quotient of the flat torus.
+
+    Coordinates are angles (base, fiber) in radians, wrapped into [0,2pi).
+
+    Identification (base-first convention):
+        (b, f) ~ (b + pi, -f)
+
+    Quotient distance:
+        d([x],[y]) = min( d_T2(x,y), d_T2(x, g(y)) )
+    where g(b,f) = (b+pi, -f).
+    """
+    name: str = "KB_flat"
+
+    def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        X = np.asarray(X, dtype=float)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+
+        if X.ndim != 2 or X.shape[1] != 2:
+            raise ValueError(f"X must be (n,2) angles (base,fiber). Got {X.shape}.")
+        if Y0.ndim != 2 or Y0.shape[1] != 2:
+            raise ValueError(f"Y must be (m,2) angles (base,fiber). Got {Y0.shape}.")
+
+        # g(b,f) = (b + pi, -f) modulo 2pi
+        Y1 = Y0.copy()
+        Y1[:, 0] = np.mod(Y1[:, 0] + np.pi, 2.0 * np.pi)
+        Y1[:, 1] = np.mod(-Y1[:, 1], 2.0 * np.pi)
+
+        D0 = _t2_flat_pairwise_angles(X, Y0)
+        D1 = _t2_flat_pairwise_angles(X, Y1)
+        return np.minimum(D0, D1)
+
+
+@dataclass(frozen=True)
+class TorusDiagFlatMetric:
+    """
+    Flat metric on the quotient of the flat torus by the Z2 action
+
+        (base, fiber) ~ (base + pi, fiber + pi)
+
+    Homeomorphic to RP^1 x S^1 (a trivial circle bundle over RP^1).
+    """
+    name: str = "T2_diag_flat"
+
+    def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        X = np.asarray(X, dtype=float)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+
+        if X.ndim != 2 or X.shape[1] != 2:
+            raise ValueError(f"X must be (n,2) angles (base,fiber). Got {X.shape}.")
+        if Y0.ndim != 2 or Y0.shape[1] != 2:
+            raise ValueError(f"Y must be (m,2) angles (base,fiber). Got {Y0.shape}.")
+
+        # g(b,f) = (b + pi, f + pi) modulo 2pi
+        Y1 = Y0.copy()
+        Y1[:, 0] = np.mod(Y1[:, 0] + np.pi, 2.0 * np.pi)
+        Y1[:, 1] = np.mod(Y1[:, 1] + np.pi, 2.0 * np.pi)
+
+        D0 = _t2_flat_pairwise_angles(X, Y0)
+        D1 = _t2_flat_pairwise_angles(X, Y1)
+        return np.minimum(D0, D1)
+
+
+def T2_Z2QuotientFlatMetric(kind: str = "klein") -> Metric:
+    """
+    Factory for Z2 quotient metrics on angle-coordinates (base,fiber) in [0,2pi)^2.
+
+    kind:
+      - "klein": (b,f) ~ (b+pi, -f)
+      - "diag":  (b,f) ~ (b+pi, f+pi)
+    """
+    kind = str(kind).lower().strip()
+    if kind in {"klein", "kb", "klein_bottle"}:
+        return KleinBottleFlatMetric()
+    if kind in {"diag", "diagonal", "diag_pi", "diagonal_pi"}:
+        return TorusDiagFlatMetric()
+    raise ValueError(f"Unknown kind={kind!r}. Expected 'klein' or 'diag'.")
+
+
+# ============================================================
+# Converting scalar metrics -> vectorized metrics
+# ============================================================
 
 @dataclass(frozen=True)
 class SciPyCdistMetric:
@@ -139,14 +252,13 @@ def as_metric(metric: Union["Metric", Callable, None]) -> "Metric":
     """Convert either a Metric object or a callable(p,q) into a Metric object."""
     if metric is None:
         return EuclideanMetric()
-    # duck-typing: Metric objects have .pairwise
     if hasattr(metric, "pairwise"):
         return metric  # type: ignore[return-value]
     return SciPyCdistMetric(metric=metric, name=getattr(metric, "__name__", "custom_metric"))
 
 
 # ============================================================
-# Quotient metrics
+# Euclidean Z2 quotient metrics on embedded data
 # ============================================================
 
 ActionFn = Callable[[np.ndarray], np.ndarray]
@@ -159,15 +271,177 @@ def _pairwise_euclidean(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
 
 
 @dataclass(frozen=True)
+class Z2QuotientMetricEuclidean:
+    """
+    Z2 quotient metric induced from ambient Euclidean distance in R^d.
+
+    d([x],[y]) = min(||x - y||, ||x - g(y)||)
+    """
+    action: ActionFn
+    dim: int
+    name: str = "Z2QuotientMetricEuclidean"
+
+    def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        X = np.asarray(X, dtype=float)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+
+        if X.ndim != 2 or X.shape[1] != self.dim:
+            raise ValueError(f"X must be (n,{self.dim}). Got {X.shape}.")
+        if Y0.ndim != 2 or Y0.shape[1] != self.dim:
+            raise ValueError(f"Y must be (m,{self.dim}). Got {Y0.shape}.")
+
+        Y1 = np.asarray(self.action(Y0), dtype=float)
+        if Y1.shape != Y0.shape:
+            raise ValueError(f"action returned shape {Y1.shape}, expected {Y0.shape}.")
+
+        D0 = _pairwise_euclidean(X, Y0)
+        D1 = _pairwise_euclidean(X, Y1)
+        return np.minimum(D0, D1)
+
+    def dist(self, p: np.ndarray, q: np.ndarray) -> float:
+        p = np.asarray(p, dtype=float).reshape(self.dim)
+        q = np.asarray(q, dtype=float).reshape(self.dim)
+        q2 = np.asarray(self.action(q), dtype=float).reshape(self.dim)
+        return float(min(np.linalg.norm(p - q), np.linalg.norm(p - q2)))
+
+
+# ============================================================
+# C^2 torus (R^4) Z2 quotient metrics with base-first convention
+# ============================================================
+# We assume the torus is embedded as (z1,z2) in C^2 with real coords:
+#   z1 = x1 + i x2, z2 = x3 + i x4.
+#
+# To make "first coordinate is base projection" explicit, we allow:
+#   base_in="z1"  or  base_in="z2"
+# ============================================================
+
+def act_klein_C2_torus_base_in_z1(Y: np.ndarray) -> np.ndarray:
+    """
+    base_in="z1": base angle lives in z1, fiber angle lives in z2.
+
+    Klein action in angles (b,f): (b,f) ~ (b+pi, -f)
+    becomes (z1,z2) -> (-z1, conj(z2)).
+
+    Real coords: (x1,x2,x3,x4) -> (-x1,-x2, x3,-x4)
+    """
+    Y = np.asarray(Y, dtype=float)
+    if Y.shape[-1] != 4:
+        raise ValueError(f"Expected last dim 4 for C^2 data. Got {Y.shape}.")
+    out = Y.copy()
+    out[..., 0:2] *= -1.0
+    out[..., 3] *= -1.0
+    return out
+
+
+def act_klein_C2_torus_base_in_z2(Y: np.ndarray) -> np.ndarray:
+    """
+    base_in="z2": base angle lives in z2, fiber angle lives in z1.
+
+    Klein action in (b,f): (b,f) ~ (b+pi, -f)
+    in (z1,z2) ordering means: (z_fiber, z_base) -> (conj(z_fiber), -z_base)
+    i.e. (z1,z2) -> (conj(z1), -z2).
+
+    Real coords: (x1,x2,x3,x4) -> (x1,-x2, -x3,-x4)
+    """
+    Y = np.asarray(Y, dtype=float)
+    if Y.shape[-1] != 4:
+        raise ValueError(f"Expected last dim 4 for C^2 data. Got {Y.shape}.")
+    out = Y.copy()
+    out[..., 1] *= -1.0       # conj(z1)
+    out[..., 2:4] *= -1.0     # -z2
+    return out
+
+
+def act_diag_C2_torus_base_in_z1(Y: np.ndarray) -> np.ndarray:
+    """
+    Diagonal pi-shift: (b,f) ~ (b+pi, f+pi) corresponds to (z1,z2)->(-z1,-z2),
+    independent of which factor is called base.
+    """
+    Y = np.asarray(Y, dtype=float)
+    if Y.shape[-1] != 4:
+        raise ValueError(f"Expected last dim 4 for C^2 data. Got {Y.shape}.")
+    return -Y
+
+
+def act_diag_C2_torus_base_in_z2(Y: np.ndarray) -> np.ndarray:
+    # Same map; kept for clarity/symmetry.
+    return act_diag_C2_torus_base_in_z1(Y)
+
+
+# Back-compat aliases (older code may import these names)
+def act_klein_C2_torus(Y: np.ndarray) -> np.ndarray:
+    return act_klein_C2_torus_base_in_z1(Y)
+
+
+def act_diag_C2_torus(Y: np.ndarray) -> np.ndarray:
+    return act_diag_C2_torus_base_in_z1(Y)
+
+
+def Torus_KleinQuotientMetric_R4(*, base_in: str = "z2") -> "Metric":
+    """
+    Z2 quotient metric on R^4 C^2-torus embedding that implements the Klein identification
+    (base,fiber) ~ (base+pi, -fiber) with an explicit base-factor choice.
+
+    base_in:
+      - "z1" (default): base angle is encoded in z1
+      - "z2":            base angle is encoded in z2
+    """
+    base_in = str(base_in).lower().strip()
+    if base_in == "z1":
+        act = act_klein_C2_torus_base_in_z1
+        nm = "T2_to_Klein_R4(base=z1)"
+    elif base_in == "z2":
+        act = act_klein_C2_torus_base_in_z2
+        nm = "T2_to_Klein_R4(base=z2)"
+    else:
+        raise ValueError("base_in must be 'z1' or 'z2'.")
+    return Z2QuotientMetricEuclidean(action=act, dim=4, name=nm)
+
+
+def Torus_DiagQuotientMetric_R4(*, base_in: str = "z2") -> "Metric":
+    """
+    Z2 quotient metric on R^4 C^2-torus embedding for the diagonal pi-shift:
+      (base,fiber) ~ (base+pi, fiber+pi)
+
+    This is symmetric under swapping base/fiber, but we keep base_in for API consistency.
+    """
+    base_in = str(base_in).lower().strip()
+    if base_in not in {"z1", "z2"}:
+        raise ValueError("base_in must be 'z1' or 'z2'.")
+    act = act_diag_C2_torus_base_in_z1
+    nm = f"T2_to_Diag_R4(base={base_in})"
+    return Z2QuotientMetricEuclidean(action=act, dim=4, name=nm)
+
+
+def Torus_Z2QuotientMetric_R4(kind: str = "klein", *, base_in: str = "z2") -> "Metric":
+    """
+    Factory for Z2 quotient metrics on a C^2 torus embedded in R^4.
+
+    kind:
+      - "klein": (b,f)~(b+pi,-f)
+      - "diag":  (b,f)~(b+pi,f+pi)
+
+    base_in:
+      - "z1" (default) or "z2" (for klein; diag is symmetric but accepted)
+    """
+    kind = str(kind).lower().strip()
+    if kind in {"klein", "kb", "klein_bottle"}:
+        return Torus_KleinQuotientMetric_R4(base_in=base_in)
+    if kind in {"diag", "diagonal", "diag_pi", "diagonal_pi"}:
+        return Torus_DiagQuotientMetric_R4(base_in=base_in)
+    raise ValueError(f"Unknown kind={kind!r}. Expected 'klein' or 'diag'.")
+
+
+# ============================================================
+# Existing R^5 Z2 quotient (kept for compatibility)
+# ============================================================
+
+@dataclass(frozen=True)
 class Z2QuotientMetricR5:
     """
     Z2 quotient metric induced from ambient Euclidean distance in R^5.
 
     Points are in R^5, intended as (v, Re z, Im z) with v in R^3, z on S^1.
-    The Z2 action is: y ~ g(y), where g is an involution.
-
-    Quotient distance:
-        d([x],[y]) = min(||x - y||, ||x - g(y)||)
     """
     action: ActionFn
     name: str = "Z2QuotientMetricR5"
@@ -197,9 +471,7 @@ class Z2QuotientMetricR5:
 
 
 def act_base_only(Y: np.ndarray) -> np.ndarray:
-    """
-    (v, a, b) -> (-v, a, b)  i.e. (v,z) -> (-v, z)
-    """
+    """(v, a, b) -> (-v, a, b)  i.e. (v,z) -> (-v, z)"""
     Y = np.asarray(Y, dtype=float)
     out = Y.copy()
     out[..., :3] *= -1.0
@@ -207,9 +479,7 @@ def act_base_only(Y: np.ndarray) -> np.ndarray:
 
 
 def act_pi_twist(Y: np.ndarray) -> np.ndarray:
-    """
-    (v, a, b) -> (-v, -a, -b)  i.e. (v,z) -> (-v, -z)
-    """
+    """(v, a, b) -> (-v, -a, -b)  i.e. (v,z) -> (-v, -z)"""
     Y = np.asarray(Y, dtype=float)
     out = Y.copy()
     out[..., :3] *= -1.0
@@ -218,9 +488,7 @@ def act_pi_twist(Y: np.ndarray) -> np.ndarray:
 
 
 def act_reflection_twist(Y: np.ndarray) -> np.ndarray:
-    """
-    (v, a, b) -> (-v, a, -b)  i.e. (v,z) -> (-v, conj(z))
-    """
+    """(v, a, b) -> (-v, a, -b)  i.e. (v,z) -> (-v, conj z)"""
     Y = np.asarray(Y, dtype=float)
     out = Y.copy()
     out[..., :3] *= -1.0
@@ -255,11 +523,7 @@ def _safe_normalize_rows(X: np.ndarray, eps: float = 1e-12) -> np.ndarray:
 
 
 def _quat_mul(A: np.ndarray, B: np.ndarray) -> np.ndarray:
-    """
-    Hamilton product, vectorized.
-    A: (...,4), B: (...,4) -> (...,4)
-    Convention: q = (a,b,c,d) with a scalar.
-    """
+    """Hamilton product, vectorized. q=(a,b,c,d) with a scalar."""
     A = np.asarray(A, dtype=float)
     B = np.asarray(B, dtype=float)
 
@@ -274,10 +538,6 @@ def _quat_mul(A: np.ndarray, B: np.ndarray) -> np.ndarray:
 
 
 def _s3_geodesic_pairwise(X: np.ndarray, Y: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
-    """
-    Geodesic distance on S^3 via arccos(<x,y>) in R^4.
-    X: (n,4), Y: (m,4) -> (n,m)
-    """
     X = _safe_normalize_rows(X, eps=eps)
     Y = _safe_normalize_rows(Y, eps=eps)
     dots = np.clip(X @ Y.T, -1.0, 1.0)
@@ -285,20 +545,12 @@ def _s3_geodesic_pairwise(X: np.ndarray, Y: np.ndarray, *, eps: float = 1e-12) -
 
 
 def _s3_chordal_pairwise(X: np.ndarray, Y: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
-    """
-    Chordal distance on S^3 induced from ambient R^4 Euclidean distance.
-    X: (n,4), Y: (m,4) -> (n,m)
-    """
     X = _safe_normalize_rows(X, eps=eps)
     Y = _safe_normalize_rows(Y, eps=eps)
     return np.linalg.norm(X[:, None, :] - Y[None, :, :], axis=-1)
 
 
 def _unit_quat_from_axis_angle(v: np.ndarray, theta: float, *, eps: float = 1e-12) -> np.ndarray:
-    """
-    g = cos(theta) + (v_hat) sin(theta), where v is a 3-vector.
-    Returns (4,) quaternion.
-    """
     v = np.asarray(v, dtype=float).reshape(3,)
     nv = max(np.linalg.norm(v), eps)
     vhat = v / nv
@@ -306,7 +558,6 @@ def _unit_quat_from_axis_angle(v: np.ndarray, theta: float, *, eps: float = 1e-1
 
 
 def _default_v_axis() -> np.ndarray:
-    # default v = e1 (consistent with your hopf_projection default)
     return np.array([1.0, 0.0, 0.0], dtype=float)
 
 
@@ -315,13 +566,7 @@ class ZpHopfQuotientMetricS3:
     """
     Quotient metric on S^3 / <g>, where g = exp(v * 2pi/p) lies in the Hopf fiber circle S^1_v.
 
-    This is compatible with hopf_projection(q, v=v_axis) because right-multiplication by g
-    preserves q v q^{-1} (since g commutes with v).
-
-    Distance:
-        d([x],[y]) = min_{m=0..p-1} d_S3(x, y * g^m)
-
-    Inputs are unit quaternions in R^4 with convention (a,b,c,d).
+    d([x],[y]) = min_{m=0..p-1} d_S3(x, y * g^m)
     """
     p: int
     v_axis: np.ndarray = field(default_factory=_default_v_axis)
@@ -339,7 +584,6 @@ class ZpHopfQuotientMetricS3:
         v = np.asarray(self.v_axis, dtype=float).reshape(3,)
         nv = max(np.linalg.norm(v), self.eps)
         v = v / nv
-
         object.__setattr__(self, "p", p)
         object.__setattr__(self, "v_axis", v)
 
@@ -352,35 +596,26 @@ class ZpHopfQuotientMetricS3:
         if Y0.ndim != 2 or Y0.shape[1] != 4:
             raise ValueError(f"Y must be (m,4) quaternions. Got {Y0.shape}.")
 
-        # Normalize (important if user passes slightly non-unit quats)
         Xn = _safe_normalize_rows(X, eps=self.eps)
         Yn = _safe_normalize_rows(Y0, eps=self.eps)
 
-        # Choose base distance on S^3
         dist_fn = _s3_geodesic_pairwise if self.base == "geodesic" else _s3_chordal_pairwise
 
-        # Precompute powers g^m (as unit quaternions): g = exp(v * 2pi/p)
         theta0 = 2.0 * np.pi / float(self.p)
         gs = np.stack(
             [_unit_quat_from_axis_angle(self.v_axis, m * theta0, eps=self.eps) for m in range(self.p)],
             axis=0,
-        )  # (p,4)
+        )
 
-        # For each m, compute distance to Y * g^m and take min.
         Dmin = None
         for m in range(self.p):
-            Ym = _quat_mul(Yn, gs[m][None, :])  # right-multiply each row of Y by g^m
+            Ym = _quat_mul(Yn, gs[m][None, :])
             Dm = dist_fn(Xn, Ym, eps=self.eps)
             Dmin = Dm if Dmin is None else np.minimum(Dmin, Dm)
-
         return Dmin
 
 
 def _pick_u_perp_v(v_axis: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
-    """
-    Choose a unit 3-vector u ⟂ v_axis in a deterministic way.
-    Returns u_vec in R^3 (not a quaternion).
-    """
     v = np.asarray(v_axis, dtype=float).reshape(3,)
     nv = max(np.linalg.norm(v), eps)
     v = v / nv
@@ -391,15 +626,10 @@ def _pick_u_perp_v(v_axis: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
 
     u = np.cross(v, a)
     nu = max(np.linalg.norm(u), eps)
-    u = u / nu
-    return u
+    return u / nu
 
 
 def _right_mul_by_u(Q: np.ndarray, u_axis: np.ndarray) -> np.ndarray:
-    """
-    Apply tau(q)=q*u where u is the pure-imag unit quaternion (0,u_axis).
-    Q: (n,4) -> (n,4)
-    """
     u_axis = np.asarray(u_axis, dtype=float).reshape(3,)
     u_quat = np.array([0.0, u_axis[0], u_axis[1], u_axis[2]], dtype=float)
     return _quat_mul(Q, u_quat[None, :])
@@ -412,34 +642,30 @@ class Z2LensAntipodalQuotientMetricS3:
     that covers antipodal on S^2 under pi_v(q)=q v q^{-1}.
 
     Requires p even so that tau^2 is trivial on L(p,1).
-    Distance:
-        d([x],[y]) = min_{e in {id,tau}} min_{m=0..p-1} d_S3(x, e(y) * g^m)
     """
     p: int
     v_axis: np.ndarray = field(default_factory=_default_v_axis)
     base: str = "geodesic"  # "geodesic" or "chordal"
     name: str = "Z2LensAntipodalQuotientMetricS3"
     eps: float = 1e-12
-    u_axis: Optional[np.ndarray] = None  # if None, we pick a canonical u ⟂ v
+    u_axis: Optional[np.ndarray] = None
 
     def __post_init__(self) -> None:
         p = int(self.p)
         if p <= 0:
             raise ValueError(f"p must be positive. Got {self.p}.")
         if p % 2 != 0:
-            raise ValueError(f"This Z2 quotient covers antipodal and is well-defined only for even p. Got p={p}.")
+            raise ValueError(f"antipodal quotient requires even p. Got p={p}.")
         if self.base not in ("geodesic", "chordal"):
             raise ValueError(f"base must be 'geodesic' or 'chordal'. Got {self.base}.")
 
         v = np.asarray(self.v_axis, dtype=float).reshape(3,)
-        nv = max(np.linalg.norm(v), self.eps)
-        v = v / nv
+        v = v / max(np.linalg.norm(v), self.eps)
 
         ua = None
         if self.u_axis is not None:
             ua = np.asarray(self.u_axis, dtype=float).reshape(3,)
-            nua = max(np.linalg.norm(ua), self.eps)
-            ua = ua / nua
+            ua = ua / max(np.linalg.norm(ua), self.eps)
 
         object.__setattr__(self, "p", p)
         object.__setattr__(self, "v_axis", v)
@@ -459,32 +685,27 @@ class Z2LensAntipodalQuotientMetricS3:
 
         dist_fn = _s3_geodesic_pairwise if self.base == "geodesic" else _s3_chordal_pairwise
 
-        # generator g = exp(v * 2pi/p)
         theta0 = 2.0 * np.pi / float(self.p)
         gs = np.stack(
             [_unit_quat_from_axis_angle(self.v_axis, m * theta0, eps=self.eps) for m in range(self.p)],
             axis=0,
-        )  # (p,4)
+        )
 
-        # choose u ⟂ v
         u_axis = _pick_u_perp_v(self.v_axis, eps=self.eps) if self.u_axis is None else self.u_axis
         assert u_axis is not None
         u_axis = u_axis / max(np.linalg.norm(u_axis), self.eps)
 
-        # Two representatives for Y-orbit: Y and tau(Y)=Y*u
         Ytau = _right_mul_by_u(Yn, u_axis)
 
         def min_over_zp(Yrep: np.ndarray) -> np.ndarray:
             Dmin = None
             for m in range(self.p):
-                Ym = _quat_mul(Yrep, gs[m][None, :])  # right-multiply by g^m
+                Ym = _quat_mul(Yrep, gs[m][None, :])
                 Dm = dist_fn(Xn, Ym, eps=self.eps)
                 Dmin = Dm if Dmin is None else np.minimum(Dmin, Dm)
             return Dmin
 
-        D0 = min_over_zp(Yn)
-        D1 = min_over_zp(Ytau)
-        return np.minimum(D0, D1)
+        return np.minimum(min_over_zp(Yn), min_over_zp(Ytau))
 
 
 def S3QuotientMetric(
@@ -496,31 +717,6 @@ def S3QuotientMetric(
     u_axis: Optional[np.ndarray] = None,
     name: Optional[str] = None,
 ) -> "Metric":
-    """
-    Unified constructor for S^3 quotient metrics compatible with hopf_projection.
-
-    Parameters
-    ----------
-    p : int
-        Lens parameter. Uses the cyclic subgroup <exp(v * 2pi/p)> acting by right-multiplication.
-        p=1 means "no Z_p quotient" (still returns a valid Metric).
-    v_axis : (3,) array
-        Axis v defining hopf_projection(q,v)=q v q^{-1} and the Hopf circle subgroup S^1_v.
-    antipodal : bool
-        If True, additionally quotient by the Z2-action tau(q)=q*u covering antipodal on S^2.
-        This is well-defined only when p is even (because tau^2 = (-1) which must lie in <g>).
-    base : {"geodesic","chordal"}
-        Underlying S^3 distance used before quotienting.
-    u_axis : optional (3,) array
-        Controls which u ⟂ v is used for the Z2 element. If None, a canonical perpendicular is chosen.
-    name : optional str
-        Override metric.name. Otherwise a reasonable default is used.
-
-    Returns
-    -------
-    Metric
-        Either ZpHopfQuotientMetricS3 or Z2LensAntipodalQuotientMetricS3.
-    """
     p = int(p)
     if p <= 0:
         raise ValueError(f"p must be positive. Got {p}.")
@@ -531,7 +727,7 @@ def S3QuotientMetric(
 
     if antipodal:
         if p % 2 != 0:
-            raise ValueError(f"antipodal=True requires even p (so -1 ∈ <exp(v*2pi/p)>). Got p={p}.")
+            raise ValueError(f"antipodal=True requires even p. Got p={p}.")
         return Z2LensAntipodalQuotientMetricS3(
             p=p,
             v_axis=v_axis,
@@ -549,7 +745,7 @@ def S3QuotientMetric(
 
 
 # ============================================================
-# Old existing scalar / vector metric functions
+# Old scalar metric functions (kept for compatibility)
 # ============================================================
 
 def S1_dist(theta1, theta2):
@@ -585,6 +781,40 @@ def T2_dist(p, q):
     return np.linalg.norm(torus_diff)
 
 
+def KB_flat_dist(p, q):
+    """
+    Scalar Klein bottle flat distance on angle coords p=(base,fiber), q=(base,fiber),
+    using (b,f)~(b+pi,-f).
+    """
+    p = np.asarray(p, dtype=float).reshape(2,)
+    q = np.asarray(q, dtype=float).reshape(2,)
+
+    def _t2(pv, qv):
+        diff = np.abs(pv - qv)
+        diff = np.minimum(diff, 2.0 * np.pi - diff)
+        return float(np.linalg.norm(diff))
+
+    qg = np.array([(q[0] + np.pi) % (2.0 * np.pi), (-q[1]) % (2.0 * np.pi)], dtype=float)
+    return min(_t2(p, q), _t2(p, qg))
+
+
+def T2_diag_flat_dist(p, q):
+    """
+    Scalar flat distance for the Z2 quotient on (base,fiber):
+        (b,f) ~ (b+pi, f+pi)
+    """
+    p = np.asarray(p, dtype=float).reshape(2,)
+    q = np.asarray(q, dtype=float).reshape(2,)
+
+    def _t2(pv, qv):
+        diff = np.abs(pv - qv)
+        diff = np.minimum(diff, 2.0 * np.pi - diff)
+        return float(np.linalg.norm(diff))
+
+    qg = np.array([(q[0] + np.pi) % (2.0 * np.pi), (q[1] + np.pi) % (2.0 * np.pi)], dtype=float)
+    return min(_t2(p, q), _t2(p, qg))
+
+
 # ============================================================
 # Distance matrices helper (backwards compatible)
 # ============================================================
@@ -601,7 +831,6 @@ def get_dist_mat(data1, data2=None, metric=Euc_met):
     X = np.asarray(data1)
     Y = X if data2 is None else np.asarray(data2)
 
-    # Map known old metrics to fast vectorized Metric objects
     if metric is Euc_met:
         M = EuclideanMetric()
         return M.pairwise(X, None if data2 is None else Y)
@@ -630,6 +859,13 @@ def get_dist_mat(data1, data2=None, metric=Euc_met):
         M = T2FlatMetric()
         return M.pairwise(X, None if data2 is None else Y)
 
-    # Otherwise accept Metric object or callable(p,q)
+    if metric is KB_flat_dist:
+        M = KleinBottleFlatMetric()
+        return M.pairwise(X, None if data2 is None else Y)
+
+    if metric is T2_diag_flat_dist:
+        M = TorusDiagFlatMetric()
+        return M.pairwise(X, None if data2 is None else Y)
+
     M = as_metric(metric)
     return M.pairwise(X, None if data2 is None else Y)

@@ -245,21 +245,15 @@ class BundleResult:
                     ref_angle=float(getattr(cocycle, "ref_angle", 0.0)),
                     U=self.cover.U,
                 )
-            # If not ok and not require_orientable, proceed without orienting.
 
-        # Extract theta on edges FROM THE (possibly oriented) cocycle, radians
-        theta_edge = theta_dict_to_edge_vector_radians(
-            edges=edges_used,
-            theta=coc_use.theta,  # IMPORTANT: oriented theta if ok
-        )
+        theta_edge = theta_dict_to_edge_vector_radians(edges=edges_used, theta=coc_use.theta)
 
-        # Build global trivialization using oriented f and theta
         F = build_global_trivialization(
             edges=edges_used,
             U=self.cover.U,
             pou=self.cover.pou,
             f=f_use,
-            theta_edge=theta_edge,  # radians
+            theta_edge=theta_edge,
             method=str(method),
             beta_edge=None,
         )
@@ -312,7 +306,6 @@ class BundleResult:
 
         gt = self._cache[key]
 
-        # Mirror “default-ish” call into bundle.global_trivialization
         if (
             self.global_trivialization is None
             and edge_weights is None
@@ -324,8 +317,7 @@ class BundleResult:
 
         return gt
 
-    
-
+    # ---------- Frame dataset ----------
     def get_frame_dataset(
         self,
         *,
@@ -337,51 +329,22 @@ class BundleResult:
         subcomplex: SubcomplexMode = "full",
         persistence=None,
     ):
-        """
-        Convenience wrapper around bundle_map.get_frame_dataset().
-
-        Parameters
-        ----------
-        stage:
-            Which pipeline stage to export frames from.
-        reducer:
-            Optional FrameReducerConfig (used only for stage='post_reduction').
-        max_frames, rng_seed:
-            Optional subsampling controls.
-        edges:
-            If provided, explicitly restrict to these cover-graph edges (overrides subcomplex).
-        subcomplex:
-            One of {"full","cocycle","max_trivial"}.
-            - "full": use the whole complex (default).
-            - "cocycle": use the cobirth complex (keep edges after cobirth cutoff).
-            - "max_trivial": use the codeath complex (keep edges after codeath cutoff).
-        persistence:
-            Optional PersistenceResult override. If not provided and subcomplex != "full",
-            we try to use self.persistence.
-        """
         from .bundle_map import get_frame_dataset as _get_frame_dataset
 
         Omega = getattr(self.cocycle, "Omega", None)
         if Omega is None:
             raise AttributeError("bundle.cocycle.Omega is missing; cannot build frame dataset.")
 
-        # If user explicitly supplied edges, respect that and ignore subcomplex selection.
         edges_used = edges
 
         if edges_used is None and subcomplex != "full":
-            p = persistence
-            if p is None:
-                p = getattr(self, "persistence", None)
-
+            p = persistence if persistence is not None else getattr(self, "persistence", None)
             if p is None:
                 raise ValueError(
                     "subcomplex != 'full' requires persistence. "
                     "Compute bundle.persistence first or pass persistence=..."
                 )
-
-            # Import helper from class_persistence.py
             from .class_persistence import _edges_for_subcomplex_from_persistence
-
             edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
 
         return _get_frame_dataset(
@@ -395,9 +358,6 @@ class BundleResult:
             rng_seed=rng_seed,
         )
 
-    
-    
-    
     # ---------- Bundle map ----------
     def compute_bundle_map(
         self,
@@ -405,13 +365,12 @@ class BundleResult:
         edges: Optional[Iterable[Edge]] = None,
         strict_semicircle: bool = True,
         semicircle_tol: float = 1e-8,
-        reducer=None,  # FrameReducerConfig | None
+        reducer=None,
         show_summary: bool = True,
         compute_chart_disagreement: bool = True,
     ) -> BundleMapResult:
         from .bundle_map import get_bundle_map
 
-        # IMPORTANT: Omega lives in self.cocycle.Omega (per your o2_cocycle.py)
         Omega = getattr(self.cocycle, "Omega", None)
         if Omega is None:
             raise AttributeError("bundle.cocycle.Omega is missing; cannot run bundle_map.get_bundle_map().")
@@ -443,7 +402,6 @@ class BundleResult:
             },
         )
 
-
     def get_bundle_map(
         self,
         *,
@@ -457,20 +415,6 @@ class BundleResult:
         show_summary: bool = False,
         compute_chart_disagreement: bool = True,
     ) -> BundleMapResult:
-        """
-        Retrieve (or compute+cache) a bundle map.
-
-        edges:
-            Explicit edge set to restrict computation (overrides subcomplex).
-        subcomplex:
-            {"full","cocycle","max_trivial"} edge restriction derived from persistence
-            (used only if edges is None).
-        persistence:
-            Optional PersistenceResult override; otherwise uses self.persistence when needed.
-        """
-        # ----------------------------
-        # Resolve edges_used
-        # ----------------------------
         edges_used = edges
         subcomplex_key = None
 
@@ -478,12 +422,10 @@ class BundleResult:
             subcomplex = str(subcomplex)
             if subcomplex not in {"full", "cocycle", "max_trivial"}:
                 raise ValueError(f"subcomplex must be one of 'full','cocycle','max_trivial'. Got {subcomplex!r}")
-            subcomplex_key = subcomplex  # for caching
+            subcomplex_key = subcomplex
 
             if subcomplex != "full":
-                p = persistence
-                if p is None:
-                    p = getattr(self, "persistence", None)
+                p = persistence if persistence is not None else getattr(self, "persistence", None)
                 if p is None:
                     raise ValueError(
                         "subcomplex != 'full' requires persistence. "
@@ -492,9 +434,6 @@ class BundleResult:
                 from .class_persistence import _edges_for_subcomplex_from_persistence
                 edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
 
-        # ----------------------------
-        # Build cache key
-        # ----------------------------
         red_key = None
         if reducer is not None:
             red_key = (
@@ -512,16 +451,13 @@ class BundleResult:
         key = (
             "bundle_map",
             edges_key,
-            subcomplex_key,  # NEW (distinguishes full vs cocycle/max_trivial when edges=None)
+            subcomplex_key,
             bool(strict_semicircle),
             float(semicircle_tol),
             red_key,
             bool(compute_chart_disagreement),
         )
 
-        # ----------------------------
-        # Compute / cache
-        # ----------------------------
         if recompute or key not in self._cache:
             self._cache[key] = self.compute_bundle_map(
                 edges=edges_used,
@@ -534,13 +470,10 @@ class BundleResult:
 
         bm = self._cache[key]
 
-        # ----------------------------
-        # Save default bundle_map only for true default call
-        # ----------------------------
         if (
             self.bundle_map is None
             and edges is None
-            and subcomplex == "full"          # NEW
+            and subcomplex == "full"
             and reducer is None
             and bool(strict_semicircle) is True
             and float(semicircle_tol) == 1e-8
@@ -570,6 +503,9 @@ def build_bundle(
     min_patch_size: int = 10,
     verbose_triv: bool = True,
     fail_fast_triv: bool = True,
+    # ---- PCA fallback knobs (passed through) ----
+    pca_anchor: str = "farthest",
+    notify_pca_fallback: bool = True,
     # ---- transition options ----
     weights=None,
     min_points_edge: int = 5,
@@ -584,9 +520,9 @@ def build_bundle(
     compute_euler_num: bool = True,
     require_rank1_fundamental: bool = True,
     # ---- lazy-default preferences ----
-    prefer_edge_weight: str = "rms",        # "rms" or "witness"
-    trivialization_method: str = "singer",  # "singer" or "pu"
-    theta_units: str = "radians",           # "cycles" or "radians"
+    prefer_edge_weight: str = "rms",
+    trivialization_method: str = "singer",
+    theta_units: str = "radians",
     # ---- presentation ----
     show: bool = False,
 ) -> BundleResult:
@@ -594,11 +530,12 @@ def build_bundle(
     End-to-end pipeline (core only):
       cover + data -> local triv -> transitions -> quality -> classes
 
-    Persistence + max-trivial + global trivialization + bundle_map are computed lazily via:
-      bundle.get_persistence(), bundle.get_max_trivial_subcomplex(),
-      bundle.get_global_trivialization(), bundle.get_bundle_map()
+    Behavior (as discussed):
+    - If cc_alg is provided: use it for local circular coordinates.
+    - Else if CircularCoords_cls is provided: use Dreimac.
+    - Else: fall back to PCA-based (or metric-MDS-based) circular coordinates, and
+      print a notification (controlled by notify_pca_fallback + verbose_triv).
     """
-    # local imports to avoid circulars
     from .local_triv import compute_local_triv
     from .o2_cocycle import estimate_transitions
     from .quality import compute_bundle_quality
@@ -625,6 +562,10 @@ def build_bundle(
         update_frac=update_frac,
         standard_range=standard_range,
         CircularCoords_cls=CircularCoords_cls,
+        # PCA fallback passthrough
+        pca_anchor=pca_anchor,
+        notify_pca_fallback=notify_pca_fallback,
+        # robust
         min_patch_size=min_patch_size,
         verbose=verbose_triv,
         fail_fast=fail_fast_triv,
@@ -657,6 +598,7 @@ def build_bundle(
         triangles=triangles,
         delta_min_points=delta_min_points,
         delta_fail_fast=delta_fail_fast,
+        compute_witness=compute_witness,
     )
 
     # 5) characteristic classes (full nerve)
@@ -670,12 +612,20 @@ def build_bundle(
         try_orient=try_orient,
         compute_euler_num=compute_euler_num,
     )
-    
+
     if show:
         _status_clear()
         show_summary(classes, quality=quality, show=True)
     else:
         _status_clear()
+
+    # Record which CC method was used (for provenance)
+    if cc_alg is not None:
+        cc_method = "custom_cc_alg"
+    elif CircularCoords_cls is not None:
+        cc_method = "dreimac"
+    else:
+        cc_method = "pca2"
 
     return BundleResult(
         cover=cover,
@@ -693,6 +643,8 @@ def build_bundle(
             "prime": int(prime),
             "landmarks_per_patch": int(landmarks_per_patch),
             "min_patch_size": int(min_patch_size),
+            "cc_method": str(cc_method),
+            "pca_anchor": str(pca_anchor),
             # store *preferences*, not computed results
             "prefer_edge_weight": str(prefer_edge_weight),
             "trivialization_method": str(trivialization_method),
@@ -746,7 +698,7 @@ def show_bundle(
     base_metric=None,
     rng=None,
     debug: bool = False,
-    port: Optional[int] = None,  # keep Py3.9+ compatibility
+    port: Optional[int] = None,
 ):
     if base_metric is None:
         base_metric = getattr(self.cover, "metric", None)
@@ -784,7 +736,7 @@ def bundle_show_nerve(
     tri_opacity: float = 0.25,
     tri_color: str = "pink",
     cochains: Optional[List[Dict[Tuple[int, ...], object]]] = None,
-    edge_weight_source: Optional[str] = None,  # None => use bundle.meta["prefer_edge_weight"]
+    edge_weight_source: Optional[str] = None,
     edge_weights: Optional[Dict[Edge, float]] = None,
     edge_cutoff: Optional[float] = None,
     highlight_edges: Optional[Set[Edge]] = None,
@@ -792,11 +744,9 @@ def bundle_show_nerve(
 ):
     cover = bundle.cover
 
-    # Default: use the bundle's weight-filtration preference
     if edge_weight_source is None:
         edge_weight_source = bundle.meta.get("prefer_edge_weight", "rms")
 
-    # If user didn't pass explicit weights, derive them from the bundle
     if edge_weights is None:
         if edge_weight_source == "rms":
             edge_weights = getattr(bundle.transitions, "rms_angle_err", None)
@@ -924,7 +874,7 @@ def bundle_show_circle_nerve(
     omega: Optional[Dict[Edge, int]] = None,
     weights: Optional[Dict[Edge, float]] = None,
     phi: Optional[Dict[int, int]] = None,
-    weights_source: str = "rms",  # "rms" | "witness" | "none"
+    weights_source: str = "rms",
     reorder_cycle: bool = True,
     fail_if_not_cycle: bool = True,
     title: Optional[str] = None,
@@ -1008,7 +958,7 @@ def bundle_compare_trivs(
     s: float = 1.0,
     save_path: Optional[str] = None,
     max_pairs: int = 25,
-    metric: str = "mean",   # "mean" or "rms" (used for selection + display)
+    metric: str = "mean",
     show: bool = True,
     return_selected: bool = False,
 ):

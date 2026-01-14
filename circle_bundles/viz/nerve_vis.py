@@ -51,7 +51,6 @@ def nerve_vis(
     image_zoom: float = 0.2,
     save_path: Optional[str] = None,
     title: Optional[str] = None,
-    # NEW:
     draw_all_vertices: bool = True,
     show: bool = True,
 ):

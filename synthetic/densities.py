@@ -142,12 +142,15 @@ def get_density_axes(
         eigvals, eigvecs = np.linalg.eigh(M)  # ascending
 
         if smallest:
-            directions[i] = eigvecs[:, 0]
+            v = eigvecs[:, 0]
             ratios[i] = (eigvals[0] + stab) / (eigvals[1] + stab)
         else:
-            directions[i] = eigvecs[:, -1]
+            v = eigvecs[:, -1]
             ratios[i] = (eigvals[-1] + stab) / (eigvals[1] + stab)
 
+        if float(v[2]) < 0.0:
+            v = -v            
+        directions[i] = v
     return (directions, ratios) if return_eigs else directions
 
 

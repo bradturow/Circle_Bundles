@@ -18,8 +18,14 @@ def fiber_vis(
     max_images: int = 12,
     zoom: float = 0.2,
     figsize=(10, 8),
+    dpi: int = 150,
     save_path: Optional[str] = None,
     random_state: Optional[int] = None,
+    ax=None,
+    clear_ax: bool = True,
+    show: bool = True,
+    scatter_alpha: float = 0.15,
+    scatter_s: float = 10.0,
 ):
     """
     Visualize up to `max_images` items from `data` by embedding them to 3D (PCA)
@@ -35,6 +41,11 @@ def fiber_vis(
     selected_indices : optional explicit indices to visualize
     max_images : cap on number of thumbnails
     random_state : RNG seed used when selected_indices is None
+
+    Subplot usage
+    -------------
+    If `ax` is provided, it must be a 3D axis (projection='3d'). In that case,
+    this function draws into `ax` and will not create a new figure.
     """
     import matplotlib.pyplot as plt
     from matplotlib.offsetbox import OffsetImage, AnnotationBbox
@@ -68,6 +79,7 @@ def fiber_vis(
         if len(selected_indices) == 0:
             raise ValueError("selected_indices produced no valid indices in range.")
 
+    selected_indices = list(selected_indices)
     selected_data = data[np.asarray(selected_indices, dtype=int)]
 
     # ---- embed (PCA) ----
@@ -85,14 +97,34 @@ def fiber_vis(
         else:
             embedded = emb[:, :3]
 
-    fig = plt.figure(figsize=figsize)
-    ax = fig.add_subplot(111, projection="3d")
+    # ---- figure / axes ----
+    created_fig = False
+    if ax is None:
+        fig = plt.figure(figsize=figsize, dpi=int(dpi))
+        ax = fig.add_subplot(111, projection="3d")
+        created_fig = True
+    else:
+        fig = ax.figure
+        ax_is_3d = getattr(ax, "name", "") == "3d"
+        if not ax_is_3d:
+            raise ValueError("Provided ax is not a 3D axis. Create it with projection='3d'.")
+
+    if clear_ax:
+        ax.cla()
 
     # light scatter so the space is visible (but not noisy)
-    ax.scatter(embedded[:, 0], embedded[:, 1], embedded[:, 2], alpha=0.15, s=10)
+    ax.scatter(
+        embedded[:, 0],
+        embedded[:, 1],
+        embedded[:, 2],
+        alpha=float(scatter_alpha),
+        s=float(scatter_s),
+    )
 
+    # Ensure transforms/projection are ready
     fig.canvas.draw()
 
+    # ---- overlays ----
     for i, (x, y, z) in enumerate(embedded):
         idx = int(selected_indices[i])
         try:
@@ -111,8 +143,23 @@ def fiber_vis(
         except Exception as e:
             print(f"Error rendering image at index {idx}: {type(e).__name__}: {e}")
 
-    plt.tight_layout()
-    if save_path is not None:
-        fig.savefig(save_path, dpi=300, bbox_inches="tight")
+    # Aesthetics
+    ax.grid(True)
+    try:
+        ax.set_box_aspect([1, 1, 1])
+    except Exception:
+        pass
 
-    return fig
+    # Only do layout/show if we created the figure
+    if created_fig:
+        plt.tight_layout()
+        if save_path is not None:
+            fig.savefig(save_path, dpi=300, bbox_inches="tight")
+        if show:
+            plt.show()
+    else:
+        # In subplot mode, still honor save_path (saves the full figure)
+        if save_path is not None:
+            fig.savefig(save_path, dpi=300, bbox_inches="tight")
+
+    return fig, ax
