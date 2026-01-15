@@ -148,6 +148,10 @@ from .covers import (
     plot_cover_summary_boxplot,
 )
 
+
+from .metric_ball_cover_builders import make_s2_metric_ball_cover, make_rp2_metric_ball_cover
+
+
 from .triangle_cover_builders import (
     make_s2_cover,
     make_rp2_cover,
@@ -179,6 +183,17 @@ from .geometry import (
     get_bary_coords,
     points_in_triangle_mask,
 )
+
+
+# ----------------------------
+# Cover builders (S^2 / RP^2 etc.)
+# ----------------------------
+from .triangle_cover_builders_fibonacci import (
+    make_s2_fibonacci_star_cover,
+    make_rp2_fibonacci_star_cover,
+    fibonacci_sphere,
+)
+
 
 # ----------------------------
 # O(2) cocycles / quality
@@ -229,7 +244,7 @@ from .metrics import (
     T2_dist,
     KleinBottleFlatMetric,
     KB_flat_dist,
-    # NEW: diagonal torus Z2 quotient in angle coords + factory
+    # diagonal torus Z2 quotient in angle coords + factory
     TorusDiagFlatMetric,
     T2_Z2QuotientFlatMetric,
     T2_diag_flat_dist,
@@ -394,7 +409,8 @@ __all__ = [
     "get_star_cover", "get_U_from_subcomplexes", "get_simplices", "points_to_simplices",
     "bary_extend", "barycentric_coords_triangle", "barycentric_refinement", "insert_triangle_complex",
     "get_nerve_simplices", "max_trivial_to_simplex_tree",
-    "get_bary_coords", "points_in_triangle_mask",
+    "get_bary_coords", "points_in_triangle_mask", "make_s2_metric_ball_cover", "make_rp2_metric_ball_cover",
+    "make_s2_fibonacci_star_cover", "fibonacci_sphere", "make_rp2_fibonacci_star_cover",
 
     # o2 cocycle / quality
     "O2Cocycle", "TransitionReport",

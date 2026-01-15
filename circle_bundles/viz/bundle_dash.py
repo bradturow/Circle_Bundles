@@ -197,6 +197,9 @@ def prepare_bundle_viz_inputs(
     base_points = np.asarray(base_points)
     data = np.asarray(data)
 
+    if base_points.ndim == 1:
+        base_points = base_points.reshape(-1, 1)
+        
     if base_points.ndim != 2:
         raise ValueError("base_points must be 2D.")
     n = int(base_points.shape[0])
