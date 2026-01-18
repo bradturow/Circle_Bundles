@@ -623,15 +623,43 @@ class BundleResult:
         if show_summary:
             rep = getattr(bm, "report", None)
             if rep is not None:
-                ambient_dim = int(np.asarray(self.data).shape[1])
-                pullback_dim = int(total_data.shape[1])
-                extra_rows = [
-                    (
-                        r"\text{Ambient dimension}",
-                        rf"\mathbb{{R}}^{{{ambient_dim}}}\ \to\ \mathbb{{R}}^{{{pullback_dim}}}",
-                    )
-                ]
 
+                ambient_dim = int(total_data.shape[1])
+                ambient_fiber_dim = int(fiber.shape[1])
+
+                def _cover_base_symbol_latex(cover) -> str:
+                    """
+                    Choose the base symbol for reporting.
+
+                    - If cover.metric is Euclidean -> return "" (signal: use R^D form)
+                    - Else use cover.base_name_latex if set, else cover.base_name if set, else "B".
+                    """
+                    m = getattr(cover, "metric", None)
+                    mname = getattr(m, "name", "")  # ensure_metric() => should exist
+                    if str(mname).strip().lower() == "euclidean":
+                        return ""
+
+                    s = getattr(cover, "base_name_latex", None)
+                    if isinstance(s, str) and s.strip():
+                        return s.strip()
+
+                    s = getattr(cover, "base_name", None)
+                    if isinstance(s, str) and s.strip():
+                        return s.strip()
+
+                    return "B"                
+                
+                B = _cover_base_symbol_latex(self.cover)
+
+                if B == "":
+                    rhs = rf"\widetilde{{E}}\subset\mathbb{{R}}^{{{ambient_dim}}}"
+                else:
+                    rhs = rf"\widetilde{{E}}\subset {B}\times\mathbb{{R}}^{{{ambient_fiber_dim}}}"
+
+                extra_rows = [
+                    (r"\text{Ambient space}", rhs)
+                ]
+                
                 show_bundle_map_summary(
                     bm.report,
                     show=True,

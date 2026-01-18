@@ -44,6 +44,8 @@ class EuclideanMetric:
 class S1AngleMetric:
     """Angles in radians; distance on S^1."""
     name: str = "S1_angle"
+    base_name: str = "S^1"
+    base_name_latex: str = r"\mathbb{S}^1"        
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         t1 = np.asarray(X).reshape(-1)[:, None]
@@ -56,6 +58,8 @@ class S1AngleMetric:
 class RP1AngleMetric:
     """Angles in radians; theta ~ theta+pi. Accepts any real angles."""
     name: str = "RP1_angle"
+    base_name: str = "RP^1"
+    base_name_latex: str = r"\mathbb{RP}^1"        
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         t1 = np.mod(np.asarray(X, dtype=float).reshape(-1), np.pi)[:, None]
@@ -68,6 +72,8 @@ class RP1AngleMetric:
 class S1UnitVectorMetric:
     """Unit vectors in R^2; geodesic distance arccos(<p,q>)."""
     name: str = "S1_unitvec"
+    base_name: str = "S^1"
+    base_name_latex: str = r"\mathbb{S}^1"        
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
@@ -80,7 +86,9 @@ class S1UnitVectorMetric:
 class RP1UnitVectorMetric:
     """Unit vectors in R^2 with antipodal ID; distance arccos(|<p,q>|)."""
     name: str = "RP1_unitvec"
-
+    base_name: str = "RP^1"
+    base_name_latex: str = r"\mathbb{RP}^1"        
+       
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
@@ -105,7 +113,9 @@ class RP1UnitVectorMetric:
 class RP2UnitVectorMetric:
     """Unit vectors in R^3 with antipodal ID; min(||p-q||, ||p+q||)."""
     name: str = "RP2_unitvec"
-
+    base_name: str = "RP^2"
+    base_name_latex: str = r"\mathbb{RP}^2"        
+        
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
@@ -130,6 +140,8 @@ def _t2_flat_pairwise_angles(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
 class T2FlatMetric:
     """Flat torus distance for coords in [0,2pi)^2 (angles)."""
     name: str = "T2_flat"
+    base_name: str = "T^2"
+    base_name_latex: str = r"\mathbb{T}^2"        
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)

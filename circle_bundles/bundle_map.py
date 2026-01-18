@@ -1118,6 +1118,7 @@ def show_bundle_map_summary(
     return text
 
 
+
 def _display_bundle_map_summary_latex(
     report: BundleMapReport,
     *,
@@ -1256,6 +1257,7 @@ def _display_bundle_map_summary_latex(
         return True
     except Exception:
         return False
+
 
 
 # ============================================================

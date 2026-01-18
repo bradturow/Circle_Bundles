@@ -346,22 +346,43 @@ class CoverBase:
     metric: Any = None                 # should be a Metric object (has .pairwise)
     full_dist_mat: Optional[np.ndarray] = None  # optional cache for viz
 
+# --- optional metadata for summaries/plots ---
+    base_name: Optional[str] = None
+    base_name_latex: Optional[str] = None        
+        
+        
     def __post_init__(self):
         self.base_points = _as_2d_points(self.base_points, name="cover.base_points")
         if self.landmarks is not None:
             self.landmarks = _as_2d_points(self.landmarks, name="cover.landmarks")        
     
+
     def ensure_metric(self):
         """
         Normalize self.metric into a vectorized Metric object with .pairwise.
         Defaults to EuclideanMetric if missing.
+
+        Also: if the metric carries base_name/base_name_latex and the cover does not
+        already have explicit base labels, inherit them.
         """
         if self.metric is None:
             self.metric = EuclideanMetric()
         else:
             self.metric = as_metric(self.metric)
+
+        # ---- inherit base labels from metric if user didn't set cover labels ----
+        if getattr(self, "base_name", None) in (None, ""):
+            bn = getattr(self.metric, "base_name", None)
+            if isinstance(bn, str) and bn.strip():
+                self.base_name = bn.strip()
+
+        if getattr(self, "base_name_latex", None) in (None, ""):
+            bL = getattr(self.metric, "base_name_latex", None)
+            if isinstance(bL, str) and bL.strip():
+                self.base_name_latex = bL.strip()
+
         return self.metric
-        
+                
     def build(self) -> "CoverBase":
         raise NotImplementedError
 
