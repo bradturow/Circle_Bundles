@@ -18,6 +18,14 @@ Tet = Tuple[int, int, int, int]
 def canon_tet(a: int, b: int, c: int, d: int) -> Tet:
     return tuple(sorted((int(a), int(b), int(c), int(d))))
 
+def _as_2d_points(X: np.ndarray, *, name: str = "points") -> np.ndarray:
+    X = np.asarray(X)
+    if X.ndim == 1:
+        return X.reshape(-1, 1)
+    if X.ndim == 2:
+        return X
+    raise ValueError(f"{name} must be 1D or 2D. Got shape {X.shape}.")
+
 
 # ----------------------------
 # Nerve summary data container
@@ -337,7 +345,12 @@ class CoverBase:
     landmarks: Optional[np.ndarray] = None  # (n_sets, dB) float
     metric: Any = None                 # should be a Metric object (has .pairwise)
     full_dist_mat: Optional[np.ndarray] = None  # optional cache for viz
-        
+
+    def __post_init__(self):
+        self.base_points = _as_2d_points(self.base_points, name="cover.base_points")
+        if self.landmarks is not None:
+            self.landmarks = _as_2d_points(self.landmarks, name="cover.landmarks")        
+    
     def ensure_metric(self):
         """
         Normalize self.metric into a vectorized Metric object with .pairwise.

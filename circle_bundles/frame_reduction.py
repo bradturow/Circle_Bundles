@@ -18,6 +18,9 @@ import numpy as np
 
 from .status_utils import _status, _status_clear  # shared status helpers
 
+from .gauge_canon import GaugeCanonConfig, compute_samplewise_gauge_from_o2_cocycle, apply_gauge_to_frames, GaugeCanonReport  # noqa
+
+
 ReduceMethod = Literal["none", "subspace_pca", "psc"]
 
 __all__ = [
@@ -28,7 +31,38 @@ __all__ = [
     "reduction_curve_subspace_pca",
     "reduce_frames_psc",
     "reduction_curve_psc",
+    "GaugeCanonConfig",
+    "GaugeCanonReport",
+    "canonicalize_frames_before_reduction",    
 ]
+
+
+def canonicalize_frames_before_reduction(
+    *,
+    Phi_true: np.ndarray,
+    Omega_true: dict,
+    U: np.ndarray,
+    pou: np.ndarray,
+    edges: Optional[Sequence[Tuple[int,int]]] = None,
+    cfg: Optional[GaugeCanonConfig] = None,
+) -> Tuple[np.ndarray, GaugeCanonReport, np.ndarray, dict]:
+    """
+    Convenience: compute gauge from Omega_true, apply it to Phi_true.
+
+    Returns:
+      Phi_star: (n_sets,n_samples,D,2)
+      report: GaugeCanonReport
+      gauge: (n_sets,n_samples,2,2)
+      Omega_star: dict edges -> (n_samples,2,2)
+    """
+    if cfg is None:
+        cfg = GaugeCanonConfig(enabled=True)
+
+    gauge, Omega_star, rep = compute_samplewise_gauge_from_o2_cocycle(
+        Omega_true, U=U, pou=pou, edges=edges, cfg=cfg
+    )
+    Phi_star = apply_gauge_to_frames(Phi_true, gauge, U=U)
+    return Phi_star, rep, gauge, Omega_star
 
 
 # ============================================================

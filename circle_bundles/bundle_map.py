@@ -5,6 +5,7 @@ bundle_map.py
 Global bundle coordinatization pipeline.
 
 This version includes:
+- optional frame packing via vertex-coloring of the overlap graph ("coloring" packing)
 - the PSC/subspace-PCA "frame reduction" hook (delegated to frame_reduction.py)
 - the IMPORTANT gluing fix: anchored principal-branch lift for angle averaging
   (chart-equivariant; avoids π-flips caused by largest-gap branch cuts)
@@ -42,10 +43,16 @@ from .o2_cocycle import angles_to_unit
 Mat2 = np.ndarray
 SummaryMode = Literal["auto", "text", "latex", "both"]
 
+# packing mode for the frame-stacking construction
+FramePacking = Literal["none", "coloring", "coloring2"]
+
 __all__ = [
     # angle utilities
     "weighted_angle_mean_anchored",
     "infer_edges_from_U",
+    # NEW: packing helpers
+    "FramePacking",
+    "greedy_graph_coloring",
     # main pipeline pieces
     "build_true_frames",
     "apply_frame_reduction",
@@ -147,6 +154,112 @@ def weighted_angle_mean_anchored(
 
 
 # ============================================================
+# Overlap-graph coloring (vertex coloring)
+# ============================================================
+
+def greedy_graph_coloring(
+    *,
+    n_sets: int,
+    edges: Iterable[Edge],
+) -> Tuple[np.ndarray, int]:
+    """
+    Greedy proper coloring of the overlap graph (1-skeleton).
+
+    Vertices: charts 0..n_sets-1
+    Edges: (j,k) if U_j overlaps U_k
+
+    Returns:
+      colors: (n_sets,) int array with values 0..K-1
+      K: number of colors used
+
+    Notes:
+    - We do NOT attempt to compute the exact chromatic number (NP-hard).
+    - We order vertices by descending degree to improve greedy performance.
+    """
+    n_sets = int(n_sets)
+    if n_sets < 0:
+        raise ValueError("n_sets must be nonnegative.")
+
+    adj: List[Set[int]] = [set() for _ in range(n_sets)]
+    for (a, b) in edges:
+        a, b = canon_edge(int(a), int(b))
+        if a == b:
+            continue
+        if not (0 <= a < n_sets and 0 <= b < n_sets):
+            raise ValueError(f"Edge {(a,b)} out of range for n_sets={n_sets}.")
+        adj[a].add(b)
+        adj[b].add(a)
+
+    deg = np.array([len(adj[i]) for i in range(n_sets)], dtype=int)
+    order = list(np.argsort(-deg))  # descending degree
+
+    colors = -np.ones(n_sets, dtype=int)
+    for v in order:
+        used = {colors[u] for u in adj[v] if colors[u] >= 0}
+        c = 0
+        while c in used:
+            c += 1
+        colors[v] = c
+
+    K = int(colors.max()) + 1 if n_sets > 0 else 0
+    return colors, K
+
+def edges_power_k(
+    *,
+    n_sets: int,
+    edges: Iterable[Edge],
+    k: int,
+) -> List[Edge]:
+    """
+    Return edge list for the k-th power graph G^k of the overlap graph G.
+
+    G has vertices 0..n_sets-1 and undirected edges given by `edges`.
+    In G^k, we connect (i,j) iff graph distance in G is <= k.
+
+    For k=1: returns the original edges (canonized).
+    For k=2: connects nodes with a common neighbor (distance 2), in addition to original edges.
+    """
+    n_sets = int(n_sets)
+    k = int(k)
+    if k < 1:
+        raise ValueError("k must be >= 1")
+
+    # adjacency in G
+    adj: List[Set[int]] = [set() for _ in range(n_sets)]
+    for (a, b) in edges:
+        a, b = canon_edge(int(a), int(b))
+        if a == b:
+            continue
+        adj[a].add(b)
+        adj[b].add(a)
+
+    out: Set[Edge] = set()
+
+    # BFS from each node up to depth k; add edges to all reached nodes
+    for src in range(n_sets):
+        # frontier BFS
+        seen = {src}
+        frontier = {src}
+        for _ in range(k):
+            nxt: Set[int] = set()
+            for u in frontier:
+                nxt.update(adj[u])
+            nxt -= seen
+            seen |= nxt
+            frontier = nxt
+            if not frontier:
+                break
+
+        # seen now contains nodes within distance <=k (including src)
+        for dst in seen:
+            if dst == src:
+                continue
+            out.add(canon_edge(src, dst))
+
+    return sorted(out)
+
+
+# ============================================================
 # Linear algebra helpers (rank-2 projector + Stiefel polar)
 # ============================================================
 
@@ -211,13 +324,18 @@ def get_local_frames(
     pou: np.ndarray,
     Omega: Dict[Edge, Mat2],
     edges: Iterable[Edge],
+    packing: FramePacking = "none",
+    colors: Optional[np.ndarray] = None,
 ) -> np.ndarray:
     """
-    Build approximate local frames Phi[j,s] ∈ R^{D×2}, D=2*n_sets:
+    Build approximate local frames Phi[j,s] ∈ R^{D×2}.
 
-      Phi_j(s) = [ sqrt(rho_0(s)) Omega_{0<-j} ;
-                   ...
-                   sqrt(rho_{n-1}(s)) Omega_{n-1<-j} ]
+    packing="none":
+        D = 2*n_sets, each chart i gets its own 2D block.
+
+    packing="coloring":
+        D = 2*K where K is the number of colors in a proper coloring of the overlap graph.
+        Chart i is assigned slot colors[i] and its block is placed into that slot.
 
     Convention:
       Omega[(a,b)] for a<b maps b -> a.
@@ -235,6 +353,7 @@ def get_local_frames(
     edge_set = {canon_edge(a, b) for (a, b) in edges if a != b}
     sqrt_pou = np.sqrt(np.clip(pou, 0.0, None))
 
+    # Directed Omega lookup: Omega_lookup[i,j] = Omega_{i<-j}
     Omega_lookup = np.zeros((n_sets, n_sets, 2, 2), dtype=float)
     for i in range(n_sets):
         Omega_lookup[i, i] = np.eye(2)
@@ -248,14 +367,39 @@ def get_local_frames(
         Omega_lookup[a, b] = Oab
         Omega_lookup[b, a] = Oab.T
 
-    D = 2 * n_sets
+    # Slot assignment
+    if packing == "none":
+        K = n_sets
+        slot_of = np.arange(n_sets, dtype=int)
+    elif packing in {"coloring", "coloring2"}:
+        if colors is None:
+            raise ValueError("colors must be provided when packing='coloring'.")
+        colors = np.asarray(colors, dtype=int).reshape(-1)
+        if colors.shape != (n_sets,):
+            raise ValueError("colors must have shape (n_sets,).")
+        if np.any(colors < 0):
+            raise ValueError("colors must be nonnegative.")
+        K = int(colors.max()) + 1 if n_sets > 0 else 0
+        slot_of = colors
+    else:
+        raise ValueError(f"Unknown packing: {packing!r}")
+
+    D = 2 * K
     Phi = np.zeros((n_sets, n_samples, D, 2), dtype=float)
+
     for j in range(n_sets):
         mask_j = U[j].astype(float)[:, None, None]  # (n_samples,1,1)
         for i in range(n_sets):
+            slot = int(slot_of[i])
+            r0 = 2 * slot
+            r1 = r0 + 2
+
             Oij = Omega_lookup[i, j][None, :, :]          # (1,2,2)
             w = sqrt_pou[i, :, None, None]                # (n_samples,1,1)
-            Phi[j, :, 2 * i : 2 * i + 2, :] = (w * Oij) * mask_j
+
+            # Use += for robustness; with a proper coloring, there are no collisions at any b.
+            Phi[j, :, r0:r1, :] += (w * Oij) * mask_j
+
     return Phi
 
 
@@ -404,11 +548,6 @@ def witness_error_stats(
 
     Returns:
       (eps_geo_sup, eps_geo_mean, eps_C_sup, eps_C_mean)
-
-    where:
-      eps_geo: geodesic distance on S^1 (radians) in [0, pi]
-      eps_C:   chordal distance d_C on the unit circle in C (equivalently R^2),
-               d_C(u,v) = |u - v| = 2 sin(eps_geo/2) in [0, 2]
     """
     U = np.asarray(U, dtype=bool)
     f = np.asarray(f, dtype=float)
@@ -450,7 +589,6 @@ def witness_error_stats(
             vk = angles_to_unit(np.array([f[k, s]], dtype=float))[0]  # (2,)
             wk = O @ vk
 
-            # chordal on unit circle in C is Euclidean in R^2:
             dc = float(np.linalg.norm(vj - wk))
             dgeo = _chordal_to_geo(dc)
 
@@ -484,13 +622,6 @@ def build_bundle_map(
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
     Build a global map F: samples -> R^D.
-
-    For each sample s:
-      - For EACH active chart j, compute chartwise output F_j(s):
-          transport all local angles into chart j,
-          anchored semicircle average (default),
-          output Phi_true[j,s] @ unit(mean_theta).
-      - Global F[s] is chosen as F_{j0}(s) for a canonical chart j0 (first active).
 
     Returns:
       F:     (n_samples, D)
@@ -635,6 +766,10 @@ class TrueFramesResult:
     Omega_true: Dict[Edge, np.ndarray]
     cl_proj_dist: float
     frame_proj_dist: float
+    # optional debug info for packing
+    packing: FramePacking = "none"
+    n_colors: Optional[int] = None
+    colors: Optional[np.ndarray] = None  # (n_sets,) if packing="coloring"
 
 
 def build_true_frames(
@@ -643,6 +778,7 @@ def build_true_frames(
     pou: np.ndarray,
     Omega: Dict[Edge, Mat2],
     edges: Optional[Iterable[Edge]] = None,
+    packing: FramePacking = "none",
 ) -> TrueFramesResult:
     """Phi -> classifying map -> rank-2 projectors -> Stiefel projection -> Omega_true."""
     U = np.asarray(U, dtype=bool)
@@ -652,7 +788,21 @@ def build_true_frames(
         edges = infer_edges_from_U(U)
     edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
 
-    Phi = get_local_frames(U=U, pou=pou, Omega=Omega, edges=edges_list)
+    colors: Optional[np.ndarray] = None
+    n_colors: Optional[int] = None
+    if packing in {"coloring", "coloring2"}:
+        k = 1 if packing == "coloring" else 2
+        edges_for_coloring = edges_list if k == 1 else edges_power_k(n_sets=int(U.shape[0]), edges=edges_list, k=k)
+        colors, n_colors = greedy_graph_coloring(n_sets=int(U.shape[0]), edges=edges_for_coloring)
+
+    Phi = get_local_frames(
+        U=U,
+        pou=pou,
+        Omega=Omega,
+        edges=edges_list,
+        packing=packing,
+        colors=colors,
+    )
     P, cl_proj_dist = get_classifying_map(Phi, pou, project=True)
     Phi_true, frame_proj_dist = project_frames_to_stiefel(U=U, Phi=Phi, P=P)
     Omega_true = cocycle_from_frames(Phi_true=Phi_true, edges=edges_list)
@@ -664,6 +814,9 @@ def build_true_frames(
         Omega_true=Omega_true,
         cl_proj_dist=float(cl_proj_dist),
         frame_proj_dist=float(frame_proj_dist),
+        packing=packing,
+        n_colors=n_colors,
+        colors=colors,
     )
 
 
@@ -789,6 +942,7 @@ def get_frame_dataset(
     rng_seed: Optional[int] = None,
     subcomplex: SubcomplexMode = "full",
     persistence: Optional[PersistenceResult] = None,
+    packing: FramePacking = "none",
 ) -> FrameDataset:
     """
     Build and return a packed frame dataset at a specified pipeline stage.
@@ -798,15 +952,10 @@ def get_frame_dataset(
       "post_projection",  # TrueFramesResult.Phi_true
       "post_reduction"    # Phi after reducer (if reducer provided; else Phi_true)
     }
-
-    subcomplex ∈ {"full","cocycle","max_trivial"}:
-      - full: all charts
-      - cocycle: cobirth complex (max of SW1/Euler cobirth k_removed)
-      - max_trivial: max-trivial complex (max of SW1/Euler codeath k_removed)
     """
     stage = str(stage)
 
-    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges)
+    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges, packing=packing)
 
     if stage == "pre_projection":
         Phi_stage = tf.Phi
@@ -857,15 +1006,15 @@ def get_frame_dataset(
 @dataclass
 class BundleMapReport:
     # core diagnostics
-    cl_proj_dist: float                # Grassmann projection dist (see LaTeX)
-    frame_proj_dist: float             # Stiefel projection dist (see LaTeX)
-    cocycle_proj_dist: float           # d_infty(Ω, Π(Ω))
+    cl_proj_dist: float
+    frame_proj_dist: float
+    cocycle_proj_dist: float
 
     # trivialization error (computed using Π(Ω))
-    eps_triv: Optional[float]          # ε_triv   (chordal d_C sup)
-    eps_triv_geo: Optional[float]      # ε_triv^geo (radians sup)
-    eps_triv_mean: Optional[float]     # \bar{ε}_triv (chordal mean)
-    eps_triv_geo_mean: Optional[float] # \bar{ε}_triv^geo (radians mean)
+    eps_triv: Optional[float]
+    eps_triv_geo: Optional[float]
+    eps_triv_mean: Optional[float]
+    eps_triv_geo_mean: Optional[float]
 
     # optional extras
     chart_disagreement: Optional[float] = None
@@ -874,8 +1023,12 @@ class BundleMapReport:
     reduction_method: Optional[str] = None
     reduction_D_in: Optional[int] = None
     reduction_d_out: Optional[int] = None
-    eps_red: Optional[float] = None         # ε_red (sup projection error)
-    eps_red_mean: Optional[float] = None    # \bar{ε}_red (mean projection error)
+    eps_red: Optional[float] = None
+    eps_red_mean: Optional[float] = None
+
+    # packing info (optional)
+    packing: Optional[str] = None
+    n_colors: Optional[int] = None
 
     def has_reduction(self) -> bool:
         return self.eps_red_mean is not None or self.eps_red is not None
@@ -905,6 +1058,13 @@ class BundleMapReport:
         if self.chart_disagreement is not None:
             lines.append(_tline("chart disagreement:", f"{float(self.chart_disagreement):.{r}f}"))
 
+        if self.packing is not None:
+            pack = str(self.packing)
+            extra = ""
+            if self.n_colors is not None:
+                extra = f" (colors={int(self.n_colors)})"
+            lines.append(_tline("frame packing:", pack + extra))
+
         if self.has_reduction():
             meth = self.reduction_method or "reduction"
             Din = self.reduction_D_in
@@ -933,15 +1093,11 @@ def show_bundle_map_summary(
     show: bool = True,
     mode: SummaryMode = "auto",
     rounding: int = 3,
+    extra_rows: Optional[List[Tuple[str, str]]] = None,  
 ) -> str:
+
     """
     Pretty summary, matching characteristic-class `show_summary`.
-
-    mode:
-      - "auto": show LaTeX if available, else print text
-      - "text": print text only
-      - "latex": show LaTeX only (best-effort; falls back to text)
-      - "both": show LaTeX (if available) AND print text
     """
     text = report.to_text(r=rounding)
 
@@ -950,15 +1106,24 @@ def show_bundle_map_summary(
 
     did_latex = False
     if mode in {"latex", "auto", "both"}:
-        did_latex = _display_bundle_map_summary_latex(report, rounding=rounding)
-
+        did_latex = _display_bundle_map_summary_latex(
+            report,
+            rounding=rounding,
+            extra_rows=extra_rows,
+        )
+        
     if mode == "both" or mode == "text" or (mode == "auto" and not did_latex) or (mode == "latex" and not did_latex):
         print("\n" + text + "\n")
 
     return text
 
 
-def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int = 3) -> bool:
+def _display_bundle_map_summary_latex(
+    report: BundleMapReport,
+    *,
+    rounding: int = 3,
+    extra_rows: Optional[List[Tuple[str, str]]] = None,  
+) -> bool:
     try:
         from IPython.display import Math, display  # type: ignore
     except Exception:
@@ -968,7 +1133,6 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
 
     coord_rows: List[Tuple[str, str]] = []
 
-    # Cocycle projection distance: uses Π(Ω)
     coord_rows.append(
         (
             r"\text{Cocycle projection dist.}",
@@ -978,8 +1142,7 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
             + r" = " + f"{float(report.cocycle_proj_dist):.{r}f}",
         )
     )
-
-    # Trivialization error in d_C, with geo conversion labeled in radians
+    
     if report.eps_triv is not None:
         geo_pi = None if report.eps_triv_geo is None else float(report.eps_triv_geo) / np.pi
         rhs = f"{float(report.eps_triv):.{r}f}"
@@ -995,20 +1158,13 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
             )
         )
 
-    # Mean trivialization error
     if report.eps_triv_mean is not None:
         geo_pi_m = None if report.eps_triv_geo_mean is None else float(report.eps_triv_geo_mean) / np.pi
         rhs = f"{float(report.eps_triv_mean):.{r}f}"
         if geo_pi_m is not None:
             rhs += rf"\ \ (\bar{{\varepsilon}}_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi_m:.{r}f}\pi\ \mathrm{{rad}})"
-        coord_rows.append(
-            (
-                r"\text{Mean triv error}",
-                r"\bar{\varepsilon}_{\mathrm{triv}} = " + rhs,
-            )
-        )
+        coord_rows.append((r"\text{Mean triv error}", r"\bar{\varepsilon}_{\mathrm{triv}} = " + rhs))
 
-    # Grassmann / Stiefel distances
     coord_rows.append(
         (
             r"\text{Grassmann proj. dist.}",
@@ -1026,7 +1182,6 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
         )
     )
 
-    # Chart disagreement (sup over overlaps)
     if report.chart_disagreement is not None:
         coord_rows.append(
             (
@@ -1037,9 +1192,22 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
             )
         )
 
-    # ----------------------------
-    # Dimensionality reduction rows
-    # ----------------------------
+    if report.packing not in {None, "none"}:
+        pack = str(report.packing)
+        if report.n_colors is not None:
+            # use math for K, keep the mode in monospace
+            coord_rows.append(
+                (
+                    r"\text{Frame packing}",
+                    rf"\texttt{{{pack}}}\quad (K={int(report.n_colors)})",
+                )
+            )
+        else:
+            coord_rows.append((r"\text{Frame packing}", rf"\texttt{{{pack}}}"))
+
+    if extra_rows:
+        coord_rows.extend(extra_rows)    
+            
     red_rows: List[Tuple[str, str]] = []
     if report.has_reduction():
         meth = report.reduction_method or "reduction"
@@ -1063,13 +1231,7 @@ def _display_bundle_map_summary_latex(report: BundleMapReport, *, rounding: int 
                 )
             )
         if report.eps_red_mean is not None:
-            red_rows.append(
-                (
-                    r"\text{Projection err. (mean)}",
-                    r"\bar{\varepsilon}_{\mathrm{red}}"
-                    + r" = " + f"{float(report.eps_red_mean):.{r}f}",
-                )
-            )
+            red_rows.append((r"\text{Projection err. (mean)}", r"\bar{\varepsilon}_{\mathrm{red}} = " + f"{float(report.eps_red_mean):.{r}f}"))
 
     def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:
         return r"\\[3pt]".join(r"\quad " + lab + r" &:\quad " + expr for lab, expr in rows)
@@ -1112,6 +1274,7 @@ def get_bundle_map(
     reducer: Optional[FrameReducerConfig] = None,
     show_summary: bool = True,
     compute_chart_disagreement: bool = True,
+    packing: FramePacking = "none",
 ) -> Tuple[np.ndarray, np.ndarray, Dict[Edge, np.ndarray], np.ndarray, BundleMapReport]:
     """
     End-to-end coordinatization.
@@ -1140,7 +1303,7 @@ def get_bundle_map(
     edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
 
     # (A) true frames
-    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges_list)
+    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges_list, packing=packing)
 
     # (B) diagnostics in ambient space
     cocycle_proj_dist = cocycle_projection_distance(
@@ -1181,7 +1344,7 @@ def get_bundle_map(
     if compute_chart_disagreement:
         cd_val = float(chart_disagreement_stats(U=U, pre_F=pre_F).max)
 
-    # (F) reduction summary fields 
+    # (F) reduction summary fields
     red_method: Optional[str] = None
     red_D_in: Optional[int] = None
     red_d: Optional[int] = None
@@ -1211,7 +1374,6 @@ def get_bundle_map(
         if eps_red_mean is not None:
             eps_red_mean = float(eps_red_mean)
 
-        # Optional sup field 
         eps_red = getattr(reduction_report, "sup_proj_err", None)
         if eps_red is None:
             eps_red = getattr(reduction_report, "sup_projection_error", None)
@@ -1233,6 +1395,8 @@ def get_bundle_map(
         reduction_d_out=red_d,
         eps_red=eps_red,
         eps_red_mean=eps_red_mean,
+        packing=str(tf.packing) if tf.packing is not None else None,
+        n_colors=tf.n_colors,
     )
 
     if show_summary:

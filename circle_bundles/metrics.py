@@ -142,6 +142,53 @@ class T2FlatMetric:
 
 
 # ============================================================
+# Product metrics on concatenated (base | fiber) vectors
+# ============================================================
+
+@dataclass(frozen=True)
+class ProductMetricConcat:
+    """
+    Product metric on concatenated vectors Z = [base | fiber].
+
+    Distance:
+        d(z,z')^2 = (base_weight * dB(base, base'))^2 + (fiber_weight * ||fiber-fiber'||)^2
+
+    Notes
+    -----
+    - Uses the *cover/base metric* dB for the base block (can be torus, RP1, etc.).
+    - Uses Euclidean distance for the fiber block.
+    - Fully vectorized, returns an (n,m) matrix, satisfies Metric protocol.
+    """
+    base_metric: Metric
+    base_dim: int
+    base_weight: float = 1.0
+    fiber_weight: float = 1.0
+    name: str = "product_concat"
+
+    def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        X = np.asarray(X, dtype=float)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+
+        if X.ndim != 2 or Y0.ndim != 2:
+            raise ValueError("ProductMetricConcat expects 2D arrays.")
+        if X.shape[1] < self.base_dim or Y0.shape[1] < self.base_dim:
+            raise ValueError(
+                f"base_dim={self.base_dim} exceeds feature dim: X={X.shape}, Y={Y0.shape}"
+            )
+
+        XB, XF = X[:, : self.base_dim], X[:, self.base_dim :]
+        YB, YF = Y0[:, : self.base_dim], Y0[:, self.base_dim :]
+
+        DB = self.base_metric.pairwise(XB, YB)  # (n,m)
+        DF = np.linalg.norm(XF[:, None, :] - YF[None, :, :], axis=-1)  # (n,m)
+
+        bw = float(self.base_weight)
+        fw = float(self.fiber_weight)
+        return np.sqrt((bw * DB) ** 2 + (fw * DF) ** 2)
+    
+    
+
+# ============================================================
 # Flat Z2 quotient metrics on angle-coordinates (base-first!)
 # ============================================================
 

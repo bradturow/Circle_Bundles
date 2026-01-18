@@ -69,6 +69,9 @@ from .frame_reduction import (
     reduction_curve_subspace_pca,
 )
 
+from .gauge_canon import GaugeCanonConfig
+
+
 # ----------------------------
 # Characteristic classes
 # ----------------------------
@@ -274,6 +277,13 @@ from .metrics import (
     act_reflection_twist,
 )
 
+from .t2_bundle_metrics import (
+    T2_circle_bundle_metric_oriented,
+    T2_circle_bundle_metric_nonorientable,
+    T2xS1ProductAngleMetric,
+)
+
+
 # ----------------------------
 # Local analysis / triv
 # ----------------------------
@@ -373,7 +383,7 @@ __all__ = [
     "project_to_rank2_projection", "reduce_frames_psc", "reduce_frames_subspace_pca",
     "reduction_curve_psc", "reduction_curve_subspace_pca",
     "show_bundle_map_summary", "stack_active_frames", "weighted_angle_mean_anchored",
-    "witness_error_stats",
+    "witness_error_stats", "GaugeCanonConfig",
 
     # characteristic classes
     "ClassResult", "H2_dimensions", "compute_classes", "compute_twisted_euler_class", "show_summary",
@@ -434,7 +444,8 @@ __all__ = [
     "act_klein_C2_torus", "act_diag_C2_torus",
     "S3QuotientMetric", "ZpHopfQuotientMetricS3", "Z2LensAntipodalQuotientMetricS3",
     "Z2QuotientMetricR5",
-    "act_base_only", "act_pi_twist", "act_reflection_twist",
+    "act_base_only", "act_pi_twist", "act_reflection_twist", "T2_circle_bundle_metric_oriented",
+    "T2_circle_bundle_metric_nonorientable", "T2xS1ProductAngleMetric",
 
     # local
     "LocalTrivResult", "compute_local_triv", "compute_circular_coords_dreimac", "compute_circular_coords_pca2",

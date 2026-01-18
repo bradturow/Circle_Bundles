@@ -16,6 +16,8 @@ from .coordinatization import (
 
 from .status_utils import _status, _status_clear
 
+from .bundle_map import FramePacking  # Literal["none","coloring"]
+
 Simp = Tuple[int, ...]
 
 SubcomplexMode = Literal["full", "cocycle", "max_trivial"]
@@ -48,6 +50,41 @@ class BundleMapResult:
     report: Any
     meta: Dict[str, Any] = field(default_factory=dict)
 
+@dataclass
+class PullbackTotalSpaceResult:
+    """
+    Pullback total space Z = (base | fiber) with a product metric.
+
+    total_data:
+        Concatenated array [base | fiber] of shape (n_samples, base_dim + fiber_dim)
+
+    base_proj_map:
+        Projection to the base coordinates (first base_dim columns)
+    """
+    total_data: np.ndarray
+    metric: Any
+    bundle_map: BundleMapResult
+
+    base_dim: int
+    fiber_dim: int
+    base_weight: float
+    fiber_weight: float
+
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+    def base_proj_map(self, X: Optional[np.ndarray] = None) -> np.ndarray:
+        """Projection to the base block (first base_dim columns)."""
+        A = self.total_data if X is None else np.asarray(X, dtype=float)
+        return A[:, : self.base_dim]
+
+    def to_text(self) -> str:
+        return (
+            "=== Pullback Total Space ===\n"
+            f"total_data shape: {tuple(self.total_data.shape)}\n"
+            f"metric: {getattr(self.metric, 'name', type(self.metric).__name__)}"
+        )
+
+        
 
 # ----------------------------
 # BundleResult
@@ -328,7 +365,9 @@ class BundleResult:
         edges: Optional[Iterable[Edge]] = None,
         subcomplex: SubcomplexMode = "full",
         persistence=None,
+        packing: FramePacking = "coloring",   
     ):
+
         from .bundle_map import get_frame_dataset as _get_frame_dataset
 
         Omega = getattr(self.cocycle, "Omega", None)
@@ -356,7 +395,9 @@ class BundleResult:
             stage=stage,
             max_frames=max_frames,
             rng_seed=rng_seed,
+            packing=packing,                     
         )
+
 
     # ---------- Bundle map ----------
     def compute_bundle_map(
@@ -368,7 +409,9 @@ class BundleResult:
         reducer=None,
         show_summary: bool = True,
         compute_chart_disagreement: bool = True,
+        packing: FramePacking = "coloring",   
     ) -> BundleMapResult:
+
         from .bundle_map import get_bundle_map
 
         Omega = getattr(self.cocycle, "Omega", None)
@@ -386,7 +429,9 @@ class BundleResult:
             reducer=reducer,
             show_summary=bool(show_summary),
             compute_chart_disagreement=bool(compute_chart_disagreement),
+            packing=packing,                      
         )
+
 
         return BundleMapResult(
             F=np.asarray(F),
@@ -399,7 +444,8 @@ class BundleResult:
                 "semicircle_tol": float(semicircle_tol),
                 "reducer": None if reducer is None else getattr(reducer, "__dict__", str(reducer)),
                 "compute_chart_disagreement": bool(compute_chart_disagreement),
-            },
+                "packing": str(packing),              # NEW
+            },            
         )
 
     def get_bundle_map(
@@ -411,6 +457,7 @@ class BundleResult:
         strict_semicircle: bool = True,
         semicircle_tol: float = 1e-8,
         reducer=None,
+        packing: FramePacking = "coloring",   
         recompute: bool = False,
         show_summary: bool = False,
         compute_chart_disagreement: bool = True,
@@ -448,25 +495,28 @@ class BundleResult:
         if edges_used is not None:
             edges_key = tuple(sorted({canon_edge(*e) for e in edges_used if e[0] != e[1]}))
 
+            
         key = (
             "bundle_map",
             edges_key,
             subcomplex_key,
+            str(packing),                        
             bool(strict_semicircle),
             float(semicircle_tol),
             red_key,
             bool(compute_chart_disagreement),
         )
-
+ 
         if recompute or key not in self._cache:
             self._cache[key] = self.compute_bundle_map(
                 edges=edges_used,
                 strict_semicircle=strict_semicircle,
                 semicircle_tol=semicircle_tol,
                 reducer=reducer,
+                packing=packing,                      
                 show_summary=show_summary,
                 compute_chart_disagreement=compute_chart_disagreement,
-            )
+            )            
 
         bm = self._cache[key]
 
@@ -475,6 +525,7 @@ class BundleResult:
             and edges is None
             and subcomplex == "full"
             and reducer is None
+            and str(packing) == "coloring"        
             and bool(strict_semicircle) is True
             and float(semicircle_tol) == 1e-8
             and bool(compute_chart_disagreement) is True
@@ -483,7 +534,116 @@ class BundleResult:
 
         return bm
 
+    def get_pullback_data(
+        self,
+        *,
+        bundle_map: Optional["BundleMapResult"] = None,
+        # bundle map options if bundle_map is None
+        edges: Optional[Iterable[Edge]] = None,
+        subcomplex: SubcomplexMode = "full",
+        persistence=None,
+        strict_semicircle: bool = True,
+        semicircle_tol: float = 1e-8,
+        reducer=None,
+        recompute_bundle_map: bool = False,
+        compute_chart_disagreement: bool = True,
+        # packing options
+        packing: "FramePacking" = "none",  # "none" | "coloring" | "coloring2"
+        # pullback metric options
+        base_weight: float = 1.0,
+        fiber_weight: float = 1.0,
+        show_summary: bool = True,
+    ) -> "PullbackTotalSpaceResult":
+        from .metrics import ProductMetricConcat, EuclideanMetric, as_metric
+        from .bundle_map import show_bundle_map_summary
 
+        bm = bundle_map
+        if bm is None:
+            bm = self.get_bundle_map(
+                edges=edges,
+                subcomplex=subcomplex,
+                persistence=persistence,
+                strict_semicircle=strict_semicircle,
+                semicircle_tol=semicircle_tol,
+                reducer=reducer,
+                recompute=recompute_bundle_map,
+                show_summary=False,  
+                compute_chart_disagreement=compute_chart_disagreement,
+                packing=packing,   
+            )
+
+        fiber = np.asarray(bm.F, dtype=float)
+        base = np.asarray(self.cover.base_points, dtype=float)
+
+        # Promote 1D base points to 2D column vector (RP1 angles, etc.)
+        if base.ndim == 1:
+            base = base.reshape(-1, 1)
+        elif base.ndim != 2:
+            raise ValueError(f"cover.base_points must be 1D or 2D. Got {base.shape}.")
+
+        if fiber.ndim != 2:
+            raise ValueError(f"bundle_map.F must be 2D. Got {fiber.shape}.")
+        if base.shape[0] != fiber.shape[0]:
+            raise ValueError(
+                f"base and fiber must have same n_samples: {base.shape[0]} vs {fiber.shape[0]}"
+            )
+
+        total_data = np.concatenate([base, fiber], axis=1)
+
+        base_metric = getattr(self.cover, "metric", None)
+        if base_metric is None:
+            base_metric = EuclideanMetric()
+        base_metric = as_metric(base_metric)
+
+        pm = ProductMetricConcat(
+            base_metric=base_metric,
+            base_dim=int(base.shape[1]),
+            base_weight=float(base_weight),
+            fiber_weight=float(fiber_weight),
+            name=f"product_concat(base={getattr(base_metric,'name','metric')},bw={base_weight},fw={fiber_weight})",
+        )
+
+        out = PullbackTotalSpaceResult(
+            total_data=total_data,
+            metric=pm,
+            bundle_map=bm,
+            base_dim=int(base.shape[1]),
+            fiber_dim=int(fiber.shape[1]),
+            base_weight=float(base_weight),
+            fiber_weight=float(fiber_weight),
+            meta={
+                "subcomplex": str(subcomplex),
+                "strict_semicircle": bool(strict_semicircle),
+                "semicircle_tol": float(semicircle_tol),
+                "compute_chart_disagreement": bool(compute_chart_disagreement),
+                "packing": str(packing),  # <---- NEW
+            },
+        )
+
+        if show_summary:
+            rep = getattr(bm, "report", None)
+            if rep is not None:
+                ambient_dim = int(np.asarray(self.data).shape[1])
+                pullback_dim = int(total_data.shape[1])
+                extra_rows = [
+                    (
+                        r"\text{Ambient dimension}",
+                        rf"\mathbb{{R}}^{{{ambient_dim}}}\ \to\ \mathbb{{R}}^{{{pullback_dim}}}",
+                    )
+                ]
+
+                show_bundle_map_summary(
+                    bm.report,
+                    show=True,
+                    mode="auto",
+                    rounding=3,
+                    extra_rows=extra_rows,
+                )
+        
+        return out
+
+
+    
 # ----------------------------
 # build_bundle pipeline
 # ----------------------------
