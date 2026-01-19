@@ -548,7 +548,7 @@ class BundleResult:
         recompute_bundle_map: bool = False,
         compute_chart_disagreement: bool = True,
         # packing options
-        packing: "FramePacking" = "none",  # "none" | "coloring" | "coloring2"
+        packing: "FramePacking" = "coloring2",  # "none" | "coloring" | "coloring2"
         # pullback metric options
         base_weight: float = 1.0,
         fiber_weight: float = 1.0,
@@ -881,20 +881,41 @@ def show_bundle(
     r_max: float = 2.0,
     colors=None,
     densities=None,
-    landmark_inds=None,
+    data_landmark_inds=None,   
+    landmark_inds=None,        
     max_samples: int = 10_000,
     base_metric=None,
     rng=None,
     debug: bool = False,
     port: Optional[int] = None,
 ):
+    # Base metric default
     if base_metric is None:
         base_metric = getattr(self.cover, "metric", None)
     if base_metric is None:
         from .metrics import EuclideanMetric
         base_metric = EuclideanMetric()
 
-    from .viz.bundle_dash import prepare_bundle_viz_inputs_from_bundle, make_bundle_app, run_bundle_app
+    # Back-compat: allow old param name
+    if data_landmark_inds is None and landmark_inds is not None:
+        data_landmark_inds = landmark_inds
+
+    # Pull base landmarks from the cover automatically
+    # This can be: bool mask (n,), int indices (L,), points (L,d_base), or list of groups
+    cover_landmarks = getattr(self.cover, "landmarks", None)
+
+    # Normalize 1D landmark points → (1, d_base)
+    if isinstance(cover_landmarks, np.ndarray):
+        cover_landmarks = np.asarray(cover_landmarks)
+        d_base = self.cover.base_points.shape[1]
+        if cover_landmarks.ndim == 1 and cover_landmarks.shape[0] == d_base:
+            cover_landmarks = cover_landmarks.reshape(1, d_base)    
+
+    from .viz.bundle_dash import (
+        prepare_bundle_viz_inputs_from_bundle,
+        make_bundle_app,
+        run_bundle_app,
+    )
 
     viz = prepare_bundle_viz_inputs_from_bundle(
         self,
@@ -903,13 +924,13 @@ def show_bundle(
         base_metric=base_metric,
         colors=colors,
         densities=densities,
-        landmark_inds=landmark_inds,
+        data_landmark_inds=data_landmark_inds,  # fiber panel highlighting
+        landmarks=cover_landmarks,              # base panel highlighting (from cover)
         rng=rng,
     )
-    app = make_bundle_app(viz, initial_r=initial_r, r_max=r_max)
-    run_bundle_app(app, port=port, debug=debug)
+    app = make_bundle_app(viz, initial_r=float(initial_r), r_max=float(r_max))
+    run_bundle_app(app, port=port, debug=bool(debug))
     return app
-
 
 # ----------------------------
 # Convenience wrappers for nerve viz (thin wiring only)
@@ -1009,7 +1030,7 @@ def bundle_show_max_trivial(
         tris_to_draw = all_tris
 
     if title is None:
-        title = f"Nerve (max-trivial: removed k={max_triv.k_removed})"
+        title = f"Max Subcomplex On Which Class Representatives Are Coboundaries"
 
     fig = make_nerve_figure(
         landmarks=landmarks,

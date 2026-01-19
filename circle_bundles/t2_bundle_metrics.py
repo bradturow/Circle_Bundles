@@ -11,35 +11,55 @@ with the understanding that angles are taken mod 2pi when evaluating distances.
 We define a natural product metric upstairs and then construct quotient metrics
 by taking a min over group actions (finite groups like Z2, or lattice actions like Z^2).
 
-Design goals
-------------
-- Keep *all* T^2 bundle-specific quotient logic out of metrics.py.
-- Support:
-    * oriented S^1-bundles over T^2 (Euler class k in Z)
-    * O(2)-bundles with reflection monodromy along one base generator
-- Use your existing "new-style" Metric interface: objects with .pairwise(X, Y).
-
-Conventions / IMPORTANT IMPLEMENTATION NOTE
-------------------------------------------
+IMPORTANT IMPLEMENTATION NOTE
+-----------------------------
 - Coordinates are (theta1, theta2, phi) = (base1, base2, fiber) in radians.
 - Inputs may be any real angles.
 
-- CRITICAL: For quotient metrics, the group action should act on a *lift* to R^3.
-  Therefore, our generators/actions DO NOT wrap mod 2pi.
-
-- Wrapping into [0,2pi) happens ONLY inside the base "upstairs" metric
+- For quotient metrics, actions are intended to act on a *lift* in R^3 (no wrapping).
+  Wrapping into [0,2pi) happens ONLY inside the upstairs metric
   (T2xS1ProductAngleMetric) when it computes distances.
 
 - For Z^2 quotients we approximate the true quotient metric by searching over a bounded
-  exponent window [-W, W]^2 (good for experiments; increase W if needed).
+  window [-W, W]^2. Increase W if you see artifacts.
 """
 
 from dataclasses import dataclass
-from typing import Callable, Optional, Sequence, Protocol
+from typing import Callable, Optional, Protocol, Sequence
 
 import numpy as np
 
 TWOPI = 2.0 * np.pi
+
+
+@dataclass(frozen=True)
+class R2xS1ProductLiftMetric:
+    """
+    Product metric upstairs on R^2 x S^1 in lifted angle coords (theta1, theta2, phi):
+        d^2 = ||(theta1,theta2)-(theta1',theta2')||_2^2 + (fiber_weight * d_S1(phi,phi'))^2
+
+    CRITICAL: base coords are NOT wrapped here. The quotient over Z^2 induces the torus.
+    """
+    fiber_weight: float = 1.0
+    name: str = "R2xS1_lift_product"
+
+    def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        X = np.asarray(X, dtype=float)
+        Y0 = X if Y is None else np.asarray(Y, dtype=float)
+
+        if X.ndim != 2 or X.shape[1] != 3:
+            raise ValueError(f"X must be (n,3). Got {X.shape}.")
+        if Y0.ndim != 2 or Y0.shape[1] != 3:
+            raise ValueError(f"Y must be (m,3). Got {Y0.shape}.")
+
+        # Euclidean on the lifted base coordinates
+        Db = np.linalg.norm(X[:, None, :2] - Y0[None, :, :2], axis=-1)
+
+        # Circular distance on the fiber
+        Df = s1_pairwise_angles(X[:, 2], Y0[:, 2])
+
+        w = float(self.fiber_weight)
+        return np.sqrt(Db**2 + (w * Df) ** 2)
 
 
 # ---------------------------------------------------------------------
@@ -92,7 +112,7 @@ class T2xS1ProductAngleMetric:
         d^2 = d_T2^2 + (fiber_weight * d_S1)^2
     where d_T2 is L2 of wrapped diffs in coords (0,1) and d_S1 is wrapped diff in coord (2).
 
-    IMPORTANT: This class is where wrapping occurs. Actions/generators should NOT wrap.
+    IMPORTANT: This class is where wrapping occurs. Actions should NOT wrap.
     """
     fiber_weight: float = 1.0
     name: str = "T2xS1_product"
@@ -117,7 +137,7 @@ class T2xS1ProductAngleMetric:
 # ---------------------------------------------------------------------
 
 ActionFn = Callable[[np.ndarray], np.ndarray]
-GenFn = Callable[[np.ndarray, int], np.ndarray]  # generator with integer exponent
+Z2ActionFn = Callable[[np.ndarray, int, int], np.ndarray]  # action by (m,n) in Z^2
 
 
 @dataclass(frozen=True)
@@ -151,45 +171,38 @@ class FiniteQuotientMetric:
 
 
 @dataclass(frozen=True)
-class ZkQuotientMetric:
+class Z2QuotientMetric:
     """
-    Quotient metric by a Z^k-action with k commuting generators.
+    Quotient metric by a Z^2-action specified as a *single* action (m,n) ↦ act(Y,m,n).
 
-    We approximate the true quotient metric by searching over a bounded window:
-        m_i in [-window, window].
+    This avoids subtle order-dependence issues that can arise when you try to implement
+    a cocycle-defined Z^2-action via sequential application of separate generators.
 
-    Each generator is a function gen(Y, m) that applies exponent m directly (m can be negative).
-
-    Practical note:
-      - window=1 is usually enough for local bundle-map experiments,
-        but if you see artifacts, bump to 2 or 3.
+    We approximate the true quotient metric by searching over:
+        (m,n) in [-window,window]^2.
     """
     base_metric: Metric
-    generators: Sequence[GenFn]  # length k
+    action: Z2ActionFn
     window: int = 1
-    name: str = "ZkQuotientMetric"
+    name: str = "Z2QuotientMetric"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
         X = np.asarray(X, dtype=float)
         Y0 = X if Y is None else np.asarray(Y, dtype=float)
 
-        k = len(self.generators)
-        if k == 0:
-            raise ValueError("Need at least one generator for ZkQuotientMetric.")
         W = int(self.window)
         if W < 0:
             raise ValueError("window must be >= 0.")
 
-        grids = np.meshgrid(*([np.arange(-W, W + 1)] * k), indexing="ij")
-        exponents = np.stack([g.ravel() for g in grids], axis=1)  # (K, k)
+        ms = np.arange(-W, W + 1, dtype=int)
+        ns = np.arange(-W, W + 1, dtype=int)
 
         Dmin: Optional[np.ndarray] = None
-        for mvec in exponents:
-            Yg = Y0
-            for gen, m in zip(self.generators, mvec):
-                Yg = gen(Yg, int(m))
-            Dg = self.base_metric.pairwise(X, Yg)
-            Dmin = Dg if Dmin is None else np.minimum(Dmin, Dg)
+        for m in ms:
+            for n in ns:
+                Yg = np.asarray(self.action(Y0, int(m), int(n)), dtype=float)
+                Dg = self.base_metric.pairwise(X, Yg)
+                Dmin = Dg if Dmin is None else np.minimum(Dmin, Dg)
 
         assert Dmin is not None
         return Dmin
@@ -198,39 +211,6 @@ class ZkQuotientMetric:
 # ---------------------------------------------------------------------
 # T^2 x S^1 action primitives (LIFTED angles: NO WRAPPING HERE)
 # ---------------------------------------------------------------------
-
-def gen_base_shift(axis: int) -> GenFn:
-    """
-    Z-generator shifting theta_axis by 2pi*m (axis 0 or 1).
-
-    NOTE: No wrapping. This acts on a lift in R^3.
-    """
-    if axis not in (0, 1):
-        raise ValueError("axis must be 0 or 1 for base coordinates.")
-
-    def _gen(Y: np.ndarray, m: int) -> np.ndarray:
-        Y = np.asarray(Y, dtype=float)
-        out = Y.copy()
-        out[..., axis] = out[..., axis] + TWOPI * float(m)
-        return out
-
-    return _gen
-
-
-def gen_fiber_shift() -> GenFn:
-    """
-    Z-generator shifting fiber angle phi by 2pi*m.
-
-    NOTE: No wrapping. This acts on a lift in R^3.
-    """
-    def _gen(Y: np.ndarray, m: int) -> np.ndarray:
-        Y = np.asarray(Y, dtype=float)
-        out = Y.copy()
-        out[..., 2] = out[..., 2] + TWOPI * float(m)
-        return out
-
-    return _gen
-
 
 def act_fiber_reflection(Y: np.ndarray) -> np.ndarray:
     """
@@ -244,54 +224,121 @@ def act_fiber_reflection(Y: np.ndarray) -> np.ndarray:
     return out
 
 
-def gen_twist_by_other_base(*, shift_axis: int, other_axis: int, k: int) -> GenFn:
+def act_Z2_trivial(Y: np.ndarray, m: int, n: int) -> np.ndarray:
     """
-    Z-generator that:
-      theta_shift_axis += 2pi*m
-      phi += k*m*theta_other_axis
+    Trivial Z^2 action on base lifts:
+      theta1 += 2pi*m
+      theta2 += 2pi*n
+      phi unchanged
 
-    This bilinear coupling is a standard way to realize Euler class k
-    in a Z^2 quotient model for oriented circle bundles over T^2.
-
-    IMPORTANT: No wrapping here; wrapping happens in the base metric when measuring distance.
+    NOTE: No wrapping here; wrapping happens in the upstairs metric.
     """
-    if shift_axis not in (0, 1) or other_axis not in (0, 1) or shift_axis == other_axis:
-        raise ValueError("shift_axis and other_axis must be distinct elements of {0,1}.")
-    k = int(k)
-
-    def _gen(Y: np.ndarray, m: int) -> np.ndarray:
-        Y = np.asarray(Y, dtype=float)
-        out = Y.copy()
-        mm = float(m)
-        out[..., shift_axis] = out[..., shift_axis] + TWOPI * mm
-        out[..., 2] = out[..., 2] + float(k) * mm * out[..., other_axis]
-        return out
-
-    return _gen
+    Y = np.asarray(Y, dtype=float)
+    out = Y.copy()
+    out[..., 0] = out[..., 0] + TWOPI * float(m)
+    out[..., 1] = out[..., 1] + TWOPI * float(n)
+    return out
 
 
-def gen_base_shift_with_fiber_reflection(axis: int) -> GenFn:
+def act_Z2_oriented_euler(
+    Y: np.ndarray,
+    m: int,
+    n: int,
+    *,
+    k: int,
+    convention: str = "twist_on_theta1_shift",
+) -> np.ndarray:
     """
-    Z-generator:
-      theta_axis += 2pi*m
-      if m is odd, reflect fiber (phi -> -phi)
+    A standard cocycle model for an oriented S^1-bundle over T^2 with Euler class k.
 
-    Encodes O(2) monodromy (-1 on the fiber) along one base generator.
+    This defines an action of Z^2 on R^2 x S^1 (implemented on lifted angles in R^3).
+    Distances are computed after wrapping inside T2xS1ProductAngleMetric, so fiber shifts
+    differing by 2pi*integer are metrically invisible (as they should be for S^1).
 
-    NOTE: No wrapping here; wrapping happens in the base metric when measuring distance.
+    Parameters
+    ----------
+    convention:
+        - "twist_on_theta1_shift": phi += k*m*theta2
+        - "twist_on_theta2_shift": phi += k*n*theta1
     """
-    if axis not in (0, 1):
-        raise ValueError("axis must be 0 or 1 for base coordinates.")
+    Y = np.asarray(Y, dtype=float)
+    out = Y.copy()
 
-    def _gen(Y: np.ndarray, m: int) -> np.ndarray:
-        Y = np.asarray(Y, dtype=float)
-        out = Y.copy()
-        out[..., axis] = out[..., axis] + TWOPI * float(m)
+    mm = float(m)
+    nn = float(n)
+    kk = float(int(k))
+
+    # IMPORTANT: use the *input* base coordinates (out currently equals Y)
+    theta1 = out[..., 0]
+    theta2 = out[..., 1]
+
+    out[..., 0] = theta1 + TWOPI * mm
+    out[..., 1] = theta2 + TWOPI * nn
+
+    convention = str(convention).strip()
+    if convention == "twist_on_theta1_shift":
+        out[..., 2] = out[..., 2] + kk * mm * theta2
+    elif convention == "twist_on_theta2_shift":
+        out[..., 2] = out[..., 2] + kk * nn * theta1
+    else:
+        raise ValueError("Unknown convention. Use 'twist_on_theta1_shift' or 'twist_on_theta2_shift'.")
+
+    return out
+
+
+def act_Z2_nonorientable(
+    Y: np.ndarray,
+    m: int,
+    n: int,
+    *,
+    reflect_along: int,
+    k: int = 0,
+) -> np.ndarray:
+    """
+    Z^2 action modeling an O(2)-bundle over T^2 with reflection monodromy along one base generator.
+
+    reflect_along:
+        0 means the theta1 loop reflects the fiber when traversed oddly (m odd)
+        1 means the theta2 loop reflects the fiber when traversed oddly (n odd)
+
+    k:
+        optional additional coupling term (useful for experiments with twisted Euler behavior).
+        For k=0 this is the "pure reflection monodromy" model.
+    """
+    reflect_along = int(reflect_along)
+    if reflect_along not in (0, 1):
+        raise ValueError("reflect_along must be 0 or 1.")
+    other = 1 - reflect_along
+
+    Y = np.asarray(Y, dtype=float)
+    out = Y.copy()
+
+    mm = float(m)
+    nn = float(n)
+    kk = float(int(k))
+
+    theta1 = out[..., 0]
+    theta2 = out[..., 1]
+
+    out[..., 0] = theta1 + TWOPI * mm
+    out[..., 1] = theta2 + TWOPI * nn
+
+    # Reflection parity determined by the chosen base generator
+    if reflect_along == 0:
         if (int(m) % 2) != 0:
             out[..., 2] = -out[..., 2]
-        return out
+    else:
+        if (int(n) % 2) != 0:
+            out[..., 2] = -out[..., 2]
 
-    return _gen
+    # Optional coupling (kept simple for experiments; metrically mod-2pi anyway)
+    if int(k) != 0:
+        if reflect_along == 0:
+            out[..., 2] = out[..., 2] + kk * mm * theta2  # couple to theta2
+        else:
+            out[..., 2] = out[..., 2] + kk * nn * theta1  # couple to theta1
+
+    return out
 
 
 # ---------------------------------------------------------------------
@@ -304,41 +351,15 @@ def T2_circle_bundle_metric_oriented(
     fiber_weight: float = 1.0,
     window: int = 1,
     convention: str = "twist_on_theta1_shift",
-) -> Metric:
-    """
-    Metric on the total space of an oriented S^1-bundle over T^2 with Euler class k,
-    modeled as a Z^2-quotient of the upstairs product metric.
+):
+    base_metric = R2xS1ProductLiftMetric(fiber_weight=float(fiber_weight))
 
-    Parameters
-    ----------
-    k:
-        Intended Euler class (sign depends on your cocycle orientation conventions).
-    fiber_weight:
-        Scales fiber distance relative to base.
-    window:
-        Search range for (m,n) in [-window,window]^2 in the quotient metric.
-    convention:
-        - "twist_on_theta1_shift": generator along theta1 includes twist by theta2
-        - "twist_on_theta2_shift": generator along theta2 includes twist by theta1
-    """
-    base_metric = T2xS1ProductAngleMetric(fiber_weight=float(fiber_weight))
+    def _act(Y: np.ndarray, m: int, n: int) -> np.ndarray:
+        return act_Z2_oriented_euler(Y, m, n, k=int(k), convention=str(convention))
 
-    convention = str(convention).strip()
-    if convention == "twist_on_theta1_shift":
-        g_tw = gen_twist_by_other_base(shift_axis=0, other_axis=1, k=int(k))
-        g_sh = gen_base_shift(axis=1)
-        # Often nicer seam behavior if we apply the "other-axis" shift first:
-        generators = [g_sh, g_tw]
-    elif convention == "twist_on_theta2_shift":
-        g_sh = gen_base_shift(axis=0)
-        g_tw = gen_twist_by_other_base(shift_axis=1, other_axis=0, k=int(k))
-        generators = [g_sh, g_tw]
-    else:
-        raise ValueError("Unknown convention. Use 'twist_on_theta1_shift' or 'twist_on_theta2_shift'.")
-
-    return ZkQuotientMetric(
+    return Z2QuotientMetric(
         base_metric=base_metric,
-        generators=generators,
+        action=_act,
         window=int(window),
         name=f"T2_S1_oriented_euler_{int(k)}",
     )
@@ -350,45 +371,17 @@ def T2_circle_bundle_metric_nonorientable(
     k: int = 0,
     fiber_weight: float = 1.0,
     window: int = 1,
-) -> Metric:
-    """
-    Metric on an O(2)-bundle over T^2 with reflection monodromy along one base generator.
+):
+    base_metric = R2xS1ProductLiftMetric(fiber_weight=float(fiber_weight))
 
-    reflect_along:
-        Which base generator reflects the fiber when traversed oddly (0 for theta1 loop, 1 for theta2 loop).
-    k:
-        Optional additional twist coupling (useful for twisted Euler experiments).
-        Set k=0 for the pure reflection-monodromy model.
-    """
-    reflect_along = int(reflect_along)
-    if reflect_along not in (0, 1):
-        raise ValueError("reflect_along must be 0 or 1.")
-    other = 1 - reflect_along
+    def _act(Y: np.ndarray, m: int, n: int) -> np.ndarray:
+        return act_Z2_nonorientable(Y, m, n, reflect_along=int(reflect_along), k=int(k))
 
-    base_metric = T2xS1ProductAngleMetric(fiber_weight=float(fiber_weight))
-
-    g_reflect = gen_base_shift_with_fiber_reflection(axis=reflect_along)
-    g_other = gen_base_shift(axis=other)
-
-    if int(k) != 0:
-        twist = gen_twist_by_other_base(shift_axis=reflect_along, other_axis=other, k=int(k))
-
-        def g1(Y: np.ndarray, m: int) -> np.ndarray:
-            # both depend on m; act on the lifted coordinates (no wrap)
-            return g_reflect(twist(Y, m), m)
-
-    else:
-        g1 = g_reflect
-
-    gens = [None, None]  # type: ignore[assignment]
-    gens[reflect_along] = g1
-    gens[other] = g_other
-
-    return ZkQuotientMetric(
+    return Z2QuotientMetric(
         base_metric=base_metric,
-        generators=[gens[0], gens[1]],  # type: ignore[arg-type]
+        action=_act,
         window=int(window),
-        name=f"T2_O2_nonorientable(reflect={reflect_along},k={int(k)})",
+        name=f"T2_O2_nonorientable(reflect={int(reflect_along)},k={int(k)})",
     )
 
 
@@ -397,15 +390,15 @@ __all__ = [
     "T2xS1ProductAngleMetric",
     # wrappers
     "FiniteQuotientMetric",
-    "ZkQuotientMetric",
+    "Z2QuotientMetric",
     # helpers / primitives
     "wrap_angles",
     "tN_flat_pairwise_angles",
+    "s1_pairwise_angles",
     "act_fiber_reflection",
-    "gen_base_shift",
-    "gen_fiber_shift",
-    "gen_twist_by_other_base",
-    "gen_base_shift_with_fiber_reflection",
+    "act_Z2_trivial",
+    "act_Z2_oriented_euler",
+    "act_Z2_nonorientable",
     # factories
     "T2_circle_bundle_metric_oriented",
     "T2_circle_bundle_metric_nonorientable",

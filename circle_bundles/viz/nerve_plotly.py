@@ -149,7 +149,7 @@ def make_nerve_figure(
     - highlight_edges are drawn on top as a thicker colored overlay.
     """
     if title is None:
-        title = "Geometric Realization of the Nerve"
+        title = "2-Skeleton Of The Nerve"
 
     emb = embed_landmarks(landmarks)
     n = int(emb.shape[0])

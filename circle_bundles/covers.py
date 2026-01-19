@@ -287,7 +287,7 @@ def plot_cover_summary_boxplot(
         x_whisk = 1.0
         x_text = x_whisk + 0.03  # in data coords; OK since x-range is tiny
 
-        # Put labels BESIDE the whisker endpoints (right side), centered vertically on the endpoint
+        # Put labels beside the whisker endpoints, centered vertically on the endpoint
         tmax = ax.text(
             x_text, high,
             f"max = {label_fmt.format(high)}",
@@ -356,6 +356,10 @@ class CoverBase:
         if self.landmarks is not None:
             self.landmarks = _as_2d_points(self.landmarks, name="cover.landmarks")        
     
+    def normalize_shapes(self) -> None:
+        self.base_points = _as_2d_points(self.base_points, name="cover.base_points")
+        if self.landmarks is not None:
+            self.landmarks = _as_2d_points(self.landmarks, name="cover.landmarks")
 
     def ensure_metric(self):
         """
@@ -604,7 +608,8 @@ class MetricBallCover(CoverBase):
         self.radius = float(radius)
         self.metric = metric
         self.ensure_metric()
-
+        self.normalize_shapes()  
+        
     def build(self) -> "MetricBallCover":
         if self.landmarks is None:
             raise ValueError("MetricBallCover requires landmarks.")

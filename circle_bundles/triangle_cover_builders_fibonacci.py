@@ -207,6 +207,7 @@ def make_s2_fibonacci_star_cover(
 
     cover._build_star_sets_U()
     cover._build_pou_from_barycentric()
+        
     return cover
 
 
@@ -446,4 +447,16 @@ def make_rp2_fibonacci_star_cover(
         sample_weights=sample_weights,
     )
     cover.build()
+    
+    from .metrics import RP2UnitVectorMetric
+    cover.metric = RP2UnitVectorMetric()
+
+    bn = getattr(cover.metric, "base_name", None)
+    if isinstance(bn, str) and bn.strip():
+        cover.base_name = bn.strip()
+
+    bL = getattr(cover.metric, "base_name_latex", None)
+    if isinstance(bL, str) and bL.strip():
+        cover.base_name_latex = bL.strip()
+
     return cover

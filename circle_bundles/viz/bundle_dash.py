@@ -32,7 +32,16 @@ class BundleVizInputs:
     dist_mat: np.ndarray                    # (m, m)
     colors: Optional[np.ndarray] = None     # (m,)
     densities: Optional[np.ndarray] = None  # (m,)
-    landmark_masks: Optional[List[np.ndarray]] = None  # list of (m,) bool arrays
+
+    # Total-space / fiber landmarks: list of (m,) bool masks over *downsampled* points
+    data_landmark_masks: Optional[List[np.ndarray]] = None
+
+    # Base landmarks:
+    # - base_landmark_masks: list of (m,) bool masks over *downsampled* points (subset of base_points)
+    # - base_landmark_points: list of (L_i, d_base) arrays (extra points not necessarily in dataset)
+    base_landmark_masks: Optional[List[np.ndarray]] = None
+    base_landmark_points: Optional[List[np.ndarray]] = None
+
     sample_inds: Optional[np.ndarray] = None           # (m,) indices into original
 
 
@@ -47,11 +56,12 @@ def find_free_port() -> int:
         return int(s.getsockname()[1])
 
 
-def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndarray, PCA]:
     """
     Return:
       emb: (n,3) embedding (pads with zeros if base dim < 3)
       explained: cumulative explained variance ratio, length <=3
+      pca: fitted PCA object (so we can transform landmark points consistently)
     """
     base_points = np.asarray(base_points)
     if base_points.ndim != 2:
@@ -66,7 +76,7 @@ def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndar
 
     if emb.shape[1] < 3:
         emb = np.pad(emb, ((0, 0), (0, 3 - emb.shape[1])), mode="constant")
-    return emb, explained
+    return emb, explained, pca
 
 
 def _normalize_to_unit_interval(vals: np.ndarray) -> np.ndarray:
@@ -78,46 +88,130 @@ def _normalize_to_unit_interval(vals: np.ndarray) -> np.ndarray:
     return (vals - vmin) / (vmax - vmin)
 
 
-def _normalize_landmarks(landmark_inds: Any, n: int) -> Optional[List[np.ndarray]]:
+def _normalize_bool_masks_any(inds_or_masks: Any, n: int, *, name: str) -> Optional[List[np.ndarray]]:
     """
     Accept:
       - None
-      - ndarray (n,)
-      - ndarray (k,n) or (n,k)
+      - ndarray (n,) bool-ish
+      - ndarray (k,n) or (n,k) bool-ish
       - list/tuple of arrays (n,)
     Return: list of bool masks [(n,), ...] or None
     """
-    if landmark_inds is None:
+    if inds_or_masks is None:
         return None
 
-    if isinstance(landmark_inds, np.ndarray):
-        arr = np.asarray(landmark_inds)
+    if isinstance(inds_or_masks, np.ndarray):
+        arr = np.asarray(inds_or_masks)
         if arr.ndim == 1:
             if arr.shape[0] != n:
-                raise ValueError(f"landmark_inds length mismatch: expected {n}, got {arr.shape[0]}")
+                raise ValueError(f"{name} length mismatch: expected {n}, got {arr.shape[0]}")
             return [arr.astype(bool)]
         if arr.ndim == 2:
             # allow (n,k) or (k,n); canonicalize to (k,n)
             if arr.shape[0] == n and arr.shape[1] != n:
                 arr = arr.T
             if arr.shape[1] != n:
-                raise ValueError(f"2D landmark_inds must have one axis length {n}; got {arr.shape}")
+                raise ValueError(f"2D {name} must have one axis length {n}; got {arr.shape}")
             return [arr[i].astype(bool) for i in range(arr.shape[0])]
-        raise ValueError("landmark_inds ndarray must be 1D or 2D.")
+        raise ValueError(f"{name} ndarray must be 1D or 2D.")
 
     masks: List[np.ndarray] = []
-    for m in landmark_inds:
+    for m in inds_or_masks:
         mm = np.asarray(m).astype(bool)
         if mm.shape != (n,):
-            raise ValueError(f"Each landmark mask must be shape ({n},), got {mm.shape}")
+            raise ValueError(f"Each {name} mask must be shape ({n},), got {mm.shape}")
         masks.append(mm)
     return masks
 
 
-def _subset_landmarks(masks: Optional[List[np.ndarray]], sample_inds: np.ndarray) -> Optional[List[np.ndarray]]:
+def _subset_masks(masks: Optional[List[np.ndarray]], sample_inds: np.ndarray) -> Optional[List[np.ndarray]]:
     if masks is None:
         return None
     return [np.asarray(m, bool)[sample_inds] for m in masks]
+
+
+def _normalize_base_landmarks(
+    landmarks: Any,
+    *,
+    base_points: np.ndarray,
+    name: str = "landmarks",
+) -> Tuple[Optional[List[np.ndarray]], Optional[List[np.ndarray]]]:
+    """
+    Base-landmarks input normalization.
+
+    Accepts:
+      - None
+      - points: ndarray (L, d_base)
+      - mask:   ndarray (n,) bool
+      - inds:   ndarray (L,) int
+      - list/tuple of any mixture of the above (each element is one "group")
+
+    Returns:
+      (base_landmark_masks_full, base_landmark_points_full)
+        - base_landmark_masks_full: list of (n,) bool masks selecting points in base_points
+        - base_landmark_points_full: list of (L_i, d_base) arrays (extra points)
+    """
+    if landmarks is None:
+        return None, None
+
+    bp = np.asarray(base_points)
+    if bp.ndim != 2:
+        raise ValueError("base_points must be 2D.")
+    n, d_base = int(bp.shape[0]), int(bp.shape[1])
+
+    def _one(obj: Any) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
+        # returns (mask_or_none, points_or_none) where mask is shape (n,)
+        if obj is None:
+            return None, None
+
+        arr = np.asarray(obj)
+
+        # bool mask
+        if arr.dtype == bool and arr.ndim == 1:
+            if arr.shape[0] != n:
+                raise ValueError(f"{name} bool mask length mismatch: expected {n}, got {arr.shape[0]}")
+            return arr.astype(bool), None
+
+        # index array
+        if np.issubdtype(arr.dtype, np.integer) and arr.ndim == 1:
+            idx = arr.astype(int).reshape(-1)
+            if idx.size == 0:
+                return np.zeros((n,), dtype=bool), None
+            if np.any(idx < 0) or np.any(idx >= n):
+                raise ValueError(f"{name} index out of bounds for n={n}.")
+            mask = np.zeros((n,), dtype=bool)
+            mask[idx] = True
+            return mask, None
+
+        # points array
+        if arr.ndim == 2 and int(arr.shape[1]) == d_base:
+            pts = np.asarray(arr, dtype=float)
+            return None, pts
+
+        raise ValueError(
+            f"{name} entries must be bool mask (n,), int indices (L,), or points (L,d_base={d_base}). "
+            f"Got array with shape {arr.shape} dtype {arr.dtype}."
+        )
+
+    masks: List[np.ndarray] = []
+    pts_groups: List[np.ndarray] = []
+
+    # list/tuple = multiple groups
+    if isinstance(landmarks, (list, tuple)):
+        for g in landmarks:
+            m, p = _one(g)
+            if m is not None:
+                masks.append(m.astype(bool))
+            if p is not None:
+                pts_groups.append(np.asarray(p, dtype=float))
+    else:
+        m, p = _one(landmarks)
+        if m is not None:
+            masks.append(m.astype(bool))
+        if p is not None:
+            pts_groups.append(np.asarray(p, dtype=float))
+
+    return (masks if masks else None), (pts_groups if pts_groups else None)
 
 
 def _parse_click_index(clickData: Any) -> Optional[int]:
@@ -184,11 +278,21 @@ def prepare_bundle_viz_inputs(
     max_samples: int = 10_000,
     colors: Optional[np.ndarray] = None,
     densities: Optional[np.ndarray] = None,
-    landmark_inds: Any = None,
+    data_landmark_inds: Any = None,
+    landmarks: Any = None,
     rng: Optional[np.random.Generator] = None,
 ) -> BundleVizInputs:
     """
     Produce a downsampled view of base_points/data plus a distance matrix.
+
+    Landmarks
+    ---------
+    - data_landmark_inds: masks over points (n,) or list of such, used to highlight points in the *fiber* PCA panel.
+    - landmarks: base-landmarks to highlight in the *base* panel.
+        Accepts:
+          * (L, d_base) points, or list of such
+          * (n,) boolean mask, or list of such
+          * (L,) integer indices, or list of such
 
     If full_dist_mat is provided and same_metric=True, we will:
       - use it directly if no downsampling happened
@@ -199,7 +303,7 @@ def prepare_bundle_viz_inputs(
 
     if base_points.ndim == 1:
         base_points = base_points.reshape(-1, 1)
-        
+
     if base_points.ndim != 2:
         raise ValueError("base_points must be 2D.")
     n = int(base_points.shape[0])
@@ -218,7 +322,13 @@ def prepare_bundle_viz_inputs(
     if rng is None:
         rng = np.random.default_rng()
 
-    landmark_masks_full = _normalize_landmarks(landmark_inds, n)
+    # total-space landmark masks (over full n)
+    data_landmark_masks_full = _normalize_bool_masks_any(data_landmark_inds, n, name="data_landmark_inds")
+
+    # base landmarks (over full n masks and/or extra points)
+    base_landmark_masks_full, base_landmark_points_full = _normalize_base_landmarks(
+        landmarks, base_points=base_points, name="landmarks"
+    )
 
     if n > int(max_samples):
         sample_inds = rng.choice(n, size=int(max_samples), replace=False)
@@ -230,7 +340,9 @@ def prepare_bundle_viz_inputs(
     X = data[sample_inds]
     c = colors[sample_inds] if colors is not None else None
     d = densities[sample_inds] if densities is not None else None
-    lm = _subset_landmarks(landmark_masks_full, sample_inds)
+
+    data_lm = _subset_masks(data_landmark_masks_full, sample_inds)
+    base_lm_masks = _subset_masks(base_landmark_masks_full, sample_inds)
 
     m = int(bp.shape[0])
 
@@ -247,13 +359,26 @@ def prepare_bundle_viz_inputs(
     if dist_mat.shape != (m, m):
         raise ValueError(f"dist_mat must be (m,m). Got {dist_mat.shape} for m={m}")
 
+    # extra base landmark points (not necessarily in the dataset)
+    base_lm_pts: Optional[List[np.ndarray]] = None
+    if base_landmark_points_full is not None:
+        d_base = int(base_points.shape[1])
+        base_lm_pts = []
+        for pts in base_landmark_points_full:
+            pts = np.asarray(pts, dtype=float)
+            if pts.ndim != 2 or pts.shape[1] != d_base:
+                raise ValueError(f"Each landmarks points group must be (L_i, {d_base}), got {pts.shape}")
+            base_lm_pts.append(pts)
+
     return BundleVizInputs(
         base_points=bp,
         data=X,
         dist_mat=dist_mat,
         colors=c,
         densities=d,
-        landmark_masks=lm,
+        data_landmark_masks=data_lm,
+        base_landmark_masks=base_lm_masks,
+        base_landmark_points=base_lm_pts,
         sample_inds=sample_inds,
     )
 
@@ -266,7 +391,8 @@ def prepare_bundle_viz_inputs_from_bundle(
     base_metric: Any = None,
     colors: Optional[np.ndarray] = None,
     densities: Optional[np.ndarray] = None,
-    landmark_inds: Any = None,
+    data_landmark_inds: Any = None,
+    landmarks: Any = None,
     rng: Optional[np.random.Generator] = None,
 ) -> BundleVizInputs:
     """
@@ -301,7 +427,8 @@ def prepare_bundle_viz_inputs_from_bundle(
         max_samples=max_samples,
         colors=colors,
         densities=densities,
-        landmark_inds=landmark_inds,
+        data_landmark_inds=data_landmark_inds,
+        landmarks=landmarks,
         rng=rng,
     )
 
@@ -312,19 +439,27 @@ def prepare_bundle_viz_inputs_from_bundle(
 
 def _make_figures(
     *,
-    base_embedded: np.ndarray,          # (n,3)
-    explained_variance: np.ndarray,     # (<=3,)
-    data: np.ndarray,                  # (n, d_data)
-    dist_mat: np.ndarray,              # (n,n)
+    base_embedded: np.ndarray,                      # (n,3)
+    explained_variance: np.ndarray,                 # (<=3,)
+    base_landmark_masks: Optional[List[np.ndarray]],  # list of (n,) bool masks (subset of base points)
+    base_landmarks_embedded: Optional[List[np.ndarray]],  # list of (L_i,3) extra points
+    data: np.ndarray,                              # (n, d_data)
+    dist_mat: np.ndarray,                          # (n,n)
     colors: Optional[np.ndarray],
     normalized_colors: Optional[np.ndarray],
     densities: Optional[np.ndarray],
-    landmark_masks: Optional[List[np.ndarray]],
+    data_landmark_masks: Optional[List[np.ndarray]],  # list of (n,) bool masks (for fiber panel)
     selected_index: Optional[int],
     r: float,
     density_threshold: Optional[float] = None,
 ) -> Tuple[go.Figure, go.Figure, str, str]:
     n = int(base_embedded.shape[0])
+
+    # Marker sizes (priority: red > landmark > blue > gray)
+    size_gray = 2
+    size_blue = 3
+    size_landmark = 5
+    size_red = 7
 
     # --- base plot ---
     fig_base = go.Figure()
@@ -332,7 +467,7 @@ def _make_figures(
         go.Scatter3d(
             x=base_embedded[:, 0], y=base_embedded[:, 1], z=base_embedded[:, 2],
             mode="markers",
-            marker=dict(size=2, color="lightgray", opacity=0.5),
+            marker=dict(size=size_gray, color="lightgray", opacity=0.5),
             hoverinfo="none",
             name="Base Points",
         )
@@ -355,18 +490,7 @@ def _make_figures(
         else:
             filtered = nearby_indices
 
-        # highlight base neighborhood
-        fig_base.add_trace(
-            go.Scatter3d(
-                x=[base_embedded[selected_index, 0]],
-                y=[base_embedded[selected_index, 1]],
-                z=[base_embedded[selected_index, 2]],
-                mode="markers",
-                marker=dict(size=7, color="red", opacity=1.0),
-                name="Selected",
-                hoverinfo="none",
-            )
-        )
+        # Base plot: add neighbors first (blue), then landmarks, then selected (red) last.
         if filtered.size:
             fig_base.add_trace(
                 go.Scatter3d(
@@ -374,11 +498,68 @@ def _make_figures(
                     y=base_embedded[filtered, 1],
                     z=base_embedded[filtered, 2],
                     mode="markers",
-                    marker=dict(size=3, color="blue", opacity=0.8),
+                    marker=dict(size=size_blue, color="blue", opacity=0.8),
                     name="Neighbors",
                     hoverinfo="none",
                 )
             )
+
+        # Base plot: dataset landmarks (masks over base points)
+        if base_landmark_masks is not None:
+            lm_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow", "black"]
+            for i, mask in enumerate(base_landmark_masks):
+                mask = np.asarray(mask, bool)
+                idx = np.where(mask)[0]
+                if idx.size:
+                    fig_base.add_trace(
+                        go.Scatter3d(
+                            x=base_embedded[idx, 0],
+                            y=base_embedded[idx, 1],
+                            z=base_embedded[idx, 2],
+                            mode="markers",
+                            marker=dict(
+                                size=size_landmark,
+                                color=lm_colors[i % len(lm_colors)],
+                                opacity=0.95,
+                            ),
+                            name=f"Landmarks {i+1}",
+                            hoverinfo="none",
+                        )
+                    )
+
+        # Base plot: extra landmark points (not necessarily in dataset)
+        if base_landmarks_embedded is not None:
+            lm_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow", "black"]
+            for i, L3 in enumerate(base_landmarks_embedded):
+                L3 = np.asarray(L3, dtype=float)
+                if L3.size == 0:
+                    continue
+                fig_base.add_trace(
+                    go.Scatter3d(
+                        x=L3[:, 0], y=L3[:, 1], z=L3[:, 2],
+                        mode="markers",
+                        marker=dict(
+                            size=size_landmark,
+                            color=lm_colors[i % len(lm_colors)],
+                            opacity=0.95,
+                        ),
+                        name=f"Landmarks (extra) {i+1}",
+                        hoverinfo="none",
+                    )
+                )
+
+        # Base plot: selected point last (red)
+        fig_base.add_trace(
+            go.Scatter3d(
+                x=[base_embedded[selected_index, 0]],
+                y=[base_embedded[selected_index, 1]],
+                z=[base_embedded[selected_index, 2]],
+                mode="markers",
+                marker=dict(size=size_red, color="red", opacity=1.0),
+                name="Selected",
+                hoverinfo="none",
+            )
+        )
 
         # Fiber PCA
         nearby_data = data[filtered] if filtered.size else np.zeros((0, data.shape[1]), dtype=float)
@@ -428,9 +609,11 @@ def _make_figures(
                     )
                 )
 
-            if landmark_masks is not None:
-                landmark_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow"]
-                for i, mask in enumerate(landmark_masks):
+            # Total-space landmarks in the fiber panel:
+            # NOTE: these masks are over the *downsampled* indexing already.
+            if data_landmark_masks is not None:
+                lm_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow", "black"]
+                for i, mask in enumerate(data_landmark_masks):
                     mask = np.asarray(mask, bool)
                     local = np.where(mask[filtered])[0]
                     if local.size:
@@ -438,13 +621,12 @@ def _make_figures(
                             go.Scatter3d(
                                 x=fiber_pca[local, 0], y=fiber_pca[local, 1], z=fiber_pca[local, 2],
                                 mode="markers",
-                                marker=dict(size=4, color=landmark_colors[i % len(landmark_colors)], opacity=0.9),
-                                name=f"Landmarks {i+1}",
+                                marker=dict(size=4, color=lm_colors[i % len(lm_colors)], opacity=0.9),
+                                name=f"Data Landmarks {i+1}",
                                 hoverinfo="none",
                             )
                         )
         elif nearby_data.shape[0] == 1:
-            # still show the single point so the panel isn't empty
             fig_data.add_trace(
                 go.Scatter3d(
                     x=[0.0], y=[0.0], z=[0.0],
@@ -458,17 +640,61 @@ def _make_figures(
         else:
             variance_text = "PCA Variance (Fiber): (empty neighborhood)"
 
+    else:
+        # Even with no selection, still show base landmarks (so you can orient yourself)
+        if base_landmark_masks is not None:
+            lm_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow", "black"]
+            for i, mask in enumerate(base_landmark_masks):
+                mask = np.asarray(mask, bool)
+                idx = np.where(mask)[0]
+                if idx.size:
+                    fig_base.add_trace(
+                        go.Scatter3d(
+                            x=base_embedded[idx, 0],
+                            y=base_embedded[idx, 1],
+                            z=base_embedded[idx, 2],
+                            mode="markers",
+                            marker=dict(
+                                size=size_landmark,
+                                color=lm_colors[i % len(lm_colors)],
+                                opacity=0.95,
+                            ),
+                            name=f"Landmarks {i+1}",
+                            hoverinfo="none",
+                        )
+                    )
+
+        if base_landmarks_embedded is not None:
+            lm_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow", "black"]
+            for i, L3 in enumerate(base_landmarks_embedded):
+                L3 = np.asarray(L3, dtype=float)
+                if L3.size == 0:
+                    continue
+                fig_base.add_trace(
+                    go.Scatter3d(
+                        x=L3[:, 0], y=L3[:, 1], z=L3[:, 2],
+                        mode="markers",
+                        marker=dict(
+                            size=size_landmark,
+                            color=lm_colors[i % len(lm_colors)],
+                            opacity=0.95,
+                        ),
+                        name=f"Landmarks (extra) {i+1}",
+                        hoverinfo="none",
+                    )
+                )
+
     fig_base.update_layout(
         title="Base Points",
         scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
         margin=dict(l=0, r=0, t=30, b=30),
-        showlegend=False,
+        showlegend=False,  
     )
     fig_data.update_layout(
         title="Fiber Data",
         scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
         margin=dict(l=0, r=0, t=30, b=30),
-        showlegend=True,
+        showlegend=False,
     )
 
     return fig_base, fig_data, label, variance_text
@@ -494,14 +720,27 @@ def make_bundle_app(
     dist_mat = np.asarray(viz.dist_mat)
     colors = viz.colors
     densities = viz.densities
-    landmark_masks = viz.landmark_masks
+
+    data_landmark_masks = viz.data_landmark_masks
+    base_landmark_masks = viz.base_landmark_masks
+    base_landmark_points = viz.base_landmark_points
 
     n = int(base_points.shape[0])
     if data.shape[0] != n or dist_mat.shape != (n, n):
         raise ValueError("viz inputs misaligned.")
 
-    base_embedded, explained_variance = _embed_base_points_pca(base_points)
+    base_embedded, explained_variance, pca_base = _embed_base_points_pca(base_points)
     normalized_colors = _normalize_to_unit_interval(colors) if colors is not None else None
+
+    base_landmarks_embedded: Optional[List[np.ndarray]] = None
+    if base_landmark_points is not None:
+        base_landmarks_embedded = []
+        for g in base_landmark_points:
+            g = np.asarray(g, dtype=float)
+            L = pca_base.transform(g)
+            if L.shape[1] < 3:
+                L = np.pad(L, ((0, 0), (0, 3 - L.shape[1])), mode="constant")
+            base_landmarks_embedded.append(L)
 
     app = dash.Dash(__name__)
 
@@ -602,12 +841,14 @@ def make_bundle_app(
         fig_base, fig_data, label, variance_text = _make_figures(
             base_embedded=base_embedded,
             explained_variance=explained_variance,
+            base_landmark_masks=base_landmark_masks,
+            base_landmarks_embedded=base_landmarks_embedded,
             data=data,
             dist_mat=dist_mat,
             colors=colors,
             normalized_colors=normalized_colors,
             densities=densities,
-            landmark_masks=landmark_masks,
+            data_landmark_masks=data_landmark_masks,
             selected_index=selected_index,
             r=float(r),
             density_threshold=None if density_threshold is None else float(density_threshold),
@@ -642,7 +883,8 @@ def show_bundle_vis(
     r_max: float = 2.0,
     colors: Optional[np.ndarray] = None,
     densities: Optional[np.ndarray] = None,
-    landmark_inds: Any = None,
+    data_landmark_inds: Any = None,
+    landmarks: Any = None,
     max_samples: int = 10_000,
     rng: Optional[np.random.Generator] = None,
     port: Optional[int] = None,
@@ -653,6 +895,13 @@ def show_bundle_vis(
 
     - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat/base_metric).
     - "Fiber Data" shows PCA of data restricted to the selected neighborhood.
+
+    Landmarks:
+      - data_landmark_inds: bool masks over points (n,) or list of such; highlights points in the fiber PCA panel.
+      - landmarks: base landmarks highlighted in the base panel:
+          * (L,d_base) points OR list of such
+          * (n,) bool mask OR list of such
+          * (L,) int indices OR list of such
     """
     viz = prepare_bundle_viz_inputs(
         base_points=np.asarray(base_points),
@@ -664,7 +913,8 @@ def show_bundle_vis(
         max_samples=int(max_samples),
         colors=colors,
         densities=densities,
-        landmark_inds=landmark_inds,
+        data_landmark_inds=data_landmark_inds,
+        landmarks=landmarks,
         rng=rng,
     )
     app = make_bundle_app(viz, initial_r=float(initial_r), r_max=float(r_max))
@@ -700,20 +950,35 @@ def save_bundle_snapshot(
     dist_mat = np.asarray(viz.dist_mat)
     colors = viz.colors
     densities = viz.densities
-    landmark_masks = viz.landmark_masks
 
-    base_embedded, explained_variance = _embed_base_points_pca(base_points)
+    data_landmark_masks = viz.data_landmark_masks
+    base_landmark_masks = viz.base_landmark_masks
+    base_landmark_points = viz.base_landmark_points
+
+    base_embedded, explained_variance, pca_base = _embed_base_points_pca(base_points)
     normalized_colors = _normalize_to_unit_interval(colors) if colors is not None else None
+
+    base_landmarks_embedded: Optional[List[np.ndarray]] = None
+    if base_landmark_points is not None:
+        base_landmarks_embedded = []
+        for g in base_landmark_points:
+            g = np.asarray(g, dtype=float)
+            L = pca_base.transform(g)
+            if L.shape[1] < 3:
+                L = np.pad(L, ((0, 0), (0, 3 - L.shape[1])), mode="constant")
+            base_landmarks_embedded.append(L)
 
     fig_base, fig_data, _, _ = _make_figures(
         base_embedded=base_embedded,
         explained_variance=explained_variance,
+        base_landmark_masks=base_landmark_masks,
+        base_landmarks_embedded=base_landmarks_embedded,
         data=data,
         dist_mat=dist_mat,
         colors=colors,
         normalized_colors=normalized_colors,
         densities=densities,
-        landmark_masks=landmark_masks,
+        data_landmark_masks=data_landmark_masks,
         selected_index=int(selected_index),
         r=float(r),
         density_threshold=None if density_threshold is None else float(density_threshold),
