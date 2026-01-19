@@ -10,5 +10,5 @@ Recommended usage:
 This re-exports the curated public API defined in circle_bundles.api.
 """
 
-#from .api import *  # noqa: F401,F403
+from .api import *  # noqa: F401,F403
 #from .api import __all__  # noqa: F401

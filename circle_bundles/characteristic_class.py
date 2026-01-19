@@ -40,10 +40,10 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Set
 import numpy as np
 import sympy as sp
 
-from .combinatorics import Edge, Tri, canon_edge, canon_tri
+from .nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 
-from .class_persistence import build_delta_C0_to_C1_Z2, build_delta_C1_to_C2_Z_twisted
-from .class_persistence import in_image_mod2, in_image_Z_fast_pipeline
+from .analysis.class_persistence import build_delta_C0_to_C1_Z2, build_delta_C1_to_C2_Z_twisted
+from .analysis.class_persistence import in_image_mod2, in_image_Z_fast_pipeline
 
 
 # ============================================================
