@@ -16,9 +16,9 @@ from typing import List, Optional, Sequence, Tuple, Literal
 
 import numpy as np
 
-from .status_utils import _status, _status_clear  # shared status helpers
+from ..utils.status_utils import _status, _status_clear  # shared status helpers
 
-from .gauge_canon import GaugeCanonConfig, compute_samplewise_gauge_from_o2_cocycle, apply_gauge_to_frames, GaugeCanonReport  # noqa
+from ..trivializations.gauge_canon import GaugeCanonConfig, compute_samplewise_gauge_from_o2_cocycle, apply_gauge_to_frames, GaugeCanonReport  # noqa
 
 
 ReduceMethod = Literal["none", "subspace_pca", "psc"]

@@ -336,7 +336,11 @@ def compute_bundle_quality(
 
     if compute_witness:
         # local import to avoid any import-cycle surprises
-        from .bundle_map import build_true_frames, witness_error_stats, cocycle_projection_distance
+        from ..trivializations.bundle_map import (
+            build_true_frames,
+            witness_error_stats,
+            cocycle_projection_distance,
+        )
 
         # Use the same edge set you used everywhere else
         # and the cocycle's Omega (simplicial) as input.

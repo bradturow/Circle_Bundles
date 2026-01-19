@@ -1,11 +1,16 @@
-# optical_flow/__init__.py
-from __future__ import annotations
-
 """
-optical_flow package.
+Optical flow utilities (Sintel pipeline support).
 
-Preferred imports:
-    from optical_flow.api import ...
+This subpackage contains functions for:
+- contrast computations on patches/frames
+- loading / organizing flow frames
+- preprocessing / patch extraction pipelines
+- optional visualization helpers
 """
 
-from .api import *  # noqa: F401,F403
+
+from .contrast import *         
+from .flow_frames import *
+from .flow_processing import *
+
+__all__ = []  

@@ -1,13 +1,27 @@
-# synthetic/__init__.py
-from __future__ import annotations
-
 """
-synthetic
-
-Synthetic dataset generators and visualization utilities used throughout the project.
-
-Preferred imports:
-    from synthetic.api import ...
+Synthetic datasets and geometric models used for demonstrations and validation.
 """
 
-from .api import *  # noqa: F401,F403
+from . import (
+    densities,
+    mesh_vis,
+    meshes,
+    nat_img_patches,
+    opt_flow_patches,
+    s2_bundles,
+    so3_sampling,
+    step_edges,
+    tori_and_kb,
+)
+
+__all__ = [
+    "densities",
+    "mesh_vis",
+    "meshes",
+    "nat_img_patches",
+    "opt_flow_patches",
+    "s2_bundles",
+    "so3_sampling",
+    "step_edges",
+    "tori_and_kb",
+]

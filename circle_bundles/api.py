@@ -34,7 +34,7 @@ from .bundle import (
 # ----------------------------
 # Bundle map pipeline
 # ----------------------------
-from .bundle_map import (
+from .trivializations.bundle_map import (
     BundleMapReport,
     ChartDisagreementStats,
     FrameDataset,
@@ -64,7 +64,7 @@ from .bundle_map import (
     witness_error_stats,
 )
 
-from .frame_reduction import (
+from .reduction.frame_reduction import (
     reduction_curve_psc,
     reduction_curve_subspace_pca,
 )
@@ -109,7 +109,7 @@ from .characteristic_class import (
 # ----------------------------
 # Characteristic class persistence
 # ----------------------------
-from .class_persistence import (
+from .analysis.class_persistence import (
     CobirthResult,
     CodeathResult,
     PersistenceResult,
@@ -177,12 +177,12 @@ from .triangle_covers import (
     insert_triangle_complex,
 )
 
-from .nerve_utils import (
+from .nerve.nerve_utils import (
     get_simplices as get_nerve_simplices,
     max_trivial_to_simplex_tree,
 )
 
-from .geometry import (
+from .geometry.geometry import (
     get_bary_coords,
     points_in_triangle_mask,
 )
@@ -214,7 +214,7 @@ from .o2_cocycle import (
     rotation_matrix,
 )
 
-from .quality import (
+from .analysis.quality import (
     BundleQualityReport,
     compute_bundle_quality,
     compute_O2_cocycle_defect,
@@ -227,7 +227,7 @@ from .quality import (
 # alpha is now computed from *Euclidean/chordal* eps (per your update).
 # We keep the old public name `compute_alpha_from_eps_delta` but point it at
 # the Euclidean version so existing notebooks don’t break.
-from .quality import compute_alpha_from_eps_delta_euc as compute_alpha_from_eps_delta
+from .analysis.quality import compute_alpha_from_eps_delta_euc as compute_alpha_from_eps_delta
 
 # ----------------------------
 # Metrics
@@ -287,14 +287,14 @@ from .t2_bundle_metrics import (
 # ----------------------------
 # Local analysis / triv
 # ----------------------------
-from .local_triv import (
+from .trivializations.local_triv import (
     LocalTrivResult,
     compute_local_triv,
     compute_circular_coords_dreimac,
     compute_circular_coords_pca2,
 )
 
-from .local_analysis import (
+from .analysis.local_analysis import (
     get_dense_fiber_indices,
     get_local_pca,
     get_local_rips,
@@ -302,7 +302,7 @@ from .local_analysis import (
     plot_local_rips,
 )
 
-from .geometric_unwrapping import (
+from .geometry.geometric_unwrapping import (
     get_cocycle_dict,
     lift_base_points,
 )
@@ -323,7 +323,7 @@ from .fiberwise_clustering import (
 # ----------------------------
 # Z2 linear utilities
 # ----------------------------
-from .z2_linear import (
+from .geometry.z2_linear import (
     solve_Z2_edge_coboundary,
     solve_Z2_linear_system,
     phi_Z2_to_pm1,

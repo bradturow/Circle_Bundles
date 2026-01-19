@@ -6,17 +6,19 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple, Un
 
 import numpy as np
 
-from .combinatorics import Edge, Tri, canon_edge, canon_tri
+from .nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 
-from .coordinatization import (
+
+from .trivializations.coordinatization import (
     GlobalTrivializationResult,
     MaxTrivialSubcomplex,
     compute_max_trivial_subcomplex as compute_max_trivial_subcomplex_core,
 )
 
-from .status_utils import _status, _status_clear
+from .utils.status_utils import _status, _status_clear
 
-from .bundle_map import FramePacking  # Literal["none","coloring"]
+from .trivializations.bundle_map import FramePacking  # Literal["none","coloring"]
+
 
 Simp = Tuple[int, ...]
 
@@ -368,7 +370,7 @@ class BundleResult:
         packing: FramePacking = "coloring",   
     ):
 
-        from .bundle_map import get_frame_dataset as _get_frame_dataset
+        from .trivializations.bundle_map import get_frame_dataset as _get_frame_dataset
 
         Omega = getattr(self.cocycle, "Omega", None)
         if Omega is None:
@@ -412,7 +414,7 @@ class BundleResult:
         packing: FramePacking = "coloring",   
     ) -> BundleMapResult:
 
-        from .bundle_map import get_bundle_map
+        from .trivializations.bundle_map import get_bundle_map
 
         Omega = getattr(self.cocycle, "Omega", None)
         if Omega is None:
@@ -555,7 +557,7 @@ class BundleResult:
         show_summary: bool = True,
     ) -> "PullbackTotalSpaceResult":
         from .metrics import ProductMetricConcat, EuclideanMetric, as_metric
-        from .bundle_map import show_bundle_map_summary
+        from .trivializations.bundle_map import show_bundle_map_summary
 
         bm = bundle_map
         if bm is None:
@@ -724,7 +726,7 @@ def build_bundle(
     - Else: fall back to PCA-based (or metric-MDS-based) circular coordinates, and
       print a notification (controlled by notify_pca_fallback + verbose_triv).
     """
-    from .local_triv import compute_local_triv
+    from .trivializations.local_triv import compute_local_triv
     from .o2_cocycle import estimate_transitions
     from .quality import compute_bundle_quality
     from .characteristic_class import compute_classes, show_summary

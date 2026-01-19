@@ -6,7 +6,8 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Literal
 
 import numpy as np
 
-from .combinatorics import Edge, Tri, canon_edge, canon_tri
+from ..nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
+
 
 Simp = Tuple[int, ...]  # generic simplex as sorted tuple
 Tet = Tuple[int, int, int, int]

@@ -26,7 +26,7 @@ import numpy as np
 
 Mat2 = np.ndarray
 
-from .combinatorics import Edge, canon_edge
+from .nerve.combinatorics import Edge, canon_edge
 
 __all__ = [
     "Mat2",

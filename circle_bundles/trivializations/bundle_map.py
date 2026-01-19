@@ -26,19 +26,19 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Sequence, Set, 
 
 import numpy as np
 
-from .class_persistence import (
+from ..analysis.class_persistence import (
     PersistenceResult,
     SubcomplexMode,
     _edges_for_subcomplex_from_persistence,
 )
-from .combinatorics import Edge, canon_edge
-from .frame_reduction import (
+from ..nerve.combinatorics import Edge, canon_edge
+from ..reduction.frame_reduction import (
     FrameReducerConfig,
     FrameReductionReport,
     reduce_frames_psc,
     reduce_frames_subspace_pca,
 )
-from .o2_cocycle import angles_to_unit
+from ..o2_cocycle import angles_to_unit
 
 Mat2 = np.ndarray
 SummaryMode = Literal["auto", "text", "latex", "both"]
