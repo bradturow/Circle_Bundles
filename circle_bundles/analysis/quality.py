@@ -6,7 +6,7 @@ from typing import Iterable, List, Optional, Tuple
 
 import numpy as np
 
-from .combinatorics import Edge, Tri
+from ..nerve.combinatorics import Edge, Tri
 
 
 @dataclass

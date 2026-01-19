@@ -5,7 +5,7 @@ from typing import Any, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 
-from ..combinatorics import canon_edge
+from ..nerve.combinatorics import canon_edge
 
 __all__ = [
     "show_circle_nerve",

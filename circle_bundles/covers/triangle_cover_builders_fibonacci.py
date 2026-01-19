@@ -6,9 +6,9 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 from scipy.spatial import ConvexHull
 
-from .covers import CoverBase, TriangulationStarCover
-from .combinatorics import canon_edge, canon_tri, Edge, Tri
-from .geometry import get_bary_coords
+from ..base_covers import CoverBase, TriangulationStarCover
+from ..nerve.combinatorics import canon_edge, canon_tri, Edge, Tri
+from ..geometry.geometry import get_bary_coords
 from .triangle_covers import _require_gudhi  # lazy gudhi import helper
 
 __all__ = [
@@ -448,7 +448,7 @@ def make_rp2_fibonacci_star_cover(
     )
     cover.build()
     
-    from .metrics import RP2UnitVectorMetric
+    from ..metrics import RP2UnitVectorMetric
     cover.metric = RP2UnitVectorMetric()
 
     bn = getattr(cover.metric, "base_name", None)

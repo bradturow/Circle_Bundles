@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "circle-bundles"
+version = "0.1.0"
+description = "Discrete approximate circle bundles and characteristic classes for data analysis."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Brad Turow" }]
+
+dependencies = [
+  "numpy",
+  "scipy",
+  "matplotlib",
+  "networkx",
+  "scikit-learn",
+]
+
+[project.optional-dependencies]
+viz = ["plotly"]
+dev = ["pytest", "ruff"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["circle_bundles*"]

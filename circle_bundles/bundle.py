@@ -120,7 +120,7 @@ class BundleResult:
         show: bool = False,
     ):
         # local import to avoid circular deps
-        from .class_persistence import compute_bundle_persistence, summarize_edge_driven_persistence
+        from .analysis.class_persistence import compute_bundle_persistence, summarize_edge_driven_persistence
 
         if prefer_edge_weight is None:
             prefer_edge_weight = self.meta.get("prefer_edge_weight", "rms")
@@ -236,7 +236,7 @@ class BundleResult:
         orient: bool = True,
         require_orientable: bool = True,
     ) -> GlobalTrivializationResult:
-        from .coordinatization import (
+        from .trivializations.coordinatization import (
             build_global_trivialization,
             theta_dict_to_edge_vector_radians,
             apply_orientation_gauge_to_f,
@@ -385,7 +385,7 @@ class BundleResult:
                     "subcomplex != 'full' requires persistence. "
                     "Compute bundle.persistence first or pass persistence=..."
                 )
-            from .class_persistence import _edges_for_subcomplex_from_persistence
+            from .analysis.class_persistence import _edges_for_subcomplex_from_persistence
             edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
 
         return _get_frame_dataset(
@@ -480,7 +480,7 @@ class BundleResult:
                         "subcomplex != 'full' requires persistence. "
                         "Compute bundle.persistence first or pass persistence=..."
                     )
-                from .class_persistence import _edges_for_subcomplex_from_persistence
+                from .analysis.class_persistence import _edges_for_subcomplex_from_persistence
                 edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
 
         red_key = None
@@ -728,7 +728,7 @@ def build_bundle(
     """
     from .trivializations.local_triv import compute_local_triv
     from .o2_cocycle import estimate_transitions
-    from .quality import compute_bundle_quality
+    from .analysis.quality import compute_bundle_quality
     from .characteristic_class import compute_classes, show_summary
 
     data = np.asarray(data)

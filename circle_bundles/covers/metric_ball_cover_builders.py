@@ -6,7 +6,7 @@ from typing import Any, Literal, Optional, Tuple
 
 import numpy as np
 
-from .covers import MetricBallCover
+from ..base_covers import MetricBallCover
 
 
 __all__ = [

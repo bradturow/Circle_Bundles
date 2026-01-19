@@ -4,8 +4,8 @@ from __future__ import annotations
 from typing import Dict, Tuple
 import numpy as np
 
-from .covers import TriangulationStarCover  # <- this is the CoverBase subclass that has summarize()
-from .triangle_covers import (               # <- your gudhi-based utilities file
+from ..base_covers import TriangulationStarCover  
+from .triangle_covers import (              
     initialize_octahedron,
     get_sd,
     build_rp2_simplex_tree,

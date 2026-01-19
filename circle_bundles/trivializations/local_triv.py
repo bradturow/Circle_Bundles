@@ -7,7 +7,7 @@ from typing import Callable, Dict, Optional, Tuple
 import numpy as np
 import warnings
 
-from .status_utils import _status, _status_clear
+from ..utils.status_utils import _status, _status_clear
 
 
 __all__ = [

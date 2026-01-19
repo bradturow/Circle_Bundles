@@ -8,8 +8,8 @@ import numpy as np
 
 from .metrics import EuclideanMetric, as_metric
 
-from .geometry import get_bary_coords, points_in_triangle_mask
-from .combinatorics import Edge, Tri, canon_edge, canon_tri
+from .geometry.geometry import get_bary_coords, points_in_triangle_mask
+from .nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 
 
 Tet = Tuple[int, int, int, int]

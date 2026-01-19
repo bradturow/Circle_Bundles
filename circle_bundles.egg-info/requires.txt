@@ -1,0 +1,12 @@
+numpy
+scipy
+matplotlib
+networkx
+scikit-learn
+
+[dev]
+pytest
+ruff
+
+[viz]
+plotly

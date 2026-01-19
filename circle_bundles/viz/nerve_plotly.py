@@ -7,7 +7,7 @@ import numpy as np
 import plotly.graph_objects as go
 from sklearn.decomposition import PCA
 
-from ..combinatorics import canon_edge, canon_tri
+from ..nerve.combinatorics import canon_edge, canon_tri
 
 Edge = Tuple[int, int]
 Tri = Tuple[int, int, int]

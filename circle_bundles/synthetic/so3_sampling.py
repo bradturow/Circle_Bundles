@@ -8,7 +8,7 @@ from scipy.spatial.transform import Rotation as Rotation
 
 Rule = Optional[Literal["fiber", "equator"]]
 
-__all__ = ["sample_SO3", "project_O3"]
+__all__ = ["sample_so3", "project_o3"]
 
 
 def _unit(x: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
@@ -77,7 +77,7 @@ def _orthonormal_frame_from_first_column(
 
 
 @overload
-def sample_SO3(
+def sample_so3(
     n_samples: int,
     *,
     rule: None = None,
@@ -86,7 +86,7 @@ def sample_SO3(
     eps: float = ...,
 ) -> Tuple[np.ndarray, np.ndarray]: ...
 @overload
-def sample_SO3(
+def sample_so3(
     n_samples: int,
     *,
     rule: Literal["fiber"],
@@ -95,7 +95,7 @@ def sample_SO3(
     eps: float = ...,
 ) -> Tuple[np.ndarray, np.ndarray]: ...
 @overload
-def sample_SO3(
+def sample_so3(
     n_samples: int,
     *,
     rule: Literal["equator"],
@@ -105,7 +105,7 @@ def sample_SO3(
 ) -> Tuple[np.ndarray, np.ndarray]: ...
 
 
-def sample_SO3(
+def sample_so3(
     n_samples: int,
     *,
     rule: Rule = None,
@@ -187,7 +187,7 @@ def sample_SO3(
     raise ValueError(f"Unknown rule={rule!r}. Expected None, 'fiber', or 'equator'.")
 
 
-def project_O3(O3_data: np.ndarray, v: Optional[np.ndarray] = None) -> np.ndarray:
+def project_o3(O3_data: np.ndarray, v: Optional[np.ndarray] = None) -> np.ndarray:
     """
     Given flattened O(3) matrices (N, 9), return the image of v under each matrix.
 

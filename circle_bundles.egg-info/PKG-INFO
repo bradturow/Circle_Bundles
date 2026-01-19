@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: circle-bundles
+Version: 0.1.0
+Summary: Discrete approximate circle bundles and characteristic classes for data analysis.
+Author: Brad Turow
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: matplotlib
+Requires-Dist: networkx
+Requires-Dist: scikit-learn
+Provides-Extra: viz
+Requires-Dist: plotly; extra == "viz"
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: ruff; extra == "dev"
