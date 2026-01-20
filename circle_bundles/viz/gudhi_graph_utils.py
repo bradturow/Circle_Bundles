@@ -4,7 +4,7 @@ from typing import Dict, Tuple
 
 import networkx as nx
 
-from ..combinatorics import canon_edge
+from ..nerve.combinatorics import canon_edge
 
 Edge = Tuple[int, int]
 

@@ -138,7 +138,7 @@ def make_step_edges(
     patch_vectors = patch_array.reshape(n_patches, -1, order="F")  # (n,18)
 
     if normalize:
-        from optical_flow.contrast import get_contrast_norms
+        from ..optical_flow.contrast import get_contrast_norms
         norms = get_contrast_norms(patch_vectors)
         norms = np.maximum(norms, eps)
         patch_vectors = patch_vectors / norms[:, None]
