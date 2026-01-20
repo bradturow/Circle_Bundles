@@ -6,8 +6,6 @@ from typing import Any, Callable, List, Optional, Tuple
 
 import socket
 import numpy as np
-import plotly.graph_objects as go
-from sklearn.decomposition import PCA
 
 __all__ = [
     "BundleVizInputs",
@@ -56,13 +54,24 @@ def find_free_port() -> int:
         return int(s.getsockname()[1])
 
 
-def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndarray, PCA]:
+def _embed_base_points_pca(base_points: np.ndarray) -> Tuple[np.ndarray, np.ndarray, Any]:
     """
     Return:
       emb: (n,3) embedding (pads with zeros if base dim < 3)
       explained: cumulative explained variance ratio, length <=3
       pca: fitted PCA object (so we can transform landmark points consistently)
+
+    Notes
+    -----
+    - Imports scikit-learn lazily (only when this is called).
     """
+    try:
+        from sklearn.decomposition import PCA
+    except ImportError as e:
+        raise ImportError(
+            "bundle_dash PCA embedding requires scikit-learn. Install with `pip install scikit-learn`."
+        ) from e
+
     base_points = np.asarray(base_points)
     if base_points.ndim != 2:
         raise ValueError("base_points must be 2D (n_points, dim).")
@@ -160,7 +169,6 @@ def _normalize_base_landmarks(
     n, d_base = int(bp.shape[0]), int(bp.shape[1])
 
     def _one(obj: Any) -> Tuple[Optional[np.ndarray], Optional[np.ndarray]]:
-        # returns (mask_or_none, points_or_none) where mask is shape (n,)
         if obj is None:
             return None, None
 
@@ -196,7 +204,6 @@ def _normalize_base_landmarks(
     masks: List[np.ndarray] = []
     pts_groups: List[np.ndarray] = []
 
-    # list/tuple = multiple groups
     if isinstance(landmarks, (list, tuple)):
         for g in landmarks:
             m, p = _one(g)
@@ -289,10 +296,6 @@ def prepare_bundle_viz_inputs(
     ---------
     - data_landmark_inds: masks over points (n,) or list of such, used to highlight points in the *fiber* PCA panel.
     - landmarks: base-landmarks to highlight in the *base* panel.
-        Accepts:
-          * (L, d_base) points, or list of such
-          * (n,) boolean mask, or list of such
-          * (L,) integer indices, or list of such
 
     If full_dist_mat is provided and same_metric=True, we will:
       - use it directly if no downsampling happened
@@ -424,7 +427,7 @@ def prepare_bundle_viz_inputs_from_bundle(
         full_dist_mat=full_dist_mat,
         base_metric=base_metric,
         same_metric=same_metric,
-        max_samples=max_samples,
+        max_samples=int(max_samples),
         colors=colors,
         densities=densities,
         data_landmark_inds=data_landmark_inds,
@@ -439,12 +442,12 @@ def prepare_bundle_viz_inputs_from_bundle(
 
 def _make_figures(
     *,
-    base_embedded: np.ndarray,                      # (n,3)
-    explained_variance: np.ndarray,                 # (<=3,)
+    base_embedded: np.ndarray,                        # (n,3)
+    explained_variance: np.ndarray,                   # (<=3,)
     base_landmark_masks: Optional[List[np.ndarray]],  # list of (n,) bool masks (subset of base points)
     base_landmarks_embedded: Optional[List[np.ndarray]],  # list of (L_i,3) extra points
-    data: np.ndarray,                              # (n, d_data)
-    dist_mat: np.ndarray,                          # (n,n)
+    data: np.ndarray,                                # (n, d_data)
+    dist_mat: np.ndarray,                            # (n,n)
     colors: Optional[np.ndarray],
     normalized_colors: Optional[np.ndarray],
     densities: Optional[np.ndarray],
@@ -452,7 +455,28 @@ def _make_figures(
     selected_index: Optional[int],
     r: float,
     density_threshold: Optional[float] = None,
-) -> Tuple[go.Figure, go.Figure, str, str]:
+) -> Tuple["go.Figure", "go.Figure", str, str]:
+    """
+    Returns (fig_base, fig_data, label, variance_text).
+
+    Notes
+    -----
+    - Imports plotly + sklearn lazily (only when called).
+    """
+    try:
+        import plotly.graph_objects as go
+    except ImportError as e:
+        raise ImportError(
+            "bundle_dash figure construction requires plotly. Install with `pip install plotly`."
+        ) from e
+
+    try:
+        from sklearn.decomposition import PCA
+    except ImportError as e:
+        raise ImportError(
+            "bundle_dash fiber PCA requires scikit-learn. Install with `pip install scikit-learn`."
+        ) from e
+
     n = int(base_embedded.shape[0])
 
     # Marker sizes (priority: red > landmark > blue > gray)
@@ -476,7 +500,6 @@ def _make_figures(
     # --- data plot ---
     fig_data = go.Figure()
     variance_text = f"PCA Variance (Base): {np.round(explained_variance, 3)}"
-
     label = "Selected Point: (none)"
 
     if selected_index is not None and 0 <= selected_index < n:
@@ -490,7 +513,7 @@ def _make_figures(
         else:
             filtered = nearby_indices
 
-        # Base plot: add neighbors first (blue), then landmarks, then selected (red) last.
+        # Base plot: neighbors first (blue), then landmarks, then selected (red) last.
         if filtered.size:
             fig_base.add_trace(
                 go.Scatter3d(
@@ -517,11 +540,7 @@ def _make_figures(
                             y=base_embedded[idx, 1],
                             z=base_embedded[idx, 2],
                             mode="markers",
-                            marker=dict(
-                                size=size_landmark,
-                                color=lm_colors[i % len(lm_colors)],
-                                opacity=0.95,
-                            ),
+                            marker=dict(size=size_landmark, color=lm_colors[i % len(lm_colors)], opacity=0.95),
                             name=f"Landmarks {i+1}",
                             hoverinfo="none",
                         )
@@ -538,11 +557,7 @@ def _make_figures(
                     go.Scatter3d(
                         x=L3[:, 0], y=L3[:, 1], z=L3[:, 2],
                         mode="markers",
-                        marker=dict(
-                            size=size_landmark,
-                            color=lm_colors[i % len(lm_colors)],
-                            opacity=0.95,
-                        ),
+                        marker=dict(size=size_landmark, color=lm_colors[i % len(lm_colors)], opacity=0.95),
                         name=f"Landmarks (extra) {i+1}",
                         hoverinfo="none",
                     )
@@ -609,8 +624,7 @@ def _make_figures(
                     )
                 )
 
-            # Total-space landmarks in the fiber panel:
-            # NOTE: these masks are over the *downsampled* indexing already.
+            # Total-space landmarks in the fiber panel (masks are over downsampled indexing)
             if data_landmark_masks is not None:
                 lm_colors = ["orange", "green", "purple", "cyan", "magenta", "yellow", "black"]
                 for i, mask in enumerate(data_landmark_masks):
@@ -654,11 +668,7 @@ def _make_figures(
                             y=base_embedded[idx, 1],
                             z=base_embedded[idx, 2],
                             mode="markers",
-                            marker=dict(
-                                size=size_landmark,
-                                color=lm_colors[i % len(lm_colors)],
-                                opacity=0.95,
-                            ),
+                            marker=dict(size=size_landmark, color=lm_colors[i % len(lm_colors)], opacity=0.95),
                             name=f"Landmarks {i+1}",
                             hoverinfo="none",
                         )
@@ -674,11 +684,7 @@ def _make_figures(
                     go.Scatter3d(
                         x=L3[:, 0], y=L3[:, 1], z=L3[:, 2],
                         mode="markers",
-                        marker=dict(
-                            size=size_landmark,
-                            color=lm_colors[i % len(lm_colors)],
-                            opacity=0.95,
-                        ),
+                        marker=dict(size=size_landmark, color=lm_colors[i % len(lm_colors)], opacity=0.95),
                         name=f"Landmarks (extra) {i+1}",
                         hoverinfo="none",
                     )
@@ -688,15 +694,18 @@ def _make_figures(
         title="Base Points",
         scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
         margin=dict(l=0, r=0, t=30, b=30),
-        showlegend=False,  
+        showlegend=False,
+        uirevision="bundle-viewer",   # ✅ preserve camera
     )
     fig_data.update_layout(
         title="Fiber Data",
         scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
         margin=dict(l=0, r=0, t=30, b=30),
         showlegend=False,
+        uirevision="bundle-viewer",   # ✅ preserve camera
     )
-
+    
+    
     return fig_base, fig_data, label, variance_text
 
 
@@ -710,10 +719,23 @@ def make_bundle_app(
     initial_r: float = 0.1,
     r_max: float = 2.0,
 ):
-    # local imports so importing this module doesn't require dash
-    import dash
-    from dash import dcc, html
-    from dash.dependencies import Input, Output
+    """
+    Build the Dash app.
+
+    Notes
+    -----
+    - Imports dash lazily (only when this is called).
+    - Plotly/sklearn are also lazy via helper functions called here.
+    """
+    # Local imports so importing this module doesn't require dash
+    try:
+        import dash
+        from dash import dcc, html
+        from dash.dependencies import Input, Output
+    except ImportError as e:
+        raise ImportError(
+            "make_bundle_app requires dash. Install with `pip install dash`."
+        ) from e
 
     base_points = np.asarray(viz.base_points)
     data = np.asarray(viz.data)
@@ -896,12 +918,7 @@ def show_bundle_vis(
     - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat/base_metric).
     - "Fiber Data" shows PCA of data restricted to the selected neighborhood.
 
-    Landmarks:
-      - data_landmark_inds: bool masks over points (n,) or list of such; highlights points in the fiber PCA panel.
-      - landmarks: base landmarks highlighted in the base panel:
-          * (L,d_base) points OR list of such
-          * (n,) bool mask OR list of such
-          * (L,) int indices OR list of such
+    This function only requires Dash/Plotly/sklearn if it is actually called.
     """
     viz = prepare_bundle_viz_inputs(
         base_points=np.asarray(base_points),
@@ -936,7 +953,7 @@ def save_bundle_snapshot(
     data_html: Optional[str] = None,
     base_image: Optional[str] = None,
     data_image: Optional[str] = None,
-) -> Tuple[go.Figure, go.Figure]:
+) -> Tuple["go.Figure", "go.Figure"]:
     """
     Create the two figures for a given (selected_index, r, density_threshold) and optionally save.
 
@@ -945,6 +962,13 @@ def save_bundle_snapshot(
       - Static images require 'kaleido':
           pip install -U kaleido
     """
+    try:
+        import plotly.graph_objects as go  # noqa: F401  (for return type at runtime)
+    except ImportError as e:
+        raise ImportError(
+            "save_bundle_snapshot requires plotly. Install with `pip install plotly`."
+        ) from e
+
     base_points = np.asarray(viz.base_points)
     data = np.asarray(viz.data)
     dist_mat = np.asarray(viz.dist_mat)

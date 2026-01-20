@@ -4,10 +4,6 @@ from __future__ import annotations
 from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
-import plotly.graph_objects as go
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-from matplotlib.colors import to_hex
 
 
 def show_pca(
@@ -22,33 +18,58 @@ def show_pca(
     max_components: int = 50,
     use_randomized: bool = False,
     n_iter: int = 4,
-    # --- numerical/plot stability ---
+    # --- numerical / plot stability ---
     jitter_eps: float = 1e-3,
     tol_flat_z: float = 1e-6,
     random_state: int = 0,
-    # --- appearance (NEW) ---
+    # --- appearance ---
     set_cmap: str = "viridis",
     set_cmap_range: Tuple[float, float] = (0.10, 0.90),
     # --- behavior ---
     show: bool = True,
     return_figs: bool = False,
-) -> Tuple[go.Figure, plt.Figure] | None:
+) -> Tuple["go.Figure", "plt.Figure"] | None:
     """
-    PCA visualization:
+    PCA visualization.
 
-    - Fit PCA on full data (up to max_components).
-    - Plot first 3 PCs in Plotly, using up to max_points points.
-    - Plot cumulative explained variance (up to computed components) in Matplotlib.
-    - Print CEV for k=1,2,3 (if available).
+    - Fits PCA on the full dataset (up to max_components).
+    - Plots first 3 PCs using Plotly (subsampled to max_points).
+    - Plots cumulative explained variance using Matplotlib.
+    - Prints CEV for k=1,2,3 (if available).
 
-    If U is provided, renders one trace per set (toggleable).
-
-    New:
-    - When U is provided and `colors` is None, set colors are chosen by sampling a
-      Matplotlib colormap (`set_cmap`) across `set_cmap_range`.
+    Optional:
+    - If U is provided, renders one toggleable trace per set.
+    - If colors is None and U is provided, colors are drawn from a Matplotlib colormap.
     """
-    from matplotlib.colors import to_hex  # local import keeps module import-light
 
+    # ------------------------------------------------------------
+    # Lazy imports (keep module import lightweight)
+    # ------------------------------------------------------------
+    try:
+        import matplotlib.pyplot as plt
+        from matplotlib.colors import to_hex
+    except ImportError as e:
+        raise ImportError(
+            "show_pca requires matplotlib. Install with `pip install matplotlib`."
+        ) from e
+
+    try:
+        import plotly.graph_objects as go
+    except ImportError as e:
+        raise ImportError(
+            "show_pca requires plotly. Install with `pip install plotly`."
+        ) from e
+
+    try:
+        from sklearn.decomposition import PCA
+    except ImportError as e:
+        raise ImportError(
+            "show_pca requires scikit-learn. Install with `pip install scikit-learn`."
+        ) from e
+
+    # ------------------------------------------------------------
+    # Input validation
+    # ------------------------------------------------------------
     X = np.asarray(data, dtype=float)
     if X.ndim != 2:
         raise ValueError("show_pca expects a 2D array of shape (n_samples, d).")
@@ -56,7 +77,7 @@ def show_pca(
     if n <= 0:
         raise ValueError("show_pca received empty data (n_samples=0).")
 
-    # pad to at least 3 dims so we can always plot 3 PCs
+    # Ensure at least 3 dims for plotting
     if d < 3:
         X = np.hstack([X, np.zeros((n, 3 - d), dtype=float)])
         d = 3
@@ -65,6 +86,9 @@ def show_pca(
     if n_components < 1:
         raise ValueError("Not enough samples/dimensions to compute PCA.")
 
+    # ------------------------------------------------------------
+    # PCA fit
+    # ------------------------------------------------------------
     pca = PCA(
         n_components=n_components,
         svd_solver="randomized" if use_randomized else "auto",
@@ -76,7 +100,9 @@ def show_pca(
     ev = np.asarray(pca.explained_variance_ratio_, dtype=float)
     cev = np.cumsum(ev)
 
-    # ---------- choose plot subset ----------
+    # ------------------------------------------------------------
+    # Subsample for plotting
+    # ------------------------------------------------------------
     if max_points is not None and n > int(max_points):
         rng = np.random.default_rng(random_state)
         idx_plot = rng.choice(n, size=int(max_points), replace=False)
@@ -86,22 +112,28 @@ def show_pca(
 
     X_plot = X[idx_plot]
     Z = pca.transform(X_plot)
-    # ensure we have at least 3 columns
+
     if Z.shape[1] < 3:
         Z = np.hstack([Z, np.zeros((Z.shape[0], 3 - Z.shape[1]), dtype=float)])
     Z3 = Z[:, :3]
 
-    # Jitter if z is basically constant
+    # Jitter flat z-axis
     if np.std(Z3[:, 2]) < float(tol_flat_z):
         rng = np.random.default_rng(random_state)
         Z3[:, 2] += float(jitter_eps) * rng.standard_normal(Z3.shape[0])
 
-    # ---------- handle U / colors ----------
+    # ------------------------------------------------------------
+    # Handle U / colors
+    # ------------------------------------------------------------
     use_U = U is not None and np.size(U) > 0
+    colors_plot = None
+    set_colors = None
+
     if use_U:
         U_bool = np.asarray(U, dtype=bool)
         if U_bool.ndim != 2 or U_bool.shape[1] != n:
             raise ValueError(f"U must have shape (n_sets, n_samples) = (?, {n}).")
+
         U_plot = U_bool[:, idx_plot]
         n_sets = U_plot.shape[0]
 
@@ -111,41 +143,32 @@ def show_pca(
             raise ValueError("titles must have length equal to U.shape[0].")
 
         if colors is None:
-            # Pretty, interpolated scheme from a perceptually-uniform colormap
             cmap = plt.get_cmap(set_cmap)
             a, b = map(float, set_cmap_range)
-            if n_sets == 1:
-                ts = np.array([(a + b) / 2.0], dtype=float)
-            else:
-                ts = np.linspace(a, b, n_sets, dtype=float)
+            ts = np.linspace(a, b, n_sets) if n_sets > 1 else [(a + b) / 2.0]
             set_colors = [to_hex(cmap(t)) for t in ts]
-            colors_plot = None
         else:
             colors_arr = np.asarray(colors, dtype=object)
             if colors_arr.shape[0] != n:
-                raise ValueError("colors must have length n_samples when provided.")
+                raise ValueError("colors must have length n_samples.")
             colors_plot = colors_arr[idx_plot]
-            set_colors = None
     else:
-        U_plot = None
-        set_colors = None
         if colors is not None:
             colors_arr = np.asarray(colors, dtype=object)
             if colors_arr.shape[0] != n:
-                raise ValueError("colors must have length n_samples when provided.")
+                raise ValueError("colors must have length n_samples.")
             colors_plot = colors_arr[idx_plot]
-        else:
-            colors_plot = None
 
-    # ---------- Plotly 3D scatter ----------
+    # ------------------------------------------------------------
+    # Plotly 3D scatter
+    # ------------------------------------------------------------
     fig3d = go.Figure()
 
-    if use_U and U_plot is not None:
+    if use_U:
         for j in range(U_plot.shape[0]):
             idx = np.where(U_plot[j])[0]
             if idx.size == 0:
                 continue
-
             c = set_colors[j] if colors is None else colors_plot[idx]
             fig3d.add_trace(
                 go.Scatter3d(
@@ -176,7 +199,9 @@ def show_pca(
         title=f"PCA (first 3 PCs) | fit k={n_components} | plotted n={len(idx_plot)}",
     )
 
-    # ---------- Matplotlib CEV ----------
+    # ------------------------------------------------------------
+    # Matplotlib CEV plot
+    # ------------------------------------------------------------
     ks = np.arange(1, n_components + 1)
     fig_ev = plt.figure()
     plt.plot(ks, cev)

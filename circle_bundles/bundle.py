@@ -30,6 +30,16 @@ def canon_simplex(sig: Iterable[int]) -> Simp:
 
 
 def attach_bundle_viz_methods():
+    """
+    Monkey-patch visualization helpers onto BundleResult.
+
+    Notes
+    -----
+    - This is optional: call it only if you want BundleResult.show_bundle(),
+      BundleResult.show_circle_nerve(), etc.
+    - All heavy visualization dependencies remain lazily imported inside
+      the visualization methods themselves.
+    """
     BundleResult.bundle_app = bundle_app
     BundleResult.show_bundle = show_bundle
 
@@ -855,12 +865,46 @@ def bundle_app(
     r_max: float = 2.0,
     colors=None,
     densities=None,
-    landmark_inds=None,
+    data_landmark_inds=None,     
+    landmarks=None,              
     max_samples: int = 10_000,
     base_metric=None,
     rng=None,
 ):
-    from .viz.bundle_dash import prepare_bundle_viz_inputs_from_bundle, make_bundle_app
+    """
+    Return a Dash app (does not run it). Requires optional deps: dash, plotly, scikit-learn.
+
+    Parameters
+    ----------
+    landmark_inds / data_landmark_inds:
+        Masks/indices for highlighting points in the *fiber* PCA panel.
+        (landmark_inds is kept for backwards compatibility.)
+
+    landmarks:
+        Base-panel landmarks (mask/indices/points or list of groups). If None,
+        we default to bundle.cover.landmarks when available.
+    """
+
+    # Default base landmarks from cover unless explicitly overridden
+    if landmarks is None:
+        landmarks = getattr(self.cover, "landmarks", None)
+
+        # Normalize 1D landmark points → (1, d_base) when a single point was stored
+        if isinstance(landmarks, np.ndarray):
+            landmarks = np.asarray(landmarks)
+            base_points = getattr(self.cover, "base_points", None)
+            if base_points is not None:
+                d_base = int(np.asarray(base_points).shape[1]) if np.asarray(base_points).ndim == 2 else 1
+                if landmarks.ndim == 1 and landmarks.shape[0] == d_base:
+                    landmarks = landmarks.reshape(1, d_base)
+
+    try:
+        from .viz.bundle_dash import prepare_bundle_viz_inputs_from_bundle, make_bundle_app
+    except ImportError as e:
+        raise ImportError(
+            "BundleResult.bundle_app() requires optional dependencies (dash, plotly, scikit-learn). "
+            "Install them to use the interactive bundle viewer."
+        ) from e
 
     viz = prepare_bundle_viz_inputs_from_bundle(
         self,
@@ -869,10 +913,11 @@ def bundle_app(
         base_metric=base_metric,
         colors=colors,
         densities=densities,
-        landmark_inds=landmark_inds,
+        data_landmark_inds=data_landmark_inds,  
+        landmarks=landmarks,                    
         rng=rng,
     )
-    return make_bundle_app(viz, initial_r=initial_r, r_max=r_max)
+    return make_bundle_app(viz, initial_r=float(initial_r), r_max=float(r_max))
 
 
 def show_bundle(
@@ -884,13 +929,19 @@ def show_bundle(
     colors=None,
     densities=None,
     data_landmark_inds=None,   
-    landmark_inds=None,        
+    landmarks=None,            
     max_samples: int = 10_000,
     base_metric=None,
     rng=None,
     debug: bool = False,
     port: Optional[int] = None,
 ):
+    """
+    Run the interactive Dash viewer.
+
+    Requires optional dependencies (dash, plotly, scikit-learn). If missing,
+    raises a friendly ImportError.
+    """
     # Base metric default
     if base_metric is None:
         base_metric = getattr(self.cover, "metric", None)
@@ -898,26 +949,31 @@ def show_bundle(
         from .metrics import EuclideanMetric
         base_metric = EuclideanMetric()
 
-    # Back-compat: allow old param name
-    if data_landmark_inds is None and landmark_inds is not None:
-        data_landmark_inds = landmark_inds
+    # Base landmarks: default to cover.landmarks unless overridden
+    if landmarks is None:
+        landmarks = getattr(self.cover, "landmarks", None)
 
-    # Pull base landmarks from the cover automatically
-    # This can be: bool mask (n,), int indices (L,), points (L,d_base), or list of groups
-    cover_landmarks = getattr(self.cover, "landmarks", None)
+        # Normalize 1D landmark points → (1, d_base)
+        if isinstance(landmarks, np.ndarray):
+            landmarks = np.asarray(landmarks)
+            base_points = getattr(self.cover, "base_points", None)
+            if base_points is not None:
+                bp = np.asarray(base_points)
+                d_base = int(bp.shape[1]) if bp.ndim == 2 else 1
+                if landmarks.ndim == 1 and landmarks.shape[0] == d_base:
+                    landmarks = landmarks.reshape(1, d_base)
 
-    # Normalize 1D landmark points → (1, d_base)
-    if isinstance(cover_landmarks, np.ndarray):
-        cover_landmarks = np.asarray(cover_landmarks)
-        d_base = self.cover.base_points.shape[1]
-        if cover_landmarks.ndim == 1 and cover_landmarks.shape[0] == d_base:
-            cover_landmarks = cover_landmarks.reshape(1, d_base)    
-
-    from .viz.bundle_dash import (
-        prepare_bundle_viz_inputs_from_bundle,
-        make_bundle_app,
-        run_bundle_app,
-    )
+    try:
+        from .viz.bundle_dash import (
+            prepare_bundle_viz_inputs_from_bundle,
+            make_bundle_app,
+            run_bundle_app,
+        )
+    except ImportError as e:
+        raise ImportError(
+            "BundleResult.show_bundle() requires optional dependencies (dash, plotly, scikit-learn). "
+            "Install them to use the interactive bundle viewer."
+        ) from e
 
     viz = prepare_bundle_viz_inputs_from_bundle(
         self,
@@ -926,8 +982,8 @@ def show_bundle(
         base_metric=base_metric,
         colors=colors,
         densities=densities,
-        data_landmark_inds=data_landmark_inds,  # fiber panel highlighting
-        landmarks=cover_landmarks,              # base panel highlighting (from cover)
+        data_landmark_inds=data_landmark_inds,  
+        landmarks=landmarks,                    
         rng=rng,
     )
     app = make_bundle_app(viz, initial_r=float(initial_r), r_max=float(r_max))
