@@ -1088,11 +1088,24 @@ def bundle_show_circle_nerve(
     weights_source: str = "rms",
     reorder_cycle: bool = True,
     fail_if_not_cycle: bool = True,
+    auto_omega: bool = True,
+    compute_phi: bool = True,
+    phi_source: str = "orient_if_possible",
     title: Optional[str] = None,
     save_path: Optional[str] = None,
     show: bool = True,
     **kwargs,
 ):
+    """
+    Visualize the (cycle) nerve in a circle layout, optionally restricted to a maximal
+    trivial subcomplex, with optional edge/vertex annotations.
+
+    NEW convenience behavior
+    ------------------------
+    - If auto_omega=True and omega is None, uses bundle.classes.omega_O1_used when available.
+    - If compute_phi=True and phi is None, computes a vertex potential on the chosen edge set
+      using bundle.classes.cocycle_used.restrict(...).orient_if_possible(...).
+    """
     from .viz.nerve_circle import (
         show_circle_nerve,
         is_single_cycle_graph,
@@ -1123,6 +1136,10 @@ def bundle_show_circle_nerve(
         )
         kept_edges = list(max_triv.kept_edges)
 
+    # auto omega default
+    if omega is None and auto_omega:
+        omega = getattr(getattr(bundle, "classes", None), "omega_O1_used", None)
+
     if weights is None and weights_source != "none":
         if weights_source == "rms":
             weights = getattr(bundle.transitions, "rms_angle_err", None)
@@ -1130,6 +1147,18 @@ def bundle_show_circle_nerve(
             weights = getattr(bundle.quality, "witness_err", None)
         else:
             raise ValueError("weights_source must be 'rms', 'witness', or 'none'.")
+
+    # compute phi default (on kept edges if present, else all edges)
+    if phi is None and compute_phi:
+        if phi_source != "orient_if_possible":
+            raise ValueError("phi_source currently only supports 'orient_if_possible'.")
+        edge_set_for_phi = kept_edges if kept_edges is not None else edges
+        cocycle = getattr(getattr(bundle, "classes", None), "cocycle_used", None)
+        if cocycle is None:
+            raise AttributeError("bundle.classes.cocycle_used is missing; cannot compute phi.")
+        Omega = cocycle.restrict(edge_set_for_phi)
+        phi_vec = Omega.orient_if_possible(edge_set_for_phi)[2]
+        phi = {i: int(phi_vec[i]) for i in range(n)}
 
     if reorder_cycle and ok:
         order = cycle_order_from_edges(n, edges, start=0)

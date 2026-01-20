@@ -115,7 +115,7 @@ def sample_opt_flow_torus(
     alpha, theta = _fold_theta_alpha_to_rp1(alpha0, theta0)
 
     # Local import keeps synthetic usable even if optical_flow isn't installed.
-    from optical_flow.contrast import get_dct_basis, get_contrast_norms
+    from ..optical_flow.contrast import get_dct_basis, get_contrast_norms
 
     e1u, e2u, e1v, e2v = get_dct_basis(dim, normalize=True, opt_flow=True, top_two=True)
 
