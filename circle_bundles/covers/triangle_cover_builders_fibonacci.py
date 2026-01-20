@@ -207,7 +207,8 @@ def make_s2_fibonacci_star_cover(
 
     cover._build_star_sets_U()
     cover._build_pou_from_barycentric()
-        
+    cover.ensure_metric()
+
     return cover
 
 

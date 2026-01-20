@@ -10,9 +10,9 @@ __all__ = [
     "hopf_projection",
     "spin3_adjoint_to_so3",
     "so3_to_s2_projection",
-    "sample_S2_trivial",
+    "sample_s2_trivial",
     "tangent_frame_on_s2",
-    "sample_S2_unit_tangent",
+    "sample_s2_unit_tangent",
 ]
 
 
@@ -228,7 +228,7 @@ def so3_to_s2_projection(
 # S^2 bundles / embeddings
 # ----------------------------
 
-def sample_S2_trivial(
+def sample_s2_trivial(
     n_points: int,
     *,
     sigma: float = 0.0,
@@ -291,7 +291,7 @@ def tangent_frame_on_s2(p: np.ndarray, *, eps: float = 1e-12) -> Tuple[np.ndarra
     return e1, e2
 
 
-def sample_S2_unit_tangent(
+def sample_s2_unit_tangent(
     n_points: int,
     *,
     sigma: float = 0.0,
