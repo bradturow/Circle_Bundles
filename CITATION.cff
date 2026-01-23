@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: circle_bundles
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Turow
+    given-names: Brad
+    affiliation: Northeastern University
+version: 0.1.0
+date-released: 2026-01-XX
+url: https://github.com/YOUR_USERNAME/circle_bundles
