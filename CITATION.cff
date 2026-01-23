@@ -5,6 +5,11 @@ authors:
   - family-names: Turow
     given-names: Brad
     affiliation: Northeastern University
+    orcid: https://orcid.org/0000-0002-0694-4411
+  - family-names: Perea
+    given-names: Jose A.
+    affiliation: Northeastern University
+    orcid: https://orcid.org/0000-0002-6440-5096
 version: 0.1.0
-date-released: 2026-01-XX
-url: https://github.com/YOUR_USERNAME/circle_bundles
+date-released: 2026-01-23
+url: https://github.com/bradturow/circle_bundles
