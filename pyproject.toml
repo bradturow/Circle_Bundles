@@ -9,7 +9,10 @@ description = "Discrete approximate circle bundles and characteristic classes fo
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "Brad Turow" }]
+authors = [
+  { name = "Brad Turow" },
+  { name = "José A. Perea" }
+]
 
 dependencies = [
   "numpy",

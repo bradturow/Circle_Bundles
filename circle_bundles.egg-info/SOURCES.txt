@@ -1,9 +1,10 @@
+README.md
 pyproject.toml
 circle_bundles/__init__.py
 circle_bundles/api.py
+circle_bundles/base_covers.py
 circle_bundles/bundle.py
 circle_bundles/characteristic_class.py
-circle_bundles/covers.py
 circle_bundles/metrics.py
 circle_bundles/o2_cocycle.py
 circle_bundles.egg-info/PKG-INFO
@@ -31,7 +32,6 @@ circle_bundles/optical_flow/flow_processing.py
 circle_bundles/optical_flow/patch_viz.py
 circle_bundles/reduction/frame_reduction.py
 circle_bundles/synthetic/__init__.py
-circle_bundles/synthetic/character_dataset.py
 circle_bundles/synthetic/densities.py
 circle_bundles/synthetic/mesh_vis.py
 circle_bundles/synthetic/meshes.py
@@ -49,6 +49,7 @@ circle_bundles/utils/status_utils.py
 circle_bundles/viz/__init__.py
 circle_bundles/viz/angles.py
 circle_bundles/viz/base_vis.py
+circle_bundles/viz/bundle_dash.py
 circle_bundles/viz/circle_vis.py
 circle_bundles/viz/fiber_vis.py
 circle_bundles/viz/fiberwise_clustering_vis.py
@@ -58,4 +59,5 @@ circle_bundles/viz/lattice_vis.py
 circle_bundles/viz/nerve_circle.py
 circle_bundles/viz/nerve_plotly.py
 circle_bundles/viz/nerve_vis.py
+circle_bundles/viz/pca_vis.py
 circle_bundles/viz/thumb_grids.py

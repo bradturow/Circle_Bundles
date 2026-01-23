@@ -701,7 +701,7 @@ def build_bundle(
     standard_range: bool = False,
     CircularCoords_cls=None,
     min_patch_size: int = 10,
-    verbose_triv: bool = True,
+    verbose_triv: Optional[bool] = None,
     fail_fast_triv: bool = True,
     # ---- PCA fallback knobs (passed through) ----
     pca_anchor: str = "farthest",
@@ -725,22 +725,33 @@ def build_bundle(
     theta_units: str = "radians",
     # ---- presentation ----
     show: bool = False,
+    verbose: Optional[bool] = None,
 ) -> BundleResult:
     """
     End-to-end pipeline (core only):
       cover + data -> local triv -> transitions -> quality -> classes
 
-    Behavior (as discussed):
-    - If cc_alg is provided: use it for local circular coordinates.
-    - Else if CircularCoords_cls is provided: use Dreimac.
-    - Else: fall back to PCA-based (or metric-MDS-based) circular coordinates, and
-      print a notification (controlled by notify_pca_fallback + verbose_triv).
+    Parameters
+    ----------
+    show:
+        If True, prints a short summary of computed characteristic classes / quality.
+    verbose:
+        Controls progress/status printing. If None (default), we set verbose = show:
+        - show=False -> quiet (good for README/CI)
+        - show=True  -> prints progress + summary (good for notebooks)
     """
     from .trivializations.local_triv import compute_local_triv
     from .o2_cocycle import estimate_transitions
     from .analysis.quality import compute_bundle_quality
     from .characteristic_class import compute_classes, show_summary
 
+    # Default verbosity: quiet unless explicitly "showing"
+    if verbose is None:
+        verbose = bool(show)
+    if verbose_triv is None:
+        verbose = bool(show)
+    
+        
     data = np.asarray(data)
 
     # 1) build cover if needed
@@ -767,7 +778,7 @@ def build_bundle(
         notify_pca_fallback=notify_pca_fallback,
         # robust
         min_patch_size=min_patch_size,
-        verbose=verbose_triv,
+        verbose=verbose_triv,     
         fail_fast=fail_fast_triv,
     )
 
@@ -775,8 +786,10 @@ def build_bundle(
         raise ValueError(f"Local triv failed on sets: {sorted(triv.errors.keys())}")
 
     # 3) transitions
-    _status_clear()
-    _status("Estimating transition functions...")
+    if verbose:
+        _status_clear()
+        _status("Estimating transition functions...")
+
     cocycle, trep = estimate_transitions(
         cover.U,
         triv.f,
@@ -788,7 +801,9 @@ def build_bundle(
     )
 
     # 4) quality
-    _status("Gathering summary data...")
+    if verbose:
+        _status("Gathering summary data...")
+
     quality = compute_bundle_quality(
         cover,
         triv,
@@ -802,7 +817,9 @@ def build_bundle(
     )
 
     # 5) characteristic classes (full nerve)
-    _status("Computing characteristic class representatives...")
+    if verbose:
+        _status("Computing characteristic class representatives...")
+
     classes = compute_classes(
         cover,
         cocycle,
@@ -813,11 +830,14 @@ def build_bundle(
         compute_euler_num=compute_euler_num,
     )
 
+    # Presentation
     if show:
-        _status_clear()
+        if verbose:
+            _status_clear()
         show_summary(classes, quality=quality, show=True)
     else:
-        _status_clear()
+        if verbose:
+            _status_clear()
 
     # Record which CC method was used (for provenance)
     if cc_alg is not None:
@@ -851,6 +871,7 @@ def build_bundle(
             "theta_units": str(theta_units),
         },
     )
+
 
 
 # ----------------------------

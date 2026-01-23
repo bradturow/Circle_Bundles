@@ -7,15 +7,16 @@ tags:
   - computational geometry
 authors:
   - name: Brad Turow
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0694-4411
     affiliation: 1
   - name: José A. Perea
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-6440-5096
     affiliation: 1
 affiliations:
   - name: Northeastern University
     index: 1
-date: 2026-01-XX
+date: 2026-01-23
+
 bibliography: paper.bib
 ---
 
@@ -23,7 +24,7 @@ bibliography: paper.bib
 
 `circle_bundles` is a Python software package implementing algorithms for the construction and analysis of *discrete approximate circle bundles* from data. The package provides computational tools for identifying circle-bundle–like structure in point clouds, estimating local trivializations, computing transition functions, and extracting global topological invariants such as (twisted) Euler classes.
 
-The software accompanies and implements the methods introduced in *Discrete Approximate Circle Bundles* [@turow2026discrete], and supports both synthetic and real-world datasets, including applications to optical flow patch spaces. In addition to the core algorithms, the repository includes tutorial notebooks demonstrating the pipeline in simple geometric settings, as well as notebooks reproducing figures and experiments from the associated research papers.
+The software accompanies and implements the methods introduced in *Discrete Approximate Circle Bundles* \cite{turow2025discrete}, and supports both synthetic and real-world datasets, including applications to optical flow patch spaces. In addition to the core algorithms, the repository includes tutorial notebooks demonstrating the pipeline in simple geometric settings, as well as notebooks reproducing figures and experiments from the associated research papers.
 
 ## Statement of need
 
@@ -33,12 +34,12 @@ While existing topological data analysis libraries provide powerful methods for 
 
 ## Functionality
 
-The package implements the full pipeline described in [@turow2026discrete], including:
+The package implements the full pipeline described in \cite{turow2025discrete}, including:
 
 - Construction of discrete approximate circle bundles from point cloud data using metric covers and local circular coordinates.
 - Computation of transition functions between local trivializations, with support for both oriented circle bundles and non-orientable O(2)-bundle structures.
 - Extraction of global topological invariants, including Euler classes and twisted Euler classes, via Čech cocycle representations.
-- Support for both synthetic datasets and real data applications, including optical flow patch spaces [@turow2026opticalflow].
+- Support for both synthetic datasets and real data applications, including optical flow patch spaces.
 - Visualization utilities for inspecting covers, nerves, local trivializations, transition functions, and global bundle structure.
 
 In addition to the core library, the repository contains tutorial notebooks illustrating the methods in simple geometric settings, as well as reproducibility notebooks corresponding to figures and experiments in the associated research papers.
@@ -53,6 +54,4 @@ The `circle_bundles` package is open source and publicly available on GitHub. Al
 
 ## Acknowledgements
 
-The authors thank collaborators and reviewers for helpful discussions. [Optional: funding, grants, etc.]
-
-## References
+This work was partially supported by the National Science Foundation through CAREER award DMS-2415445.
