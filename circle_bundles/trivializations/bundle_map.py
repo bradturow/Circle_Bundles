@@ -50,7 +50,7 @@ __all__ = [
     # angle utilities
     "weighted_angle_mean_anchored",
     "infer_edges_from_U",
-    # NEW: packing helpers
+    # packing helpers
     "FramePacking",
     "greedy_graph_coloring",
     # main pipeline pieces

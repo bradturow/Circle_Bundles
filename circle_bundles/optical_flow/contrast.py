@@ -13,7 +13,7 @@ __all__ = [
     "get_contrast_norms",
     "get_dct_basis",
     "get_predominant_dirs",
-    "get_lifted_predom_dirs",
+    "get_lifted_predominant_dirs",
 ]
 
 
@@ -255,7 +255,7 @@ def get_predominant_dirs(patches: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
     return predom, ratios
 
 
-def get_lifted_predom_dirs(flow_patches: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
+def get_lifted_predominant_dirs(flow_patches: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     """
     For each patch, find the pixel with largest flow magnitude and return its unit vector.
 

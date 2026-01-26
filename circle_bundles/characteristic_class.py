@@ -952,29 +952,18 @@ def _fmt_mean_euc_with_geo_pi(d_euc_mean: Optional[float], *, decimals: int = 3)
 def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto") -> str:
     """
     Pretty summary of (1) diagnostics and (2) characteristic classes.
-    (Updated: remove RMS lines; use d_C; use ε_triv (chordal) and show geo in π-parens;
-     use \bar{ε}_triv for mean triv error.)
+
+    User-facing conventions:
+    - No explicit pairing notation is shown.
+    - Euler number displayed as:
+        * orientable:     "Euler number: e = k"
+        * non-orientable: "(twisted) Euler number: ẽ = k"
+    - If orientable AND Euler class is nontrivial BUT Euler number is undefined,
+      report the spin class instead:
+        "Spin class: w₂ = 0 (spin)" or "Spin class: w₂ ≠ 0 (not spin)"
     """
-    def _describe_H2_iso_tag(c) -> Optional[str]:
-        H2_Q = getattr(c, "H2_dim_Q", None)
-        H2_Z2 = getattr(c, "H2_dim_Z2", None)
-        if H2_Q is None or H2_Z2 is None:
-            return None
-        H2_Q = int(H2_Q)
-        H2_Z2 = int(H2_Z2)
-        if H2_Q == 0 and H2_Z2 == 0:
-            return "0"
-        if H2_Q == 0 and H2_Z2 == 1:
-            return "Z2"
-        if H2_Q == 1 and H2_Z2 == 1:
-            return "Z"
-        return "non-cyclic"
-
-    def _pretty_H2_text(tag: str) -> str:
-        return {"0": "0", "Z2": "ℤ₂", "Z": "ℤ", "non-cyclic": "non-cyclic"}[tag]
-
     # ----------------------------
-    # Pull quantities (UPDATED)
+    # Pull quantities
     # ----------------------------
     eps_triv = getattr(quality, "eps_align_euc", None) if quality is not None else None
     eps_triv_mean = getattr(quality, "eps_align_euc_mean", None) if quality is not None else None
@@ -990,14 +979,34 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     # “is coboundary?” flags
     w1_is_cob = getattr(classes, "sw1_is_coboundary_Z2", None)
     if w1_is_cob is None:
-        w1_is_cob = bool(orientable)  # fallback
+        # fallback: if orientable was inferred successfully, treat w1 as zero
+        w1_is_cob = bool(orientable)
 
     e_is_cob = getattr(classes, "euler_is_coboundary_Z", None)
     euler_rep = getattr(classes, "euler_class", {}) or {}
     e_trivial_cochain = all(int(v) == 0 for v in euler_rep.values()) if euler_rep else True
     e_zero_for_print = bool(e_is_cob) if e_is_cob is not None else bool(e_trivial_cochain)
 
-    H2_tag = _describe_H2_iso_tag(classes)
+    # Euler number (integer pairing), when computed
+    eZ = getattr(classes, "twisted_euler_number_Z", None)
+
+    # w2 / spin fallback (only used in the special case described above)
+    def _infer_w2_is_zero() -> Optional[bool]:
+        """
+        Returns:
+            True  if w2 = 0,
+            False if w2 != 0,
+            None  if unavailable.
+        """
+        sp = getattr(classes, "spin_on_this_complex", None)
+        if sp is not None:
+            return bool(sp)
+
+        sw2 = getattr(classes, "sw2_Z2", None)
+        if isinstance(sw2, dict) and len(sw2) > 0:
+            return all((int(v) & 1) == 0 for v in sw2.values())
+
+        return None
 
     # ----------------------------
     # Build plain-text summary
@@ -1056,7 +1065,7 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     ))
 
     if n_tri == 0:
-        lines.append(_tline("Euler class:", "(no 2-simplices) -> not computed"))
+        lines.append(_tline("Euler class:", "0 (no 2-simplices)"))
         text = "\n".join(lines)
         if show:
             did_latex = False
@@ -1065,7 +1074,6 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                     classes,
                     quality=quality,
                     rounding_dist=rounding_dist,
-                    H2_tag=H2_tag,
                     e_zero_for_print=e_zero_for_print,
                     w1_is_zero=bool(w1_is_cob),
                 )
@@ -1073,19 +1081,26 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    if orientable:
-        lines.append(_tline("Euler class:", "e = 0 (trivial)" if e_zero_for_print else "e ≠ 0 (non-trivial)"))
-    else:
-        lines.append(_tline("Euler class:", "ẽ = 0" if e_zero_for_print else "ẽ ≠ 0"))
 
+    # Euler class line 
+    if orientable:
+        lines.append(_tline(
+            "Euler class:",
+            "e = 0 (trivial)" if e_zero_for_print else "e ≠ 0 (non-trivial)"
+        ))
+    else:
+        lines.append(_tline(
+            "(twisted) Euler class:",
+            "ẽ = 0" if e_zero_for_print else "ẽ ≠ 0"
+        ))
+
+
+    # If Euler class is trivial, optionally report bundle_trivial and stop
     if e_zero_for_print:
         bt = getattr(classes, "bundle_trivial_on_this_complex", None)
         if bt is not None:
             lines.append(_tline("bundle trivial:", f"{bool(bt)}"))
-        if orientable:
-            sp = getattr(classes, "spin_on_this_complex", None)
-            if sp is not None:
-                lines.append(_tline("spin:", f"{bool(sp)}"))
+
         text = "\n".join(lines)
         if show:
             did_latex = False
@@ -1094,7 +1109,6 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                     classes,
                     quality=quality,
                     rounding_dist=rounding_dist,
-                    H2_tag=H2_tag,
                     e_zero_for_print=e_zero_for_print,
                     w1_is_zero=bool(w1_is_cob),
                 )
@@ -1102,17 +1116,29 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    if H2_tag is not None:
-        lines.append(_tline("Second homology:", f"Ĥ₂(U; Z_ω) ≅ {_pretty_H2_text(H2_tag)}"))
+    # Euler class is nontrivial from here on.
 
-    eZ = getattr(classes, "twisted_euler_number_Z", None)
     if eZ is not None:
-        lines.append(_tline("Euler number:", f"⟨{'e' if orientable else 'ẽ'}, [U]⟩ = {eZ}"))
-
-    if orientable:
-        spin_flag = getattr(classes, "spin_on_this_complex", None)
-        if spin_flag is not None:
-            lines.append(_tline("mod 2 info:", "w₂ = 0 (spin)" if bool(spin_flag) else "w₂ ≠ 0 (not spin)"))
+        if orientable:
+            parity_note = "(spin)" if (int(eZ) % 2 == 0) else "(not spin)"
+            lines.append(_tline(
+                "Euler number:",
+                f"e = {int(eZ)} {parity_note}"
+            ))
+        else:
+            lines.append(_tline(
+                "(twisted) Euler number:",
+                f"ẽ = {int(eZ)}"
+            ))
+    else:
+        # Special case: orientable + nontrivial Euler class but Euler number undefined -> show spin class
+        if orientable:
+            w2_is_zero = _infer_w2_is_zero()
+            if w2_is_zero is not None:
+                lines.append(_tline(
+                    "Spin class:",
+                    "w₂ = 0 (spin)" if bool(w2_is_zero) else "w₂ ≠ 0 (not spin)"
+                ))
 
     bt = getattr(classes, "bundle_trivial_on_this_complex", None)
     if bt is not None:
@@ -1127,7 +1153,6 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 classes,
                 quality=quality,
                 rounding_dist=rounding_dist,
-                H2_tag=H2_tag,
                 e_zero_for_print=e_zero_for_print,
                 w1_is_zero=bool(w1_is_cob),
             )
@@ -1142,34 +1167,29 @@ def _display_summary_latex(
     *,
     quality=None,
     rounding_dist: float,
-    H2_tag: Optional[str],
     e_zero_for_print: bool,
     w1_is_zero: bool,
 ) -> bool:
     """
-    Best-effort IPython Math display (UPDATED formatting).
-    Returns True iff LaTeX display succeeded.
+    Best-effort IPython Math display (user-facing formatting).
+
+    Rules:
+    - No explicit pairings shown.
+    - Euler number displayed as e = k (orientable) or \\tilde{e} = k (non-orientable),
+      with label "(twisted) Euler number" when non-orientable.
+    - If orientable AND Euler class is nontrivial BUT Euler number undefined,
+      report the spin class instead: w2 = 0 (spin) or w2 != 0 (not spin).
     """
     try:
         from IPython.display import display, Math  # type: ignore
     except Exception:
         return False
 
-    def _latex_H2_iso(tag: str) -> str:
-        if tag == "0":
-            return r"0"
-        if tag == "Z2":
-            return r"\mathbb{Z}_2"
-        if tag == "Z":
-            return r"\mathbb{Z}"
-        return r"\text{non-cyclic}"
-
     # ----------------------------
-    # Pull diagnostics (UPDATED)
+    # Pull diagnostics
     # ----------------------------
     eps_triv = getattr(quality, "eps_align_euc", None) if quality is not None else None
     eps_triv_mean = getattr(quality, "eps_align_euc_mean", None) if quality is not None else None
-
     delta = getattr(quality, "delta", None) if quality is not None else None
     alpha = getattr(quality, "alpha", None) if quality is not None else None
     eps_coc = getattr(quality, "cocycle_defect", None) if quality is not None else None
@@ -1180,14 +1200,17 @@ def _display_summary_latex(
     orientable = bool(getattr(classes, "orientable", False))
     n_tri = int(getattr(classes, "n_triangles", 0))
     eZ = getattr(classes, "twisted_euler_number_Z", None)
-    eZ2 = getattr(classes, "euler_number_mod2", None)
 
-    w2_trivial = getattr(classes, "spin_on_this_complex", None)
-    if w2_trivial is None:
-        w2_trivial = all((int(v) & 1) == 0 for v in (getattr(classes, "sw2_Z2", {}) or {}).values())
+    def _infer_w2_is_zero() -> Optional[bool]:
+        sp = getattr(classes, "spin_on_this_complex", None)
+        if sp is not None:
+            return bool(sp)
 
-    e_sym_round = r"\tilde{e}"
-    e_sym = r"e" if orientable else r"\tilde{e}"
+        sw2 = getattr(classes, "sw2_Z2", None)
+        if isinstance(sw2, dict) and len(sw2) > 0:
+            return all((int(v) & 1) == 0 for v in sw2.values())
+
+        return None
 
     # helpers for latex numeric strings with geo-in-π parentheses
     def _latex_eps_with_geo_pi(d_euc: Optional[float], *, decimals: int = 3, mean: bool = False) -> str:
@@ -1198,8 +1221,18 @@ def _display_summary_latex(
         if theta is None:
             return f"{d_euc:.{decimals}f}"
         if mean:
-            return f"{d_euc:.{decimals}f}" + r"\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=" + f"{theta/np.pi:.{decimals}f}" + r"\pi\right)"
-        return f"{d_euc:.{decimals}f}" + r"\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=" + f"{theta/np.pi:.{decimals}f}" + r"\pi\right)"
+            return (
+                f"{d_euc:.{decimals}f}"
+                + r"\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}="
+                + f"{theta/np.pi:.{decimals}f}"
+                + r"\pi\right)"
+            )
+        return (
+            f"{d_euc:.{decimals}f}"
+            + r"\ \left(\varepsilon_{\text{triv}}^{\text{geo}}="
+            + f"{theta/np.pi:.{decimals}f}"
+            + r"\pi\right)"
+        )
 
     # ----------------------------
     # Rows
@@ -1244,52 +1277,55 @@ def _display_summary_latex(
 
         diag_rows.append((
             r"\text{Euler rounding dist.}",
-            r"d_\infty(\delta_\omega\theta," + e_sym_round + r") = " + f"{float(rounding_dist):.3f}"
+            r"d_\infty(\delta_\omega\theta,\tilde{e}) = " + f"{float(rounding_dist):.3f}"
         ))
 
     class_rows: List[Tuple[str, str]] = []
     class_rows.append((
-        r"\text{Stiefel-Whitney}",
+        r"\text{Stiefel--Whitney}",
         r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})"
     ))
 
     if n_tri == 0:
-        class_rows.append((r"\text{Euler class}", r"\text{(no 2-simplices)}"))
+        class_rows.append((r"\text{Euler class}", r"e = 0\ \text{(no 2-simplices)}"))
     else:
         if orientable:
-            class_rows.append((r"\text{Euler class}", r"e = 0\ (\text{trivial})" if e_zero_for_print else r"e \neq 0\ (\text{non-trivial})"))
+            class_rows.append((
+                r"\text{Euler class}",
+                r"e = 0\ (\text{trivial})" if e_zero_for_print else r"e \neq 0\ (\text{non-trivial})"
+            ))
         else:
-            class_rows.append((r"\text{Euler class}", r"\tilde{e} = 0" if e_zero_for_print else r"\tilde{e} \neq 0"))
+            class_rows.append((
+                r"\text{(twisted) Euler class}",
+                r"\tilde{e} = 0" if e_zero_for_print else r"\tilde{e} \neq 0"
+            ))
 
+        # Euler class is nontrivial -> either show Euler number (if defined),
+        # or show spin class (orientable only) when Euler number is undefined.
         if not e_zero_for_print:
-            if H2_tag is not None:
-                class_rows.append((
-                    r"\text{Second homology}",
-                    r"\check{H}_2(\mathcal{U};\mathbb{Z}_\omega)\cong " + _latex_H2_iso(H2_tag)
-                ))
-
             if eZ is not None:
-                class_rows.append((
-                    r"\text{Euler number}",
-                    r"\langle " + e_sym + r",[\mathcal{U}]\rangle = " + str(int(eZ))
-                ))
-
-            if orientable:
-                class_rows.append((
-                    r"\text{mod 2 info}",
-                    r"w_2 = 0\ (\text{spin})" if w2_trivial else r"w_2 \neq 0\ (\text{not spin})"
-                ))
-                if (eZ is None) and (eZ2 is not None):
+                if orientable:
+                    parity_note = (
+                        r"\ (\text{spin})" if (int(eZ) % 2 == 0)
+                        else r"\ (\text{not spin})"
+                    )
                     class_rows.append((
-                        r"\text{mod 2 pairing}",
-                        r"\langle w_2,[\mathcal{U}]\rangle = " + str(int(eZ2) & 1) + r"\ (\mathrm{mod}\ 2)"
+                        r"\text{Euler number}",
+                        r"e = " + str(int(eZ)) + parity_note
+                    ))
+                else:
+                    class_rows.append((
+                        r"\text{(twisted) Euler number}",
+                        r"\tilde{e} = " + str(int(eZ))
                     ))
             else:
-                if (eZ is None) and (eZ2 is not None):
-                    class_rows.append((
-                        r"\text{mod 2 pairing}",
-                        r"\langle " + e_sym + r",[\mathcal{U}]\rangle = " + str(int(eZ2) & 1) + r"\ (\mathrm{mod}\ 2)"
-                    ))
+                if orientable:
+                    w2_is_zero = _infer_w2_is_zero()
+                    if w2_is_zero is not None:
+                        class_rows.append((
+                            r"\text{Spin class}",
+                            r"w_2 = 0\ (\text{spin})" if bool(w2_is_zero) else r"w_2 \neq 0\ (\text{not spin})"
+                        ))
 
     def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:
         out: List[str] = []
