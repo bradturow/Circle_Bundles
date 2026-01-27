@@ -39,8 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -90,7 +92,7 @@
 
 
 <div class="viewcode-block" id="change_path">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.change_path">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.change_path">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">change_path</span><span class="p">(</span><span class="n">flow_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span> <span class="n">old_base</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span> <span class="n">new_base</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Map a Sintel .flo path to its corresponding .png frame path.</span>
@@ -118,7 +120,7 @@
 
 
 <div class="viewcode-block" id="get_labeled_frame">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_labeled_frame">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_labeled_frame">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_labeled_frame</span><span class="p">(</span>
     <span class="n">frame_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PathLike</span><span class="p">],</span>
@@ -181,7 +183,7 @@
 
 
 <div class="viewcode-block" id="write_video_from_frames">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.write_video_from_frames">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.write_video_from_frames">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">write_video_from_frames</span><span class="p">(</span>
     <span class="n">image_files</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">PathLike</span><span class="p">],</span>
     <span class="n">output_video</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
@@ -218,7 +220,7 @@
 
 
 <div class="viewcode-block" id="get_labeled_video">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_labeled_video">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_labeled_video">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_labeled_video</span><span class="p">(</span>
     <span class="n">flo_paths</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">PathLike</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -293,7 +295,7 @@
 
 
 <div class="viewcode-block" id="annotate_optical_flow">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.annotate_optical_flow">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.annotate_optical_flow">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">annotate_optical_flow</span><span class="p">(</span>
     <span class="n">image_dir</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
     <span class="n">flow_dir</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
@@ -362,7 +364,7 @@
 
 
 <div class="viewcode-block" id="get_sintel_scene_folders">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_sintel_scene_folders">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_sintel_scene_folders">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_sintel_scene_folders</span><span class="p">(</span>
     <span class="n">base_path</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
     <span class="n">scene_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clean&quot;</span><span class="p">,</span>

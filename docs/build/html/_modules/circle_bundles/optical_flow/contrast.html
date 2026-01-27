@@ -39,8 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -138,7 +140,7 @@
 
 
 <div class="viewcode-block" id="get_contrast_norms">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_contrast_norms">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_contrast_norms">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_contrast_norms</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">patch_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;opt_flow&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Vectorized contrast norms.</span>
@@ -198,7 +200,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="get_dct_basis">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_dct_basis">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_dct_basis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_dct_basis</span><span class="p">(</span>
     <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -283,7 +285,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="get_predominant_dirs">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_predominant_dirs">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_predominant_dirs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_predominant_dirs</span><span class="p">(</span><span class="n">patches</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predominant direction in RP^1 via PCA of (u_i, v_i) vectors across pixels.</span>
@@ -333,7 +335,7 @@
 
 
 <div class="viewcode-block" id="get_lifted_predominant_dirs">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.get_lifted_predominant_dirs">[docs]</a>
+<a class="viewcode-back" href="../../../api/optical_flow.html#circle_bundles.get_lifted_predominant_dirs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lifted_predominant_dirs</span><span class="p">(</span><span class="n">flow_patches</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For each patch, find the pixel with largest flow magnitude and return its unit vector.</span>

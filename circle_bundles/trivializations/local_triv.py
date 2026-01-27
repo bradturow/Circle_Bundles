@@ -1,8 +1,8 @@
-# circle_bundles/local_triv.py
+# circle_bundles/trivializations/local_triv.py
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple, Any
 
 import numpy as np
 import warnings
@@ -12,6 +12,7 @@ from ..utils.status_utils import _status, _status_clear
 
 __all__ = [
     "LocalTrivResult",
+    "DreimacCCConfig",
     "compute_circular_coords_pca2",
     "compute_circular_coords_dreimac",
     "compute_local_triv",
@@ -26,6 +27,32 @@ class LocalTrivResult:
     n_landmarks: np.ndarray
     errors: Dict[int, str]
 
+
+# ----------------------------
+# CC method config(s)
+# ----------------------------
+
+@dataclass(frozen=True)
+class DreimacCCConfig:
+    """
+    Configuration for Dreimac circular coordinates.
+
+    Notes
+    -----
+    - CircularCoords_cls is required (e.g. dreimac.CircularCoords).
+    - If total_metric is provided to compute_local_triv, we pass a distance matrix
+      to Dreimac with distance_matrix=True.
+    """
+    CircularCoords_cls: Any
+    landmarks_per_patch: int = 200
+    prime: int = 41
+    update_frac: float = 0.25
+    standard_range: bool = False  # feel free to delete later if you decide it's not needed
+
+
+# ----------------------------
+# PCA2 / MDS helpers
+# ----------------------------
 
 def _pca2_project(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -47,8 +74,6 @@ def _pca2_project(X: np.ndarray) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     mu = X.mean(axis=0)
     Xc = X - mu
 
-    # SVD is stable and fast for PCA:
-    # Xc = U S Vt, columns of V are principal directions in R^D
     U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
     V = Vt.T[:, :2]  # (D,2)
     Y = Xc @ V       # (m,2)
@@ -74,12 +99,10 @@ def _mds2_from_dist(D: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     if m == 0:
         raise ValueError("Empty distance matrix: cannot run MDS.")
 
-    # Double-centering: B = -1/2 * J * D^2 * J
     J = np.eye(m) - np.ones((m, m), dtype=float) / float(m)
     D2 = D * D
     B = -0.5 * (J @ D2 @ J)
 
-    # Eigendecomposition (symmetric)
     w, V = np.linalg.eigh(B)
     idx = np.argsort(w)[::-1]
     w = w[idx]
@@ -87,7 +110,6 @@ def _mds2_from_dist(D: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
 
     w = np.maximum(w, 0.0)
     if w.size == 0 or w[0] < eps:
-        # totally degenerate
         return np.zeros((m, 2), dtype=float)
 
     Y = V[:, :2] * np.sqrt(w[:2])[None, :]
@@ -98,21 +120,17 @@ def compute_circular_coords_pca2(
     X: Optional[np.ndarray] = None,
     *,
     dist_mat: Optional[np.ndarray] = None,
-    anchor: str = "farthest",  # "farthest" or "first"
     eps: float = 1e-12,
 ) -> np.ndarray:
     """
     Compute simple circular coordinates via 2D PCA (or via 2D classical MDS if dist_mat given).
 
-    This is a lightweight fallback when Dreimac is unavailable/unwanted.
+    Orientation stabilization is fixed to the "farthest point" convention.
 
     Parameters
     ----------
     X : (m,D) array, required if dist_mat is None
     dist_mat : (m,m) optional precomputed distances (if provided, uses MDS->2D->atan2)
-    anchor : orientation stabilization:
-        - "farthest": pick the point farthest from the mean in 2D and rotate so it has angle 0
-        - "first": rotate so the first point has angle 0
     eps : small guard
 
     Returns
@@ -135,27 +153,18 @@ def compute_circular_coords_pca2(
     u = Y[:, 0]
     v = Y[:, 1]
 
-    # If the projection collapsed, return zeros
     if np.std(u) < eps and np.std(v) < eps:
         return np.zeros(len(u), dtype=float)
 
-    ang = np.arctan2(v, u)  # (-pi,pi]
+    ang = np.arctan2(v, u)
     ang = np.mod(ang, 2.0 * np.pi)
 
-    # ---- orientation stabilization (optional but helpful) ----
-    anchor = str(anchor)
-    if anchor == "first" and len(ang) > 0:
-        ang0 = float(ang[0])
-        ang = np.mod(ang - ang0, 2.0 * np.pi)
-
-    elif anchor == "farthest" and len(ang) > 0:
+    # ---- orientation stabilization: ALWAYS "farthest" ----
+    if len(ang) > 0:
         r2 = u * u + v * v
         k = int(np.argmax(r2))
         ang0 = float(ang[k])
         ang = np.mod(ang - ang0, 2.0 * np.pi)
-
-    elif anchor not in {"first", "farthest"}:
-        raise ValueError(f"anchor must be 'first' or 'farthest'. Got {anchor!r}")
 
     return ang
 
@@ -168,7 +177,7 @@ def compute_circular_coords_dreimac(
     update_frac: float = 0.25,
     standard_range: bool = False,
     CircularCoords_cls=None,
-    dist_mat: Optional[np.ndarray] = None,  # optional precomputed distance matrix
+    dist_mat: Optional[np.ndarray] = None,
 ) -> Tuple[np.ndarray, int, int]:
     """
     Compute circular coordinates using Dreimac.
@@ -204,11 +213,10 @@ def compute_circular_coords_dreimac(
                     X_or_D,
                     n_landmarks,
                     prime=prime,
-                    distance_matrix=use_dist,  # IMPORTANT
+                    distance_matrix=use_dist,
                 )
                 angles = cc.get_coordinates(standard_range=standard_range)
 
-                # Dreimac sometimes emits coverage warnings; treat as retry.
                 for w in wlist:
                     msg = str(w.message).lower()
                     if "not covered by a landmark" in msg:
@@ -218,7 +226,6 @@ def compute_circular_coords_dreimac(
             if angles.shape != (n_points,):
                 raise ValueError(f"Dreimac returned shape {angles.shape}, expected ({n_points},).")
 
-            # Robust wrap to circle
             angles = np.mod(angles, 2.0 * np.pi)
             return angles, n_retries, n_landmarks
 
@@ -233,25 +240,24 @@ def compute_circular_coords_dreimac(
             n_landmarks = min(int(np.ceil((1.0 + float(update_frac)) * n_landmarks)), n_points)
 
 
+def _pairwise_dist_or_none(total_metric: Optional[object], Xj: np.ndarray) -> Optional[np.ndarray]:
+    if total_metric is None:
+        return None
+    if not hasattr(total_metric, "pairwise"):
+        raise TypeError("total_metric must have a .pairwise(X, Y=None) method.")
+    Dj = np.asarray(total_metric.pairwise(Xj), dtype=float)
+    m = int(Xj.shape[0])
+    if Dj.shape != (m, m):
+        raise ValueError(f"total_metric.pairwise returned shape {Dj.shape}, expected ({m},{m}).")
+    return Dj
+
+
 def compute_local_triv(
     data: np.ndarray,
     U: np.ndarray,
     *,
-    cc_alg: Optional[Callable[[np.ndarray], np.ndarray]] = None,
+    cc: object = "pca2",
     total_metric: Optional[object] = None,
-
-    # Dreimac defaults
-    landmarks_per_patch: int = 200,
-    prime: int = 41,
-    update_frac: float = 0.25,
-    standard_range: bool = False,
-    CircularCoords_cls=None,
-
-    # PCA fallback knobs
-    pca_anchor: str = "farthest",   # NOTE: matches compute_circular_coords_pca2
-    notify_pca_fallback: bool = True,
-
-    # Robustness knobs
     min_patch_size: int = 10,
     verbose: bool = True,
     fail_fast: bool = True,
@@ -264,10 +270,15 @@ def compute_local_triv(
     - f has shape (n_sets, n_samples) radians
     - f[j, s] meaningful only when U[j, s] is True
 
-    Behavior:
-    - If cc_alg is provided: use it on each patch.
-    - Else if CircularCoords_cls is provided: use Dreimac (optionally with total_metric dist mats).
-    - Else: fall back to PCA-based circular coordinates (metric-PCA via MDS if total_metric is provided).
+    Circular coordinates method (cc):
+    - "pca2" (default): compute_circular_coords_pca2
+      * if total_metric is provided, uses MDS from patch distance matrices
+    - DreimacCCConfig(...): use Dreimac on points or distance matrices
+    - callable: advanced hook; we call cc(Xj, dist_mat=Dj) if possible, else cc(Xj)
+
+    Notes
+    -----
+    - For a callable cc, returning angles in radians is expected; we wrap to [0,2pi).
     """
     data = np.asarray(data)
     U = np.asarray(U, dtype=bool)
@@ -279,10 +290,15 @@ def compute_local_triv(
     if data.shape[0] != n_samples:
         raise ValueError(f"data has n={data.shape[0]} samples but U has n_samples={n_samples}.")
 
-    # Decide default method
-    use_pca_default = (cc_alg is None) and (CircularCoords_cls is None)
-    if use_pca_default and verbose and notify_pca_fallback:
-        _status("CircularCoords_cls not provided; using PCA-based circular coordinates.")
+    cc_is_pca2 = (isinstance(cc, str) and str(cc).lower() == "pca2")
+    cc_is_dreimac = isinstance(cc, DreimacCCConfig)
+    cc_is_callable = callable(cc)
+
+    if not (cc_is_pca2 or cc_is_dreimac or cc_is_callable):
+        raise ValueError(
+            "cc must be 'pca2', a DreimacCCConfig(...), or a callable. "
+            f"Got {type(cc).__name__}: {cc!r}"
+        )
 
     f = np.zeros((n_sets, n_samples), dtype=float)
     valid = np.zeros(n_sets, dtype=bool)
@@ -309,47 +325,38 @@ def compute_local_triv(
         Xj = data[mask]
 
         try:
-            # 1) Explicit cc_alg always wins
-            if cc_alg is not None:
-                ang = np.asarray(cc_alg(Xj), dtype=float).reshape(-1)
+            Dj = _pairwise_dist_or_none(total_metric, Xj)
+
+            # 1) Custom callable wins
+            if cc_is_callable:
+                try:
+                    ang = cc(Xj, dist_mat=Dj)  # type: ignore[misc]
+                except TypeError:
+                    ang = cc(Xj)  # type: ignore[misc]
+                ang = np.asarray(ang, dtype=float).reshape(-1)
                 if ang.shape != (m,):
-                    raise ValueError(f"cc_alg returned shape {ang.shape}, expected ({m},).")
+                    raise ValueError(f"cc callable returned shape {ang.shape}, expected ({m},).")
                 f[j, mask] = np.mod(ang, 2.0 * np.pi)
                 valid[j] = True
                 continue
 
-            # 2) PCA default fallback
-            if use_pca_default:
-                Dj = None
-                if total_metric is not None:
-                    if not hasattr(total_metric, "pairwise"):
-                        raise TypeError("total_metric must have a .pairwise(X, Y=None) method.")
-                    Dj = np.asarray(total_metric.pairwise(Xj), dtype=float)
-                    if Dj.shape != (m, m):
-                        raise ValueError(f"total_metric.pairwise returned shape {Dj.shape}, expected ({m},{m}).")
-
-                ang = compute_circular_coords_pca2(Xj, dist_mat=Dj, anchor=str(pca_anchor))
+            # 2) PCA2
+            if cc_is_pca2:
+                ang = compute_circular_coords_pca2(Xj, dist_mat=Dj)
                 f[j, mask] = ang
                 valid[j] = True
                 continue
 
-            # 3) Otherwise Dreimac path (requires CircularCoords_cls)
-            Dj = None
-            if total_metric is not None:
-                if not hasattr(total_metric, "pairwise"):
-                    raise TypeError("total_metric must have a .pairwise(X, Y=None) method.")
-                Dj = np.asarray(total_metric.pairwise(Xj), dtype=float)
-                if Dj.shape != (m, m):
-                    raise ValueError(f"total_metric.pairwise returned shape {Dj.shape}, expected ({m},{m}).")
-
+            # 3) Dreimac config
+            assert cc_is_dreimac
             ang, retries, n_lmks = compute_circular_coords_dreimac(
                 Xj,
                 dist_mat=Dj,
-                n_landmarks_init=landmarks_per_patch,
-                prime=prime,
-                update_frac=update_frac,
-                standard_range=standard_range,
-                CircularCoords_cls=CircularCoords_cls,
+                n_landmarks_init=cc.landmarks_per_patch,
+                prime=cc.prime,
+                update_frac=cc.update_frac,
+                standard_range=cc.standard_range,
+                CircularCoords_cls=cc.CircularCoords_cls,
             )
             f[j, mask] = ang
             valid[j] = True

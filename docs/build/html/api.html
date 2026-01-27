@@ -40,114 +40,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">API Reference</a><ul>
-<li><a class="reference internal" href="#circle_bundles.safe_add_edges"><code class="docutils literal notranslate"><span class="pre">safe_add_edges()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_weights"><code class="docutils literal notranslate"><span class="pre">get_weights()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.fiberwise_clustering"><code class="docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.plot_fiberwise_pca_grid"><code class="docutils literal notranslate"><span class="pre">plot_fiberwise_pca_grid()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_cluster_persistence"><code class="docutils literal notranslate"><span class="pre">get_cluster_persistence()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_filtered_cluster_graph"><code class="docutils literal notranslate"><span class="pre">get_filtered_cluster_graph()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_local_pca"><code class="docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.plot_local_pca"><code class="docutils literal notranslate"><span class="pre">plot_local_pca()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_local_rips"><code class="docutils literal notranslate"><span class="pre">get_local_rips()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.plot_local_rips"><code class="docutils literal notranslate"><span class="pre">plot_local_rips()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.S2GeodesicMetric"><code class="docutils literal notranslate"><span class="pre">S2GeodesicMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP2GeodesicMetric"><code class="docutils literal notranslate"><span class="pre">RP2GeodesicMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_s2_fibonacci_star_cover"><code class="docutils literal notranslate"><span class="pre">make_s2_fibonacci_star_cover()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_rp2_fibonacci_star_cover"><code class="docutils literal notranslate"><span class="pre">make_rp2_fibonacci_star_cover()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.MetricBallCover"><code class="docutils literal notranslate"><span class="pre">MetricBallCover</span></code></a><ul>
-<li><a class="reference internal" href="#circle_bundles.MetricBallCover.nerve_tetrahedra"><code class="docutils literal notranslate"><span class="pre">MetricBallCover.nerve_tetrahedra()</span></code></a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
 </ul>
-</li>
-<li><a class="reference internal" href="#circle_bundles.TriangulationStarCover"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_cocycle_dict"><code class="docutils literal notranslate"><span class="pre">get_cocycle_dict()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.lift_base_points"><code class="docutils literal notranslate"><span class="pre">lift_base_points()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.solve_Z2_linear_system"><code class="docutils literal notranslate"><span class="pre">solve_Z2_linear_system()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.solve_Z2_edge_coboundary"><code class="docutils literal notranslate"><span class="pre">solve_Z2_edge_coboundary()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_contrast_norms"><code class="docutils literal notranslate"><span class="pre">get_contrast_norms()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_dct_basis"><code class="docutils literal notranslate"><span class="pre">get_dct_basis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_predominant_dirs"><code class="docutils literal notranslate"><span class="pre">get_predominant_dirs()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_lifted_predominant_dirs"><code class="docutils literal notranslate"><span class="pre">get_lifted_predominant_dirs()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.change_path"><code class="docutils literal notranslate"><span class="pre">change_path()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_labeled_frame"><code class="docutils literal notranslate"><span class="pre">get_labeled_frame()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.write_video_from_frames"><code class="docutils literal notranslate"><span class="pre">write_video_from_frames()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_labeled_video"><code class="docutils literal notranslate"><span class="pre">get_labeled_video()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.annotate_optical_flow"><code class="docutils literal notranslate"><span class="pre">annotate_optical_flow()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_sintel_scene_folders"><code class="docutils literal notranslate"><span class="pre">get_sintel_scene_folders()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.read_flo"><code class="docutils literal notranslate"><span class="pre">read_flo()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_from_frame"><code class="docutils literal notranslate"><span class="pre">sample_from_frame()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_patch_sample"><code class="docutils literal notranslate"><span class="pre">get_patch_sample()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.preprocess_flow_patches"><code class="docutils literal notranslate"><span class="pre">preprocess_flow_patches()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_patch_visualizer"><code class="docutils literal notranslate"><span class="pre">make_patch_visualizer()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.mesh_to_density"><code class="docutils literal notranslate"><span class="pre">mesh_to_density()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_density_axes"><code class="docutils literal notranslate"><span class="pre">get_density_axes()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.rotate_density"><code class="docutils literal notranslate"><span class="pre">rotate_density()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_mesh_sample"><code class="docutils literal notranslate"><span class="pre">get_mesh_sample()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_density_visualizer"><code class="docutils literal notranslate"><span class="pre">make_density_visualizer()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_tri_prism_visualizer"><code class="docutils literal notranslate"><span class="pre">make_tri_prism_visualizer()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_star_pyramid_visualizer"><code class="docutils literal notranslate"><span class="pre">make_star_pyramid_visualizer()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_rotating_mesh_clip"><code class="docutils literal notranslate"><span class="pre">make_rotating_mesh_clip()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_tri_prism"><code class="docutils literal notranslate"><span class="pre">make_tri_prism()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_star_pyramid"><code class="docutils literal notranslate"><span class="pre">make_star_pyramid()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_nat_img_kb"><code class="docutils literal notranslate"><span class="pre">sample_nat_img_kb()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_gradient_dirs"><code class="docutils literal notranslate"><span class="pre">get_gradient_dirs()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_opt_flow_torus"><code class="docutils literal notranslate"><span class="pre">sample_opt_flow_torus()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_flow_patches"><code class="docutils literal notranslate"><span class="pre">make_flow_patches()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_sphere"><code class="docutils literal notranslate"><span class="pre">sample_sphere()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.hopf_projection"><code class="docutils literal notranslate"><span class="pre">hopf_projection()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.spin3_adjoint_to_so3"><code class="docutils literal notranslate"><span class="pre">spin3_adjoint_to_so3()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.so3_to_s2_projection"><code class="docutils literal notranslate"><span class="pre">so3_to_s2_projection()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_s2_trivial"><code class="docutils literal notranslate"><span class="pre">sample_s2_trivial()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.tangent_frame_on_s2"><code class="docutils literal notranslate"><span class="pre">tangent_frame_on_s2()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_s2_unit_tangent"><code class="docutils literal notranslate"><span class="pre">sample_s2_unit_tangent()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_so3"><code class="docutils literal notranslate"><span class="pre">sample_so3()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.project_o3"><code class="docutils literal notranslate"><span class="pre">project_o3()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_patch_types_list"><code class="docutils literal notranslate"><span class="pre">get_patch_types_list()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_step_edges"><code class="docutils literal notranslate"><span class="pre">make_step_edges()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_all_step_edges"><code class="docutils literal notranslate"><span class="pre">make_all_step_edges()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_binary_step_edges"><code class="docutils literal notranslate"><span class="pre">sample_binary_step_edges()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.mean_center"><code class="docutils literal notranslate"><span class="pre">mean_center()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_step_edge_torus"><code class="docutils literal notranslate"><span class="pre">sample_step_edge_torus()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.small_to_big"><code class="docutils literal notranslate"><span class="pre">small_to_big()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.sample_C2_torus"><code class="docutils literal notranslate"><span class="pre">sample_C2_torus()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.compute_circular_coords_pca2"><code class="docutils literal notranslate"><span class="pre">compute_circular_coords_pca2()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.compute_circular_coords_dreimac"><code class="docutils literal notranslate"><span class="pre">compute_circular_coords_dreimac()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.attach_bundle_viz_methods"><code class="docutils literal notranslate"><span class="pre">attach_bundle_viz_methods()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.build_bundle"><code class="docutils literal notranslate"><span class="pre">build_bundle()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.EuclideanMetric"><code class="docutils literal notranslate"><span class="pre">EuclideanMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.S1AngleMetric"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP1AngleMetric"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.S1UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP1UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP2UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.T2FlatMetric"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.Torus_Z2QuotientMetric_R4"><code class="docutils literal notranslate"><span class="pre">Torus_Z2QuotientMetric_R4()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP2_TrivialMetric"><code class="docutils literal notranslate"><span class="pre">RP2_TrivialMetric()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP2_TwistMetric"><code class="docutils literal notranslate"><span class="pre">RP2_TwistMetric()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.RP2_FlipMetric"><code class="docutils literal notranslate"><span class="pre">RP2_FlipMetric()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.compare_angle_pairs"><code class="docutils literal notranslate"><span class="pre">compare_angle_pairs()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.compare_trivs"><code class="docutils literal notranslate"><span class="pre">compare_trivs()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.base_vis"><code class="docutils literal notranslate"><span class="pre">base_vis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.show_bundle_vis"><code class="docutils literal notranslate"><span class="pre">show_bundle_vis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.save_bundle_snapshot"><code class="docutils literal notranslate"><span class="pre">save_bundle_snapshot()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.circle_vis"><code class="docutils literal notranslate"><span class="pre">circle_vis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.fiber_vis"><code class="docutils literal notranslate"><span class="pre">fiber_vis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.make_patch_cluster_diagram"><code class="docutils literal notranslate"><span class="pre">make_patch_cluster_diagram()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.get_G_vertex_coords"><code class="docutils literal notranslate"><span class="pre">get_G_vertex_coords()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.plot_component_patch_diagram"><code class="docutils literal notranslate"><span class="pre">plot_component_patch_diagram()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.graph_to_st"><code class="docutils literal notranslate"><span class="pre">graph_to_st()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.create_st_dicts"><code class="docutils literal notranslate"><span class="pre">create_st_dicts()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.lattice_vis"><code class="docutils literal notranslate"><span class="pre">lattice_vis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.show_circle_nerve"><code class="docutils literal notranslate"><span class="pre">show_circle_nerve()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.nerve_vis"><code class="docutils literal notranslate"><span class="pre">nerve_vis()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.show_pca"><code class="docutils literal notranslate"><span class="pre">show_pca()</span></code></a></li>
-<li><a class="reference internal" href="#circle_bundles.show_data_vis"><code class="docutils literal notranslate"><span class="pre">show_data_vis()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</div>
+
         </div>
       </div>
     </nav>
@@ -183,6 +79,12 @@ share at least one sample that is non-noise in BOTH fibers.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>U</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>cl</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <dl class="simple">
 <dt>Node convention:</dt><dd><p>node = (fiber_index, cluster_label)</p>
@@ -209,6 +111,11 @@ share at least one sample that is non-noise in BOTH fibers.</p>
 <p class="rubric">Notes</p>
 <p>If present, uses edge attribute ‘indices_shared’ as the overlap evidence
 (faster + consistent with safe_add_edges()).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -222,6 +129,8 @@ share at least one sample that is non-noise in BOTH fibers.</p>
 <li><p><strong>U</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_samples</em><em>) </em><em>bool</em>)</p></li>
 <li><p><strong>eps_values</strong> (<em>(</em><em>n_fibers</em><em>,</em><em>) </em><em>float</em>)</p></li>
 <li><p><strong>min_sample_values</strong> (<em>(</em><em>n_fibers</em><em>,</em><em>) </em><em>int</em>)</p></li>
+<li><p><strong>build_pca_embeddings</strong> (<em>bool</em>)</p></li>
+<li><p><strong>pca_dim</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -244,6 +153,18 @@ Edges indicate overlap; includes ‘indices_shared’.</p></li>
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">plot_fiberwise_pca_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/analysis/fiberwise_clustering.html#plot_fiberwise_pca_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.plot_fiberwise_pca_grid" title="Link to this definition"></a></dt>
 <dd><p>Plot PCA scatter for selected fibers using summary[‘pca_store’].
 Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>summary</strong> (<em>dict</em>)</p></li>
+<li><p><strong>to_view</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>cmap</strong> (<em>str</em>)</p></li>
+<li><p><strong>point_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -253,6 +174,14 @@ Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
 <p>Requires that G edges have ‘weight’ (e.g. computed by get_weights()).</p>
 <dl class="simple">
 <dt>Returns a list of dicts:</dt><dd><p>{‘weight’: w, ‘n_components’: int, ‘components’: [set(nodes), …]}</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_results</strong> (<em>bool</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -274,6 +203,17 @@ and recompute global components.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>cl</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>)</p></li>
+<li><p><strong>rule</strong> (<em>str</em>)</p></li>
+<li><p><strong>show_results</strong> (<em>bool</em>)</p></li>
+<li><p><strong>hide_biggest</strong> (<em>bool</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -293,6 +233,16 @@ and recompute global components.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>U</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>p_values</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>to_view</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>n_components</strong> (<em>int</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -300,6 +250,19 @@ and recompute global components.</p>
 <dt class="sig sig-object py" id="circle_bundles.plot_local_pca">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">plot_local_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fiber_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/analysis/local_analysis.html#plot_local_pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.plot_local_pca" title="Link to this definition"></a></dt>
 <dd><p>Grid of PCA scatterplots. Returns (fig, axes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fiber_ids</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>proj_list</strong> (<em>Sequence</em><em>[</em><em>ndarray</em><em> | </em><em>None</em><em>]</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>titles</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>point_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -309,6 +272,17 @@ and recompute global components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>U</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>p_values</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>to_view</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>maxdim</strong> (<em>int</em>)</p></li>
+<li><p><strong>n_perm</strong> (<em>int</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -321,12 +295,29 @@ and recompute global components.</p>
 <dd><p>Grid of persistence diagrams. Returns (fig, axes).</p>
 <p class="rubric">Notes</p>
 <p>Imports persim lazily so importing this module doesn’t require persim.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fiber_ids</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>rips_list</strong> (<em>Sequence</em><em>[</em><em>dict</em><em> | </em><em>None</em><em>]</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>titles</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.S2GeodesicMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">S2GeodesicMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/covers/metric_ball_cover_builders.html#S2GeodesicMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.S2GeodesicMetric" title="Link to this definition"></a></dt>
 <dd><p>Geodesic distance on S^2: d(x,y) = arccos(&lt;x,y&gt;), with x,y unit vectors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eps</strong> (<em>float</em>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -334,6 +325,11 @@ and recompute global components.</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">RP2GeodesicMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/covers/metric_ball_cover_builders.html#RP2GeodesicMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.RP2GeodesicMetric" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
 <dt>Projective geodesic distance on RP^2 via S^2 reps:</dt><dd><p>d([x],[y]) = arccos(<a href="#id11"><span class="problematic" id="id12">|&lt;x,y&gt;|</span></a>), with x,y unit vectors.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>eps</strong> (<em>float</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -344,7 +340,14 @@ and recompute global components.</p>
 <dd><p>S^2 star cover built from the convex-hull triangulation of Fibonacci landmarks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="api/covers.html#circle_bundles.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>base_points</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>n_vertices</strong> (<em>int</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -361,6 +364,16 @@ and recompute global components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">RP2StarCover</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>base_points</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>n_pairs</strong> (<em>int</em>)</p></li>
+<li><p><strong>landmark_oversample</strong> (<em>int</em>)</p></li>
+<li><p><strong>landmark_seed</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+<li><p><strong>atol</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <section id="pipeline">
@@ -389,7 +402,17 @@ and recompute global components.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.MetricBallCover">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">MetricBallCover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/base_covers.html#MetricBallCover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.MetricBallCover" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_points</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>landmarks</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>radius</strong> (<em>float</em>)</p></li>
+<li><p><strong>metric</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.MetricBallCover.nerve_tetrahedra">
 <span class="sig-name descname"><span class="pre">nerve_tetrahedra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/base_covers.html#MetricBallCover.nerve_tetrahedra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.MetricBallCover.nerve_tetrahedra" title="Link to this definition"></a></dt>
 <dd><p>3-simplices in the nerve: 4-way overlaps U_i ∩ U_j ∩ U_k ∩ U_l ≠ ∅.</p>
@@ -414,6 +437,17 @@ Uses K_preimages: the location of each base point in <a href="#id13"><span class
 </ul>
 </dd>
 </dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_points</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>K_preimages</strong> (<em>np.ndarray</em>)</p></li>
+<li><p><strong>K</strong> (<em>Any</em>)</p></li>
+<li><p><strong>vertex_coords_dict</strong> (<em>dict</em>)</p></li>
+<li><p><strong>metric</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -432,6 +466,13 @@ Edges connect clusters across different fibers.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict[(j,k), int] with j&lt;k, values in {0,1}</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>value_rule</strong> (<em>str</em>)</p></li>
+<li><p><strong>require_consistent</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -455,6 +496,10 @@ attribute ‘indices_shared’, we use that to propagate faster/cleaner.</p></li
 <li><p><strong>seed_cluster</strong> (<em>ints</em>) – Seed a starting cluster to orient.</p></li>
 <li><p><strong>assume_two_clusters</strong> (<em>bool</em>) – If True, we apply the “other label opposite” rule in the seed fiber and
 enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
+<li><p><strong>return_assigned</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+<li><p><strong>noise_label</strong> (<em>int</em>)</p></li>
+<li><p><strong>prefer_edge_shared_indices</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -491,6 +536,12 @@ enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>b</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -507,6 +558,18 @@ enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
 <li><p>edges may be directed or undirected; omega_Z2 may store either orientation.</p></li>
 <li><p>Returns one solution with free variables set to 0.</p></li>
 </ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edges</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>omega_Z2</strong> (<em>Dict</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>n_vertices</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[bool, <em>ndarray</em> | None]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -544,6 +607,14 @@ enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<em>int</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+<li><p><strong>opt_flow</strong> (<em>bool</em>)</p></li>
+<li><p><strong>top_two</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <ul class="simple">
@@ -579,7 +650,10 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dd><p>For each patch, find the pixel with largest flow magnitude and return its unit vector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>flow_patches</strong> (<em>(</em><em>N</em><em>, </em><em>2*n^2</em><em>)</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flow_patches</strong> (<em>(</em><em>N</em><em>, </em><em>2*n^2</em><em>)</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>unit</strong></p>
@@ -598,6 +672,13 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>flow_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>old_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>new_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Example</p>
 <p>old_base/…/flow/&lt;scene&gt;/frame_0001.flo</p>
@@ -610,6 +691,18 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dd><p>Draw colored dots at patch locations on a Sintel frame.</p>
 <p>patch_df must have columns: [‘row’, ‘column’, ‘color’].
 ‘color’ can be any hashable ID (ints/strings). IDs are mapped to custom_colors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>patch_df</strong> (<em>DataFrame</em>)</p></li>
+<li><p><strong>dot_radius</strong> (<em>int</em>)</p></li>
+<li><p><strong>custom_colors</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -619,6 +712,14 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image_files</strong> (<em>Sequence</em><em>[</em><em>str</em><em> | </em><em>Path</em><em>]</em>)</p></li>
+<li><p><strong>output_video</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>fps</strong> (<em>float</em>)</p></li>
+<li><p><strong>codec</strong> (<em>str</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -634,6 +735,18 @@ Each mask becomes one color group (0,1,2,…).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>flo_paths</strong> (<em>Sequence</em><em>[</em><em>str</em><em> | </em><em>Path</em><em>]</em>)</p></li>
+<li><p><strong>scene_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>patch_df</strong> (<em>DataFrame</em>)</p></li>
+<li><p><strong>inds_list</strong> (<em>Sequence</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>old_flow_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>new_frame_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>fps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>Assumes flo_paths are ordered by frame number, corresponding to frames 1..T.</p>
@@ -648,6 +761,17 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>flow_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>lattice_res</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>scale</strong> (<em>float</em>)</p></li>
+<li><p><strong>width</strong> (<em>float</em>)</p></li>
+<li><p><strong>arrow_color</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -659,6 +783,13 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>base_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>scene_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>scene</strong> (<em>str</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -673,6 +804,9 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(H, W, 2) float32 array</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<em>str</em><em> | </em><em>Path</em>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -689,6 +823,14 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(n_patches, 2*d*d + 2) array</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flo_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>n_patches</strong> (<em>int</em>)</p></li>
+<li><p><strong>d</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -707,6 +849,14 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <li><p><strong>file_paths</strong> (<em>list of lists of .flo Paths, grouped by scene folder order</em>)</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flow_root</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>patches_per_frame</strong> (<em>int</em>)</p></li>
+<li><p><strong>d</strong> (<em>int</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -728,6 +878,15 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patch_df</strong> (<em>DataFrame</em>)</p></li>
+<li><p><strong>hc_frac</strong> (<em>float</em>)</p></li>
+<li><p><strong>max_samples</strong> (<em>int</em>)</p></li>
+<li><p><strong>k_list</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -742,6 +901,23 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>vis_func(patch_vector) -&gt; matplotlib Figure</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>fig_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>intensity_cmap</strong> (<em>str</em>)</p></li>
+<li><p><strong>intensity_normalize</strong> (<em>Literal</em><em>[</em><em>'minmax'</em><em>, </em><em>'none'</em><em>]</em>)</p></li>
+<li><p><strong>show_intensity_grid</strong> (<em>bool</em>)</p></li>
+<li><p><strong>intensity_grid_lw</strong> (<em>float</em>)</p></li>
+<li><p><strong>flipud</strong> (<em>bool</em>)</p></li>
+<li><p><strong>flow_normalize</strong> (<em>Literal</em><em>[</em><em>'maxmag'</em><em>, </em><em>'none'</em><em>]</em>)</p></li>
+<li><p><strong>quiver_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>headwidth</strong> (<em>float</em>)</p></li>
+<li><p><strong>headlength</strong> (<em>float</em>)</p></li>
+<li><p><strong>grid_lw</strong> (<em>float</em>)</p></li>
+<li><p><strong>border_lw_mult</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -763,6 +939,17 @@ rng is accepted for API consistency but is best-effort.</p></li>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(grid_size^3,) ndarray</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>Trimesh</em>)</p></li>
+<li><p><strong>grid_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>n_surface_samples</strong> (<em>int</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -790,6 +977,15 @@ rng is accepted for API consistency but is best-effort.</p></li>
 <li><p><strong>ratios</strong> (<em>(N,), optional</em>) – If smallest: (λ_min / λ_mid), else: (λ_max / λ_mid) with a small stabilizer.</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flat_densities</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>grid_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>smallest</strong> (<em>bool</em>)</p></li>
+<li><p><strong>return_eigs</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -870,6 +1066,15 @@ rng is accepted for API consistency but is best-effort.</p></li>
 <li><p><strong>face_groups</strong> (<em>groups</em><em> of </em><em>face indices</em><em> (</em><em>explicit lists</em><em> or </em><em>(</em><em>start</em><em>,</em><em>end_excl</em><em>) </em><em>ranges</em><em>)</em>)</p></li>
 <li><p><strong>depth_sort</strong> (<em>bool</em>) – If True, manually sorts triangles back-to-front using projected depth
 (helps with alpha blending / occlusion in Matplotlib).</p></li>
+<li><p><strong>face_colors_list</strong> (<em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>show_edges</strong> (<em>bool</em>)</p></li>
+<li><p><strong>edge_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>elev</strong> (<em>float</em>)</p></li>
+<li><p><strong>azim</strong> (<em>float</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -894,6 +1099,18 @@ in the yz-plane to ensure a stable color assignment.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>base_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>colormap</strong> (<em>str</em><em> | </em><em>LinearSegmentedColormap</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>elev</strong> (<em>float</em>)</p></li>
+<li><p><strong>azim</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -907,6 +1124,19 @@ in the yz-plane to ensure a stable color assignment.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list[np.ndarray]</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flat_mesh</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>vis_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>Figure</em><em>]</em>)</p></li>
+<li><p><strong>out_path</strong> (<em>str</em>)</p></li>
+<li><p><strong>n_frames</strong> (<em>int</em>)</p></li>
+<li><p><strong>azim_start</strong> (<em>float</em>)</p></li>
+<li><p><strong>azim_end</strong> (<em>float</em>)</p></li>
+<li><p><strong>elev</strong> (<em>float</em>)</p></li>
+<li><p><strong>close_figs</strong> (<em>bool</em>)</p></li>
+<li><p><strong>fps</strong> (<em>int</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -936,6 +1166,12 @@ and extrusion along the x-axis.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>height</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -961,6 +1197,14 @@ and extrusion along the x-axis.</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>trimesh.Trimesh</p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>radius_outer</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius_inner</strong> (<em>float</em>)</p></li>
+<li><p><strong>height</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -975,6 +1219,16 @@ alpha “fiber” angle adjusted so the model is continuous under the identifica
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>n</strong> (<em>int</em>)</p></li>
+<li><p><strong>noise</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+<li><p><strong>return_angles</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -986,6 +1240,13 @@ Returns (thetas, strengths).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patches</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>n</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1027,6 +1288,21 @@ patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>sample_r</strong> (<em>bool</em>)</p></li>
+<li><p><strong>r_min</strong> (<em>float</em>)</p></li>
+<li><p><strong>r_lam</strong> (<em>float</em>)</p></li>
+<li><p><strong>r_values</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>return_r</strong> (<em>bool</em>)</p></li>
+<li><p><strong>contrast_renorm</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1038,6 +1314,15 @@ patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>alpha</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>theta</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>r</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>contrast_renorm</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -1056,6 +1341,13 @@ patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>)</p></li>
+<li><p><strong>dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <p>dim=2 -&gt; S^2 in R^3, output shape (n,3)
@@ -1071,6 +1363,7 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>(</em><em>n</em><em>,</em><em>4</em><em>) </em><em>real</em><em> or </em><em>(</em><em>n</em><em>,</em><em>2</em><em>) </em><em>complex</em>) – Quaternion coordinates: q = (a,b,c,d) with z1=a+ib, z2=c+id.</p></li>
 <li><p><strong>v</strong> (<em>(</em><em>3</em><em>,</em><em>) </em><em>array-like</em><em>, </em><em>optional</em>) – Axis vector in R^3. Will be normalized. Default is e1 = (1,0,0).</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -1097,6 +1390,12 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(n,9) array, row-major flattening of 3x3 matrices.</p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1107,6 +1406,13 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>R</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>v</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -1137,6 +1443,15 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>radius_mean</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius_clip</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1150,6 +1465,12 @@ Convention: e2 = p × e1.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>p</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1161,6 +1482,16 @@ Convention: e2 = p × e1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>equator</strong> (<em>bool</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>radius_mean</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius_clip</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1315,6 +1646,21 @@ If a_min == a_max, all patches use that fixed angle.</p>
 </dd>
 </dl>
 </section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_patches</strong> (<em>int</em>)</p></li>
+<li><p><strong>spots</strong> (<em>Sequence</em><em>[</em><em>Sequence</em><em>[</em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>angle_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[<em>ndarray</em>, <em>ndarray</em>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1324,6 +1670,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>angle</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -1349,6 +1701,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_filament</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1359,6 +1717,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patch_vector</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>copy</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -1419,6 +1783,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>smallest</strong> (<em>float</em>)</p></li>
+<li><p><strong>largest</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -1443,6 +1813,17 @@ z2 = R(theta) * exp(i theta)</p>
 <li><p><strong>theta</strong> (<em>(n_points,)    (base angle) optional</em>)</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>R_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>r_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>return_theta</strong> (<em>bool</em>)</p></li>
+<li><p><strong>return_alpha</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1484,40 +1865,57 @@ distance_matrix=True to Dreimac.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span></p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="circle_bundles.attach_bundle_viz_methods">
-<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">attach_bundle_viz_methods</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/bundle.html#attach_bundle_viz_methods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.attach_bundle_viz_methods" title="Link to this definition"></a></dt>
-<dd><p>Monkey-patch visualization helpers onto BundleResult.</p>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><p>This is optional: call it only if you want BundleResult.show_bundle(),
-BundleResult.show_circle_nerve(), etc.</p></li>
-<li><p>All heavy visualization dependencies remain lazily imported inside
-the visualization methods themselves.</p></li>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>n_landmarks_init</strong> (<em>int</em>)</p></li>
+<li><p><strong>prime</strong> (<em>int</em>)</p></li>
+<li><p><strong>update_frac</strong> (<em>float</em>)</p></li>
+<li><p><strong>standard_range</strong> (<em>bool</em>)</p></li>
+<li><p><strong>dist_mat</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
 </ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.build_bundle">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc_alg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks_per_patch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">41</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_frac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CircularCoords_cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_triv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_fast_triv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'farthest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notify_pca_fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_fast_missing_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_fail_fast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_orient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_euler_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_rank1_fundamental</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trivialization_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'singer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'radians'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.build_bundle" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>End-to-end pipeline (core only):</dt><dd><p>cover + data -&gt; local triv -&gt; transitions -&gt; quality -&gt; classes</p>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="api/bundle.html#circle_bundles.bundle.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a></span></p>
 </dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>show</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span>) – If True, prints a short summary of computed characteristic classes / quality.</p></li>
-<li><p><strong>verbose</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code>]</span>) – Controls progress/status printing. If None (default), we set verbose = show:
-- show=False -&gt; quiet (good for README/CI)
-- show=True  -&gt; prints progress + summary (good for notebooks)</p></li>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>landmarks_per_patch</strong> (<em>int</em>)</p></li>
+<li><p><strong>prime</strong> (<em>int</em>)</p></li>
+<li><p><strong>update_frac</strong> (<em>float</em>)</p></li>
+<li><p><strong>standard_range</strong> (<em>bool</em>)</p></li>
+<li><p><strong>min_patch_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>verbose_triv</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>fail_fast_triv</strong> (<em>bool</em>)</p></li>
+<li><p><strong>pca_anchor</strong> (<em>str</em>)</p></li>
+<li><p><strong>notify_pca_fallback</strong> (<em>bool</em>)</p></li>
+<li><p><strong>min_points_edge</strong> (<em>int</em>)</p></li>
+<li><p><strong>ref_angle</strong> (<em>float</em>)</p></li>
+<li><p><strong>fail_fast_missing_edges</strong> (<em>bool</em>)</p></li>
+<li><p><strong>delta_min_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>delta_fail_fast</strong> (<em>bool</em>)</p></li>
+<li><p><strong>compute_witness</strong> (<em>bool</em>)</p></li>
+<li><p><strong>try_orient</strong> (<em>bool</em>)</p></li>
+<li><p><strong>compute_euler_num</strong> (<em>bool</em>)</p></li>
+<li><p><strong>require_rank1_fundamental</strong> (<em>bool</em>)</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<em>str</em>)</p></li>
+<li><p><strong>trivialization_method</strong> (<em>str</em>)</p></li>
+<li><p><strong>theta_units</strong> (<em>str</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></span></p>
+</dl>
+<dl class="simple">
+<dt>End-to-end pipeline (core only):</dt><dd><p>cover + data -&gt; local triv -&gt; transitions -&gt; quality -&gt; classes</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1525,42 +1923,101 @@ the visualization methods themselves.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.EuclideanMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">EuclideanMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#EuclideanMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.EuclideanMetric" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>)</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.S1AngleMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">S1AngleMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S1_angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\mathbb{S}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#S1AngleMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.S1AngleMetric" title="Link to this definition"></a></dt>
 <dd><p>Angles in radians; distance on S^1.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name_latex</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">RP1AngleMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP1_angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\mathbb{RP}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#RP1AngleMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.RP1AngleMetric" title="Link to this definition"></a></dt>
 <dd><p>Angles in radians; theta ~ theta+pi. Accepts any real angles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name_latex</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.S1UnitVectorMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">S1UnitVectorMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S1_unitvec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\mathbb{S}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#S1UnitVectorMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.S1UnitVectorMetric" title="Link to this definition"></a></dt>
 <dd><p>Unit vectors in R^2; geodesic distance arccos(&lt;p,q&gt;).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name_latex</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.RP1UnitVectorMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">RP1UnitVectorMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP1_unitvec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\mathbb{RP}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#RP1UnitVectorMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.RP1UnitVectorMetric" title="Link to this definition"></a></dt>
 <dd><p>Unit vectors in R^2 with antipodal ID; distance arccos(<a href="#id15"><span class="problematic" id="id16">|&lt;p,q&gt;|</span></a>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name_latex</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.RP2UnitVectorMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">RP2UnitVectorMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP2_unitvec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\mathbb{RP}^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#RP2UnitVectorMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.RP2UnitVectorMetric" title="Link to this definition"></a></dt>
 <dd><p>Unit vectors in R^3 with antipodal ID; min(||p-q||, ||p+q||).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name_latex</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.T2FlatMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">T2FlatMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2_flat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T^2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\mathbb{T}^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/metrics.html#T2FlatMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.T2FlatMetric" title="Link to this definition"></a></dt>
 <dd><p>Flat torus distance for coords in [0,2pi)^2 (angles).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_name_latex</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1570,6 +2027,12 @@ the visualization methods themselves.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Metric</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>kind</strong> (<em>str</em>)</p></li>
+<li><p><strong>base_in</strong> (<em>str</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -1631,6 +2094,27 @@ the visualization methods themselves.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>angle_arrays</strong> (<em>List</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>pairs</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>align</strong> (<em>bool</em>)</p></li>
+<li><p><strong>s</strong> (<em>float</em>)</p></li>
+<li><p><strong>fontsize</strong> (<em>int</em>)</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em> | </em><em>str</em>)</p></li>
+<li><p><strong>titles</strong> (<em>List</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>titlesize</strong> (<em>int</em>)</p></li>
+<li><p><strong>show_metrics</strong> (<em>bool</em>)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>)</p></li>
+<li><p><strong>x_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>y_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>x_ticks</strong> (<em>Tuple</em><em>[</em><em>List</em><em>[</em><em>float</em><em>]</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>] </em><em>| </em><em>None</em><em> | </em><em>str</em>)</p></li>
+<li><p><strong>y_ticks</strong> (<em>Tuple</em><em>[</em><em>List</em><em>[</em><em>float</em><em>]</em><em>, </em><em>List</em><em>[</em><em>str</em><em>]</em><em>] </em><em>| </em><em>None</em><em> | </em><em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1641,6 +2125,23 @@ the visualization methods themselves.</p></li>
 <dt>New behavior:</dt><dd><ul class="simple">
 <li><p>If number of nonempty overlaps &lt;= max_pairs: plot all.</p></li>
 <li><p>Otherwise: plot WORST / MEDIAN / BEST (by chosen metric).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>edges</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>ncols</strong> (<em>int</em><em> | </em><em>str</em>)</p></li>
+<li><p><strong>title_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>align</strong> (<em>bool</em>)</p></li>
+<li><p><strong>s</strong> (<em>float</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+<li><p><strong>max_pairs</strong> (<em>int</em>)</p></li>
+<li><p><strong>metric</strong> (<em>str</em>)</p></li>
+<li><p><strong>return_selected</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1662,6 +2163,27 @@ the visualization methods themselves.</p></li>
 <p>If <cite>ax</cite> is provided, it must be a 3D axis (projection=’3d’). The function
 draws into that axis and will not create a new figure.</p>
 </section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>center_index</strong> (<em>int</em>)</p></li>
+<li><p><strong>radius</strong> (<em>float</em>)</p></li>
+<li><p><strong>dist_mat</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>use_pca</strong> (<em>bool</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>clear_ax</strong> (<em>bool</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+<li><p><strong>other_alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>other_s</strong> (<em>float</em>)</p></li>
+<li><p><strong>neigh_alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>neigh_s</strong> (<em>float</em>)</p></li>
+<li><p><strong>center_s</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1673,6 +2195,28 @@ draws into that axis and will not create a new figure.</p>
 <li><p>“Fiber Data” shows PCA of data restricted to the selected neighborhood.</p></li>
 </ul>
 <p>This function only requires Dash/Plotly/sklearn if it is actually called.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_points</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>get_dist_mat</strong> (<em>Callable</em><em>[</em><em>[</em><em>...</em><em>]</em><em>, </em><em>ndarray</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>full_dist_mat</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>base_metric</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>same_metric</strong> (<em>bool</em>)</p></li>
+<li><p><strong>initial_r</strong> (<em>float</em>)</p></li>
+<li><p><strong>r_max</strong> (<em>float</em>)</p></li>
+<li><p><strong>colors</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>densities</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>data_landmark_inds</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>landmarks</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_samples</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>port</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>debug</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1682,6 +2226,18 @@ draws into that axis and will not create a new figure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type">Tuple[‘go.Figure’, ‘go.Figure’]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>viz</strong> (<em>BundleVizInputs</em>)</p></li>
+<li><p><strong>selected_index</strong> (<em>int</em>)</p></li>
+<li><p><strong>r</strong> (<em>float</em>)</p></li>
+<li><p><strong>density_threshold</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>base_html</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>data_html</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>base_image</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>data_image</strong> (<em>Optional</em><em>[</em><em>str</em><em>]</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -1711,6 +2267,22 @@ and placing the resulting images on a circle according to coords.</p>
 </dl>
 <p>If <cite>ax</cite> is provided, draw into that axis (no new figure created).
 Returns (fig, ax).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>per_circle</strong> (<em>int</em>)</p></li>
+<li><p><strong>angle_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>radius</strong> (<em>float</em>)</p></li>
+<li><p><strong>extent_factor</strong> (<em>float</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>float</em><em> | </em><em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>zoom</strong> (<em>float</em>)</p></li>
+<li><p><strong>circle_linewidth</strong> (<em>float</em>)</p></li>
+<li><p><strong>circle_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1731,6 +2303,13 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 <li><p><strong>-------------</strong></p></li>
 <li><p><strong>provided</strong> (<em>If ax is</em>)</p></li>
 <li><p><strong>case</strong> (<em>it must be a 3D axis</em><em> (</em><em>projection='3d'</em><em>)</em><em>. In that</em>)</p></li>
+<li><p><strong>zoom</strong> (<em>float</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>clear_ax</strong> (<em>bool</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+<li><p><strong>scatter_alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>scatter_s</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1751,6 +2330,24 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 <li><p>vis_func returns either a Matplotlib Figure OR an image array (H,W,3/4)</p></li>
 </ul>
 </section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>clusters</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>G</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>vis_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>ndarray</em><em> | </em><em>Figure</em><em>]</em>)</p></li>
+<li><p><strong>image_zoom</strong> (<em>float</em>)</p></li>
+<li><p><strong>row_spacing</strong> (<em>float</em>)</p></li>
+<li><p><strong>col_spacing</strong> (<em>float</em>)</p></li>
+<li><p><strong>line_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>line_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>white_thresh</strong> (<em>int</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1759,6 +2356,9 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>G</strong> (<em>Graph</em>)</p>
 </dd>
 </dl>
 <dl class="simple">
@@ -1776,6 +2376,26 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">plot_component_patch_diagram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">component_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_zoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">col_spacing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">white_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/viz/fiberwise_clustering_vis.html#plot_component_patch_diagram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.plot_component_patch_diagram" title="Link to this definition"></a></dt>
 <dd><p>One-call helper: extract component reps and plot them.</p>
 <p>Missing clusters are dropped unless require_match=True.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>cl</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>vis_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>ndarray</em><em> | </em><em>Figure</em><em>]</em>)</p></li>
+<li><p><strong>component_index</strong> (<em>int</em>)</p></li>
+<li><p><strong>require_match</strong> (<em>bool</em>)</p></li>
+<li><p><strong>image_zoom</strong> (<em>float</em>)</p></li>
+<li><p><strong>row_spacing</strong> (<em>float</em>)</p></li>
+<li><p><strong>col_spacing</strong> (<em>float</em>)</p></li>
+<li><p><strong>line_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>line_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>white_thresh</strong> (<em>int</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1789,6 +2409,15 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 </ul>
 </dd>
 </dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>max_dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>use_weights</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1799,6 +2428,15 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 <li><p>vertex_dict: vertex id -&gt; component id in filtered_G0 (or -1)</p></li>
 <li><p>edge_dict: canonical (u,v) -&gt; component id if endpoints in same component, else -1</p></li>
 <li><p>node_to_index: original node label -&gt; integer id</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G0</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>filtered_G0</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>max_dim</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1828,6 +2466,25 @@ corresponding to the provided axis’ rectangle.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Sequence</em>)</p></li>
+<li><p><strong>coords</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>vis_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>object</em><em>]</em><em>, </em><em>ndarray</em><em> | </em><em>Figure</em><em>]</em>)</p></li>
+<li><p><strong>per_row</strong> (<em>int</em>)</p></li>
+<li><p><strong>per_col</strong> (<em>int</em>)</p></li>
+<li><p><strong>padding</strong> (<em>float</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>float</em><em> | </em><em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>thumb_px</strong> (<em>int</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>transparent_border</strong> (<em>bool</em>)</p></li>
+<li><p><strong>white_thresh</strong> (<em>int</em>)</p></li>
+<li><p><strong>clear_ax</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1839,6 +2496,40 @@ corresponding to the provided axis’ rectangle.</p></li>
 <li><p>Canonicalizes edge keys via canon_edge(a,b).</p></li>
 <li><p>Supports omega/weights dicts keyed by either orientation.</p></li>
 </ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_vertices</strong> (<em>int</em>)</p></li>
+<li><p><strong>edges</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>kept_edges</strong> (<em>list</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>omega</strong> (<em>dict</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>weights</strong> (<em>dict</em><em>[</em><em>tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>phi</strong> (<em>dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>r</strong> (<em>float</em>)</p></li>
+<li><p><strong>node_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>node_facecolor</strong> (<em>str</em>)</p></li>
+<li><p><strong>node_edgecolor</strong> (<em>str</em>)</p></li>
+<li><p><strong>node_label_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>removed_edge_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>removed_edge_lw</strong> (<em>float</em>)</p></li>
+<li><p><strong>kept_edge_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>kept_edge_lw</strong> (<em>float</em>)</p></li>
+<li><p><strong>omega_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>phi_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>weights_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>fontsize_node</strong> (<em>int</em>)</p></li>
+<li><p><strong>fontsize_omega</strong> (<em>int</em>)</p></li>
+<li><p><strong>fontsize_phi</strong> (<em>int</em>)</p></li>
+<li><p><strong>fontsize_weights</strong> (<em>int</em>)</p></li>
+<li><p><strong>omega_offset</strong> (<em>float</em>)</p></li>
+<li><p><strong>weights_offset</strong> (<em>float</em>)</p></li>
+<li><p><strong>phi_offset</strong> (<em>float</em>)</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1864,6 +2555,29 @@ corresponding to the provided axis’ rectangle.</p></li>
 <p>If ax is provided, draw into that axes and DO NOT create a new figure.
 In that case, you probably want show=False (so the caller can plt.show() once).</p>
 </section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vertices</strong> (<em>Iterable</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>edges</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>triangles</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>cochains</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>Dict</em><em>[</em><em>Any</em><em>, </em><em>Any</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>base_colors</strong> (<em>dict</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>cochain_cmaps</strong> (<em>dict</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>max_dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>opacity</strong> (<em>float</em>)</p></li>
+<li><p><strong>node_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>line_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>fontsize</strong> (<em>int</em>)</p></li>
+<li><p><strong>font_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>image_zoom</strong> (<em>float</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>title</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>draw_all_vertices</strong> (<em>bool</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1880,6 +2594,31 @@ In that case, you probably want show=False (so the caller can plt.show() once).<
 <p>Optional:
 - If U is provided, renders one toggleable trace per set.
 - If colors is None and U is provided, colors are drawn from a Matplotlib colormap.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em>)</p></li>
+<li><p><strong>colors</strong> (<em>Optional</em><em>[</em><em>Sequence</em><em>]</em>)</p></li>
+<li><p><strong>U</strong> (<em>Optional</em><em>[</em><em>np.ndarray</em><em>]</em>)</p></li>
+<li><p><strong>size</strong> (<em>float</em>)</p></li>
+<li><p><strong>titles</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>str</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>max_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>max_components</strong> (<em>int</em>)</p></li>
+<li><p><strong>use_randomized</strong> (<em>bool</em>)</p></li>
+<li><p><strong>n_iter</strong> (<em>int</em>)</p></li>
+<li><p><strong>jitter_eps</strong> (<em>float</em>)</p></li>
+<li><p><strong>tol_flat_z</strong> (<em>float</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>)</p></li>
+<li><p><strong>set_cmap</strong> (<em>str</em>)</p></li>
+<li><p><strong>set_cmap_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+<li><p><strong>return_figs</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple[‘go.Figure’, ‘plt.Figure’] | None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1889,6 +2628,29 @@ In that case, you probably want show=False (so the caller can plt.show() once).<
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>Sequence</em><em>[</em><em>Any</em><em>]</em>)</p></li>
+<li><p><strong>vis_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>]</em><em>, </em><em>ndarray</em><em> | </em><em>Figure</em><em>]</em>)</p></li>
+<li><p><strong>angles</strong> (<em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>max_samples</strong> (<em>int</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>label_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>Any</em><em>]</em><em>, </em><em>Any</em><em>] </em><em>| </em><em>Sequence</em><em>[</em><em>Any</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>label_position</strong> (<em>str</em>)</p></li>
+<li><p><strong>sampling_method</strong> (<em>str</em>)</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>transparent_border</strong> (<em>bool</em>)</p></li>
+<li><p><strong>white_thresh</strong> (<em>int</em>)</p></li>
+<li><p><strong>wspace</strong> (<em>float</em>)</p></li>
+<li><p><strong>hspace</strong> (<em>float</em>)</p></li>
+<li><p><strong>figsize_per_cell</strong> (<em>float</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>pad_frac</strong> (<em>float</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <p>IMPORTANT:

@@ -39,8 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -86,6 +88,8 @@
 <span class="n">AngleFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
 
 
+<div class="viewcode-block" id="const">
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.const">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">const</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AngleFunc</span><span class="p">:</span>
     <span class="n">value_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
@@ -93,11 +97,12 @@
         <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">value_f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">f</span>
+    <span class="k">return</span> <span class="n">f</span></div>
+
 
 
 <div class="viewcode-block" id="small_to_big">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.small_to_big">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.small_to_big">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">small_to_big</span><span class="p">(</span><span class="n">smallest</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AngleFunc</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    V-shaped function with maximum at angle=pi and minimum at angle=0,2pi.</span>
@@ -140,7 +145,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="sample_C2_torus">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.sample_C2_torus">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.sample_C2_torus">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_C2_torus</span><span class="p">(</span>
     <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>

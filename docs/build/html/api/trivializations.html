@@ -42,9 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
@@ -60,6 +60,7 @@
 <li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
 </ul>
 </li>
 </ul>
@@ -129,6 +130,16 @@ distance_matrix=True to Dreimac.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>X</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>n_landmarks_init</strong> (<em>int</em>)</p></li>
+<li><p><strong>prime</strong> (<em>int</em>)</p></li>
+<li><p><strong>update_frac</strong> (<em>float</em>)</p></li>
+<li><p><strong>standard_range</strong> (<em>bool</em>)</p></li>
+<li><p><strong>dist_mat</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

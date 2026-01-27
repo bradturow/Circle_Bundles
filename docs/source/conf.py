@@ -34,6 +34,9 @@ exclude_patterns: list[str] = []
 autosummary_generate = True
 autodoc_member_order = "bysource"
 
+autodoc_typehints = "description"
+autoclass_content = "class"
+
 # Napoleon (Google / NumPy docstrings)
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True

@@ -42,9 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
@@ -65,6 +65,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
 </ul>
 </li>
 </ul>
@@ -115,6 +116,13 @@ Edges connect clusters across different fibers.</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>dict[(j,k), int] with j&lt;k, values in {0,1}</p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>G</strong> (<em>Graph</em>)</p></li>
+<li><p><strong>value_rule</strong> (<em>str</em>)</p></li>
+<li><p><strong>require_consistent</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>Multiple graph edges can map to the same fiber-pair (j,k). If they induce
@@ -137,6 +145,10 @@ attribute ‘indices_shared’, we use that to propagate faster/cleaner.</p></li
 <li><p><strong>seed_cluster</strong> (<em>ints</em>) – Seed a starting cluster to orient.</p></li>
 <li><p><strong>assume_two_clusters</strong> (<em>bool</em>) – If True, we apply the “other label opposite” rule in the seed fiber and
 enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
+<li><p><strong>return_assigned</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+<li><p><strong>noise_label</strong> (<em>int</em>)</p></li>
+<li><p><strong>prefer_edge_shared_indices</strong> (<em>bool</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -176,6 +188,12 @@ enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>b</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -192,6 +210,18 @@ enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
 <li><p>edges may be directed or undirected; omega_Z2 may store either orientation.</p></li>
 <li><p>Returns one solution with free variables set to 0.</p></li>
 </ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edges</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>omega_Z2</strong> (<em>Dict</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>n_vertices</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[bool, <em>ndarray</em> | None]</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

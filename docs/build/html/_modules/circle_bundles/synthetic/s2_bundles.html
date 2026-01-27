@@ -39,8 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -105,7 +107,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="sample_sphere">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.sample_sphere">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.sample_sphere">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_sphere</span><span class="p">(</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
@@ -138,7 +140,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="hopf_projection">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.hopf_projection">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.hopf_projection">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">hopf_projection</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -203,7 +205,7 @@
 
 
 <div class="viewcode-block" id="spin3_adjoint_to_so3">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.spin3_adjoint_to_so3">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.spin3_adjoint_to_so3">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">spin3_adjoint_to_so3</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Adjoint map Spin(3) ≅ S^3 (unit quaternions) -&gt; SO(3), vectorized.</span>
@@ -261,7 +263,7 @@
 
 
 <div class="viewcode-block" id="so3_to_s2_projection">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.so3_to_s2_projection">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.so3_to_s2_projection">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">so3_to_s2_projection</span><span class="p">(</span>
     <span class="n">R</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -309,7 +311,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="sample_s2_trivial">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.sample_s2_trivial">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.sample_s2_trivial">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_s2_trivial</span><span class="p">(</span>
     <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -348,7 +350,7 @@
 
 
 <div class="viewcode-block" id="tangent_frame_on_s2">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.tangent_frame_on_s2">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.tangent_frame_on_s2">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">tangent_frame_on_s2</span><span class="p">(</span><span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Given p on S^2, return a positively oriented orthonormal basis (e1,e2) for T_p S^2.</span>
@@ -378,7 +380,7 @@
 
 
 <div class="viewcode-block" id="sample_s2_unit_tangent">
-<a class="viewcode-back" href="../../../api.html#circle_bundles.sample_s2_unit_tangent">[docs]</a>
+<a class="viewcode-back" href="../../../api/synthetic.html#circle_bundles.sample_s2_unit_tangent">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_s2_unit_tangent</span><span class="p">(</span>
     <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>

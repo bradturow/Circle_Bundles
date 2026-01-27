@@ -42,9 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Analysis</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#fiberwise-clustering">Fiberwise clustering</a><ul>
@@ -72,6 +72,7 @@
 <li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
 </ul>
 </li>
 </ul>
@@ -114,6 +115,12 @@ share at least one sample that is non-noise in BOTH fibers.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>U</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>cl</strong> (<em>ndarray</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <dl class="simple">
 <dt>Node convention:</dt><dd><p>node = (fiber_index, cluster_label)</p>
@@ -140,6 +147,11 @@ share at least one sample that is non-noise in BOTH fibers.</p>
 <p class="rubric">Notes</p>
 <p>If present, uses edge attribute ‘indices_shared’ as the overlap evidence
 (faster + consistent with safe_add_edges()).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<em>str</em>)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -153,6 +165,8 @@ share at least one sample that is non-noise in BOTH fibers.</p>
 <li><p><strong>U</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_samples</em><em>) </em><em>bool</em>)</p></li>
 <li><p><strong>eps_values</strong> (<em>(</em><em>n_fibers</em><em>,</em><em>) </em><em>float</em>)</p></li>
 <li><p><strong>min_sample_values</strong> (<em>(</em><em>n_fibers</em><em>,</em><em>) </em><em>int</em>)</p></li>
+<li><p><strong>build_pca_embeddings</strong> (<em>bool</em>)</p></li>
+<li><p><strong>pca_dim</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -175,12 +189,34 @@ Edges indicate overlap; includes ‘indices_shared’.</p></li>
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">plot_fiberwise_pca_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#plot_fiberwise_pca_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.plot_fiberwise_pca_grid" title="Link to this definition"></a></dt>
 <dd><p>Plot PCA scatter for selected fibers using summary[‘pca_store’].
 Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>summary</strong> (<em>dict</em>)</p></li>
+<li><p><strong>to_view</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>cmap</strong> (<em>str</em>)</p></li>
+<li><p><strong>point_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.plot_fiberwise_summary_bars">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">plot_fiberwise_summary_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hide_biggest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#plot_fiberwise_summary_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.plot_fiberwise_summary_bars" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>summary</strong> (<em>dict</em>)</p></li>
+<li><p><strong>hide_biggest</strong> (<em>bool</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.get_cluster_persistence">
@@ -189,6 +225,14 @@ Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
 <p>Requires that G edges have ‘weight’ (e.g. computed by get_weights()).</p>
 <dl class="simple">
 <dt>Returns a list of dicts:</dt><dd><p>{‘weight’: w, ‘n_components’: int, ‘components’: [set(nodes), …]}</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>show_results</strong> (<em>bool</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -209,6 +253,17 @@ and recompute global components.</p>
 <li><p><strong>comp_inds</strong> (<em>(n_components, n_samples) bool</em>)</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>cl</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>)</p></li>
+<li><p><strong>rule</strong> (<em>str</em>)</p></li>
+<li><p><strong>show_results</strong> (<em>bool</em>)</p></li>
+<li><p><strong>hide_biggest</strong> (<em>bool</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -232,6 +287,16 @@ and recompute global components.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>U</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>p_values</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>to_view</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>n_components</strong> (<em>int</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -239,6 +304,19 @@ and recompute global components.</p>
 <dt class="sig sig-object py" id="circle_bundles.plot_local_pca">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">plot_local_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fiber_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/local_analysis.html#plot_local_pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.plot_local_pca" title="Link to this definition"></a></dt>
 <dd><p>Grid of PCA scatterplots. Returns (fig, axes).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fiber_ids</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>proj_list</strong> (<em>Sequence</em><em>[</em><em>ndarray</em><em> | </em><em>None</em><em>]</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>titles</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>point_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -248,6 +326,17 @@ and recompute global components.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code> | <code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code>]]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>U</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>p_values</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>to_view</strong> (<em>Sequence</em><em>[</em><em>int</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>maxdim</strong> (<em>int</em>)</p></li>
+<li><p><strong>n_perm</strong> (<em>int</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <p class="rubric">Notes</p>
@@ -260,6 +349,18 @@ and recompute global components.</p>
 <dd><p>Grid of persistence diagrams. Returns (fig, axes).</p>
 <p class="rubric">Notes</p>
 <p>Imports persim lazily so importing this module doesn’t require persim.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fiber_ids</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>rips_list</strong> (<em>Sequence</em><em>[</em><em>dict</em><em> | </em><em>None</em><em>]</em>)</p></li>
+<li><p><strong>n_cols</strong> (<em>int</em>)</p></li>
+<li><p><strong>titles</strong> (<em>str</em><em> | </em><em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>font_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

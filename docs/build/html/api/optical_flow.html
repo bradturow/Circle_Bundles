@@ -19,7 +19,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="&lt;no title&gt;" href="synthetic.html" />
+    <link rel="next" title="Synthetic data" href="synthetic.html" />
     <link rel="prev" title="Visualization" href="visualization.html" /> 
 </head>
 
@@ -42,9 +42,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul class="current">
+              <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
@@ -82,6 +82,7 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
 </ul>
 </li>
 </ul>
@@ -150,6 +151,14 @@
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>N</strong> (<em>int</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+<li><p><strong>opt_flow</strong> (<em>bool</em>)</p></li>
+<li><p><strong>top_two</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <ul class="simple">
@@ -185,7 +194,10 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dd><p>For each patch, find the pixel with largest flow magnitude and return its unit vector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>flow_patches</strong> (<em>(</em><em>N</em><em>, </em><em>2*n^2</em><em>)</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flow_patches</strong> (<em>(</em><em>N</em><em>, </em><em>2*n^2</em><em>)</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>unit</strong></p>
@@ -207,6 +219,13 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>flow_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>old_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>new_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Example</p>
 <p>old_base/…/flow/&lt;scene&gt;/frame_0001.flo</p>
@@ -219,6 +238,18 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dd><p>Draw colored dots at patch locations on a Sintel frame.</p>
 <p>patch_df must have columns: [‘row’, ‘column’, ‘color’].
 ‘color’ can be any hashable ID (ints/strings). IDs are mapped to custom_colors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>frame_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>save_path</strong> (<em>str</em><em> | </em><em>Path</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>patch_df</strong> (<em>DataFrame</em>)</p></li>
+<li><p><strong>dot_radius</strong> (<em>int</em>)</p></li>
+<li><p><strong>custom_colors</strong> (<em>Sequence</em><em>[</em><em>str</em><em>]</em>)</p></li>
+<li><p><strong>show</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -228,6 +259,14 @@ then contrast-normalize using get_contrast_norms (via flow padding trick).</p></
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image_files</strong> (<em>Sequence</em><em>[</em><em>str</em><em> | </em><em>Path</em><em>]</em>)</p></li>
+<li><p><strong>output_video</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>fps</strong> (<em>float</em>)</p></li>
+<li><p><strong>codec</strong> (<em>str</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -243,6 +282,18 @@ Each mask becomes one color group (0,1,2,…).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>flo_paths</strong> (<em>Sequence</em><em>[</em><em>str</em><em> | </em><em>Path</em><em>]</em>)</p></li>
+<li><p><strong>scene_num</strong> (<em>int</em>)</p></li>
+<li><p><strong>patch_df</strong> (<em>DataFrame</em>)</p></li>
+<li><p><strong>inds_list</strong> (<em>Sequence</em><em>[</em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>old_flow_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>new_frame_base</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>out_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>fps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Notes</p>
 <p>Assumes flo_paths are ordered by frame number, corresponding to frames 1..T.</p>
@@ -257,6 +308,17 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>flow_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>save_dir</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>lattice_res</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>scale</strong> (<em>float</em>)</p></li>
+<li><p><strong>width</strong> (<em>float</em>)</p></li>
+<li><p><strong>arrow_color</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -268,6 +330,13 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>base_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>scene_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>scene</strong> (<em>str</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -286,6 +355,9 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(H, W, 2) float32 array</p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> (<em>str</em><em> | </em><em>Path</em>)</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -301,6 +373,14 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(n_patches, 2*d*d + 2) array</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flo_path</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>n_patches</strong> (<em>int</em>)</p></li>
+<li><p><strong>d</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -319,6 +399,14 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <li><p><strong>file_paths</strong> (<em>list of lists of .flo Paths, grouped by scene folder order</em>)</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flow_root</strong> (<em>str</em><em> | </em><em>Path</em>)</p></li>
+<li><p><strong>patches_per_frame</strong> (<em>int</em>)</p></li>
+<li><p><strong>d</strong> (<em>int</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -340,6 +428,15 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patch_df</strong> (<em>DataFrame</em>)</p></li>
+<li><p><strong>hc_frac</strong> (<em>float</em>)</p></li>
+<li><p><strong>max_samples</strong> (<em>int</em>)</p></li>
+<li><p><strong>k_list</strong> (<em>Sequence</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>random_state</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -358,6 +455,23 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>vis_func(patch_vector) -&gt; matplotlib Figure</p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>fig_size</strong> (<em>float</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>intensity_cmap</strong> (<em>str</em>)</p></li>
+<li><p><strong>intensity_normalize</strong> (<em>Literal</em><em>[</em><em>'minmax'</em><em>, </em><em>'none'</em><em>]</em>)</p></li>
+<li><p><strong>show_intensity_grid</strong> (<em>bool</em>)</p></li>
+<li><p><strong>intensity_grid_lw</strong> (<em>float</em>)</p></li>
+<li><p><strong>flipud</strong> (<em>bool</em>)</p></li>
+<li><p><strong>flow_normalize</strong> (<em>Literal</em><em>[</em><em>'maxmag'</em><em>, </em><em>'none'</em><em>]</em>)</p></li>
+<li><p><strong>quiver_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>headwidth</strong> (<em>float</em>)</p></li>
+<li><p><strong>headlength</strong> (<em>float</em>)</p></li>
+<li><p><strong>grid_lw</strong> (<em>float</em>)</p></li>
+<li><p><strong>border_lw_mult</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -369,7 +483,7 @@ Skips the last image in image_dir (since it may not have a .flo match).</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="visualization.html" class="btn btn-neutral float-left" title="Visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="synthetic.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="synthetic.html" class="btn btn-neutral float-right" title="Synthetic data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

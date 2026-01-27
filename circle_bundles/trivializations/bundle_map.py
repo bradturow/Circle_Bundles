@@ -1148,7 +1148,7 @@ def _display_bundle_map_summary_latex(
         geo_pi = None if report.eps_triv_geo is None else float(report.eps_triv_geo) / np.pi
         rhs = f"{float(report.eps_triv):.{r}f}"
         if geo_pi is not None:
-            rhs += rf"\ \ (\varepsilon_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi:.{r}f}\pi\ \mathrm{{rad}})"
+            rhs += rf"\ \ (\varepsilon_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi:.{r}f}\pi)"
         coord_rows.append(
             (
                 r"\text{Trivialization error}",
@@ -1163,7 +1163,7 @@ def _display_bundle_map_summary_latex(
         geo_pi_m = None if report.eps_triv_geo_mean is None else float(report.eps_triv_geo_mean) / np.pi
         rhs = f"{float(report.eps_triv_mean):.{r}f}"
         if geo_pi_m is not None:
-            rhs += rf"\ \ (\bar{{\varepsilon}}_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi_m:.{r}f}\pi\ \mathrm{{rad}})"
+            rhs += rf"\ \ (\bar{{\varepsilon}}_{{\mathrm{{triv}}}}^{{\mathrm{{geo}}}} = {geo_pi_m:.{r}f}\pi)"
         coord_rows.append((r"\text{Mean triv error}", r"\bar{\varepsilon}_{\mathrm{triv}} = " + rhs))
 
     coord_rows.append(

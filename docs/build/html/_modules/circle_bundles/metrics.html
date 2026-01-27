@@ -39,8 +39,10 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+</ul>
+
         </div>
       </div>
     </nav>
@@ -93,7 +95,7 @@
 
 
 <div class="viewcode-block" id="EuclideanMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.EuclideanMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.EuclideanMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">EuclideanMetric</span><span class="p">:</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;euclidean&quot;</span>
@@ -112,7 +114,7 @@
 
 
 <div class="viewcode-block" id="S1AngleMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.S1AngleMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.S1AngleMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">S1AngleMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Angles in radians; distance on S^1.&quot;&quot;&quot;</span>
@@ -129,7 +131,7 @@
 
 
 <div class="viewcode-block" id="RP1AngleMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.RP1AngleMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.RP1AngleMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RP1AngleMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Angles in radians; theta ~ theta+pi. Accepts any real angles.&quot;&quot;&quot;</span>
@@ -146,7 +148,7 @@
 
 
 <div class="viewcode-block" id="S1UnitVectorMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.S1UnitVectorMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.S1UnitVectorMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">S1UnitVectorMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit vectors in R^2; geodesic distance arccos(&lt;p,q&gt;).&quot;&quot;&quot;</span>
@@ -163,7 +165,7 @@
 
 
 <div class="viewcode-block" id="RP1UnitVectorMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.RP1UnitVectorMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.RP1UnitVectorMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RP1UnitVectorMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit vectors in R^2 with antipodal ID; distance arccos(|&lt;p,q&gt;|).&quot;&quot;&quot;</span>
@@ -193,7 +195,7 @@
 
 
 <div class="viewcode-block" id="RP2UnitVectorMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.RP2UnitVectorMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.RP2UnitVectorMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RP2UnitVectorMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Unit vectors in R^3 with antipodal ID; min(||p-q||, ||p+q||).&quot;&quot;&quot;</span>
@@ -223,7 +225,7 @@
 
 
 <div class="viewcode-block" id="T2FlatMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.T2FlatMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.T2FlatMetric">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">T2FlatMetric</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Flat torus distance for coords in [0,2pi)^2 (angles).&quot;&quot;&quot;</span>
@@ -562,7 +564,7 @@
 
 
 <div class="viewcode-block" id="Torus_Z2QuotientMetric_R4">
-<a class="viewcode-back" href="../../api.html#circle_bundles.Torus_Z2QuotientMetric_R4">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.Torus_Z2QuotientMetric_R4">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Torus_Z2QuotientMetric_R4</span><span class="p">(</span><span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;klein&quot;</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">base_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z2&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Metric&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Factory for Z2 quotient metrics on a C^2 torus embedded in R^4.</span>
@@ -648,7 +650,7 @@
 
 
 <div class="viewcode-block" id="RP2_TrivialMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.RP2_TrivialMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.RP2_TrivialMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RP2_TrivialMetric</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Z2QuotientMetricR5</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Trivial circle bundle over RP^2: (v,z)~(-v,z).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Z2QuotientMetricR5</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">act_base_only</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RP2xS1&quot;</span><span class="p">)</span></div>
@@ -656,7 +658,7 @@
 
 
 <div class="viewcode-block" id="RP2_TwistMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.RP2_TwistMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.RP2_TwistMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RP2_TwistMetric</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Z2QuotientMetricR5</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Orientable nontrivial (monodromy -1): (v,z)~(-v,-z).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Z2QuotientMetricR5</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">act_pi_twist</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RP2_Twist&quot;</span><span class="p">)</span></div>
@@ -664,7 +666,7 @@
 
 
 <div class="viewcode-block" id="RP2_FlipMetric">
-<a class="viewcode-back" href="../../api.html#circle_bundles.RP2_FlipMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.RP2_FlipMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RP2_FlipMetric</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Z2QuotientMetricR5</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Non-orientable (reflection on fiber): (v,z)~(-v,conj z).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Z2QuotientMetricR5</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">act_reflection_twist</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RP2_Klein&quot;</span><span class="p">)</span></div>
@@ -868,6 +870,8 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">min_over_zp</span><span class="p">(</span><span class="n">Yn</span><span class="p">),</span> <span class="n">min_over_zp</span><span class="p">(</span><span class="n">Ytau</span><span class="p">))</span>
 
 
+<div class="viewcode-block" id="S3QuotientMetric">
+<a class="viewcode-back" href="../../api/metrics.html#circle_bundles.S3QuotientMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">S3QuotientMetric</span><span class="p">(</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -901,7 +905,8 @@
         <span class="n">v_axis</span><span class="o">=</span><span class="n">v_axis</span><span class="p">,</span>
         <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;S3/Z_</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="p">)</span></div>
+
 
 
 <span class="c1"># ============================================================</span>

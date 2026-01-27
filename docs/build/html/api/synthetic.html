@@ -43,6 +43,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
@@ -161,6 +162,17 @@ rng is accepted for API consistency but is best-effort.</p></li>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(grid_size^3,) ndarray</p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>Trimesh</em>)</p></li>
+<li><p><strong>grid_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>n_surface_samples</strong> (<em>int</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -187,6 +199,15 @@ rng is accepted for API consistency but is best-effort.</p></li>
 <li><p><strong>ratios</strong> (<em>(N,), optional</em>) – If smallest: (λ_min / λ_mid), else: (λ_max / λ_mid) with a small stabilizer.</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flat_densities</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>grid_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>smallest</strong> (<em>bool</em>)</p></li>
+<li><p><strong>return_eigs</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -263,6 +284,12 @@ and extrusion along the x-axis.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>height</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -287,6 +314,14 @@ and extrusion along the x-axis.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>trimesh.Trimesh</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>radius_outer</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius_inner</strong> (<em>float</em>)</p></li>
+<li><p><strong>height</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -323,6 +358,15 @@ and extrusion along the x-axis.</p>
 <li><p><strong>face_groups</strong> (<em>groups</em><em> of </em><em>face indices</em><em> (</em><em>explicit lists</em><em> or </em><em>(</em><em>start</em><em>,</em><em>end_excl</em><em>) </em><em>ranges</em><em>)</em>)</p></li>
 <li><p><strong>depth_sort</strong> (<em>bool</em>) – If True, manually sorts triangles back-to-front using projected depth
 (helps with alpha blending / occlusion in Matplotlib).</p></li>
+<li><p><strong>face_colors_list</strong> (<em>Sequence</em><em>[</em><em>str</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>show_edges</strong> (<em>bool</em>)</p></li>
+<li><p><strong>edge_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_width</strong> (<em>float</em>)</p></li>
+<li><p><strong>elev</strong> (<em>float</em>)</p></li>
+<li><p><strong>azim</strong> (<em>float</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -347,6 +391,18 @@ in the yz-plane to ensure a stable color assignment.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>base_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>edge_color</strong> (<em>str</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>float</em>)</p></li>
+<li><p><strong>colormap</strong> (<em>str</em><em> | </em><em>LinearSegmentedColormap</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>figsize</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>int</em>)</p></li>
+<li><p><strong>elev</strong> (<em>float</em>)</p></li>
+<li><p><strong>azim</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -360,6 +416,19 @@ in the yz-plane to ensure a stable color assignment.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>list[np.ndarray]</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>flat_mesh</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>vis_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>Figure</em><em>]</em>)</p></li>
+<li><p><strong>out_path</strong> (<em>str</em>)</p></li>
+<li><p><strong>n_frames</strong> (<em>int</em>)</p></li>
+<li><p><strong>azim_start</strong> (<em>float</em>)</p></li>
+<li><p><strong>azim_end</strong> (<em>float</em>)</p></li>
+<li><p><strong>elev</strong> (<em>float</em>)</p></li>
+<li><p><strong>close_figs</strong> (<em>bool</em>)</p></li>
+<li><p><strong>fps</strong> (<em>int</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -378,6 +447,16 @@ alpha “fiber” angle adjusted so the model is continuous under the identifica
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>n</strong> (<em>int</em>)</p></li>
+<li><p><strong>noise</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+<li><p><strong>return_angles</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -389,6 +468,13 @@ Returns (thetas, strengths).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patches</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>n</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -433,6 +519,21 @@ patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>sample_r</strong> (<em>bool</em>)</p></li>
+<li><p><strong>r_min</strong> (<em>float</em>)</p></li>
+<li><p><strong>r_lam</strong> (<em>float</em>)</p></li>
+<li><p><strong>r_values</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>return_r</strong> (<em>bool</em>)</p></li>
+<li><p><strong>contrast_renorm</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -444,6 +545,15 @@ patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>alpha</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>theta</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>r</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>contrast_renorm</strong> (<em>bool</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -465,6 +575,13 @@ patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>n</strong> (<em>int</em>)</p></li>
+<li><p><strong>dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 <p class="rubric">Examples</p>
 <p>dim=2 -&gt; S^2 in R^3, output shape (n,3)
@@ -480,6 +597,7 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>(</em><em>n</em><em>,</em><em>4</em><em>) </em><em>real</em><em> or </em><em>(</em><em>n</em><em>,</em><em>2</em><em>) </em><em>complex</em>) – Quaternion coordinates: q = (a,b,c,d) with z1=a+ib, z2=c+id.</p></li>
 <li><p><strong>v</strong> (<em>(</em><em>3</em><em>,</em><em>) </em><em>array-like</em><em>, </em><em>optional</em>) – Axis vector in R^3. Will be normalized. Default is e1 = (1,0,0).</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -506,6 +624,12 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>(n,9) array, row-major flattening of 3x3 matrices.</p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -516,6 +640,13 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>R</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>v</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -546,6 +677,15 @@ dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>radius_mean</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius_clip</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -559,6 +699,12 @@ Convention: e2 = p × e1.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>p</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -570,6 +716,16 @@ Convention: e2 = p × e1.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>equator</strong> (<em>bool</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>radius_mean</strong> (<em>float</em>)</p></li>
+<li><p><strong>radius_clip</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -730,6 +886,21 @@ If a_min == a_max, all patches use that fixed angle.</p>
 </dd>
 </dl>
 </section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_patches</strong> (<em>int</em>)</p></li>
+<li><p><strong>spots</strong> (<em>Sequence</em><em>[</em><em>Sequence</em><em>[</em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>angle_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Tuple</em>[<em>ndarray</em>, <em>ndarray</em>]</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -739,6 +910,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>angle</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -764,6 +941,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 </ul>
 </p>
 </dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>samples_per_filament</strong> (<em>int</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
 </dl>
 </dd></dl>
 
@@ -774,6 +957,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patch_vector</strong> (<em>ndarray</em>)</p></li>
+<li><p><strong>copy</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="simple">
@@ -835,6 +1024,9 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>value</strong> (<em>float</em>)</p>
+</dd>
 </dl>
 </dd></dl>
 
@@ -846,6 +1038,12 @@ If a_min == a_max, all patches use that fixed angle.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>smallest</strong> (<em>float</em>)</p></li>
+<li><p><strong>largest</strong> (<em>float</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -871,6 +1069,17 @@ z2 = R(theta) * exp(i theta)</p>
 <li><p><strong>theta</strong> (<em>(n_points,)    (base angle) optional</em>)</p></li>
 </ul>
 </p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_points</strong> (<em>int</em>)</p></li>
+<li><p><strong>R_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>r_func</strong> (<em>Callable</em><em>[</em><em>[</em><em>ndarray</em><em>]</em><em>, </em><em>ndarray</em><em>]</em>)</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>)</p></li>
+<li><p><strong>rng</strong> (<em>Generator</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>return_theta</strong> (<em>bool</em>)</p></li>
+<li><p><strong>return_alpha</strong> (<em>bool</em>)</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

@@ -138,8 +138,78 @@ class PullbackTotalSpaceResult:
 
 @dataclass
 class BundleResult:
-    """
-    Result of `build_bundle(...)`.
+    r"""
+    Output of :func:`circle_bundles.bundle.build_bundle`.
+
+    A ``BundleResult`` packages the core artifacts of a discrete circle-bundle
+    reconstruction:
+
+    - a **cover** of the base space (charts + nerve + partition of unity),
+    - a **local trivialization** (local circle coordinates per chart),
+    - an estimated **O(2) cocycle** (transition functions on overlaps),
+    - **quality diagnostics** and **characteristic class representatives**,
+    - plus cached convenience methods for downstream analysis and visualization.
+
+    Typical workflow
+    ----------------
+    Build a bundle:
+
+    >>> bundle = cb.build_bundle(data, cover, show=True)
+
+    Inspect characteristic classes / quality (already computed by ``build_bundle``):
+
+    >>> bundle.classes
+    >>> bundle.quality
+
+    Compute a persistence-style filtration over the nerve (cached):
+
+    >>> pers = bundle.get_persistence(show=True)
+
+    Extract a large subcomplex where class representatives become coboundaries (cached):
+
+    >>> mt = bundle.get_max_trivial_subcomplex()
+
+    Compute a global trivialization on that subcomplex (cached):
+
+    >>> gt = bundle.get_global_trivialization()
+    >>> F = gt.F   # global fiber coordinates
+
+    Compute fiber coordinates via the bundle-map solver (cached):
+
+    >>> bm = bundle.get_bundle_map()
+    >>> bm.F
+
+    Build a pullback total space (base | fiber) with a product metric:
+
+    >>> pb = bundle.get_pullback_data(base_weight=1.0, fiber_weight=1.0)
+    >>> pb.total_data, pb.metric
+
+    Notes on caching
+    ---------------
+    Methods named ``get_*`` cache results in ``bundle._cache`` (and also populate
+    the corresponding attribute like ``bundle.persistence`` when called with
+    default settings). Methods named ``compute_*`` perform an explicit recomputation
+    and are intended for power users; they are typically not shown in the rendered docs.
+
+    Attributes
+    ----------
+    cover:
+        Cover object with fields like ``U`` (membership matrix), ``pou`` (partition of unity),
+        landmarks, and nerve accessors (``nerve_edges()``, ``nerve_triangles()``, ...).
+    data:
+        Original data array of shape ``(n_samples, ambient_dim)``.
+    local_triv:
+        Local trivialization result (typically contains ``f`` = local angles per chart).
+    cocycle:
+        Estimated O(2) cocycle / transition data.
+    transitions:
+        Transition-fit report / errors (often includes per-edge RMS angle error).
+    quality:
+        Diagnostic information (edge/triangle consistency, optional witness errors, etc.).
+    classes:
+        Characteristic class representatives (e.g. SW1, Euler, and oriented variants when available).
+    meta:
+        Light provenance and default preferences used in construction.
     """
     cover: Any
     data: np.ndarray
@@ -1132,7 +1202,7 @@ class BundleResult:
     
 
 # ============================================================
-# build_bundle pipeline (unchanged runtime)
+# build_bundle pipeline 
 # ============================================================
 
 def build_bundle(
@@ -1140,49 +1210,42 @@ def build_bundle(
     cover,
     *,
     total_metric=None,
-    cc_alg=None,
-    landmarks_per_patch: int = 200,
-    prime: int = 41,
-    update_frac: float = 0.25,
-    standard_range: bool = False,
-    CircularCoords_cls=None,
+    cc: object = "pca2",
+    # --- Local triv robustness ---
     min_patch_size: int = 10,
-    verbose_triv: Optional[bool] = None,
-    fail_fast_triv: bool = True,
-    pca_anchor: str = "farthest",
-    notify_pca_fallback: bool = True,
+    # --- Transition estimation ---
     weights=None,
     min_points_edge: int = 5,
     ref_angle: float = 0.0,
-    fail_fast_missing_edges: bool = True,
+    # --- Quality / diagnostics ---
     delta_min_points: int = 5,
-    delta_fail_fast: bool = True,
     compute_witness: bool = False,
-    try_orient: bool = True,
-    compute_euler_num: bool = True,
-    require_rank1_fundamental: bool = True,
-    prefer_edge_weight: str = "rms",
-    trivialization_method: str = "singer",
-    theta_units: str = "radians",
+    # --- UX ---
     show: bool = False,
     verbose: Optional[bool] = None,
-) -> BundleResult:
+) -> "BundleResult":
     """
     End-to-end pipeline (core only):
         cover + data -> local triv -> transitions -> quality -> classes
+
+    Notes
+    -----
+    - Characteristic class computation is always performed with:
+        try_orient=True and compute_euler_num=True.
+    - Missing edges during transition estimation are treated as an error.
     """
-    from .trivializations.local_triv import compute_local_triv
+    from .trivializations.local_triv import compute_local_triv, DreimacCCConfig
     from .o2_cocycle import estimate_transitions
     from .analysis.quality import compute_bundle_quality
     from .characteristic_class import compute_classes, show_summary
+    from .utils.status_utils import _status, _status_clear
 
     if verbose is None:
         verbose = bool(show)
-    if verbose_triv is None:
-        verbose_triv = bool(show)
 
     data = np.asarray(data)
 
+    # Build cover if needed
     if getattr(cover, "U", None) is None or getattr(cover, "pou", None) is None:
         cover.build()
 
@@ -1190,26 +1253,25 @@ def build_bundle(
     triangles = list(cover.nerve_triangles())
     tets = list(cover.nerve_tetrahedra())
 
+    # ----------------------------
+    # Local trivializations
+    # ----------------------------
     triv = compute_local_triv(
         data,
         cover.U,
-        cc_alg=cc_alg,
+        cc=cc,
         total_metric=total_metric,
-        landmarks_per_patch=landmarks_per_patch,
-        prime=prime,
-        update_frac=update_frac,
-        standard_range=standard_range,
-        CircularCoords_cls=CircularCoords_cls,
-        pca_anchor=pca_anchor,
-        notify_pca_fallback=notify_pca_fallback,
         min_patch_size=min_patch_size,
-        verbose=verbose_triv,
-        fail_fast=fail_fast_triv,
+        verbose=bool(verbose),
+        fail_fast=True,  # canonical behavior
     )
 
-    if (not fail_fast_triv) and (not np.all(triv.valid)):
+    if not np.all(triv.valid):
         raise ValueError(f"Local triv failed on sets: {sorted(triv.errors.keys())}")
 
+    # ----------------------------
+    # Transition estimation
+    # ----------------------------
     if verbose:
         _status_clear()
         _status("Estimating transition functions...")
@@ -1221,9 +1283,12 @@ def build_bundle(
         weights=weights,
         min_points=min_points_edge,
         ref_angle=ref_angle,
-        fail_fast_missing=fail_fast_missing_edges,
+        fail_fast_missing=True,  # canonical behavior
     )
 
+    # ----------------------------
+    # Quality summary
+    # ----------------------------
     if verbose:
         _status("Gathering summary data...")
 
@@ -1235,10 +1300,13 @@ def build_bundle(
         edges=edges,
         triangles=triangles,
         delta_min_points=delta_min_points,
-        delta_fail_fast=delta_fail_fast,
+        delta_fail_fast=True,  # canonical behavior
         compute_witness=compute_witness,
     )
 
+    # ----------------------------
+    # Characteristic classes (always)
+    # ----------------------------
     if verbose:
         _status("Computing characteristic class representatives...")
 
@@ -1248,10 +1316,13 @@ def build_bundle(
         edges=edges,
         triangles=triangles,
         tets=tets,
-        try_orient=try_orient,
-        compute_euler_num=compute_euler_num,
+        try_orient=True,
+        compute_euler_num=True,
     )
 
+    # ----------------------------
+    # Optional summary visualization
+    # ----------------------------
     if show:
         if verbose:
             _status_clear()
@@ -1260,12 +1331,17 @@ def build_bundle(
         if verbose:
             _status_clear()
 
-    if cc_alg is not None:
-        cc_method = "custom_cc_alg"
-    elif CircularCoords_cls is not None:
-        cc_method = "dreimac"
-    else:
+    # ----------------------------
+    # Metadata (keep only what we might actually use downstream)
+    # ----------------------------
+    if isinstance(cc, str) and cc.lower() == "pca2":
         cc_method = "pca2"
+    elif isinstance(cc, DreimacCCConfig):
+        cc_method = "dreimac"
+    elif callable(cc):
+        cc_method = "custom_cc"
+    else:
+        cc_method = type(cc).__name__
 
     return BundleResult(
         cover=cover,
@@ -1277,22 +1353,11 @@ def build_bundle(
         quality=quality,
         classes=classes,
         meta={
+            "cc_method": str(cc_method),
+            "min_patch_size": int(min_patch_size),
             "ref_angle": float(ref_angle),
             "min_points_edge": int(min_points_edge),
             "delta_min_points": int(delta_min_points),
-            "prime": int(prime),
-            "landmarks_per_patch": int(landmarks_per_patch),
-            "min_patch_size": int(min_patch_size),
-            "cc_method": str(cc_method),
-            "pca_anchor": str(pca_anchor),
-            "prefer_edge_weight": str(prefer_edge_weight),
-            "trivialization_method": str(trivialization_method),
-            "theta_units": str(theta_units),
+            "compute_witness": bool(compute_witness),
         },
     )
-
-
-
-
-
-
