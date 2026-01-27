@@ -1,16 +1,47 @@
-# class_persistence.py
+# circle_bundles/analysis/class_persistence.py
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, Literal
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Literal,
+    TypedDict,
+    Union,
+)
 
 import numpy as np
 
 from ..nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 
-
 Simp = Tuple[int, ...]  # generic simplex as sorted tuple
 Tet = Tuple[int, int, int, int]
+
+__all__ = [
+    # result containers
+    "CobirthResult",
+    "CodeathResult",
+    "PersistenceResult",
+    # helpers
+    "canon_simplex",
+    "simplex_dim",
+    "canon_edge_tuple",
+    "canon_tri_tuple",
+    "canon_tet_tuple",
+    "ensure_edges_tris_tets",
+    "ensure_edges_tris",
+    "build_edge_weights_from_transition_report",
+    # persistence
+    "compute_bundle_persistence",
+    "summarize_edge_driven_persistence",
+    # subcomplex helper
+    "_edges_for_subcomplex_from_persistence",
+]
 
 
 # ============================================================
@@ -45,7 +76,16 @@ def canon_tet_tuple(t: Tet) -> Tet:
 
 @dataclass
 class CobirthResult:
-    # edge-driven: k_removed edges have been removed when property first holds
+    """
+    Cobirth event for an edge-driven filtration.
+
+    k_removed:
+        Number of edges removed (heaviest-first) when the property first holds.
+    cutoff_weight:
+        The filtration cutoff weight at that stage (∞ for k_removed=0).
+    removed_edges:
+        The list of edges removed up to and including that stage (canonical form).
+    """
     k_removed: int
     cutoff_weight: float
     removed_edges: List[Edge]
@@ -53,9 +93,24 @@ class CobirthResult:
 
 @dataclass
 class CodeathResult:
+    """
+    Codeath event for an edge-driven filtration. Same fields as CobirthResult.
+    """
     k_removed: int
     cutoff_weight: float
     removed_edges: List[Edge]
+
+
+class EdgeDrivenReport(TypedDict):
+    """
+    Typed shape of the dict returned by sw1_persistence_edge_driven() and
+    twisted_euler_persistence_2complex_edge_driven().
+
+    NOTE: This is purely for typing/docs. Runtime value is still a normal dict.
+    """
+    cobirth: CobirthResult
+    codeath: CodeathResult
+    removal_order: List[Edge]
 
 
 # ============================================================
@@ -457,7 +512,7 @@ def sw1_persistence_edge_driven(
     triangles: List[Tri],
     omega_Z2: Dict[Edge, int],
     edge_weights: Dict[Edge, float],
-) -> Dict[str, object]:
+) -> EdgeDrivenReport:
     """
     Edge-driven filtration:
       remove edges in descending weight order (heaviest first).
@@ -558,12 +613,12 @@ def twisted_euler_persistence_2complex_edge_driven(
     omega_O1: Dict[Edge, int],
     edge_weights: Dict[Edge, float],
     tets: Optional[List[Tet]] = None,
-) -> Dict[str, object]:
+) -> EdgeDrivenReport:
     """
     Edge-driven filtration for the twisted Euler representative e ∈ C^2(Z_ω).
 
-    If no tets are provided (or tets is empty), this matches the old behavior:
-      - cobirth is set to 0 (we assume/accept e is a cocycle on the 2-complex)
+    If no tets are provided (or tets is empty), old behavior:
+      - cobirth is set to 0 (accept e as a cocycle on the 2-complex)
       - codeath is first k such that e becomes a twisted coboundary:
             e ∈ Im(δ_ω: C^1 -> C^2) restricted to kept edges/triangles.
 
@@ -583,14 +638,14 @@ def twisted_euler_persistence_2complex_edge_driven(
     omega = {canon_edge_tuple(e): int(v) for e, v in omega_O1.items()}
     euler = {canon_tri_tuple(t): int(v) for t, v in euler_class.items()}
 
-    # old δ_ω: C^1 -> C^2 membership test matrix
+    # δ_ω: C^1 -> C^2 membership test matrix
     A12_full = build_delta_C1_to_C2_Z_twisted(edges=E_all, triangles=T_all, omega_O1=omega).astype(np.int64)
     b2_full = np.array([euler.get(t, 0) for t in T_all], dtype=np.int64)
 
     e_index = {e: idx for idx, e in enumerate(E_all)}
     t_index = {t: idx for idx, t in enumerate(T_all)}
 
-    # new δ_ω: C^2 -> C^3 cocycle test matrix (only if tets exist)
+    # δ_ω: C^2 -> C^3 cocycle test matrix (only if tets exist)
     A23_full = None
     if len(TT_all) > 0:
         A23_full = build_delta_C2_to_C3_Z_twisted(triangles=T_all, tets=TT_all, omega_O1=omega).astype(np.int64)
@@ -625,12 +680,10 @@ def twisted_euler_persistence_2complex_edge_driven(
                 kept_tet_rows = [tt_index[tt] for tt in kept_tets]
 
                 if len(kept_tri_cols) == 0:
-                    # no triangles present => e restricted is zero cochain; cocycle vacuously
                     is_cocycle = True
                 else:
                     A_t = A23_full[np.ix_(kept_tet_rows, kept_tri_cols)]
                     b_t = b2_full[kept_tri_cols]
-                    # exact integer check: A_t @ b_t == 0
                     is_cocycle = bool(np.all((A_t @ b_t) == 0))
 
             if cob is None and is_cocycle:
@@ -643,7 +696,6 @@ def twisted_euler_persistence_2complex_edge_driven(
         # -------- codeath (twisted coboundary) --------
         if cob is not None and cod is None:
             if len(kept_tris) == 0:
-                # no 2-simplices => any 2-cochain restricts to zero, hence coboundary
                 cod = CodeathResult(
                     k_removed=k,
                     cutoff_weight=cutoff_weight_from_k(rem_order, ew, k),
@@ -787,23 +839,34 @@ def build_edge_weights_from_transition_report(
 
 @dataclass
 class PersistenceResult:
+    """
+    Container for edge-driven persistence outputs.
+
+    sw1 and twisted_euler are dicts with keys:
+      "cobirth", "codeath", "removal_order"
+    and are typed as EdgeDrivenReport for docs/IDE help.
+    """
     edges: List[Edge]
     triangles: List[Tri]
     tets: List[Tet]
     vertices: List[Simp]
     edge_weights: Dict[Edge, float]
-    sw1: Dict[str, object]
-    twisted_euler: Dict[str, object]
+    sw1: EdgeDrivenReport
+    twisted_euler: EdgeDrivenReport
 
 
 SubcomplexMode = Literal["full", "cocycle", "max_trivial"]
 
-def _edges_for_subcomplex_from_persistence(p, mode: SubcomplexMode) -> List[Edge]:
+def _edges_for_subcomplex_from_persistence(p: PersistenceResult, mode: SubcomplexMode) -> List[Edge]:
     """
-    p is a PersistenceResult from compute_bundle_persistence.
-    Returns the list of kept edges (in canonical (i<j) form) for the chosen mode.
+    Returns the list of kept edges (canonical i<j) for the chosen mode, using the
+    (heaviest-first) filtration order from p.sw1["removal_order"].
+
+    mode:
+      - "full": keep all edges
+      - "cocycle": keep edges after max(cobirth times)
+      - "max_trivial": keep edges after max(codeath times)
     """
-    # In your persistence code, the true edge filtration order lives here:
     rem_order = list(p.sw1["removal_order"])  # heaviest first, length = #edges
 
     if mode == "full":
@@ -907,7 +970,6 @@ def summarize_edge_driven_persistence(
     - "r" means cutoff weight at that stage (∞ for the full complex).
     - |W_r^(d)| are the counts of d-simplices in the induced subcomplex.
     """
-
     # ----------------------------
     # Canonicalize full complex
     # ----------------------------
@@ -917,7 +979,7 @@ def summarize_edge_driven_persistence(
 
     ew = {canon_edge_tuple(e): float(w) for e, w in p.edge_weights.items()}
 
-    # Filtration order (heaviest removed first) — this defines the induced subcomplex at stage k
+    # Filtration order (heaviest removed first)
     rem_order = [canon_edge_tuple(e) for e in list(p.sw1["removal_order"])]
 
     # ----------------------------
@@ -929,7 +991,6 @@ def summarize_edge_driven_persistence(
         return arr[:top_k]
 
     def fmt_r_3(w: float) -> str:
-        """Cutoff display: 3 decimals, or ±∞."""
         if np.isposinf(w):
             return "∞"
         if np.isneginf(w):
@@ -937,10 +998,6 @@ def summarize_edge_driven_persistence(
         return f"{float(w):.3f}"
 
     def stage_sizes(k_removed: int) -> Tuple[int, int, int]:
-        """
-        Induced subcomplex sizes after removing the first k_removed edges from rem_order,
-        and keeping exactly those triangles/tets from the FULL nerve supported by kept edges.
-        """
         k = int(k_removed)
         if k < 0:
             raise ValueError(f"k_removed must be >= 0 (got {k}). This should not happen.")
@@ -962,7 +1019,6 @@ def summarize_edge_driven_persistence(
     te_cob: CobirthResult = p.twisted_euler["cobirth"]
     te_cod: CodeathResult = p.twisted_euler["codeath"]
 
-    # "Should never happen" guard
     for name, res in [
         ("sw1_cobirth", sw1_cob),
         ("sw1_codeath", sw1_cod),
@@ -973,16 +1029,14 @@ def summarize_edge_driven_persistence(
             raise ValueError(f"{name}.k_removed is {res.k_removed}. Expected >= 0.")
 
     # ----------------------------
-    # Stage rows (always include full)
+    # Stage rows
     # ----------------------------
-    # Each row: (label, k, r_str, |W_r^(1)|, |W_r^(2)|, |W_r^(3)|, removed_edges_top)
     rows: List[Tuple[str, int, str, int, int, int, List[Tuple[Edge, float]]]] = []
 
-    # full complex row = k=0, r=∞
     full_ke, full_kt, full_ktt = stage_sizes(0)
     rows.append(("Full nerve", 0, "∞", full_ke, full_kt, full_ktt, []))
 
-    def add_row(label: str, res_obj):
+    def add_row(label: str, res_obj: Union[CobirthResult, CodeathResult]):
         k = int(res_obj.k_removed)
         r_str = fmt_r_3(float(res_obj.cutoff_weight))
         ke, kt, ktt = stage_sizes(k)
@@ -993,9 +1047,6 @@ def summarize_edge_driven_persistence(
     add_row("Euler cobirth", te_cob)
     add_row("Euler codeath", te_cod)
 
-    # ----------------------------
-    # Output dict 
-    # ----------------------------
     out: Dict[str, Any] = {
         "n_edges_total": int(len(E_all)),
         "n_triangles_total": int(len(T_all)),
@@ -1012,7 +1063,7 @@ def summarize_edge_driven_persistence(
             }
             for (lab, k, r_str, ne, nt, ntt, red_top) in rows
         ],
-        # Back-compat keys for the four “events”
+        # Back-compat keys
         "SW1 cobirth": {
             "k_removed": int(sw1_cob.k_removed),
             "cutoff_weight": float(sw1_cob.cutoff_weight),
@@ -1055,9 +1106,6 @@ def summarize_edge_driven_persistence(
     # Renderers
     # ----------------------------
     def _display_summary_latex_persistence(rows_for_tex) -> bool:
-        """
-        rows_for_tex: list of tuples (stage, k, r_str, ne, nt, ntt)
-        """
         try:
             from IPython.display import display, Math  # type: ignore
         except Exception:
@@ -1072,7 +1120,6 @@ def summarize_edge_driven_persistence(
 
         body = []
         for stage, k, r_str, ne, nt, ntt in rows_for_tex:
-            # stage is text; keep it inside \text{...}
             body.append(rf"\text{{{stage}}} & {k} & {_fmt_r_tex(r_str)} & {ne} & {nt} & {ntt}")
 
         latex = (
@@ -1121,9 +1168,6 @@ def summarize_edge_driven_persistence(
             )
         print("")
 
-    # ----------------------------
-    # Show (text/latex/auto/both)
-    # ----------------------------
     if show:
         core_rows = [(lab, k, r_str, ne, nt, ntt) for (lab, k, r_str, ne, nt, ntt, _top) in rows]
 

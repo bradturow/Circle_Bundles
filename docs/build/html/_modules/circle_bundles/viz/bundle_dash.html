@@ -1,0 +1,1125 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.viz.bundle_dash &mdash; circle_bundles 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.viz.bundle_dash</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.viz.bundle_dash</h1><div class="highlight"><pre>
+<span></span><span class="c1"># circle_bundles/viz/bundle_dash.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;BundleVizInputs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;find_free_port&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;prepare_bundle_viz_inputs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;prepare_bundle_viz_inputs_from_bundle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_bundle_app&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;run_bundle_app&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;show_bundle_vis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;save_bundle_snapshot&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Data container</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BundleVizInputs</span><span class="p">:</span>
+    <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>                 <span class="c1"># (m, d_base)</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>                        <span class="c1"># (m, d_data)</span>
+    <span class="n">dist_mat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>                    <span class="c1"># (m, m)</span>
+    <span class="n">colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># (m,)</span>
+    <span class="n">densities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># (m,)</span>
+
+    <span class="c1"># Total-space / fiber landmarks: list of (m,) bool masks over *downsampled* points</span>
+    <span class="n">data_landmark_masks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Base landmarks:</span>
+    <span class="c1"># - base_landmark_masks: list of (m,) bool masks over *downsampled* points (subset of base_points)</span>
+    <span class="c1"># - base_landmark_points: list of (L_i, d_base) arrays (extra points not necessarily in dataset)</span>
+    <span class="n">base_landmark_masks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">base_landmark_points</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">sample_inds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>           <span class="c1"># (m,) indices into original</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Helpers</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">find_free_port</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pick an available local port (best-effort).&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getsockname</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_embed_base_points_pca</span><span class="p">(</span><span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return:</span>
+<span class="sd">      emb: (n,3) embedding (pads with zeros if base dim &lt; 3)</span>
+<span class="sd">      explained: cumulative explained variance ratio, length &lt;=3</span>
+<span class="sd">      pca: fitted PCA object (so we can transform landmark points consistently)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Imports scikit-learn lazily (only when this is called).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;bundle_dash PCA embedding requires scikit-learn. Install with `pip install scikit-learn`.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">base_points</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base_points must be 2D (n_points, dim).&quot;</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base_points has zero columns.&quot;</span><span class="p">)</span>
+
+    <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="n">emb</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">base_points</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">explained</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)[:</span> <span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">d</span><span class="p">)]</span>
+
+    <span class="k">if</span> <span class="n">emb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">emb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">emb</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">emb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">emb</span><span class="p">,</span> <span class="n">explained</span><span class="p">,</span> <span class="n">pca</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_to_unit_interval</span><span class="p">(</span><span class="n">vals</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vmin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span>
+    <span class="n">vmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">vmax</span> <span class="o">&lt;=</span> <span class="n">vmin</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">vals</span> <span class="o">-</span> <span class="n">vmin</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">vmax</span> <span class="o">-</span> <span class="n">vmin</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_bool_masks_any</span><span class="p">(</span><span class="n">inds_or_masks</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Accept:</span>
+<span class="sd">      - None</span>
+<span class="sd">      - ndarray (n,) bool-ish</span>
+<span class="sd">      - ndarray (k,n) or (n,k) bool-ish</span>
+<span class="sd">      - list/tuple of arrays (n,)</span>
+<span class="sd">    Return: list of bool masks [(n,), ...] or None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">inds_or_masks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inds_or_masks</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">inds_or_masks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> length mismatch: expected </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># allow (n,k) or (k,n); canonicalize to (k,n)</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span> <span class="ow">and</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">T</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;2D </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must have one axis length </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">; got </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> ndarray must be 1D or 2D.&quot;</span><span class="p">)</span>
+
+    <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">inds_or_masks</span><span class="p">:</span>
+        <span class="n">mm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mm</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Each </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> mask must be shape (</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">,), got </span><span class="si">{</span><span class="n">mm</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mm</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">masks</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_subset_masks</span><span class="p">(</span><span class="n">masks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span> <span class="n">sample_inds</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+    <span class="k">if</span> <span class="n">masks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)[</span><span class="n">sample_inds</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_base_landmarks</span><span class="p">(</span>
+    <span class="n">landmarks</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;landmarks&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base-landmarks input normalization.</span>
+
+<span class="sd">    Accepts:</span>
+<span class="sd">      - None</span>
+<span class="sd">      - points: ndarray (L, d_base)</span>
+<span class="sd">      - mask:   ndarray (n,) bool</span>
+<span class="sd">      - inds:   ndarray (L,) int</span>
+<span class="sd">      - list/tuple of any mixture of the above (each element is one &quot;group&quot;)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      (base_landmark_masks_full, base_landmark_points_full)</span>
+<span class="sd">        - base_landmark_masks_full: list of (n,) bool masks selecting points in base_points</span>
+<span class="sd">        - base_landmark_points_full: list of (L_i, d_base) arrays (extra points)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">landmarks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bp</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base_points must be 2D.&quot;</span><span class="p">)</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">d_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_one</span><span class="p">(</span><span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+        <span class="c1"># bool mask</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="nb">bool</span> <span class="ow">and</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> bool mask length mismatch: expected </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">),</span> <span class="kc">None</span>
+
+        <span class="c1"># index array</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span> <span class="ow">and</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">idx</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">n</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> index out of bounds for n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">mask</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="n">mask</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="c1"># points array</span>
+        <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">int</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="n">d_base</span><span class="p">:</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pts</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> entries must be bool mask (n,), int indices (L,), or points (L,d_base=</span><span class="si">{</span><span class="n">d_base</span><span class="si">}</span><span class="s2">). &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Got array with shape </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> dtype </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">pts_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">landmarks</span><span class="p">:</span>
+            <span class="n">m</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">_one</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">pts_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">p</span> <span class="o">=</span> <span class="n">_one</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pts_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">masks</span> <span class="k">if</span> <span class="n">masks</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span> <span class="p">(</span><span class="n">pts_groups</span> <span class="k">if</span> <span class="n">pts_groups</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_click_index</span><span class="p">(</span><span class="n">clickData</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dash clickData typically looks like:</span>
+<span class="sd">      {&quot;points&quot;:[{&quot;pointIndex&quot;: i, ...}]}  (sometimes pointNumber)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">clickData</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">clickData</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">clickData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;points&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">pts</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">pt0</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">pts</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pt0</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">pt0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pointIndex&quot;</span><span class="p">,</span> <span class="n">pt0</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pointNumber&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_call_get_dist_mat</span><span class="p">(</span>
+    <span class="n">get_dist_mat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>
+    <span class="n">bp</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">base_metric</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Priority:</span>
+<span class="sd">      1) If base_metric has .pairwise, use base_metric.pairwise(bp) directly.</span>
+<span class="sd">      2) Else if get_dist_mat provided, try get_dist_mat(bp, metric=base_metric) then fallback get_dist_mat(bp)</span>
+<span class="sd">      3) Else fallback to circle_bundles.metrics.get_dist_mat(bp, metric=base_metric)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1) Metric object fast path</span>
+    <span class="k">if</span> <span class="n">base_metric</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">base_metric</span><span class="p">,</span> <span class="s2">&quot;pairwise&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_metric</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="n">bp</span><span class="p">))</span>
+
+    <span class="c1"># 2) User-provided callable</span>
+    <span class="k">if</span> <span class="n">get_dist_mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">get_dist_mat</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">base_metric</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">get_dist_mat</span><span class="p">(</span><span class="n">bp</span><span class="p">))</span>
+
+    <span class="c1"># 3) Library fallback</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">..metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_dist_mat</span> <span class="k">as</span> <span class="n">_get_dist_mat</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">_get_dist_mat</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">base_metric</span><span class="p">))</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Prep (pure)</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_bundle_viz_inputs</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">get_dist_mat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">full_dist_mat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_metric</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">same_metric</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
+    <span class="n">colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">densities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_landmark_inds</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">landmarks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleVizInputs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Produce a downsampled view of base_points/data plus a distance matrix.</span>
+
+<span class="sd">    Landmarks</span>
+<span class="sd">    ---------</span>
+<span class="sd">    - data_landmark_inds: masks over points (n,) or list of such, used to highlight points in the *fiber* PCA panel.</span>
+<span class="sd">    - landmarks: base-landmarks to highlight in the *base* panel.</span>
+
+<span class="sd">    If full_dist_mat is provided and same_metric=True, we will:</span>
+<span class="sd">      - use it directly if no downsampling happened</span>
+<span class="sd">      - otherwise subset it via dist_mat = full_dist_mat[sample_inds][:, sample_inds]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">base_points</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">base_points</span> <span class="o">=</span> <span class="n">base_points</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">base_points</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;base_points must be 2D.&quot;</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data and base_points must align: data </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> vs base </span><span class="si">{</span><span class="n">base_points</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;colors must have length n.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">densities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">densities</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">densities</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;densities must have length n.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+
+    <span class="c1"># total-space landmark masks (over full n)</span>
+    <span class="n">data_landmark_masks_full</span> <span class="o">=</span> <span class="n">_normalize_bool_masks_any</span><span class="p">(</span><span class="n">data_landmark_inds</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data_landmark_inds&quot;</span><span class="p">)</span>
+
+    <span class="c1"># base landmarks (over full n masks and/or extra points)</span>
+    <span class="n">base_landmark_masks_full</span><span class="p">,</span> <span class="n">base_landmark_points_full</span> <span class="o">=</span> <span class="n">_normalize_base_landmarks</span><span class="p">(</span>
+        <span class="n">landmarks</span><span class="p">,</span> <span class="n">base_points</span><span class="o">=</span><span class="n">base_points</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;landmarks&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_samples</span><span class="p">):</span>
+        <span class="n">sample_inds</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_samples</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">sample_inds</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>  <span class="c1"># stable order helps toggling / reproducibility</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sample_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">bp</span> <span class="o">=</span> <span class="n">base_points</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span> <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">densities</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span> <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">data_lm</span> <span class="o">=</span> <span class="n">_subset_masks</span><span class="p">(</span><span class="n">data_landmark_masks_full</span><span class="p">,</span> <span class="n">sample_inds</span><span class="p">)</span>
+    <span class="n">base_lm_masks</span> <span class="o">=</span> <span class="n">_subset_masks</span><span class="p">(</span><span class="n">base_landmark_masks_full</span><span class="p">,</span> <span class="n">sample_inds</span><span class="p">)</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Use / subset full dist matrix when available</span>
+    <span class="k">if</span> <span class="n">full_dist_mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">same_metric</span><span class="p">):</span>
+        <span class="n">full_dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">full_dist_mat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">full_dist_mat</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;full_dist_mat must be (n,n) with n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2">. Got </span><span class="si">{</span><span class="n">full_dist_mat</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">full_dist_mat</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span class="p">(</span><span class="n">sample_inds</span><span class="p">,</span> <span class="n">sample_inds</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">_call_get_dist_mat</span><span class="p">(</span><span class="n">get_dist_mat</span><span class="p">,</span> <span class="n">bp</span><span class="p">,</span> <span class="n">base_metric</span><span class="p">)</span>
+
+    <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">dist_mat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dist_mat</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dist_mat must be (m,m). Got </span><span class="si">{</span><span class="n">dist_mat</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2"> for m=</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># extra base landmark points (not necessarily in the dataset)</span>
+    <span class="n">base_lm_pts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">base_landmark_points_full</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">d_base</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">base_lm_pts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pts</span> <span class="ow">in</span> <span class="n">base_landmark_points_full</span><span class="p">:</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pts</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">d_base</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Each landmarks points group must be (L_i, </span><span class="si">{</span><span class="n">d_base</span><span class="si">}</span><span class="s2">), got </span><span class="si">{</span><span class="n">pts</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">base_lm_pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">BundleVizInputs</span><span class="p">(</span>
+        <span class="n">base_points</span><span class="o">=</span><span class="n">bp</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">X</span><span class="p">,</span>
+        <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="n">c</span><span class="p">,</span>
+        <span class="n">densities</span><span class="o">=</span><span class="n">d</span><span class="p">,</span>
+        <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_lm</span><span class="p">,</span>
+        <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_lm_masks</span><span class="p">,</span>
+        <span class="n">base_landmark_points</span><span class="o">=</span><span class="n">base_lm_pts</span><span class="p">,</span>
+        <span class="n">sample_inds</span><span class="o">=</span><span class="n">sample_inds</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_bundle_viz_inputs_from_bundle</span><span class="p">(</span>
+    <span class="n">bundle</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">get_dist_mat</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
+    <span class="n">base_metric</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">densities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_landmark_inds</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">landmarks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleVizInputs</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BundleResult-aware prep:</span>
+<span class="sd">      - uses bundle.cover.base_points</span>
+<span class="sd">      - uses bundle.data</span>
+<span class="sd">      - uses bundle.cover.full_dist_mat if present</span>
+<span class="sd">      - uses bundle.cover.metric as default base_metric</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cover</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">cover</span>
+    <span class="n">base_points</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;base_points&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">base_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;bundle.cover.base_points is missing (needed for show_bundle).&quot;</span><span class="p">)</span>
+
+    <span class="n">cover_metric</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;metric&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">base_metric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_metric</span> <span class="o">=</span> <span class="n">cover_metric</span>
+    <span class="k">if</span> <span class="n">base_metric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">..metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">EuclideanMetric</span>
+        <span class="n">base_metric</span> <span class="o">=</span> <span class="n">EuclideanMetric</span><span class="p">()</span>
+
+    <span class="n">same_metric</span> <span class="o">=</span> <span class="p">(</span><span class="n">base_metric</span> <span class="ow">is</span> <span class="n">cover_metric</span><span class="p">)</span>
+    <span class="n">full_dist_mat</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;full_dist_mat&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">prepare_bundle_viz_inputs</span><span class="p">(</span>
+        <span class="n">base_points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bundle</span><span class="o">.</span><span class="n">data</span><span class="p">),</span>
+        <span class="n">get_dist_mat</span><span class="o">=</span><span class="n">get_dist_mat</span><span class="p">,</span>
+        <span class="n">full_dist_mat</span><span class="o">=</span><span class="n">full_dist_mat</span><span class="p">,</span>
+        <span class="n">base_metric</span><span class="o">=</span><span class="n">base_metric</span><span class="p">,</span>
+        <span class="n">same_metric</span><span class="o">=</span><span class="n">same_metric</span><span class="p">,</span>
+        <span class="n">max_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_samples</span><span class="p">),</span>
+        <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+        <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
+        <span class="n">data_landmark_inds</span><span class="o">=</span><span class="n">data_landmark_inds</span><span class="p">,</span>
+        <span class="n">landmarks</span><span class="o">=</span><span class="n">landmarks</span><span class="p">,</span>
+        <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Pure figure construction (reused by Dash + snapshot saving)</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_make_figures</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">base_embedded</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>                        <span class="c1"># (n,3)</span>
+    <span class="n">explained_variance</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>                   <span class="c1"># (&lt;=3,)</span>
+    <span class="n">base_landmark_masks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>  <span class="c1"># list of (n,) bool masks (subset of base points)</span>
+    <span class="n">base_landmarks_embedded</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>  <span class="c1"># list of (L_i,3) extra points</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>                                <span class="c1"># (n, d_data)</span>
+    <span class="n">dist_mat</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>                            <span class="c1"># (n,n)</span>
+    <span class="n">colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">normalized_colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">densities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">data_landmark_masks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]],</span>  <span class="c1"># list of (n,) bool masks (for fiber panel)</span>
+    <span class="n">selected_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">density_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;go.Figure&quot;</span><span class="p">,</span> <span class="s2">&quot;go.Figure&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns (fig_base, fig_data, label, variance_text).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Imports plotly + sklearn lazily (only when called).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;bundle_dash figure construction requires plotly. Install with `pip install plotly`.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;bundle_dash fiber PCA requires scikit-learn. Install with `pip install scikit-learn`.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_embedded</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="c1"># Marker sizes (priority: red &gt; landmark &gt; blue &gt; gray)</span>
+    <span class="n">size_gray</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">size_blue</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">size_landmark</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">size_red</span> <span class="o">=</span> <span class="mi">7</span>
+
+    <span class="c1"># --- base plot ---</span>
+    <span class="n">fig_base</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+    <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_gray</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgray&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+            <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Base Points&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># --- data plot ---</span>
+    <span class="n">fig_data</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">()</span>
+    <span class="n">variance_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PCA Variance (Base): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">explained_variance</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;Selected Point: (none)&quot;</span>
+
+    <span class="k">if</span> <span class="n">selected_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">selected_index</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Selected Point (</span><span class="si">{</span><span class="n">selected_index</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="n">nearby_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist_mat</span><span class="p">[</span><span class="n">selected_index</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">density_threshold</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">densities</span><span class="p">[</span><span class="n">nearby_indices</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">nearby_indices</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filtered</span> <span class="o">=</span> <span class="n">nearby_indices</span>
+
+        <span class="c1"># Base plot: neighbors first (blue), then landmarks, then selected (red) last.</span>
+        <span class="k">if</span> <span class="n">filtered</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+            <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">filtered</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                    <span class="n">y</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">filtered</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                    <span class="n">z</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">filtered</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_blue</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Neighbors&quot;</span><span class="p">,</span>
+                    <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Base plot: dataset landmarks (masks over base points)</span>
+        <span class="k">if</span> <span class="n">base_landmark_masks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lm_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;magenta&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">base_landmark_masks</span><span class="p">):</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                    <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                            <span class="n">x</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                            <span class="n">y</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                            <span class="n">z</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_landmark</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">lm_colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm_colors</span><span class="p">)],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.95</span><span class="p">),</span>
+                            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Landmarks </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># Base plot: extra landmark points (not necessarily in dataset)</span>
+        <span class="k">if</span> <span class="n">base_landmarks_embedded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lm_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;magenta&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">L3</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">base_landmarks_embedded</span><span class="p">):</span>
+                <span class="n">L3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">L3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">L3</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                    <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                        <span class="n">x</span><span class="o">=</span><span class="n">L3</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">L3</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">L3</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+                        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                        <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_landmark</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">lm_colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm_colors</span><span class="p">)],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.95</span><span class="p">),</span>
+                        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Landmarks (extra) </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Base plot: selected point last (red)</span>
+        <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+            <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">selected_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">selected_index</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                <span class="n">z</span><span class="o">=</span><span class="p">[</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">selected_index</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_red</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Selected&quot;</span><span class="p">,</span>
+                <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Fiber PCA</span>
+        <span class="n">nearby_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">filtered</span><span class="p">]</span> <span class="k">if</span> <span class="n">filtered</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nearby_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">pca_fiber</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">nearby_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">fiber_pca</span> <span class="o">=</span> <span class="n">pca_fiber</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">nearby_data</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fiber_pca</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">fiber_pca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">fiber_pca</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">fiber_pca</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+
+            <span class="n">fiber_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">pca_fiber</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+            <span class="n">variance_text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;PCA Variance (Fiber): </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">fiber_var</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">if</span> <span class="n">normalized_colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cvals</span> <span class="o">=</span> <span class="n">normalized_colors</span><span class="p">[</span><span class="n">filtered</span><span class="p">]</span>
+                <span class="n">orig</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">filtered</span><span class="p">]</span>
+                <span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">orig</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">nonzero</span><span class="p">):</span>
+                    <span class="n">fig_data</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                            <span class="n">x</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="n">nonzero</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="n">nonzero</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="n">nonzero</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">cvals</span><span class="p">[</span><span class="n">nonzero</span><span class="p">],</span> <span class="n">colorscale</span><span class="o">=</span><span class="s2">&quot;hsv&quot;</span><span class="p">,</span> <span class="n">cmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">cmax</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Fiber (colored)&quot;</span><span class="p">,</span>
+                            <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="o">~</span><span class="n">nonzero</span><span class="p">):</span>
+                    <span class="n">fig_data</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                            <span class="n">x</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="o">~</span><span class="n">nonzero</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="o">~</span><span class="n">nonzero</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="o">~</span><span class="n">nonzero</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;gray&quot;</span><span class="p">),</span>
+                            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Fiber (zero)&quot;</span><span class="p">,</span>
+                            <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">fig_data</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                    <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                        <span class="n">x</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+                        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                        <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">),</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Fiber&quot;</span><span class="p">,</span>
+                        <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Total-space landmarks in the fiber panel (masks are over downsampled indexing)</span>
+            <span class="k">if</span> <span class="n">data_landmark_masks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">lm_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;magenta&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data_landmark_masks</span><span class="p">):</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                    <span class="n">local</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">[</span><span class="n">filtered</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">local</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                        <span class="n">fig_data</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                            <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                                <span class="n">x</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="n">local</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="n">local</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">fiber_pca</span><span class="p">[</span><span class="n">local</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                                <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">lm_colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm_colors</span><span class="p">)],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.9</span><span class="p">),</span>
+                                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Data Landmarks </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">nearby_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">fig_data</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="p">[</span><span class="mf">0.0</span><span class="p">],</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                    <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Fiber (1 point)&quot;</span><span class="p">,</span>
+                    <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">variance_text</span> <span class="o">=</span> <span class="s2">&quot;PCA Variance (Fiber): (neighborhood has 1 point)&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">variance_text</span> <span class="o">=</span> <span class="s2">&quot;PCA Variance (Fiber): (empty neighborhood)&quot;</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Even with no selection, still show base landmarks (so you can orient yourself)</span>
+        <span class="k">if</span> <span class="n">base_landmark_masks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lm_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;magenta&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">mask</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">base_landmark_masks</span><span class="p">):</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mask</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
+                    <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                        <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                            <span class="n">x</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                            <span class="n">y</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                            <span class="n">z</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+                            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                            <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_landmark</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">lm_colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm_colors</span><span class="p">)],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.95</span><span class="p">),</span>
+                            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Landmarks </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">base_landmarks_embedded</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lm_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;purple&quot;</span><span class="p">,</span> <span class="s2">&quot;cyan&quot;</span><span class="p">,</span> <span class="s2">&quot;magenta&quot;</span><span class="p">,</span> <span class="s2">&quot;yellow&quot;</span><span class="p">,</span> <span class="s2">&quot;black&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">L3</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">base_landmarks_embedded</span><span class="p">):</span>
+                <span class="n">L3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">L3</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">L3</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">fig_base</span><span class="o">.</span><span class="n">add_trace</span><span class="p">(</span>
+                    <span class="n">go</span><span class="o">.</span><span class="n">Scatter3d</span><span class="p">(</span>
+                        <span class="n">x</span><span class="o">=</span><span class="n">L3</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">L3</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">z</span><span class="o">=</span><span class="n">L3</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span>
+                        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
+                        <span class="n">marker</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size_landmark</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">lm_colors</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm_colors</span><span class="p">)],</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.95</span><span class="p">),</span>
+                        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Landmarks (extra) </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">hoverinfo</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+    <span class="n">fig_base</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Base Points&quot;</span><span class="p">,</span>
+        <span class="n">scene</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">zaxis_title</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span><span class="p">),</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">uirevision</span><span class="o">=</span><span class="s2">&quot;bundle-viewer&quot;</span><span class="p">,</span>   <span class="c1"># ✅ preserve camera</span>
+    <span class="p">)</span>
+    <span class="n">fig_data</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Fiber Data&quot;</span><span class="p">,</span>
+        <span class="n">scene</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">zaxis_title</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span><span class="p">),</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">uirevision</span><span class="o">=</span><span class="s2">&quot;bundle-viewer&quot;</span><span class="p">,</span>   <span class="c1"># ✅ preserve camera</span>
+    <span class="p">)</span>
+    
+    
+    <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">variance_text</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Dash app (thin wrapper)</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_bundle_app</span><span class="p">(</span>
+    <span class="n">viz</span><span class="p">:</span> <span class="n">BundleVizInputs</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">initial_r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">r_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the Dash app.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Imports dash lazily (only when this is called).</span>
+<span class="sd">    - Plotly/sklearn are also lazy via helper functions called here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Local imports so importing this module doesn&#39;t require dash</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">dash</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dash</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dash.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;make_bundle_app requires dash. Install with `pip install dash`.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">dist_mat</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">colors</span>
+    <span class="n">densities</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">densities</span>
+
+    <span class="n">data_landmark_masks</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">data_landmark_masks</span>
+    <span class="n">base_landmark_masks</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">base_landmark_masks</span>
+    <span class="n">base_landmark_points</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">base_landmark_points</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">base_points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">dist_mat</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;viz inputs misaligned.&quot;</span><span class="p">)</span>
+
+    <span class="n">base_embedded</span><span class="p">,</span> <span class="n">explained_variance</span><span class="p">,</span> <span class="n">pca_base</span> <span class="o">=</span> <span class="n">_embed_base_points_pca</span><span class="p">(</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="n">normalized_colors</span> <span class="o">=</span> <span class="n">_normalize_to_unit_interval</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">base_landmarks_embedded</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">base_landmark_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_landmarks_embedded</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">base_landmark_points</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">pca_base</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+            <span class="n">base_landmarks_embedded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">dash</span><span class="o">.</span><span class="n">Dash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="n">layout_children</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span>
+                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span>
+                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="s2">&quot;400px&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-bottom&quot;</span><span class="p">:</span> <span class="s2">&quot;25px&quot;</span><span class="p">},</span>
+                            <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;displayModeBar&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                        <span class="p">),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;selected-point&quot;</span><span class="p">,</span>
+                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;10px&quot;</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
+                        <span class="p">),</span>
+                    <span class="p">],</span>
+                    <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;50%&quot;</span><span class="p">,</span> <span class="s2">&quot;display&quot;</span><span class="p">:</span> <span class="s2">&quot;inline-block&quot;</span><span class="p">,</span> <span class="s2">&quot;verticalAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">dcc</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span>
+                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;data-plot&quot;</span><span class="p">,</span>
+                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="s2">&quot;400px&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-bottom&quot;</span><span class="p">:</span> <span class="s2">&quot;25px&quot;</span><span class="p">},</span>
+                            <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;displayModeBar&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                        <span class="p">),</span>
+                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;pca-variance&quot;</span><span class="p">,</span>
+                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;10px&quot;</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
+                        <span class="p">),</span>
+                    <span class="p">],</span>
+                    <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;50%&quot;</span><span class="p">,</span> <span class="s2">&quot;display&quot;</span><span class="p">:</span> <span class="s2">&quot;inline-block&quot;</span><span class="p">,</span> <span class="s2">&quot;verticalAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">},</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;display&quot;</span><span class="p">:</span> <span class="s2">&quot;flex&quot;</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="s2">&quot;justify-content&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span>
+                    <span class="nb">min</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                    <span class="nb">max</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r_max</span><span class="p">),</span>
+                    <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                    <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">initial_r</span><span class="p">),</span>
+                    <span class="n">marks</span><span class="o">=</span><span class="p">{</span><span class="mf">0.01</span><span class="p">:</span> <span class="s2">&quot;0.01&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">r_max</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">r_max</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">r_max</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">r_max</span><span class="p">)},</span>
+                    <span class="n">tooltip</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;placement&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;always_visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                    <span class="n">updatemode</span><span class="o">=</span><span class="s2">&quot;drag&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;80%&quot;</span><span class="p">,</span> <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-top&quot;</span><span class="p">:</span> <span class="s2">&quot;20px&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="s2">&quot;Adjust the neighborhood radius (r):&quot;</span><span class="p">,</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;-10px&quot;</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dmin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">densities</span><span class="p">))</span>
+        <span class="n">dmax</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">densities</span><span class="p">))</span>
+        <span class="n">layout_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">dcc</span><span class="o">.</span><span class="n">Slider</span><span class="p">(</span>
+                        <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;density-slider&quot;</span><span class="p">,</span>
+                        <span class="nb">min</span><span class="o">=</span><span class="n">dmin</span><span class="p">,</span>
+                        <span class="nb">max</span><span class="o">=</span><span class="n">dmax</span><span class="p">,</span>
+                        <span class="n">step</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+                        <span class="n">value</span><span class="o">=</span><span class="n">dmin</span><span class="p">,</span>
+                        <span class="n">marks</span><span class="o">=</span><span class="p">{</span><span class="nb">round</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">round</span><span class="p">(</span><span class="n">dmax</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">dmax</span><span class="p">,</span> <span class="mi">2</span><span class="p">))},</span>
+                        <span class="n">tooltip</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;placement&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;always_visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                        <span class="n">updatemode</span><span class="o">=</span><span class="s2">&quot;drag&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                        <span class="s2">&quot;Density threshold: show points with density &gt; d&quot;</span><span class="p">,</span>
+                        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;80%&quot;</span><span class="p">,</span> <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-top&quot;</span><span class="p">:</span> <span class="s2">&quot;20px&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">app</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">layout_children</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;maxWidth&quot;</span><span class="p">:</span> <span class="s2">&quot;95vw&quot;</span><span class="p">})</span>
+
+    <span class="n">callback_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;clickData&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">callback_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;density-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">))</span>
+
+    <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span> <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;data-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span>
+         <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;selected-point&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span> <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;pca-variance&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">)],</span>
+        <span class="n">callback_inputs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_figures</span><span class="p">(</span><span class="n">clickData</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">selected_index</span> <span class="o">=</span> <span class="n">_parse_click_index</span><span class="p">(</span><span class="n">clickData</span><span class="p">)</span>
+
+        <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">variance_text</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
+            <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
+            <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
+            <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
+            <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+            <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+            <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
+            <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
+            <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
+            <span class="n">selected_index</span><span class="o">=</span><span class="n">selected_index</span><span class="p">,</span>
+            <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+            <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">density_threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">variance_text</span>
+
+    <span class="k">return</span> <span class="n">app</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_bundle_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># local import (dash is optional until you run)</span>
+    <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="n">find_free_port</span><span class="p">()</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://127.0.0.1:</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Bundle viewer running at: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">debug</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">debug</span><span class="p">),</span> <span class="n">use_reloader</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">))</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Public general entrypoint</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="show_bundle_vis">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.show_bundle_vis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_bundle_vis</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">get_dist_mat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">full_dist_mat</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_metric</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">same_metric</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">initial_r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">r_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">colors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">densities</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_landmark_inds</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">landmarks</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">max_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">port</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    General interactive viewer for (data, base_points) where base_points live in some metric space.</span>
+
+<span class="sd">    - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat/base_metric).</span>
+<span class="sd">    - &quot;Fiber Data&quot; shows PCA of data restricted to the selected neighborhood.</span>
+
+<span class="sd">    This function only requires Dash/Plotly/sklearn if it is actually called.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">viz</span> <span class="o">=</span> <span class="n">prepare_bundle_viz_inputs</span><span class="p">(</span>
+        <span class="n">base_points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">),</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
+        <span class="n">get_dist_mat</span><span class="o">=</span><span class="n">get_dist_mat</span><span class="p">,</span>
+        <span class="n">full_dist_mat</span><span class="o">=</span><span class="n">full_dist_mat</span><span class="p">,</span>
+        <span class="n">base_metric</span><span class="o">=</span><span class="n">base_metric</span><span class="p">,</span>
+        <span class="n">same_metric</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">same_metric</span><span class="p">),</span>
+        <span class="n">max_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_samples</span><span class="p">),</span>
+        <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+        <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
+        <span class="n">data_landmark_inds</span><span class="o">=</span><span class="n">data_landmark_inds</span><span class="p">,</span>
+        <span class="n">landmarks</span><span class="o">=</span><span class="n">landmarks</span><span class="p">,</span>
+        <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">app</span> <span class="o">=</span> <span class="n">make_bundle_app</span><span class="p">(</span><span class="n">viz</span><span class="p">,</span> <span class="n">initial_r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">initial_r</span><span class="p">),</span> <span class="n">r_max</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r_max</span><span class="p">))</span>
+    <span class="n">run_bundle_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">app</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Snapshot saving (offline, no Dash required)</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="save_bundle_snapshot">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.save_bundle_snapshot">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_bundle_snapshot</span><span class="p">(</span>
+    <span class="n">viz</span><span class="p">:</span> <span class="n">BundleVizInputs</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">selected_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">density_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_html</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_html</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">base_image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">data_image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="s2">&quot;go.Figure&quot;</span><span class="p">,</span> <span class="s2">&quot;go.Figure&quot;</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the two figures for a given (selected_index, r, density_threshold) and optionally save.</span>
+
+<span class="sd">    Notes on saving:</span>
+<span class="sd">      - HTML always works: fig.write_html(&quot;file.html&quot;)</span>
+<span class="sd">      - Static images require &#39;kaleido&#39;:</span>
+<span class="sd">          pip install -U kaleido</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>  <span class="c1"># noqa: F401  (for return type at runtime)</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;save_bundle_snapshot requires plotly. Install with `pip install plotly`.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">dist_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">viz</span><span class="o">.</span><span class="n">dist_mat</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">colors</span>
+    <span class="n">densities</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">densities</span>
+
+    <span class="n">data_landmark_masks</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">data_landmark_masks</span>
+    <span class="n">base_landmark_masks</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">base_landmark_masks</span>
+    <span class="n">base_landmark_points</span> <span class="o">=</span> <span class="n">viz</span><span class="o">.</span><span class="n">base_landmark_points</span>
+
+    <span class="n">base_embedded</span><span class="p">,</span> <span class="n">explained_variance</span><span class="p">,</span> <span class="n">pca_base</span> <span class="o">=</span> <span class="n">_embed_base_points_pca</span><span class="p">(</span><span class="n">base_points</span><span class="p">)</span>
+    <span class="n">normalized_colors</span> <span class="o">=</span> <span class="n">_normalize_to_unit_interval</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">base_landmarks_embedded</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">base_landmark_points</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_landmarks_embedded</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">base_landmark_points</span><span class="p">:</span>
+            <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="n">pca_base</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+            <span class="n">base_landmarks_embedded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">L</span><span class="p">)</span>
+
+    <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
+        <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
+        <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
+        <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
+        <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+        <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+        <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
+        <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
+        <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
+        <span class="n">selected_index</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">selected_index</span><span class="p">),</span>
+        <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+        <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">density_threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">base_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig_base</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">base_html</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data_html</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig_data</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="n">data_html</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">base_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig_base</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">base_image</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">fig_data</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">data_image</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow, Jose A. Perea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Optical flow utilities &mdash; circle_bundles 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="synthetic.html" />
+    <link rel="prev" title="Visualization" href="visualization.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#contrast-directions">Contrast + directions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_contrast_norms"><code class="docutils literal notranslate"><span class="pre">get_contrast_norms()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_dct_basis"><code class="docutils literal notranslate"><span class="pre">get_dct_basis()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_predominant_dirs"><code class="docutils literal notranslate"><span class="pre">get_predominant_dirs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_lifted_predominant_dirs"><code class="docutils literal notranslate"><span class="pre">get_lifted_predominant_dirs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#frames-and-annotation">Frames and annotation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.change_path"><code class="docutils literal notranslate"><span class="pre">change_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_labeled_frame"><code class="docutils literal notranslate"><span class="pre">get_labeled_frame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.write_video_from_frames"><code class="docutils literal notranslate"><span class="pre">write_video_from_frames()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_labeled_video"><code class="docutils literal notranslate"><span class="pre">get_labeled_video()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.annotate_optical_flow"><code class="docutils literal notranslate"><span class="pre">annotate_optical_flow()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_sintel_scene_folders"><code class="docutils literal notranslate"><span class="pre">get_sintel_scene_folders()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#flow-processing">Flow processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.read_flo"><code class="docutils literal notranslate"><span class="pre">read_flo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_from_frame"><code class="docutils literal notranslate"><span class="pre">sample_from_frame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_patch_sample"><code class="docutils literal notranslate"><span class="pre">get_patch_sample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.preprocess_flow_patches"><code class="docutils literal notranslate"><span class="pre">preprocess_flow_patches()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#patch-visualization">Patch visualization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_patch_visualizer"><code class="docutils literal notranslate"><span class="pre">make_patch_visualizer()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Optical flow utilities</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/optical_flow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="optical-flow-utilities">
+<h1>Optical flow utilities<a class="headerlink" href="#optical-flow-utilities" title="Link to this heading"></a></h1>
+<section id="contrast-directions">
+<h2>Contrast + directions<a class="headerlink" href="#contrast-directions" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_contrast_norms">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_contrast_norms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'opt_flow'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/contrast.html#get_contrast_norms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_contrast_norms" title="Link to this definition"></a></dt>
+<dd><p>Vectorized contrast norms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>array</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>n^2</em><em>) </em><em>for intensity patches</em><em>,</em>) – or (N, 2*n^2) for optical flow (u then v).</p></li>
+<li><p><strong>patch_type</strong> (<em>{'img'</em><em>,</em><em>'opt_flow'</em><em>,</em><em>'flow'}</em>) – ‘flow’ is accepted as an alias for ‘opt_flow’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>norms</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(N,) array, sqrt( x^T D x ) (and sum across u,v for flow)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_dct_basis">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_dct_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opt_flow</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_two</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/contrast.html#get_dct_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_dct_basis" title="Link to this definition"></a></dt>
+<dd><p>Generate a 2D DCT-II basis for N×N patches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>basis</strong> (<em>(M, N^2) if opt_flow=False</em>) – (2*M, 2*N^2) if opt_flow=True (stack horizontal then vertical)</p></li>
+<li><p><em>where M = N^2 (or N^2-1 if normalize=True, since DC is dropped).</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>If normalize=True, drop the DC component, mean-center each basis vector,
+then contrast-normalize using get_contrast_norms (via flow padding trick).</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_predominant_dirs">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_predominant_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patches</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/contrast.html#get_predominant_dirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_predominant_dirs" title="Link to this definition"></a></dt>
+<dd><p>Predominant direction in RP^1 via PCA of (u_i, v_i) vectors across pixels.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>patches</strong> (<em>(</em><em>N</em><em>, </em><em>2*n^2</em><em>)</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>predom_dirs</strong> (<em>(N,) angles in [0, pi)</em>)</p></li>
+<li><p><strong>ratios</strong> (<em>(N,) directionality score in [0,1] ( (λ1-λ2)/λ1 )</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_lifted_predominant_dirs">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_lifted_predominant_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow_patches</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/contrast.html#get_lifted_predominant_dirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_lifted_predominant_dirs" title="Link to this definition"></a></dt>
+<dd><p>For each patch, find the pixel with largest flow magnitude and return its unit vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flow_patches</strong> (<em>(</em><em>N</em><em>, </em><em>2*n^2</em><em>)</em>)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>unit</strong></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(N,2) unit vectors (zeros where magnitude is tiny)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="frames-and-annotation">
+<h2>Frames and annotation<a class="headerlink" href="#frames-and-annotation" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.change_path">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">change_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_base</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_frames.html#change_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.change_path" title="Link to this definition"></a></dt>
+<dd><p>Map a Sintel .flo path to its corresponding .png frame path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>old_base/…/flow/&lt;scene&gt;/frame_0001.flo</p>
+<p>-&gt; new_base/…/clean/&lt;scene&gt;/frame_0001.png</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_labeled_frame">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_labeled_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">frame_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_df</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dot_radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">('#4B0082',</span> <span class="pre">'#FF4500',</span> <span class="pre">'#ADD8E6')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_frames.html#get_labeled_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_labeled_frame" title="Link to this definition"></a></dt>
+<dd><p>Draw colored dots at patch locations on a Sintel frame.</p>
+<p>patch_df must have columns: [‘row’, ‘column’, ‘color’].
+‘color’ can be any hashable ID (ints/strings). IDs are mapped to custom_colors.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.write_video_from_frames">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">write_video_from_frames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_video</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'MJPG'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_frames.html#write_video_from_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.write_video_from_frames" title="Link to this definition"></a></dt>
+<dd><p>Write an AVI video from a sequence of image paths using OpenCV.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_labeled_video">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_labeled_video</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flo_paths</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_num</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inds_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_flow_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_frame_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_frames.html#get_labeled_video"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_labeled_video" title="Link to this definition"></a></dt>
+<dd><p>Create a labeled-frame video for a single scene.</p>
+<p>patch_df must contain at least columns: [‘scene’,’frame’,’row’,’column’].
+inds_list is a list of boolean masks (length == len(patch_df)) selecting patches.
+Each mask becomes one color group (0,1,2,…).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Assumes flo_paths are ordered by frame number, corresponding to frames 1..T.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.annotate_optical_flow">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">annotate_optical_flow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice_res</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(20,</span> <span class="pre">30)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_frames.html#annotate_optical_flow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.annotate_optical_flow" title="Link to this definition"></a></dt>
+<dd><p>Overlay optical flow vectors at lattice points on each frame and save as PDFs.
+Skips the last image in image_dir (since it may not have a .flo match).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_sintel_scene_folders">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_sintel_scene_folders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'clean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'all'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_frames.html#get_sintel_scene_folders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_sintel_scene_folders" title="Link to this definition"></a></dt>
+<dd><p>Return folder paths for each scene in Sintel.</p>
+<p>base_path should contain subfolders like: ‘clean’, ‘final’, ‘flow’</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="flow-processing">
+<h2>Flow processing<a class="headerlink" href="#flow-processing" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.read_flo">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">read_flo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_processing.html#read_flo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.read_flo" title="Link to this definition"></a></dt>
+<dd><p>Read a Middlebury/Sintel .flo optical flow file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>flow</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(H, W, 2) float32 array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_from_frame">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_from_frame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flo_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_patches</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_processing.html#sample_from_frame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_from_frame" title="Link to this definition"></a></dt>
+<dd><p>Sample n_patches random dxd optical flow patches from a .flo file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>samples</strong> – [0 : d*d)       : u components (flattened Fortran order)
+[d*d : 2*d*d)   : v components
+[-2], [-1]      : (row, col) top-left corner in the frame</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(n_patches, 2*d*d + 2) array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_patch_sample">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_patch_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flow_root</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patches_per_frame</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">385</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_processing.html#get_patch_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_patch_sample" title="Link to this definition"></a></dt>
+<dd><p>Sample patches_per_frame from every .flo file under flow_root/<em>/</em>.flo.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>patch_df</strong> (<em>DataFrame with columns [‘patch’,’row’,’column’,’scene’,’frame’]</em>) – where ‘patch’ stores a 1D np.ndarray of length 2*d*d.</p></li>
+<li><p><strong>file_paths</strong> (<em>list of lists of .flo Paths, grouped by scene folder order</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.preprocess_flow_patches">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">preprocess_flow_patches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_df</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hc_frac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(300,)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/flow_processing.html#preprocess_flow_patches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.preprocess_flow_patches" title="Link to this definition"></a></dt>
+<dd><p>Preprocess optical flow patches in patch_df.</p>
+<p>Requires patch_df[‘patch’] to contain length-2*n^2 vectors.</p>
+<p>Steps:
+- infer n
+- compute x/y mean
+- compute contrast norm + keep top hc_frac
+- downsample to max_samples
+- mean-center + contrast-normalize
+- compute density estimates 1 / dist_to_kNN for each k in k_list
+- sort by largest k density (descending)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataFrame</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="patch-visualization">
+<h2>Patch visualization<a class="headerlink" href="#patch-visualization" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_patch_visualizer">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_patch_visualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fig_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'minmax'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_intensity_grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_grid_lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flipud</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flow_normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'maxmag'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiver_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.02</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headlength</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">border_lw_mult</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/optical_flow/patch_viz.html#make_patch_visualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_patch_visualizer" title="Link to this definition"></a></dt>
+<dd><p>Canonical patch visualizer.</p>
+<ul class="simple">
+<li><p>intensity (n^2): uses imshow, optional grid overlay</p></li>
+<li><p>flow (2*n^2): quiver arrows on grid, optional vertical flip for display convention</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>vis_func(patch_vector) -&gt; matplotlib Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="visualization.html" class="btn btn-neutral float-left" title="Visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="synthetic.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow, Jose A. Perea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

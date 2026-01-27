@@ -1,0 +1,337 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.synthetic.tori_and_kb &mdash; circle_bundles 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.synthetic.tori_and_kb</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.synthetic.tori_and_kb</h1><div class="highlight"><pre>
+<span></span><span class="c1"># synthetic/tori_and_kb.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AngleFunc&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;const&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;small_to_big&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;wrap_angle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sample_C2_torus&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;torus_base_projection_from_data&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;kb_pairwise_distances_from_data&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">AngleFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">const</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AngleFunc</span><span class="p">:</span>
+    <span class="n">value_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">angle</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">value_f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span>
+
+
+<div class="viewcode-block" id="small_to_big">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.small_to_big">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">small_to_big</span><span class="p">(</span><span class="n">smallest</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">largest</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AngleFunc</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    V-shaped function with maximum at angle=pi and minimum at angle=0,2pi.</span>
+
+<span class="sd">    Returns values in [smallest, largest] for angles in [0,2pi].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">smallest_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">smallest</span><span class="p">)</span>
+    <span class="n">largest_f</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">largest</span><span class="p">)</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="p">(</span><span class="n">smallest_f</span> <span class="o">-</span> <span class="n">largest_f</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">f</span><span class="p">(</span><span class="n">angle</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">angle</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">+</span> <span class="n">largest_f</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># angle helpers</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap_angle</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap angles into [0, 2pi).&quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_angle_dist</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Minimal circular distance on S^1 between angles a and b (both arrays broadcastable).</span>
+<span class="sd">    Returns values in [0, pi].</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">d</span><span class="p">)</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Torus in C^2 = R^4</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="sample_C2_torus">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.sample_C2_torus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_C2_torus</span><span class="p">(</span>
+    <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="c1"># Base circle radius in the (x3,x4) plane (constant or varying with theta)</span>
+    <span class="n">R_func</span><span class="p">:</span> <span class="n">AngleFunc</span> <span class="o">=</span> <span class="n">const</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span>
+    <span class="c1"># Fiber circle radius in the (x1,x2) plane (allowed to vary with theta)</span>
+    <span class="n">r_func</span><span class="p">:</span> <span class="n">AngleFunc</span> <span class="o">=</span> <span class="n">const</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span>
+    <span class="c1"># Relative noise level on the radius: r_noisy = r * (1 + sigma * N(0,1))</span>
+    <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="c1"># Returns</span>
+    <span class="n">return_theta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_alpha</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+<span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sample a product-torus-style embedding in R^4 = C^2.</span>
+
+<span class="sd">        z1 = r(theta) * exp(i alpha)</span>
+<span class="sd">        z2 = R(theta) * exp(i theta)</span>
+
+<span class="sd">    So the base projection is directly recoverable from data via arg(z2).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : (n_points, 4)</span>
+<span class="sd">    base_points : (n_points, 2) = (cos(theta), sin(theta))</span>
+<span class="sd">    alpha : (n_points,)    (fiber angle)</span>
+<span class="sd">    theta : (n_points,)    (base angle) optional</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_points</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_points must be positive. Got </span><span class="si">{</span><span class="n">n_points</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+
+    <span class="n">angles</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">R_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">R_func</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">r_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">r_func</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">R_vals</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_points</span><span class="p">,)</span> <span class="ow">or</span> <span class="n">r_vals</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_points</span><span class="p">,):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;R_func and r_func must return arrays of shape (n_points,) &quot;</span>
+            <span class="s2">&quot;when given (n_points,) input.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">R_vals</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">r_vals</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;R_func and r_func must be strictly positive everywhere.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="c1"># relative noise on radius (keeps scale meaningful across varying r(theta))</span>
+        <span class="n">r_vals</span> <span class="o">=</span> <span class="n">r_vals</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n_points</span><span class="p">))</span>
+        <span class="c1"># keep radii positive (rare if sigma is modest, but guard anyway)</span>
+        <span class="n">r_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">r_vals</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
+
+    <span class="n">ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">sa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_vals</span> <span class="o">*</span> <span class="n">ca</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_vals</span> <span class="o">*</span> <span class="n">sa</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">R_vals</span> <span class="o">*</span> <span class="n">ct</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">R_vals</span> <span class="o">*</span> <span class="n">st</span>
+
+    <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">ct</span><span class="p">,</span> <span class="n">st</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">return_theta</span> <span class="ow">and</span> <span class="n">return_alpha</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">r_vals</span>
+    <span class="k">if</span> <span class="n">return_theta</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">theta</span>
+    <span class="k">if</span> <span class="n">return_alpha</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">torus_base_projection_from_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recover base points (cos theta, sin theta) from data in R^4 by normalizing (x3,x4).</span>
+<span class="sd">    This works even if R(theta) varies (as long as it&#39;s positive).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data shape (n,4). Got </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">nrm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">z2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">nrm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">nrm</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">z2</span> <span class="o">/</span> <span class="n">nrm</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Klein bottle metric on the torus parameterization</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_kb_angle_dist</span><span class="p">(</span>
+    <span class="n">alpha1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">theta1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">alpha2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">theta2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Distance on the Klein bottle viewed as a quotient of the flat torus by:</span>
+<span class="sd">        (alpha, theta) ~ (alpha + pi, -theta)</span>
+
+<span class="sd">    We use the induced quotient metric:</span>
+<span class="sd">        d_KB(p,q) = min( d_T(p,q), d_T(p, g(q)) )</span>
+<span class="sd">    where d_T is the flat torus metric with circular distances in each angle,</span>
+<span class="sd">    and g(alpha,theta) = (alpha+pi, -theta).</span>
+
+<span class="sd">    Returns array broadcasted over inputs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># torus distance between (a1,t1) and (a2,t2)</span>
+    <span class="n">da</span> <span class="o">=</span> <span class="n">_angle_dist</span><span class="p">(</span><span class="n">alpha1</span><span class="p">,</span> <span class="n">alpha2</span><span class="p">)</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">_angle_dist</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">theta2</span><span class="p">)</span>
+    <span class="n">d0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">da</span> <span class="o">*</span> <span class="n">da</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
+
+    <span class="c1"># torus distance between (a1,t1) and g(a2,t2) = (a2+pi, -t2)</span>
+    <span class="n">da_g</span> <span class="o">=</span> <span class="n">_angle_dist</span><span class="p">(</span><span class="n">alpha1</span><span class="p">,</span> <span class="n">wrap_angle</span><span class="p">(</span><span class="n">alpha2</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>
+    <span class="n">dt_g</span> <span class="o">=</span> <span class="n">_angle_dist</span><span class="p">(</span><span class="n">theta1</span><span class="p">,</span> <span class="n">wrap_angle</span><span class="p">(</span><span class="o">-</span><span class="n">theta2</span><span class="p">))</span>
+    <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">da_g</span> <span class="o">*</span> <span class="n">da_g</span> <span class="o">+</span> <span class="n">dt_g</span> <span class="o">*</span> <span class="n">dt_g</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">d0</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">kb_pairwise_distances_from_data</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute an (n,n) distance matrix using the Klein bottle quotient metric</span>
+<span class="sd">    on angles extracted from the R^4 torus data.</span>
+
+<span class="sd">    - alpha is recovered from (x1,x2) via atan2</span>
+<span class="sd">    - theta is recovered from (x3,x4) via atan2</span>
+
+<span class="sd">    This does NOT change the ambient embedding; it gives you a KB-topology metric</span>
+<span class="sd">    on the same point cloud.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data shape (n,4). Got </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># Recover angles; robust even if radii vary (atan2 ignores scale)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">wrap_angle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]))</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">wrap_angle</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]))</span>
+
+    <span class="c1"># Pairwise quotient metric (O(n^2))</span>
+    <span class="n">A1</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">T1</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">A2</span> <span class="o">=</span> <span class="n">alpha</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">theta</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="n">D</span> <span class="o">=</span> <span class="n">_kb_angle_dist</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">T1</span><span class="p">,</span> <span class="n">A2</span><span class="p">,</span> <span class="n">T2</span><span class="p">)</span>
+    <span class="c1"># zero diagonal numerically</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">D</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow, Jose A. Perea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

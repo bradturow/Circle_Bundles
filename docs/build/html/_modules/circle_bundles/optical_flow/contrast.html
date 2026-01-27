@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.optical_flow.contrast &mdash; circle_bundles 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.optical_flow.contrast</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.optical_flow.contrast</h1><div class="highlight"><pre>
+<span></span><span class="c1"># optical_flow/contrast.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">linalg</span> <span class="k">as</span> <span class="n">LA</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;mean_center&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_D_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_contrast_norms&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_dct_basis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_predominant_dirs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_lifted_predominant_dirs&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Basic utilities</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mean_center</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Row-wise mean centering.&quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;X must be a 2D array.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">X</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_D_matrix</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dense n^2 × n^2 matrix D such that x^T D x equals the sum of squared</span>
+<span class="sd">    finite differences (horizontal + vertical) on an n×n grid.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This is the graph-Laplacian quadratic form on the n×n grid.</span>
+<span class="sd">    It is dense and scales like O(n^4) memory, but is fine for small n (e.g., 3,5,7).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n must be positive&quot;</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">n</span> <span class="o">+</span> <span class="n">j</span>
+
+            <span class="c1"># horizontal edge (i,j) -- (i,j+1)</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">n</span> <span class="o">+</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">r</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">r</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="c1"># vertical edge (i,j) -- (i+1,j)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n</span> <span class="o">+</span> <span class="n">j</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">d</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">d</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">D</span><span class="p">[</span><span class="n">d</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">D</span>
+
+
+<div class="viewcode-block" id="get_contrast_norms">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.get_contrast_norms">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_contrast_norms</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">patch_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;opt_flow&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vectorized contrast norms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : array of shape (N, n^2) for intensity patches,</span>
+<span class="sd">           or (N, 2*n^2) for optical flow (u then v).</span>
+<span class="sd">    patch_type : {&#39;img&#39;,&#39;opt_flow&#39;,&#39;flow&#39;}</span>
+<span class="sd">        &#39;flow&#39; is accepted as an alias for &#39;opt_flow&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    norms : (N,) array, sqrt( x^T D x ) (and sum across u,v for flow)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;data must be a 2D array of shape (N, d)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">patch_type</span> <span class="o">==</span> <span class="s2">&quot;flow&quot;</span><span class="p">:</span>
+        <span class="n">patch_type</span> <span class="o">=</span> <span class="s2">&quot;opt_flow&quot;</span>
+
+    <span class="k">if</span> <span class="n">patch_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="s2">&quot;opt_flow&quot;</span><span class="p">}:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;patch_type must be one of {&#39;img&#39;,&#39;opt_flow&#39;,&#39;flow&#39;}&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">patch_type</span> <span class="o">==</span> <span class="s2">&quot;opt_flow&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;opt_flow patches must have even length 2*n^2&quot;</span><span class="p">)</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">n2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected n^2 columns; got </span><span class="si">{</span><span class="n">n2</span><span class="si">}</span><span class="s2"> which isn&#39;t a perfect square.&quot;</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span>
+
+    <span class="n">D</span> <span class="o">=</span> <span class="n">get_D_matrix</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">patch_type</span> <span class="o">==</span> <span class="s2">&quot;opt_flow&quot;</span><span class="p">:</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="p">:</span><span class="n">d</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">d</span><span class="p">:</span><span class="mi">2</span> <span class="o">*</span> <span class="n">d</span><span class="p">]</span>
+        <span class="n">quad</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ni,ij,nj-&gt;n&quot;</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">u</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ni,ij,nj-&gt;n&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ni,ij,nj-&gt;n&quot;</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+
+    <span class="n">quad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">quad</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># numerical safety</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># DCT basis (general N)</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="get_dct_basis">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.get_dct_basis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_dct_basis</span><span class="p">(</span>
+    <span class="n">N</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">opt_flow</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">top_two</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a 2D DCT-II basis for N×N patches.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    basis : (M, N^2) if opt_flow=False</span>
+<span class="sd">            (2*M, 2*N^2) if opt_flow=True (stack horizontal then vertical)</span>
+<span class="sd">    where M = N^2 (or N^2-1 if normalize=True, since DC is dropped).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - If normalize=True, drop the DC component, mean-center each basis vector,</span>
+<span class="sd">      then contrast-normalize using get_contrast_norms (via flow padding trick).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">N</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;N must be positive&quot;</span><span class="p">)</span>
+
+    <span class="n">basis</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">N</span><span class="p">,</span> <span class="n">N</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                    <span class="n">patch</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">u</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">))</span> <span class="o">*</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span><span class="p">))</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Light scaling (not crucial since we normalize later)</span>
+            <span class="n">patch</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">u</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">patch</span> <span class="o">*=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">patch</span> <span class="o">*=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+            <span class="n">basis</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>  <span class="c1"># (N^2, N^2)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="c1"># Drop DC component (u=v=0 term)</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">mean_center</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+
+        <span class="c1"># contrast-normalize: treat each as u component with zero v</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">basis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">basis</span><span class="p">)])</span>
+        <span class="n">norms</span> <span class="o">=</span> <span class="n">get_contrast_norms</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="n">patch_type</span><span class="o">=</span><span class="s2">&quot;opt_flow&quot;</span><span class="p">)</span>
+        <span class="n">norms_safe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">norms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">norms</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">basis</span> <span class="o">/</span> <span class="n">norms_safe</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">opt_flow</span><span class="p">:</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">basis</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">basis</span><span class="p">)])</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">basis</span><span class="p">),</span> <span class="n">basis</span><span class="p">])</span>
+        <span class="n">basis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">h</span><span class="p">,</span> <span class="n">v</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">top_two</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">opt_flow</span><span class="p">:</span>
+            <span class="c1"># Choose two low-frequency modes from each component block</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">take0</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">take1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="n">basis</span><span class="p">[[</span><span class="n">take0</span><span class="p">,</span> <span class="n">take1</span><span class="p">,</span> <span class="n">take0</span> <span class="o">+</span> <span class="n">m</span><span class="p">,</span> <span class="n">take1</span> <span class="o">+</span> <span class="n">m</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">take0</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">take1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">basis</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">return</span> <span class="n">basis</span><span class="p">[[</span><span class="n">take0</span><span class="p">,</span> <span class="n">take1</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">basis</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Predominant direction utilities</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="get_predominant_dirs">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.get_predominant_dirs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_predominant_dirs</span><span class="p">(</span><span class="n">patches</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predominant direction in RP^1 via PCA of (u_i, v_i) vectors across pixels.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    patches : (N, 2*n^2)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    predom_dirs : (N,) angles in [0, pi)</span>
+<span class="sd">    ratios      : (N,) directionality score in [0,1] ( (λ1-λ2)/λ1 )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;patches must have shape (N, 2*n^2)&quot;</span><span class="p">)</span>
+
+    <span class="n">N</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">L</span> <span class="o">//</span> <span class="mi">2</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="p">:</span><span class="n">d</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:,</span> <span class="n">d</span><span class="p">:]</span>
+
+    <span class="n">uu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">u</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">uv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">predom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">uu</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">uv</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                      <span class="p">[</span><span class="n">uv</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">vv</span><span class="p">[</span><span class="n">i</span><span class="p">]]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">LA</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">eigvals</span><span class="p">))</span>
+        <span class="n">vec</span> <span class="o">=</span> <span class="n">eigvecs</span><span class="p">[:,</span> <span class="n">idx</span><span class="p">]</span>
+        <span class="n">lam1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eigvals</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+        <span class="n">lam2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eigvals</span><span class="p">[</span><span class="mi">1</span> <span class="o">-</span> <span class="n">idx</span><span class="p">])</span>
+
+        <span class="n">predom</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">lam1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ratios</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">lam1</span> <span class="o">-</span> <span class="n">lam2</span><span class="p">)</span> <span class="o">/</span> <span class="n">lam1</span>
+
+    <span class="k">return</span> <span class="n">predom</span><span class="p">,</span> <span class="n">ratios</span></div>
+
+
+
+<div class="viewcode-block" id="get_lifted_predominant_dirs">
+<a class="viewcode-back" href="../../../api.html#circle_bundles.get_lifted_predominant_dirs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_lifted_predominant_dirs</span><span class="p">(</span><span class="n">flow_patches</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For each patch, find the pixel with largest flow magnitude and return its unit vector.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    flow_patches : (N, 2*n^2)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    unit : (N,2) unit vectors (zeros where magnitude is tiny)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">flow_patches</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;flow_patches must be 2D (N, 2*n^2)&quot;</span><span class="p">)</span>
+    <span class="n">N</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">L</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Each patch must have even length 2*n^2.&quot;</span><span class="p">)</span>
+
+    <span class="n">n2</span> <span class="o">=</span> <span class="n">L</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n2</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">n2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected length 2*n^2 with n^2 a perfect square.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># NOTE: keep Fortran-order convention consistent with your sampling pipeline.</span>
+    <span class="n">V</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+    <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">V</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># (N,n,n)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">mags</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="n">vecs</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># (N,2)</span>
+
+    <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">unit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">norms</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+    <span class="n">unit</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">/</span> <span class="n">norms</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">unit</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow, Jose A. Perea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

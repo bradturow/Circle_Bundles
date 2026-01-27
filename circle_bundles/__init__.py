@@ -182,8 +182,10 @@ from .trivializations.local_triv import (
 # ============================================================
 
 from .bundle import (
-    attach_bundle_viz_methods,
     build_bundle,
+    BundleResult,
+    BundleMapResult,
+    PullbackTotalSpaceResult
 )
 
 # ============================================================

@@ -1,0 +1,911 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Synthetic data &mdash; circle_bundles 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Optical flow utilities" href="optical_flow.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Synthetic data</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#densities">Densities</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.mesh_to_density"><code class="docutils literal notranslate"><span class="pre">mesh_to_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_density_axes"><code class="docutils literal notranslate"><span class="pre">get_density_axes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.rotate_density"><code class="docutils literal notranslate"><span class="pre">rotate_density()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_mesh_sample"><code class="docutils literal notranslate"><span class="pre">get_mesh_sample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#meshes-mesh-visualization">Meshes + mesh visualization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_tri_prism"><code class="docutils literal notranslate"><span class="pre">make_tri_prism()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_star_pyramid"><code class="docutils literal notranslate"><span class="pre">make_star_pyramid()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_density_visualizer"><code class="docutils literal notranslate"><span class="pre">make_density_visualizer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_tri_prism_visualizer"><code class="docutils literal notranslate"><span class="pre">make_tri_prism_visualizer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_star_pyramid_visualizer"><code class="docutils literal notranslate"><span class="pre">make_star_pyramid_visualizer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_rotating_mesh_clip"><code class="docutils literal notranslate"><span class="pre">make_rotating_mesh_clip()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#natural-image-patches">Natural image patches</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_nat_img_kb"><code class="docutils literal notranslate"><span class="pre">sample_nat_img_kb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_gradient_dirs"><code class="docutils literal notranslate"><span class="pre">get_gradient_dirs()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#optical-flow-patch-models">Optical-flow patch models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_opt_flow_torus"><code class="docutils literal notranslate"><span class="pre">sample_opt_flow_torus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_flow_patches"><code class="docutils literal notranslate"><span class="pre">make_flow_patches()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#s2-hopf-unit-tangent-models">S2 / Hopf / unit tangent models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_sphere"><code class="docutils literal notranslate"><span class="pre">sample_sphere()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.hopf_projection"><code class="docutils literal notranslate"><span class="pre">hopf_projection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.spin3_adjoint_to_so3"><code class="docutils literal notranslate"><span class="pre">spin3_adjoint_to_so3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.so3_to_s2_projection"><code class="docutils literal notranslate"><span class="pre">so3_to_s2_projection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_s2_trivial"><code class="docutils literal notranslate"><span class="pre">sample_s2_trivial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.tangent_frame_on_s2"><code class="docutils literal notranslate"><span class="pre">tangent_frame_on_s2()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_s2_unit_tangent"><code class="docutils literal notranslate"><span class="pre">sample_s2_unit_tangent()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#so-3-sampling">SO(3) sampling</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_so3"><code class="docutils literal notranslate"><span class="pre">sample_so3()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.project_o3"><code class="docutils literal notranslate"><span class="pre">project_o3()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#step-edge-patches">Step-edge patches</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_patch_types_list"><code class="docutils literal notranslate"><span class="pre">get_patch_types_list()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_step_edges"><code class="docutils literal notranslate"><span class="pre">make_step_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_all_step_edges"><code class="docutils literal notranslate"><span class="pre">make_all_step_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_binary_step_edges"><code class="docutils literal notranslate"><span class="pre">sample_binary_step_edges()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.mean_center"><code class="docutils literal notranslate"><span class="pre">mean_center()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_step_edge_torus"><code class="docutils literal notranslate"><span class="pre">sample_step_edge_torus()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#tori-klein-bottle-helpers">Tori / Klein bottle helpers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.const"><code class="docutils literal notranslate"><span class="pre">const()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.small_to_big"><code class="docutils literal notranslate"><span class="pre">small_to_big()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_C2_torus"><code class="docutils literal notranslate"><span class="pre">sample_C2_torus()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Synthetic data</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/synthetic.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="synthetic-data">
+<h1>Synthetic data<a class="headerlink" href="#synthetic-data" title="Link to this heading"></a></h1>
+<section id="densities">
+<h2>Densities<a class="headerlink" href="#densities" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.mesh_to_density">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">mesh_to_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_surface_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/densities.html#mesh_to_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.mesh_to_density" title="Link to this definition"></a></dt>
+<dd><p>Convert a mesh into a flattened density on a cubic grid in [-1,1]^3
+by sampling the surface and placing a Gaussian in distance-to-surface.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The mesh is copied, centered (center_mass), and scaled into ~unit ball.</p></li>
+<li><p>Deterministic sampling via rng is not guaranteed across trimesh versions;
+rng is accepted for API consistency but is best-effort.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>density</strong> – Flattened density values.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(grid_size^3,) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_density_axes">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_density_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flat_densities</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smallest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_eigs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/densities.html#get_density_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_density_axes" title="Link to this definition"></a></dt>
+<dd><p>Compute principal axes for a batch of 3D densities on a [-1,1]^3 grid.</p>
+<dl class="simple">
+<dt>For each density rho, compute weighted covariance/inertia:</dt><dd><p>M = Σ rho(x) (x - μ)(x - μ)^T</p>
+</dd>
+<dt>and return either:</dt><dd><ul class="simple">
+<li><p>smallest-eigenvalue direction (least spread), or</p></li>
+<li><p>largest-eigenvalue direction (most spread).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>directions</strong> (<em>(N,3)</em>)</p></li>
+<li><p><strong>ratios</strong> (<em>(N,), optional</em>) – If smallest: (λ_min / λ_mid), else: (λ_max / λ_mid) with a small stabilizer.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.rotate_density">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">rotate_density</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">density</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotations</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'constant'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/densities.html#rotate_density"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.rotate_density" title="Link to this definition"></a></dt>
+<dd><p>Apply 3D rotations to a density grid using interpolation (scipy.ndimage.map_coordinates).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>density</strong> (<em>(</em><em>grid_size^3</em><em>,</em><em>) or </em><em>(</em><em>grid_size</em><em>,</em><em>grid_size</em><em>,</em><em>grid_size</em><em>)</em>)</p></li>
+<li><p><strong>rotations</strong> (<em>(</em><em>k</em><em>,</em><em>9</em><em>) or </em><em>(</em><em>k</em><em>,</em><em>3</em><em>,</em><em>3</em><em>)</em>) – Rotation matrices (SO(3) or O(3)).</p></li>
+<li><p><strong>grid_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Interpolation order (1 = trilinear).</p></li>
+<li><p><strong>mode</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span>) – Passed to map_coordinates.</p></li>
+<li><p><strong>cval</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span>) – Passed to map_coordinates.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>rotated_densities</strong> – Flattened rotated densities.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(k, grid_size^3)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_mesh_sample">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_mesh_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">O3_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/densities.html#get_mesh_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_mesh_sample" title="Link to this definition"></a></dt>
+<dd><p>Apply each 3x3 matrix in O3_data to mesh vertices and return flattened vertex arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>trimesh.Trimesh</em>)</p></li>
+<li><p><strong>O3_data</strong> (<em>(</em><em>n_samples</em><em>, </em><em>9</em><em>)</em>) – Flattened 3x3 matrices (SO(3) or O(3)).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>mesh_samples</strong> – Each row is rotated vertices flattened in (x0,y0,z0,x1,y1,z1,…) order.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(n_samples, 3*N)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="meshes-mesh-visualization">
+<h2>Meshes + mesh visualization<a class="headerlink" href="#meshes-mesh-visualization" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_tri_prism">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_tri_prism</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/meshes.html#make_tri_prism"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_tri_prism" title="Link to this definition"></a></dt>
+<dd><p>Create a triangular prism with base an equilateral triangle in the (y,z)-plane
+and extrusion along the x-axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Trimesh</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul>
+<li><p><strong>mesh</strong> (<em>trimesh.Trimesh</em>)</p></li>
+<li><p><strong>face_groups</strong> (<em>list[(start, end_exclusive)]</em>) –</p>
+<dl class="simple">
+<dt>Ranges of triangle faces belonging to the 5 prism faces, in order:</dt><dd><p>0: bottom triangle
+1: top triangle
+2: side face between vertices 0-1
+3: side face between vertices 1-2
+4: side face between vertices 2-0</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_star_pyramid">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_star_pyramid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_outer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_inner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/meshes.html#make_star_pyramid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_star_pyramid" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Create a star-based pyramid mesh:</dt><dd><ul class="simple">
+<li><p>base is a 2D star polygon in the yz-plane at x=0</p></li>
+<li><p>apex at (height, 0, 0)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Triangulates the base polygon using trimesh.creation.triangulate_polygon.</p></li>
+<li><p>Then connects the apex to the boundary cycle (2*n_points edges).</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mesh</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>trimesh.Trimesh</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_density_visualizer">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_density_visualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inferno'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(3.0,</span> <span class="pre">3.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/mesh_vis.html#make_density_visualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_density_visualizer" title="Link to this definition"></a></dt>
+<dd><p>Returns a visualization function for densities on a grid_size^3 voxel grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>grid_size</strong> (<em>int</em>)</p></li>
+<li><p><strong>axis</strong> (<em>{'x'</em><em>,</em><em>'y'</em><em>,</em><em>'z'}</em>) – Axis to sum over.</p></li>
+<li><p><strong>cmap</strong> (<em>str</em>)</p></li>
+<li><p><strong>normalize</strong> (<em>bool</em>) – If True, normalize projection to max=1 for display.</p></li>
+<li><p><strong>figsize</strong> (<em>Figure sizing</em>)</p></li>
+<li><p><strong>dpi</strong> (<em>Figure sizing</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>vis_func(density) -&gt; matplotlib Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_tri_prism_visualizer">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_tri_prism_visualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">face_colors_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(4.0,</span> <span class="pre">4.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_sort</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/mesh_vis.html#make_tri_prism_visualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_tri_prism_visualizer" title="Link to this definition"></a></dt>
+<dd><p>Visualize a triangular prism-style mesh with custom face group coloring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mesh</strong> (<em>trimesh.Trimesh-like</em>) – Must have .vertices and .faces.</p></li>
+<li><p><strong>face_groups</strong> (<em>groups</em><em> of </em><em>face indices</em><em> (</em><em>explicit lists</em><em> or </em><em>(</em><em>start</em><em>,</em><em>end_excl</em><em>) </em><em>ranges</em><em>)</em>)</p></li>
+<li><p><strong>depth_sort</strong> (<em>bool</em>) – If True, manually sorts triangles back-to-front using projected depth
+(helps with alpha blending / occlusion in Matplotlib).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>flat_mesh is expected to be (n_vertices*3,) giving vertex positions.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>vis_func(flat_mesh) -&gt; Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_star_pyramid_visualizer">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_star_pyramid_visualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#94A3B8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'gray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colormap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(4.0,</span> <span class="pre">4.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/mesh_vis.html#make_star_pyramid_visualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_star_pyramid_visualizer" title="Link to this definition"></a></dt>
+<dd><p>Visualizer for a star pyramid mesh with a smooth gradient on side faces.</p>
+<p>Side faces are ordered by the angle of the base-edge midpoint
+in the yz-plane to ensure a stable color assignment.</p>
+<p>Defaults:
+- base faces: muted slate (#94A3B8)
+- side faces: pastel sunset gradient</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">Figure</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_rotating_mesh_clip">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_rotating_mesh_clip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flat_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rotation.gif'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">120</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim_start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">azim_end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">360.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">close_figs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/mesh_vis.html#make_rotating_mesh_clip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_rotating_mesh_clip" title="Link to this definition"></a></dt>
+<dd><p>Create a rotating 3D clip by changing the camera view each frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>frames</strong> – List of RGB frames (H,W,3) uint8.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>list[np.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="natural-image-patches">
+<h2>Natural image patches<a class="headerlink" href="#natural-image-patches" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_nat_img_kb">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_nat_img_kb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">noise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_angles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/nat_img_patches.html#sample_nat_img_kb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_nat_img_kb" title="Link to this definition"></a></dt>
+<dd><p>Synthetic “natural image” patch model parameterizing a Klein bottle.</p>
+<p>Returns mean-centered and L2-normalized patches built from a 1D quadratic + linear
+profile along a direction in RP^1 (theta folded to [0, pi)), with a corresponding
+alpha “fiber” angle adjusted so the model is continuous under the identification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_gradient_dirs">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_gradient_dirs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/nat_img_patches.html#get_gradient_dirs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_gradient_dirs" title="Link to this definition"></a></dt>
+<dd><p>Compute predominant GRADIENT-axis angles in RP^1 for n×n grayscale patches.
+Returns (thetas, strengths).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="optical-flow-patch-models">
+<h2>Optical-flow patch models<a class="headerlink" href="#optical-flow-patch-models" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_opt_flow_torus">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_opt_flow_torus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_lam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast_renorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/opt_flow_patches.html#sample_opt_flow_torus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_opt_flow_torus" title="Link to this definition"></a></dt>
+<dd><p>Sample the optical-flow patch torus model (dim x dim DCT basis, flattened length 2*dim^2),
+with RP^1 base angle theta folded to [0, pi).</p>
+<p>Optionally extends the model with an r-parameter in [r_min, 1] that mixes each patch
+with its perpendicular patch, using:</p>
+<blockquote>
+<div><p>perp patch = (alpha + pi/2, theta - pi/2) (then re-fold),
+lambda = 1/sqrt(2 - r),
+patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>Default behavior:</dt><dd><ul class="simple">
+<li><p>sample_r=True</p></li>
+<li><p>r ~ truncated exponential away from 1 on [r_min, 1]
+(so virtually all mass near 1, but never below r_min).</p></li>
+</ul>
+</dd>
+<dt>Noise:</dt><dd><ul class="simple">
+<li><p>if sigma &gt; 0 and contrast_renorm=True, we add Gaussian noise then contrast-renormalize.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>(n_points, 2*dim^2) ndarray</em>)</p></li>
+<li><p><strong>base_points</strong> (<em>(n_points, 2) ndarray  (cos(theta), sin(theta)), theta in [0, pi)</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>(n_points,) ndarray</em>)</p></li>
+<li><p><strong>r</strong> (<em>(n_points,) ndarray   if return_r=True</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_flow_patches">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_flow_patches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contrast_renorm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/opt_flow_patches.html#make_flow_patches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_flow_patches" title="Link to this definition"></a></dt>
+<dd><p>Generate samples from the extended torus optical-flow patch model (3x3, length 18).</p>
+<p>Folds theta into [0, pi) (RP^1 base) and adjusts alpha accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>If r is provided, it mixes a patch with a perpendicular patch:</dt><dd><p>patches_mix = λ * patches + sqrt(1-λ^2) * patches_perp</p>
+</dd>
+</dl>
+<p>where λ = 1/sqrt(2-r).</p>
+<p>If contrast_renorm=True, rescales each patch to unit “contrast norm”.</p>
+</dd></dl>
+
+</section>
+<section id="s2-hopf-unit-tangent-models">
+<h2>S2 / Hopf / unit tangent models<a class="headerlink" href="#s2-hopf-unit-tangent-models" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_sphere">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_sphere</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#sample_sphere"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_sphere" title="Link to this definition"></a></dt>
+<dd><p>Sample n points ~uniformly from S^{dim} ⊂ R^{dim+1} via Gaussian normalization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>dim=2 -&gt; S^2 in R^3, output shape (n,3)
+dim=3 -&gt; S^3 in R^4, output shape (n,4)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.hopf_projection">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">hopf_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#hopf_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.hopf_projection" title="Link to this definition"></a></dt>
+<dd><p>Generalized Hopf projection defined by q ↦ q v q^{-1}, where v ∈ S^2 ⊂ Im(H).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>(</em><em>n</em><em>,</em><em>4</em><em>) </em><em>real</em><em> or </em><em>(</em><em>n</em><em>,</em><em>2</em><em>) </em><em>complex</em>) – Quaternion coordinates: q = (a,b,c,d) with z1=a+ib, z2=c+id.</p></li>
+<li><p><strong>v</strong> (<em>(</em><em>3</em><em>,</em><em>) </em><em>array-like</em><em>, </em><em>optional</em>) – Axis vector in R^3. Will be normalized. Default is e1 = (1,0,0).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(n,3) array on S^2.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.spin3_adjoint_to_so3">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">spin3_adjoint_to_so3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#spin3_adjoint_to_so3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.spin3_adjoint_to_so3" title="Link to this definition"></a></dt>
+<dd><p>Adjoint map Spin(3) ≅ S^3 (unit quaternions) -&gt; SO(3), vectorized.</p>
+<dl class="simple">
+<dt>Input formats (same as hopf_projection):</dt><dd><ul class="simple">
+<li><p>real (n,4): [a,b,c,d] = [Re z1, Im z1, Re z2, Im z2]</p></li>
+<li><p>complex (n,2): [z1,z2] where z1=a+ib, z2=c+id</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>R_flat</strong></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(n,9) array, row-major flattening of 3x3 matrices.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.so3_to_s2_projection">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">so3_to_s2_projection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#so3_to_s2_projection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.so3_to_s2_projection" title="Link to this definition"></a></dt>
+<dd><p>Projection SO(3) -&gt; S^2 defined by R ↦ R v, with v ∈ S^2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Accepts:</dt><dd><ul class="simple">
+<li><p>(3,3)</p></li>
+<li><p>(n,3,3)</p></li>
+<li><p>(9,) row-major flatten</p></li>
+<li><p>(n,9) row-major flatten</p></li>
+</ul>
+</dd>
+</dl>
+<p>Default v is e1 = (1,0,0).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_s2_trivial">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_s2_trivial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">5.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#sample_s2_trivial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_s2_trivial" title="Link to this definition"></a></dt>
+<dd><p>Product bundle S^2 × S^1 embedded as (base ∈ R^3, fiber ∈ R^2) in R^5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>(n_points, 5) = [base_x, base_y, base_z, fiber_u, fiber_v]</em>)</p></li>
+<li><p><strong>base_points</strong> (<em>(n_points, 3) points on S^2</em>)</p></li>
+<li><p><strong>angles</strong> (<em>(n_points,) fiber angles in radians</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.tangent_frame_on_s2">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">tangent_frame_on_s2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#tangent_frame_on_s2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.tangent_frame_on_s2" title="Link to this definition"></a></dt>
+<dd><p>Given p on S^2, return a positively oriented orthonormal basis (e1,e2) for T_p S^2.
+Convention: e2 = p × e1.</p>
+<p>Stable except very near poles; near poles uses a consistent fallback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_s2_unit_tangent">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_s2_unit_tangent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">5.0)</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/s2_bundles.html#sample_s2_unit_tangent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_s2_unit_tangent" title="Link to this definition"></a></dt>
+<dd><p>Sample the (scaled) unit tangent bundle of S^2 as (tangent ∈ R^3, base ∈ R^3) in R^6.</p>
+<p>If equator=True, restrict base points to the equator z=0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="so-3-sampling">
+<h2>SO(3) sampling<a class="headerlink" href="#so-3-sampling" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_so3">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_so3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/so3_sampling.html#sample_so3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_so3" title="Link to this definition"></a></dt>
+<dd><p>Sample SO(3) (flattened rotation matrices) with optional structured rules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_samples</strong> (<em>int</em>) – Number of samples.</p></li>
+<li><p><strong>rule</strong> (<em>None</em><em> | </em><em>'fiber'</em><em> | </em><em>'equator'</em>) – <ul>
+<li><p>None: Haar-random rotations; returns (data, base_points) where base_points are first columns.</p></li>
+<li><dl class="simple">
+<dt>’fiber’: fix first column to v (or random) and sample a fiber angle θ;</dt><dd><p>returns (data, theta) with theta shape (n_samples,).</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’equator’: choose u on great circle orthogonal to v via angle φ, then choose fiber angle θ;</dt><dd><p>returns (data, angles) with angles shape (n_samples,2) = (phi, theta).</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p></li>
+<li><p><strong>v</strong> (<em>(</em><em>3</em><em>,</em><em>) </em><em>array-like</em><em>, </em><em>optional</em>) – If None, sampled randomly for the structured rules.</p></li>
+<li><p><strong>rng</strong> (<em>np.random.Generator</em><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Stability floor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>(n_samples, 9) ndarray</em>) – Flattened rotation matrices (row-major from (n,3,3) reshape).</p></li>
+<li><p><strong>extra</strong> (<em>ndarray</em>) – Depends on rule (base_points / theta / [phi,theta]).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.project_o3">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">project_o3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">O3_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/so3_sampling.html#project_o3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.project_o3" title="Link to this definition"></a></dt>
+<dd><p>Given flattened O(3) matrices (N, 9), return the image of v under each matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>O3_data</strong> (<em>(</em><em>N</em><em>,</em><em>9</em><em>) </em><em>ndarray</em>) – Row-major flattened 3x3 matrices.</p></li>
+<li><p><strong>v</strong> (<em>(</em><em>3</em><em>,</em><em>) </em><em>ndarray</em><em>, </em><em>optional</em>) – Vector to project. Default is e1.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>out</strong> – (M_i &#64; v) for each matrix M_i.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(N,3) ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="step-edge-patches">
+<h2>Step-edge patches<a class="headerlink" href="#step-edge-patches" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.get_patch_types_list">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_patch_types_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/step_edges.html#get_patch_types_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_patch_types_list" title="Link to this definition"></a></dt>
+<dd><p>Generate the 28 possible filament patch types (legacy convention).</p>
+<p>Each patch type is a list of [i,j] pixel coordinates (0..2) where a vector arrow lives.
+For a 3x3 patch, there are 28 “filament” patterns; we later include sign flips to get 56.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_step_edges">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_step_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_patches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spots</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">angle_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">6.283185307179586)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/step_edges.html#make_step_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_step_edges" title="Link to this definition"></a></dt>
+<dd><p>Generate optical-flow step edge patches as flattened vectors of length 18 (3x3x2).</p>
+<section id="conventions">
+<h3>Conventions<a class="headerlink" href="#conventions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Patch array shaped (n, 3, 3, 2) with last axis = (u,v).</p></li>
+<li><p>Flattening order is ‘F’ to match legacy notebooks.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">type n_patches<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></span></p>
+</dd>
+<dt class="field-even">param n_patches<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of patches to generate.</p>
+</dd>
+<dt class="field-odd">type n_patches<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+<dt class="field-even">type spots<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code>]]</span></p>
+</dd>
+<dt class="field-odd">param spots<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Pixel coordinates where the flow vector is placed.</p>
+</dd>
+<dt class="field-even">type spots<span class="colon">:</span></dt>
+<dd class="field-even"><p>sequence of (i,j)</p>
+</dd>
+<dt class="field-odd">type angle_range<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code>]</span></p>
+</dd>
+<dt class="field-even">param angle_range<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sample directions uniformly from [a_min, a_max].
+If a_min == a_max, all patches use that fixed angle.</p>
+</dd>
+<dt class="field-odd">type angle_range<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(float, float)</p>
+</dd>
+<dt class="field-even">type normalize<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></span></p>
+</dd>
+<dt class="field-odd">param normalize<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If True, contrast-normalize using get_contrast_norms and mean-center each channel.</p>
+</dd>
+<dt class="field-even">type normalize<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+<dt class="field-odd">type rng<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Generator</span></code>]</span></p>
+</dd>
+<dt class="field-even">param rng<span class="colon">:</span></dt>
+<dd class="field-even"><p>Random generator for reproducibility.</p>
+</dd>
+<dt class="field-odd">type rng<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.random.Generator, optional</p>
+</dd>
+<dt class="field-even">type eps<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></span></p>
+</dd>
+<dt class="field-odd">param eps<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Stability floor for normalization.</p>
+</dd>
+<dt class="field-even">type eps<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">returns<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>patch_vectors</strong> (<em>(n_patches, 18)</em>)</p></li>
+<li><p><strong>angles</strong> (<em>(n_patches,)</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_all_step_edges">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_all_step_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/step_edges.html#make_all_step_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_all_step_edges" title="Link to this definition"></a></dt>
+<dd><p>Return the 56 canonical step-edge patterns (28 types + sign flips).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>If angle is None:</dt><dd><p>Returns scalar +/-1 edge patterns as (56, 9) using legacy ‘F’ convention.</p>
+</dd>
+<dt>If angle is not None:</dt><dd><p>Returns flow vectors (56, 18) at that fixed direction (cos(angle), sin(angle)).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_binary_step_edges">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_binary_step_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">samples_per_filament</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/step_edges.html#sample_binary_step_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_binary_step_edges" title="Link to this definition"></a></dt>
+<dd><p>Sample step-edge patches across all 28 filament types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>patches</strong> (<em>(28*samples_per_filament, 18)</em>)</p></li>
+<li><p><strong>angles</strong> (<em>(28*samples_per_filament,)</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.mean_center">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">mean_center</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patch_vector</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/step_edges.html#mean_center"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.mean_center" title="Link to this definition"></a></dt>
+<dd><p>Mean-center a single patch vector (length 9 or 18).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>For length 18 (flow):</dt><dd><ul class="simple">
+<li><p>mean-center u-channel entries (first 9)</p></li>
+<li><p>mean-center v-channel entries (last 9)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_step_edge_torus">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_step_edge_torus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_samples</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/step_edges.html#sample_step_edge_torus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_step_edge_torus" title="Link to this definition"></a></dt>
+<dd><p>Generate step-edge torus samples.</p>
+<dl class="simple">
+<dt>Construction (legacy):</dt><dd><ul class="simple">
+<li><p>sample half-planes parameterized by (offset r, direction phi) inside a disk</p></li>
+<li><p>build range patches by averaging sign over m×m subgrid per pixel</p></li>
+<li><p>create flow patches by multiplying by (cos theta, sin theta)</p></li>
+<li><p>keep high-contrast patches (contrast norm &gt; thresh)</p></li>
+<li><p>mean-center &amp; contrast normalize</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_samples</strong> (<em>int</em>) – Number of candidate samples before thresholding.</p></li>
+<li><p><strong>d</strong> (<em>int</em>) – Patch width/height (typically 3).</p></li>
+<li><p><strong>m</strong> (<em>int</em>) – Subgrid resolution per pixel for averaging.</p></li>
+<li><p><strong>thresh</strong> (<em>float</em>) – Keep only samples with contrast norm &gt; thresh.</p></li>
+<li><p><strong>rng</strong> (<em>np.random.Generator</em><em>, </em><em>optional</em>)</p></li>
+<li><p><strong>eps</strong> (<em>float</em>) – Stability floor.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>flow_patches</strong> (<em>(N_kept, 2*d^2)</em>)</p></li>
+<li><p><strong>coords</strong> (<em>(N_kept, 3) where columns are (offset, phi, theta)</em>)</p></li>
+<li><p><strong>range_patches</strong> (<em>(N_kept, d^2)</em>)</p></li>
+<li><p><strong>norms</strong> (<em>(N_kept,) contrast norms (pre-normalization)</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="tori-klein-bottle-helpers">
+<h2>Tori / Klein bottle helpers<a class="headerlink" href="#tori-klein-bottle-helpers" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.const">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">const</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/tori_and_kb.html#const"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.const" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.small_to_big">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">small_to_big</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smallest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">largest</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/tori_and_kb.html#small_to_big"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.small_to_big" title="Link to this definition"></a></dt>
+<dd><p>V-shaped function with maximum at angle=pi and minimum at angle=0,2pi.</p>
+<p>Returns values in [smallest, largest] for angles in [0,2pi].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Callable</span></code>[[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.sample_C2_torus">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">sample_C2_torus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R_func=&lt;function</span> <span class="pre">const.&lt;locals&gt;.f&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_func=&lt;function</span> <span class="pre">const.&lt;locals&gt;.f&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_theta=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_alpha=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/synthetic/tori_and_kb.html#sample_C2_torus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.sample_C2_torus" title="Link to this definition"></a></dt>
+<dd><p>Sample a product-torus-style embedding in R^4 = C^2.</p>
+<blockquote>
+<div><p>z1 = r(theta) * exp(i alpha)
+z2 = R(theta) * exp(i theta)</p>
+</div></blockquote>
+<p>So the base projection is directly recoverable from data via arg(z2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code>[<code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>], <code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code>]]</span></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>data</strong> (<em>(n_points, 4)</em>)</p></li>
+<li><p><strong>base_points</strong> (<em>(n_points, 2) = (cos(theta), sin(theta))</em>)</p></li>
+<li><p><strong>alpha</strong> (<em>(n_points,)    (fiber angle)</em>)</p></li>
+<li><p><strong>theta</strong> (<em>(n_points,)    (base angle) optional</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="optical_flow.html" class="btn btn-neutral float-left" title="Optical flow utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow, Jose A. Perea.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
