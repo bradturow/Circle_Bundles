@@ -340,7 +340,7 @@ and recompute global components.</p>
 <dd><p>S^2 star cover built from the convex-hull triangulation of Fibonacci landmarks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="api/covers.html#circle_bundles.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -1830,19 +1830,14 @@ z2 = R(theta) * exp(i theta)</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.compute_circular_coords_pca2">
-<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">compute_circular_coords_pca2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'farthest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/trivializations/local_triv.html#compute_circular_coords_pca2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.compute_circular_coords_pca2" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">compute_circular_coords_pca2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/trivializations/local_triv.html#compute_circular_coords_pca2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.compute_circular_coords_pca2" title="Link to this definition"></a></dt>
 <dd><p>Compute simple circular coordinates via 2D PCA (or via 2D classical MDS if dist_mat given).</p>
-<p>This is a lightweight fallback when Dreimac is unavailable/unwanted.</p>
+<p>Orientation stabilization is fixed to the “farthest point” convention.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>X</strong> (<em>(</em><em>m</em><em>,</em><em>D</em><em>) </em><em>array</em><em>, </em><em>required if dist_mat is None</em>)</p></li>
 <li><p><strong>dist_mat</strong> (<em>(</em><em>m</em><em>,</em><em>m</em><em>) </em><em>optional precomputed distances</em><em> (</em><em>if provided</em><em>, </em><em>uses MDS-&gt;2D-&gt;atan2</em><em>)</em>)</p></li>
-<li><p><strong>anchor</strong> (<em>orientation stabilization:</em>) – <ul>
-<li><p>“farthest”: pick the point farthest from the mean in 2D and rotate so it has angle 0</p></li>
-<li><p>”first”: rotate so the first point has angle 0</p></li>
-</ul>
-</p></li>
 <li><p><strong>eps</strong> (<em>small guard</em>)</p></li>
 </ul>
 </dd>
@@ -1880,7 +1875,7 @@ distance_matrix=True to Dreimac.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.build_bundle">
-<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc_alg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks_per_patch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prime</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">41</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_frac</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">CircularCoords_cls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose_triv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_fast_triv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'farthest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notify_pca_fallback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_fast_missing_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_fail_fast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">try_orient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_euler_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_rank1_fundamental</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trivialization_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'singer'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theta_units</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'radians'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.build_bundle" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.build_bundle" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="api/bundle.html#circle_bundles.bundle.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a></span></p>
@@ -1888,27 +1883,12 @@ distance_matrix=True to Dreimac.</p>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>landmarks_per_patch</strong> (<em>int</em>)</p></li>
-<li><p><strong>prime</strong> (<em>int</em>)</p></li>
-<li><p><strong>update_frac</strong> (<em>float</em>)</p></li>
-<li><p><strong>standard_range</strong> (<em>bool</em>)</p></li>
+<li><p><strong>cc</strong> (<em>object</em>)</p></li>
 <li><p><strong>min_patch_size</strong> (<em>int</em>)</p></li>
-<li><p><strong>verbose_triv</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>fail_fast_triv</strong> (<em>bool</em>)</p></li>
-<li><p><strong>pca_anchor</strong> (<em>str</em>)</p></li>
-<li><p><strong>notify_pca_fallback</strong> (<em>bool</em>)</p></li>
 <li><p><strong>min_points_edge</strong> (<em>int</em>)</p></li>
 <li><p><strong>ref_angle</strong> (<em>float</em>)</p></li>
-<li><p><strong>fail_fast_missing_edges</strong> (<em>bool</em>)</p></li>
 <li><p><strong>delta_min_points</strong> (<em>int</em>)</p></li>
-<li><p><strong>delta_fail_fast</strong> (<em>bool</em>)</p></li>
 <li><p><strong>compute_witness</strong> (<em>bool</em>)</p></li>
-<li><p><strong>try_orient</strong> (<em>bool</em>)</p></li>
-<li><p><strong>compute_euler_num</strong> (<em>bool</em>)</p></li>
-<li><p><strong>require_rank1_fundamental</strong> (<em>bool</em>)</p></li>
-<li><p><strong>prefer_edge_weight</strong> (<em>str</em>)</p></li>
-<li><p><strong>trivialization_method</strong> (<em>str</em>)</p></li>
-<li><p><strong>theta_units</strong> (<em>str</em>)</p></li>
 <li><p><strong>show</strong> (<em>bool</em>)</p></li>
 <li><p><strong>verbose</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
 </ul>
@@ -1918,6 +1898,15 @@ distance_matrix=True to Dreimac.</p>
 <dt>End-to-end pipeline (core only):</dt><dd><p>cover + data -&gt; local triv -&gt; transitions -&gt; quality -&gt; classes</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Characteristic class computation is always performed with:</dt><dd><p>try_orient=True and compute_euler_num=True.</p>
+</dd>
+</dl>
+</li>
+<li><p>Missing edges during transition estimation are treated as an error.</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py class">

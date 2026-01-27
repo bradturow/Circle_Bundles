@@ -96,19 +96,14 @@
 <h2>Circular coordinates<a class="headerlink" href="#circular-coordinates" title="Link to this heading"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.compute_circular_coords_pca2">
-<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">compute_circular_coords_pca2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anchor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'farthest'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/trivializations/local_triv.html#compute_circular_coords_pca2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.compute_circular_coords_pca2" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">compute_circular_coords_pca2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dist_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/trivializations/local_triv.html#compute_circular_coords_pca2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.compute_circular_coords_pca2" title="Link to this definition"></a></dt>
 <dd><p>Compute simple circular coordinates via 2D PCA (or via 2D classical MDS if dist_mat given).</p>
-<p>This is a lightweight fallback when Dreimac is unavailable/unwanted.</p>
+<p>Orientation stabilization is fixed to the “farthest point” convention.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>X</strong> (<em>(</em><em>m</em><em>,</em><em>D</em><em>) </em><em>array</em><em>, </em><em>required if dist_mat is None</em>)</p></li>
 <li><p><strong>dist_mat</strong> (<em>(</em><em>m</em><em>,</em><em>m</em><em>) </em><em>optional precomputed distances</em><em> (</em><em>if provided</em><em>, </em><em>uses MDS-&gt;2D-&gt;atan2</em><em>)</em>)</p></li>
-<li><p><strong>anchor</strong> (<em>orientation stabilization:</em>) – <ul>
-<li><p>“farthest”: pick the point farthest from the mean in 2D and rotate so it has angle 0</p></li>
-<li><p>”first”: rotate so the first point has angle 0</p></li>
-</ul>
-</p></li>
 <li><p><strong>eps</strong> (<em>small guard</em>)</p></li>
 </ul>
 </dd>

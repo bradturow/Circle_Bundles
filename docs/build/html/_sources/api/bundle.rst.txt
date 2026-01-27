@@ -1,24 +1,7 @@
 bundle
 ======
 
-BundleResult
-------------
-
-.. autoclass:: circle_bundles.bundle.BundleResult
-   :members:
-   :member-order: bysource
-   :show-inheritance:
+.. automodule:: circle_bundles.bundle
+   :members: build_bundle, BundleResult, BundleMapResult, PullbackTotalSpaceResult
    :undoc-members:
-
-Result containers
------------------
-
-.. autoclass:: circle_bundles.bundle.BundleMapResult
-   :members:
-   :member-order: bysource
-   :show-inheritance:
-
-.. autoclass:: circle_bundles.bundle.PullbackTotalSpaceResult
-   :members:
-   :member-order: bysource
    :show-inheritance:

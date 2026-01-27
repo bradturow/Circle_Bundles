@@ -222,8 +222,78 @@
 <a class="viewcode-back" href="../../api/bundle.html#circle_bundles.BundleResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BundleResult</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Result of `build_bundle(...)`.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Output of :func:`circle_bundles.bundle.build_bundle`.</span>
+
+<span class="sd">    A ``BundleResult`` packages the core artifacts of a discrete circle-bundle</span>
+<span class="sd">    reconstruction:</span>
+
+<span class="sd">    - a **cover** of the base space (charts + nerve + partition of unity),</span>
+<span class="sd">    - a **local trivialization** (local circle coordinates per chart),</span>
+<span class="sd">    - an estimated **O(2) cocycle** (transition functions on overlaps),</span>
+<span class="sd">    - **quality diagnostics** and **characteristic class representatives**,</span>
+<span class="sd">    - plus cached convenience methods for downstream analysis and visualization.</span>
+
+<span class="sd">    Typical workflow</span>
+<span class="sd">    ----------------</span>
+<span class="sd">    Build a bundle:</span>
+
+<span class="sd">    &gt;&gt;&gt; bundle = cb.build_bundle(data, cover, show=True)</span>
+
+<span class="sd">    Inspect characteristic classes / quality (already computed by ``build_bundle``):</span>
+
+<span class="sd">    &gt;&gt;&gt; bundle.classes</span>
+<span class="sd">    &gt;&gt;&gt; bundle.quality</span>
+
+<span class="sd">    Compute a persistence-style filtration over the nerve (cached):</span>
+
+<span class="sd">    &gt;&gt;&gt; pers = bundle.get_persistence(show=True)</span>
+
+<span class="sd">    Extract a large subcomplex where class representatives become coboundaries (cached):</span>
+
+<span class="sd">    &gt;&gt;&gt; mt = bundle.get_max_trivial_subcomplex()</span>
+
+<span class="sd">    Compute a global trivialization on that subcomplex (cached):</span>
+
+<span class="sd">    &gt;&gt;&gt; gt = bundle.get_global_trivialization()</span>
+<span class="sd">    &gt;&gt;&gt; F = gt.F   # global fiber coordinates</span>
+
+<span class="sd">    Compute fiber coordinates via the bundle-map solver (cached):</span>
+
+<span class="sd">    &gt;&gt;&gt; bm = bundle.get_bundle_map()</span>
+<span class="sd">    &gt;&gt;&gt; bm.F</span>
+
+<span class="sd">    Build a pullback total space (base | fiber) with a product metric:</span>
+
+<span class="sd">    &gt;&gt;&gt; pb = bundle.get_pullback_data(base_weight=1.0, fiber_weight=1.0)</span>
+<span class="sd">    &gt;&gt;&gt; pb.total_data, pb.metric</span>
+
+<span class="sd">    Notes on caching</span>
+<span class="sd">    ---------------</span>
+<span class="sd">    Methods named ``get_*`` cache results in ``bundle._cache`` (and also populate</span>
+<span class="sd">    the corresponding attribute like ``bundle.persistence`` when called with</span>
+<span class="sd">    default settings). Methods named ``compute_*`` perform an explicit recomputation</span>
+<span class="sd">    and are intended for power users; they are typically not shown in the rendered docs.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cover:</span>
+<span class="sd">        Cover object with fields like ``U`` (membership matrix), ``pou`` (partition of unity),</span>
+<span class="sd">        landmarks, and nerve accessors (``nerve_edges()``, ``nerve_triangles()``, ...).</span>
+<span class="sd">    data:</span>
+<span class="sd">        Original data array of shape ``(n_samples, ambient_dim)``.</span>
+<span class="sd">    local_triv:</span>
+<span class="sd">        Local trivialization result (typically contains ``f`` = local angles per chart).</span>
+<span class="sd">    cocycle:</span>
+<span class="sd">        Estimated O(2) cocycle / transition data.</span>
+<span class="sd">    transitions:</span>
+<span class="sd">        Transition-fit report / errors (often includes per-edge RMS angle error).</span>
+<span class="sd">    quality:</span>
+<span class="sd">        Diagnostic information (edge/triangle consistency, optional witness errors, etc.).</span>
+<span class="sd">    classes:</span>
+<span class="sd">        Characteristic class representatives (e.g. SW1, Euler, and oriented variants when available).</span>
+<span class="sd">    meta:</span>
+<span class="sd">        Light provenance and default preferences used in construction.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cover</span><span class="p">:</span> <span class="n">Any</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
@@ -1265,7 +1335,7 @@
     
 
 <span class="c1"># ============================================================</span>
-<span class="c1"># build_bundle pipeline (unchanged runtime)</span>
+<span class="c1"># build_bundle pipeline </span>
 <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="build_bundle">
@@ -1275,49 +1345,42 @@
     <span class="n">cover</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">total_metric</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">cc_alg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">landmarks_per_patch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
-    <span class="n">prime</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">41</span><span class="p">,</span>
-    <span class="n">update_frac</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
-    <span class="n">standard_range</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">CircularCoords_cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cc</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="s2">&quot;pca2&quot;</span><span class="p">,</span>
+    <span class="c1"># --- Local triv robustness ---</span>
     <span class="n">min_patch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-    <span class="n">verbose_triv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fail_fast_triv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">pca_anchor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;farthest&quot;</span><span class="p">,</span>
-    <span class="n">notify_pca_fallback</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># --- Transition estimation ---</span>
     <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">min_points_edge</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
-    <span class="n">fail_fast_missing_edges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># --- Quality / diagnostics ---</span>
     <span class="n">delta_min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-    <span class="n">delta_fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">compute_witness</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">try_orient</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">compute_euler_num</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">require_rank1_fundamental</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">prefer_edge_weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
-    <span class="n">trivialization_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;singer&quot;</span><span class="p">,</span>
-    <span class="n">theta_units</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;radians&quot;</span><span class="p">,</span>
+    <span class="c1"># --- UX ---</span>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleResult</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;BundleResult&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    End-to-end pipeline (core only):</span>
 <span class="sd">        cover + data -&gt; local triv -&gt; transitions -&gt; quality -&gt; classes</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Characteristic class computation is always performed with:</span>
+<span class="sd">        try_orient=True and compute_euler_num=True.</span>
+<span class="sd">    - Missing edges during transition estimation are treated as an error.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.trivializations.local_triv</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_local_triv</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.trivializations.local_triv</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_local_triv</span><span class="p">,</span> <span class="n">DreimacCCConfig</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.o2_cocycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_transitions</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.analysis.quality</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_bundle_quality</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.characteristic_class</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_classes</span><span class="p">,</span> <span class="n">show_summary</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.utils.status_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_status</span><span class="p">,</span> <span class="n">_status_clear</span>
 
     <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">verbose</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose_triv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">verbose_triv</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">show</span><span class="p">)</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
+    <span class="c1"># Build cover if needed</span>
     <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;pou&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">cover</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 
@@ -1325,26 +1388,25 @@
     <span class="n">triangles</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cover</span><span class="o">.</span><span class="n">nerve_triangles</span><span class="p">())</span>
     <span class="n">tets</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cover</span><span class="o">.</span><span class="n">nerve_tetrahedra</span><span class="p">())</span>
 
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Local trivializations</span>
+    <span class="c1"># ----------------------------</span>
     <span class="n">triv</span> <span class="o">=</span> <span class="n">compute_local_triv</span><span class="p">(</span>
         <span class="n">data</span><span class="p">,</span>
         <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
-        <span class="n">cc_alg</span><span class="o">=</span><span class="n">cc_alg</span><span class="p">,</span>
+        <span class="n">cc</span><span class="o">=</span><span class="n">cc</span><span class="p">,</span>
         <span class="n">total_metric</span><span class="o">=</span><span class="n">total_metric</span><span class="p">,</span>
-        <span class="n">landmarks_per_patch</span><span class="o">=</span><span class="n">landmarks_per_patch</span><span class="p">,</span>
-        <span class="n">prime</span><span class="o">=</span><span class="n">prime</span><span class="p">,</span>
-        <span class="n">update_frac</span><span class="o">=</span><span class="n">update_frac</span><span class="p">,</span>
-        <span class="n">standard_range</span><span class="o">=</span><span class="n">standard_range</span><span class="p">,</span>
-        <span class="n">CircularCoords_cls</span><span class="o">=</span><span class="n">CircularCoords_cls</span><span class="p">,</span>
-        <span class="n">pca_anchor</span><span class="o">=</span><span class="n">pca_anchor</span><span class="p">,</span>
-        <span class="n">notify_pca_fallback</span><span class="o">=</span><span class="n">notify_pca_fallback</span><span class="p">,</span>
         <span class="n">min_patch_size</span><span class="o">=</span><span class="n">min_patch_size</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose_triv</span><span class="p">,</span>
-        <span class="n">fail_fast</span><span class="o">=</span><span class="n">fail_fast_triv</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">verbose</span><span class="p">),</span>
+        <span class="n">fail_fast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># canonical behavior</span>
     <span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">fail_fast_triv</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">triv</span><span class="o">.</span><span class="n">valid</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">triv</span><span class="o">.</span><span class="n">valid</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Local triv failed on sets: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">triv</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Transition estimation</span>
+    <span class="c1"># ----------------------------</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">_status_clear</span><span class="p">()</span>
         <span class="n">_status</span><span class="p">(</span><span class="s2">&quot;Estimating transition functions...&quot;</span><span class="p">)</span>
@@ -1356,9 +1418,12 @@
         <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
         <span class="n">min_points</span><span class="o">=</span><span class="n">min_points_edge</span><span class="p">,</span>
         <span class="n">ref_angle</span><span class="o">=</span><span class="n">ref_angle</span><span class="p">,</span>
-        <span class="n">fail_fast_missing</span><span class="o">=</span><span class="n">fail_fast_missing_edges</span><span class="p">,</span>
+        <span class="n">fail_fast_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># canonical behavior</span>
     <span class="p">)</span>
 
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Quality summary</span>
+    <span class="c1"># ----------------------------</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">_status</span><span class="p">(</span><span class="s2">&quot;Gathering summary data...&quot;</span><span class="p">)</span>
 
@@ -1370,10 +1435,13 @@
         <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
         <span class="n">triangles</span><span class="o">=</span><span class="n">triangles</span><span class="p">,</span>
         <span class="n">delta_min_points</span><span class="o">=</span><span class="n">delta_min_points</span><span class="p">,</span>
-        <span class="n">delta_fail_fast</span><span class="o">=</span><span class="n">delta_fail_fast</span><span class="p">,</span>
+        <span class="n">delta_fail_fast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>  <span class="c1"># canonical behavior</span>
         <span class="n">compute_witness</span><span class="o">=</span><span class="n">compute_witness</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Characteristic classes (always)</span>
+    <span class="c1"># ----------------------------</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">_status</span><span class="p">(</span><span class="s2">&quot;Computing characteristic class representatives...&quot;</span><span class="p">)</span>
 
@@ -1383,10 +1451,13 @@
         <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
         <span class="n">triangles</span><span class="o">=</span><span class="n">triangles</span><span class="p">,</span>
         <span class="n">tets</span><span class="o">=</span><span class="n">tets</span><span class="p">,</span>
-        <span class="n">try_orient</span><span class="o">=</span><span class="n">try_orient</span><span class="p">,</span>
-        <span class="n">compute_euler_num</span><span class="o">=</span><span class="n">compute_euler_num</span><span class="p">,</span>
+        <span class="n">try_orient</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">compute_euler_num</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Optional summary visualization</span>
+    <span class="c1"># ----------------------------</span>
     <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">_status_clear</span><span class="p">()</span>
@@ -1395,12 +1466,17 @@
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">_status_clear</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">cc_alg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">cc_method</span> <span class="o">=</span> <span class="s2">&quot;custom_cc_alg&quot;</span>
-    <span class="k">elif</span> <span class="n">CircularCoords_cls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">cc_method</span> <span class="o">=</span> <span class="s2">&quot;dreimac&quot;</span>
-    <span class="k">else</span><span class="p">:</span>
+    <span class="c1"># ----------------------------</span>
+    <span class="c1"># Metadata (keep only what we might actually use downstream)</span>
+    <span class="c1"># ----------------------------</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cc</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">cc</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;pca2&quot;</span><span class="p">:</span>
         <span class="n">cc_method</span> <span class="o">=</span> <span class="s2">&quot;pca2&quot;</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cc</span><span class="p">,</span> <span class="n">DreimacCCConfig</span><span class="p">):</span>
+        <span class="n">cc_method</span> <span class="o">=</span> <span class="s2">&quot;dreimac&quot;</span>
+    <span class="k">elif</span> <span class="nb">callable</span><span class="p">(</span><span class="n">cc</span><span class="p">):</span>
+        <span class="n">cc_method</span> <span class="o">=</span> <span class="s2">&quot;custom_cc&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cc_method</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">cc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
 
     <span class="k">return</span> <span class="n">BundleResult</span><span class="p">(</span>
         <span class="n">cover</span><span class="o">=</span><span class="n">cover</span><span class="p">,</span>
@@ -1412,25 +1488,14 @@
         <span class="n">quality</span><span class="o">=</span><span class="n">quality</span><span class="p">,</span>
         <span class="n">classes</span><span class="o">=</span><span class="n">classes</span><span class="p">,</span>
         <span class="n">meta</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;cc_method&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">cc_method</span><span class="p">),</span>
+            <span class="s2">&quot;min_patch_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_patch_size</span><span class="p">),</span>
             <span class="s2">&quot;ref_angle&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">ref_angle</span><span class="p">),</span>
             <span class="s2">&quot;min_points_edge&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_points_edge</span><span class="p">),</span>
             <span class="s2">&quot;delta_min_points&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">delta_min_points</span><span class="p">),</span>
-            <span class="s2">&quot;prime&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">prime</span><span class="p">),</span>
-            <span class="s2">&quot;landmarks_per_patch&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">landmarks_per_patch</span><span class="p">),</span>
-            <span class="s2">&quot;min_patch_size&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_patch_size</span><span class="p">),</span>
-            <span class="s2">&quot;cc_method&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">cc_method</span><span class="p">),</span>
-            <span class="s2">&quot;pca_anchor&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">pca_anchor</span><span class="p">),</span>
-            <span class="s2">&quot;prefer_edge_weight&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefer_edge_weight</span><span class="p">),</span>
-            <span class="s2">&quot;trivialization_method&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">trivialization_method</span><span class="p">),</span>
-            <span class="s2">&quot;theta_units&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">theta_units</span><span class="p">),</span>
+            <span class="s2">&quot;compute_witness&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">compute_witness</span><span class="p">),</span>
         <span class="p">},</span>
     <span class="p">)</span></div>
-
-
-
-
-
-
 
 </pre></div>
 
