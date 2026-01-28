@@ -4,7 +4,6 @@ API Reference
 .. toctree::
    :maxdepth: 2
 
-   bundle
    workflow
    analysis
    covers

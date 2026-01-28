@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Visualization &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
@@ -18,9 +18,7 @@
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Optical flow utilities" href="optical_flow.html" />
-    <link rel="prev" title="Geometry and algebra helpers" href="geometry.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,64 +40,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualization</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#angles-and-triv-comparisons">Angles and triv comparisons</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.compare_angle_pairs"><code class="docutils literal notranslate"><span class="pre">compare_angle_pairs()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.compare_trivs"><code class="docutils literal notranslate"><span class="pre">compare_trivs()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#base-space-visualizers">Base-space visualizers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.base_vis"><code class="docutils literal notranslate"><span class="pre">base_vis()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#bundle-fiber-circle-visualizers">Bundle / fiber / circle visualizers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.show_bundle_vis"><code class="docutils literal notranslate"><span class="pre">show_bundle_vis()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.save_bundle_snapshot"><code class="docutils literal notranslate"><span class="pre">save_bundle_snapshot()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.circle_vis"><code class="docutils literal notranslate"><span class="pre">circle_vis()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.circle_vis_grid"><code class="docutils literal notranslate"><span class="pre">circle_vis_grid()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.fiber_vis"><code class="docutils literal notranslate"><span class="pre">fiber_vis()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#patch-cluster-diagrams">Patch cluster diagrams</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_patch_cluster_diagram"><code class="docutils literal notranslate"><span class="pre">make_patch_cluster_diagram()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_G_vertex_coords"><code class="docutils literal notranslate"><span class="pre">get_G_vertex_coords()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.plot_component_patch_diagram"><code class="docutils literal notranslate"><span class="pre">plot_component_patch_diagram()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#nerve-visualizers">Nerve visualizers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.show_circle_nerve"><code class="docutils literal notranslate"><span class="pre">show_circle_nerve()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.nerve_vis"><code class="docutils literal notranslate"><span class="pre">nerve_vis()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#pca-thumbnails">PCA + thumbnails</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.show_pca"><code class="docutils literal notranslate"><span class="pre">show_pca()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.show_data_vis"><code class="docutils literal notranslate"><span class="pre">show_data_vis()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#gudhi-helpers">Gudhi helpers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.graph_to_st"><code class="docutils literal notranslate"><span class="pre">graph_to_st()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.create_st_dicts"><code class="docutils literal notranslate"><span class="pre">create_st_dicts()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#lattice-visualization">Lattice visualization</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.lattice_vis"><code class="docutils literal notranslate"><span class="pre">lattice_vis()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
-</ul>
-</li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -116,7 +59,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
       <li class="breadcrumb-item active">Visualization</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/visualization.rst.txt" rel="nofollow"> View page source</a>
@@ -213,7 +155,7 @@
 </dl>
 <section id="subplot-usage">
 <h3>Subplot usage<a class="headerlink" href="#subplot-usage" title="Link to this heading"></a></h3>
-<p>If <cite>ax</cite> is provided, it must be a 3D axis (projection=’3d’). The function
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> is provided, it must be a 3D axis (projection=’3d’). The function
 draws into that axis and will not create a new figure.</p>
 </section>
 <dl class="field-list simple">
@@ -321,7 +263,7 @@ and placing the resulting images on a circle according to coords.</p>
 </ul>
 </dd>
 </dl>
-<p>If <cite>ax</cite> is provided, draw into that axis (no new figure created).
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> is provided, draw into that axis (no new figure created).
 Returns (fig, ax).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -367,8 +309,8 @@ Returns (fig, ax).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.fiber_vis">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">fiber_vis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_images</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/viz/fiber_vis.html#fiber_vis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.fiber_vis" title="Link to this definition"></a></dt>
-<dd><p>Visualize up to <cite>max_images</cite> items from <cite>data</cite> by embedding them to 3D (PCA)
-and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
+<dd><p>Visualize up to <code class="xref py py-obj docutils literal notranslate"><span class="pre">max_images</span></code> items from <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code> by embedding them to 3D (PCA)
+and overlaying thumbnails rendered by <code class="xref py py-obj docutils literal notranslate"><span class="pre">vis_func</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -393,7 +335,7 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 </dd>
 </dl>
 <p>:param :
-:param this function draws into <cite>ax</cite> and will not create a new figure.:</p>
+:param this function draws into <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> and will not create a new figure.:</p>
 </dd></dl>
 
 </section>
@@ -653,7 +595,7 @@ In that case, you probably want show=False (so the caller can plt.show() once).<
 </dd>
 </dl>
 <p>IMPORTANT:
-- <cite>data</cite> is treated as a Sequence. We do NOT coerce it to np.asarray(data),</p>
+- <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code> is treated as a Sequence. We do NOT coerce it to np.asarray(data),</p>
 <blockquote>
 <div><p>because that can break for object-like payloads (meshes, images with varying shape, etc.)</p>
 </div></blockquote>
@@ -726,10 +668,10 @@ into a “safe center region” so thumbnails don’t spill outside the axes.</p
 </ul>
 </dd>
 <dt>Notes on subplot usage:</dt><dd><ul class="simple">
-<li><p>If <cite>ax</cite> is provided, thumbnails are placed inside that axis’ bounding box.</p></li>
+<li><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> is provided, thumbnails are placed inside that axis’ bounding box.</p></li>
 <li><p>We overlay small inset axes positioned in <em>figure fraction</em> coordinates
 corresponding to the provided axis’ rectangle.</p></li>
-<li><p><cite>figsize</cite>/<cite>dpi</cite> are only used if <cite>ax is None</cite>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">figsize</span></code>/<code class="xref py py-obj docutils literal notranslate"><span class="pre">dpi</span></code> are only used if <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span> <span class="pre">is</span> <span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -760,10 +702,7 @@ corresponding to the provided axis’ rectangle.</p></li>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="geometry.html" class="btn btn-neutral float-left" title="Geometry and algebra helpers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="optical_flow.html" class="btn btn-neutral float-right" title="Optical flow utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

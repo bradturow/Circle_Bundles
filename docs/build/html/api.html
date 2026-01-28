@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API Reference &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
@@ -41,7 +41,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -340,7 +341,7 @@ and recompute global components.</p>
 <dd><p>S^2 star cover built from the convex-hull triangulation of Fibonacci landmarks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="reference/covers.html#circle_bundles.base_covers.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -490,7 +491,7 @@ different values, that’s either an error (default) or we take OR.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<em>nx.Graph</em>) – Cluster graph with nodes (fiber_index, cluster_label). If edges have
 attribute ‘indices_shared’, we use that to propagate faster/cleaner.</p></li>
-<li><p><strong>cl</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_points</em><em>) </em><em>int</em>) – Fiberwise cluster labels; noise indicated by <cite>noise_label</cite>.</p></li>
+<li><p><strong>cl</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_points</em><em>) </em><em>int</em>) – Fiberwise cluster labels; noise indicated by <code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_label</span></code>.</p></li>
 <li><p><strong>base_points</strong> (<em>(</em><em>n_points</em><em>, </em><em>d</em><em>) </em><em>float</em>) – Vector representative for each base point.</p></li>
 <li><p><strong>seed_fiber</strong> (<em>ints</em>) – Seed a starting cluster to orient.</p></li>
 <li><p><strong>seed_cluster</strong> (<em>ints</em>) – Seed a starting cluster to orient.</p></li>
@@ -1878,7 +1879,7 @@ distance_matrix=True to Dreimac.</p>
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.build_bundle" title="Link to this definition"></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="api/bundle.html#circle_bundles.bundle.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="reference/bundle.html#circle_bundles.bundle.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -2149,7 +2150,7 @@ distance_matrix=True to Dreimac.</p>
 </dl>
 <section id="subplot-usage">
 <h2>Subplot usage<a class="headerlink" href="#subplot-usage" title="Link to this heading"></a></h2>
-<p>If <cite>ax</cite> is provided, it must be a 3D axis (projection=’3d’). The function
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> is provided, it must be a 3D axis (projection=’3d’). The function
 draws into that axis and will not create a new figure.</p>
 </section>
 <dl class="field-list simple">
@@ -2254,7 +2255,7 @@ and placing the resulting images on a circle according to coords.</p>
 </ul>
 </dd>
 </dl>
-<p>If <cite>ax</cite> is provided, draw into that axis (no new figure created).
+<p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> is provided, draw into that axis (no new figure created).
 Returns (fig, ax).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2277,8 +2278,8 @@ Returns (fig, ax).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.fiber_vis">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">fiber_vis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vis_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_images</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zoom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(10,</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear_ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/circle_bundles/viz/fiber_vis.html#fiber_vis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.fiber_vis" title="Link to this definition"></a></dt>
-<dd><p>Visualize up to <cite>max_images</cite> items from <cite>data</cite> by embedding them to 3D (PCA)
-and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
+<dd><p>Visualize up to <code class="xref py py-obj docutils literal notranslate"><span class="pre">max_images</span></code> items from <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code> by embedding them to 3D (PCA)
+and overlaying thumbnails rendered by <code class="xref py py-obj docutils literal notranslate"><span class="pre">vis_func</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2303,7 +2304,7 @@ and overlaying thumbnails rendered by <cite>vis_func</cite>.</p>
 </dd>
 </dl>
 <p>:param :
-:param this function draws into <cite>ax</cite> and will not create a new figure.:</p>
+:param this function draws into <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> and will not create a new figure.:</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2448,10 +2449,10 @@ into a “safe center region” so thumbnails don’t spill outside the axes.</p
 </ul>
 </dd>
 <dt>Notes on subplot usage:</dt><dd><ul class="simple">
-<li><p>If <cite>ax</cite> is provided, thumbnails are placed inside that axis’ bounding box.</p></li>
+<li><p>If <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span></code> is provided, thumbnails are placed inside that axis’ bounding box.</p></li>
 <li><p>We overlay small inset axes positioned in <em>figure fraction</em> coordinates
 corresponding to the provided axis’ rectangle.</p></li>
-<li><p><cite>figsize</cite>/<cite>dpi</cite> are only used if <cite>ax is None</cite>.</p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">figsize</span></code>/<code class="xref py py-obj docutils literal notranslate"><span class="pre">dpi</span></code> are only used if <code class="xref py py-obj docutils literal notranslate"><span class="pre">ax</span> <span class="pre">is</span> <span class="pre">None</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2643,7 +2644,7 @@ In that case, you probably want show=False (so the caller can plt.show() once).<
 </dd>
 </dl>
 <p>IMPORTANT:
-- <cite>data</cite> is treated as a Sequence. We do NOT coerce it to np.asarray(data),</p>
+- <code class="xref py py-obj docutils literal notranslate"><span class="pre">data</span></code> is treated as a Sequence. We do NOT coerce it to np.asarray(data),</p>
 <blockquote>
 <div><p>because that can break for object-like payloads (meshes, images with varying shape, etc.)</p>
 </div></blockquote>

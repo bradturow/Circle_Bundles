@@ -6,7 +6,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>circle_bundles.base_covers &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
@@ -40,7 +40,8 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -665,7 +666,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="MetricBallCover">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover">[docs]</a>
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.MetricBallCover">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MetricBallCover</span><span class="p">(</span><span class="n">CoverBase</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -682,6 +683,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_metric</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">normalize_shapes</span><span class="p">()</span>  
         
+<div class="viewcode-block" id="MetricBallCover.build">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.MetricBallCover.build">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MetricBallCover&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MetricBallCover requires landmarks.&quot;</span><span class="p">)</span>
@@ -701,8 +704,11 @@
         <span class="n">denom</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">denom</span><span class="p">[</span><span class="n">denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pou</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="n">denom</span>
-        <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
+
+<div class="viewcode-block" id="MetricBallCover.nerve_edges">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.MetricBallCover.nerve_edges">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -714,8 +720,11 @@
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_sets</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">Uj</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
                     <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">canon_edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">edges</span>
+        <span class="k">return</span> <span class="n">edges</span></div>
 
+
+<div class="viewcode-block" id="MetricBallCover.nerve_triangles">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.MetricBallCover.nerve_triangles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_triangles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -731,10 +740,11 @@
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_sets</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">ij</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">]):</span>
                         <span class="n">tris</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">canon_tri</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">tris</span>
+        <span class="k">return</span> <span class="n">tris</span></div>
+
 
 <div class="viewcode-block" id="MetricBallCover.nerve_tetrahedra">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover.nerve_tetrahedra">[docs]</a>
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.MetricBallCover.nerve_tetrahedra">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_tetrahedra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        3-simplices in the nerve: 4-way overlaps U_i ∩ U_j ∩ U_k ∩ U_l ≠ ∅.</span>
@@ -767,7 +777,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="TriangulationStarCover">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.TriangulationStarCover">[docs]</a>
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.TriangulationStarCover">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TriangulationStarCover</span><span class="p">(</span><span class="n">CoverBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Cover by open stars of vertices in a triangulation K.</span>
@@ -801,6 +811,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_tri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># (n_samples,) triangle index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_bary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>    <span class="c1"># (n_samples,3)</span>
 
+<div class="viewcode-block" id="TriangulationStarCover.build">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.TriangulationStarCover.build">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TriangulationStarCover&quot;</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relabel_vertices</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_extract_triangles</span><span class="p">()</span>
@@ -808,8 +820,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_assign_samples_to_triangles</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_star_sets_U</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_pou_from_barycentric</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
+
+<div class="viewcode-block" id="TriangulationStarCover.nerve_edges">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.TriangulationStarCover.nerve_edges">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -819,18 +834,25 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">s</span><span class="p">)</span>
                 <span class="n">edges</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">canon_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="TriangulationStarCover.nerve_triangles">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.TriangulationStarCover.nerve_triangles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_triangles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="TriangulationStarCover.nerve_tetrahedra">
+<a class="viewcode-back" href="../../reference/covers.html#circle_bundles.TriangulationStarCover.nerve_tetrahedra">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_tetrahedra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]:</span>
         <span class="c1"># Explicitly: “this cover currently models a 2-complex”</span>
         <span class="c1"># (We still extract tetrahedra from K and store them in self.tetrahedra,</span>
         <span class="c1">#  but we do not expose them here unless/when you decide to.)</span>
-        <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_relabel_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">old_vids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_coords_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>

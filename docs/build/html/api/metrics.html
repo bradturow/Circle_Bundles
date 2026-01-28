@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Metrics &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
@@ -18,9 +18,7 @@
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Trivializations" href="trivializations.html" />
-    <link rel="prev" title="Covers" href="covers.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,46 +40,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#core-metrics">Core metrics</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.EuclideanMetric"><code class="docutils literal notranslate"><span class="pre">EuclideanMetric</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#angle-coordinate-metrics">Angle-coordinate metrics</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.S1AngleMetric"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.RP1AngleMetric"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.T2FlatMetric"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#unit-vector-metrics">Unit-vector metrics</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.S1UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.RP1UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.RP2UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#quotient-model-metrics">Quotient / model metrics</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.Torus_Z2QuotientMetric_R4"><code class="docutils literal notranslate"><span class="pre">Torus_Z2QuotientMetric_R4</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.RP2_TrivialMetric"><code class="docutils literal notranslate"><span class="pre">RP2_TrivialMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.RP2_TwistMetric"><code class="docutils literal notranslate"><span class="pre">RP2_TwistMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.RP2_FlipMetric"><code class="docutils literal notranslate"><span class="pre">RP2_FlipMetric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.S3QuotientMetric"><code class="docutils literal notranslate"><span class="pre">S3QuotientMetric</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
-</ul>
-</li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -98,7 +59,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
       <li class="breadcrumb-item active">Metrics</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/metrics.rst.txt" rel="nofollow"> View page source</a>
@@ -309,10 +269,7 @@
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="covers.html" class="btn btn-neutral float-left" title="Covers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="trivializations.html" class="btn btn-neutral float-right" title="Trivializations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

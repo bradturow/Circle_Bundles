@@ -6,8 +6,8 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>bundle &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+  <title>BundleResult overview &mdash; circle_bundles 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
@@ -19,8 +19,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core workflow" href="workflow.html" />
-    <link rel="prev" title="API Reference" href="index.html" /> 
+    <link rel="next" title="User-facing methods" href="methods.html" />
+    <link rel="prev" title="Building a bundle" href="building.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,84 +43,23 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">bundle</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult"><code class="docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult.F"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.F</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult.pre_F"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.pre_F</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult.Omega_used"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.Omega_used</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult.Phi_used"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.Phi_used</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult.report"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.report</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult.meta"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.meta</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Bundle objects</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#quickstart">Quickstart</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="building.html">Building a bundle</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">BundleResult overview</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mental-model">Mental model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#key-attributes">Key attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#caching">Caching</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#api-reference">API reference</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.total_data"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.total_data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.metric"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.metric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.bundle_map"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.bundle_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.base_dim"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.base_dim</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.fiber_dim"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.fiber_dim</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.base_weight"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.base_weight</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.fiber_weight"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.fiber_weight</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.meta"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.meta</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.base_proj_map"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.base_proj_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult.to_text"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.to_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="methods.html">User-facing methods</a></li>
+<li class="toctree-l3"><a class="reference internal" href="visualization.html">Visualization</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#circle_bundles.bundle.BundleResult"><code class="docutils literal notranslate"><span class="pre">BundleResult</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.cover"><code class="docutils literal notranslate"><span class="pre">BundleResult.cover</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.data"><code class="docutils literal notranslate"><span class="pre">BundleResult.data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.local_triv"><code class="docutils literal notranslate"><span class="pre">BundleResult.local_triv</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.cocycle"><code class="docutils literal notranslate"><span class="pre">BundleResult.cocycle</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.transitions"><code class="docutils literal notranslate"><span class="pre">BundleResult.transitions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.quality"><code class="docutils literal notranslate"><span class="pre">BundleResult.quality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.classes"><code class="docutils literal notranslate"><span class="pre">BundleResult.classes</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.meta"><code class="docutils literal notranslate"><span class="pre">BundleResult.meta</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">BundleResult.cover</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id1"><code class="docutils literal notranslate"><span class="pre">BundleResult.data</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id2"><code class="docutils literal notranslate"><span class="pre">BundleResult.local_triv</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id3"><code class="docutils literal notranslate"><span class="pre">BundleResult.cocycle</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id4"><code class="docutils literal notranslate"><span class="pre">BundleResult.transitions</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id5"><code class="docutils literal notranslate"><span class="pre">BundleResult.quality</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id6"><code class="docutils literal notranslate"><span class="pre">BundleResult.classes</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#id7"><code class="docutils literal notranslate"><span class="pre">BundleResult.meta</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.total_metric"><code class="docutils literal notranslate"><span class="pre">BundleResult.total_metric</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.persistence"><code class="docutils literal notranslate"><span class="pre">BundleResult.persistence</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.max_trivial"><code class="docutils literal notranslate"><span class="pre">BundleResult.max_trivial</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.global_trivialization"><code class="docutils literal notranslate"><span class="pre">BundleResult.global_trivialization</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.bundle_map"><code class="docutils literal notranslate"><span class="pre">BundleResult.bundle_map</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.compute_persistence"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_persistence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.get_persistence"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_persistence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.compute_max_trivial_subcomplex"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_max_trivial_subcomplex()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.get_max_trivial_subcomplex"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_max_trivial_subcomplex()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.compute_global_trivialization"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_global_trivialization()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.get_global_trivialization"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_global_trivialization()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.get_frame_dataset"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_frame_dataset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.compute_bundle_map"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_bundle_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.get_bundle_map"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_bundle_map()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.get_pullback_data"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_pullback_data()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.bundle_app"><code class="docutils literal notranslate"><span class="pre">BundleResult.bundle_app()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.show_bundle"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_bundle()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.show_nerve"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_nerve()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.show_max_trivial"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_max_trivial()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.show_circle_nerve"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_circle_nerve()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.bundle.BundleResult.compare_trivs"><code class="docutils literal notranslate"><span class="pre">BundleResult.compare_trivs()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#circle_bundles.bundle.build_bundle"><code class="docutils literal notranslate"><span class="pre">build_bundle()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -137,10 +76,10 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
-      <li class="breadcrumb-item active">bundle</li>
+          <li class="breadcrumb-item"><a href="index.html">Bundle objects</a></li>
+      <li class="breadcrumb-item active">BundleResult overview</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/bundle.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/bundle/overview.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -148,148 +87,52 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="module-circle_bundles.bundle">
-<span id="bundle"></span><h1>bundle<a class="headerlink" href="#module-circle_bundles.bundle" title="Link to this heading"></a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.bundle.</span></span><span class="sig-name descname"><span class="pre">BundleMapResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_F</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega_used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Phi_used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleMapResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Result of computing a bundle map / frame coordinates.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>F</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>pre_F</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>Omega_used</strong> (<em>Dict</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>, </em><em>ndarray</em><em>]</em>)</p></li>
-<li><p><strong>Phi_used</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>report</strong> (<em>Any</em>)</p></li>
-<li><p><strong>meta</strong> (<em>BundleMapMeta</em>)</p></li>
+  <section id="bundleresult-overview">
+<h1>BundleResult overview<a class="headerlink" href="#bundleresult-overview" title="Link to this heading"></a></h1>
+<p>A <a class="reference internal" href="../reference/bundle.html#circle_bundles.bundle.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a> packages the core outputs of the reconstruction.
+It is returned by <a class="reference internal" href="building.html#circle_bundles.bundle.build_bundle" title="circle_bundles.bundle.build_bundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_bundle()</span></code></a>.</p>
+<section id="mental-model">
+<h2>Mental model<a class="headerlink" href="#mental-model" title="Link to this heading"></a></h2>
+<p>A bundle object stores:</p>
+<ul class="simple">
+<li><p>a <strong>cover</strong> of the base space (charts, nerve, partition of unity),</p></li>
+<li><p>a <strong>local trivialization</strong> (local circle coordinates on charts),</p></li>
+<li><p>an estimated <strong>O(2) cocycle</strong> (transition functions on overlaps),</p></li>
+<li><p><strong>characteristic class representatives</strong>,</p></li>
+<li><p><strong>quality diagnostics</strong>,</p></li>
+<li><p>lightweight <strong>provenance</strong> in <code class="docutils literal notranslate"><span class="pre">meta</span></code>.</p></li>
 </ul>
+</section>
+<section id="key-attributes">
+<h2>Key attributes<a class="headerlink" href="#key-attributes" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">cover</span></code></dt><dd><p>The cover object (membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code>, partition of unity, nerve accessors, landmarks, etc.).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">data</span></code></dt><dd><p>The original dataset array.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">local_triv</span></code></dt><dd><p>Local circle coordinates on each chart.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cocycle</span></code></dt><dd><p>Transition data and cocycle representation on the nerve.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">classes</span></code></dt><dd><p>Characteristic class representatives.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">quality</span></code></dt><dd><p>Diagnostics and consistency summaries.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">meta</span></code></dt><dd><p>Minimal provenance describing semantic construction choices (kept intentionally small).</p>
 </dd>
 </dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult.F">
-<span class="sig-name descname"><span class="pre">F</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult.F" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult.pre_F">
-<span class="sig-name descname"><span class="pre">pre_F</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult.pre_F" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult.Omega_used">
-<span class="sig-name descname"><span class="pre">Omega_used</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code><span class="pre">[</span><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code><span class="pre">[</span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code><span class="pre">],</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code><span class="pre">]</span></em><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult.Omega_used" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult.Phi_used">
-<span class="sig-name descname"><span class="pre">Phi_used</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult.Phi_used" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult.report">
-<span class="sig-name descname"><span class="pre">report</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult.report" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleMapResult.meta">
-<span class="sig-name descname"><span class="pre">meta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapMeta</span></code></em><a class="headerlink" href="#circle_bundles.bundle.BundleMapResult.meta" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.bundle.</span></span><span class="sig-name descname"><span class="pre">PullbackTotalSpaceResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fiber_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fiber_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#PullbackTotalSpaceResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Pullback total space Z = (base | fiber) with a product metric.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>total_data</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>metric</strong> (<em>Any</em>)</p></li>
-<li><p><strong>bundle_map</strong> (<a class="reference internal" href="#circle_bundles.bundle.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><em>BundleMapResult</em></a>)</p></li>
-<li><p><strong>base_dim</strong> (<em>int</em>)</p></li>
-<li><p><strong>fiber_dim</strong> (<em>int</em>)</p></li>
-<li><p><strong>base_weight</strong> (<em>float</em>)</p></li>
-<li><p><strong>fiber_weight</strong> (<em>float</em>)</p></li>
-<li><p><strong>meta</strong> (<em>PullbackMeta</em>)</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.total_data">
-<span class="sig-name descname"><span class="pre">total_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.total_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.metric">
-<span class="sig-name descname"><span class="pre">metric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.metric" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.bundle_map">
-<span class="sig-name descname"><span class="pre">bundle_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.bundle_map" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.base_dim">
-<span class="sig-name descname"><span class="pre">base_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.base_dim" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.fiber_dim">
-<span class="sig-name descname"><span class="pre">fiber_dim</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.fiber_dim" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.base_weight">
-<span class="sig-name descname"><span class="pre">base_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.base_weight" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.fiber_weight">
-<span class="sig-name descname"><span class="pre">fiber_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.fiber_weight" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.meta">
-<span class="sig-name descname"><span class="pre">meta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">PullbackMeta</span></code></em><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.meta" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.base_proj_map">
-<span class="sig-name descname"><span class="pre">base_proj_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#PullbackTotalSpaceResult.base_proj_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.base_proj_map" title="Link to this definition"></a></dt>
-<dd><p>Project to the base block (first base_dim columns).</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></span></p>
-</dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>X</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="circle_bundles.bundle.PullbackTotalSpaceResult.to_text">
-<span class="sig-name descname"><span class="pre">to_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#PullbackTotalSpaceResult.to_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.PullbackTotalSpaceResult.to_text" title="Link to this definition"></a></dt>
-<dd><p>Short human-readable summary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></span></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+</section>
+<section id="caching">
+<h2>Caching<a class="headerlink" href="#caching" title="Link to this heading"></a></h2>
+<p>Methods named <code class="docutils literal notranslate"><span class="pre">get_*</span></code> cache results in <code class="docutils literal notranslate"><span class="pre">bundle._cache</span></code> and may also populate a corresponding
+attribute (for example <code class="docutils literal notranslate"><span class="pre">bundle.persistence</span></code>) when called with default settings.</p>
+</section>
+<section id="api-reference">
+<h2>API reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.bundle.</span></span><span class="sig-name descname"><span class="pre">BundleResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_triv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cocycle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_trivial=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_trivialization=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_map=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_cache=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Output of <a class="reference internal" href="#circle_bundles.bundle.build_bundle" title="circle_bundles.bundle.build_bundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">circle_bundles.bundle.build_bundle()</span></code></a>.</p>
+<dd><p>Output of <a class="reference internal" href="building.html#circle_bundles.bundle.build_bundle" title="circle_bundles.bundle.build_bundle"><code class="xref py py-func docutils literal notranslate"><span class="pre">circle_bundles.bundle.build_bundle()</span></code></a>.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">BundleResult</span></code> packages the core artifacts of a discrete circle-bundle
 reconstruction:</p>
 <ul class="simple">
@@ -300,7 +143,7 @@ reconstruction:</p>
 <li><p>plus cached convenience methods for downstream analysis and visualization.</p></li>
 </ul>
 <section id="typical-workflow">
-<h2>Typical workflow<a class="headerlink" href="#typical-workflow" title="Link to this heading"></a></h2>
+<h3>Typical workflow<a class="headerlink" href="#typical-workflow" title="Link to this heading"></a></h3>
 <p>Build a bundle:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cover</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
@@ -335,7 +178,7 @@ reconstruction:</p>
 </div>
 </section>
 <section id="notes-on-caching">
-<h2>Notes on caching<a class="headerlink" href="#notes-on-caching" title="Link to this heading"></a></h2>
+<h3>Notes on caching<a class="headerlink" href="#notes-on-caching" title="Link to this heading"></a></h3>
 <p>Methods named <code class="docutils literal notranslate"><span class="pre">get_*</span></code> cache results in <code class="docutils literal notranslate"><span class="pre">bundle._cache</span></code> (and also populate
 the corresponding attribute like <code class="docutils literal notranslate"><span class="pre">bundle.persistence</span></code> when called with
 default settings). Methods named <code class="docutils literal notranslate"><span class="pre">compute_*</span></code> perform an explicit recomputation
@@ -389,71 +232,6 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dd><p>Light provenance and default preferences used in construction.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">cover</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">local_triv</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">cocycle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">transitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">quality</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">classes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">meta</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMeta</span></code></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.total_metric">
-<span class="sig-name descname"><span class="pre">total_metric</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#circle_bundles.bundle.BundleResult.total_metric" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.persistence">
-<span class="sig-name descname"><span class="pre">persistence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#circle_bundles.bundle.BundleResult.persistence" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.max_trivial">
-<span class="sig-name descname"><span class="pre">max_trivial</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#circle_bundles.bundle.BundleResult.max_trivial" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.global_trivialization">
-<span class="sig-name descname"><span class="pre">global_trivialization</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#circle_bundles.bundle.BundleResult.global_trivialization" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.bundle_map">
-<span class="sig-name descname"><span class="pre">bundle_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#circle_bundles.bundle.BundleResult.bundle_map" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.compute_persistence">
 <span class="sig-name descname"><span class="pre">compute_persistence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.compute_persistence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult.compute_persistence" title="Link to this definition"></a></dt>
@@ -472,7 +250,7 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.get_persistence">
 <span class="sig-name descname"><span class="pre">get_persistence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_persistence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult.get_persistence" title="Link to this definition"></a></dt>
-<dd><p>Cached wrapper around <cite>compute_persistence</cite>.</p>
+<dd><p>Cached wrapper around <a class="reference internal" href="../reference/bundle.html#circle_bundles.bundle.BundleResult.compute_persistence" title="circle_bundles.bundle.BundleResult.compute_persistence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_persistence</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -505,7 +283,7 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.get_max_trivial_subcomplex">
 <span class="sig-name descname"><span class="pre">get_max_trivial_subcomplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_max_trivial_subcomplex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult.get_max_trivial_subcomplex" title="Link to this definition"></a></dt>
-<dd><p>Cached wrapper around <cite>compute_max_trivial_subcomplex</cite>.</p>
+<dd><p>Cached wrapper around <a class="reference internal" href="../reference/bundle.html#circle_bundles.bundle.BundleResult.compute_max_trivial_subcomplex" title="circle_bundles.bundle.BundleResult.compute_max_trivial_subcomplex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_max_trivial_subcomplex</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxTrivialSubcomplex</span></code></span></p>
@@ -543,7 +321,7 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.get_global_trivialization">
 <span class="sig-name descname"><span class="pre">get_global_trivialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_orientable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_global_trivialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult.get_global_trivialization" title="Link to this definition"></a></dt>
-<dd><p>Cached wrapper around <cite>compute_global_trivialization</cite>.</p>
+<dd><p>Cached wrapper around <a class="reference internal" href="../reference/bundle.html#circle_bundles.bundle.BundleResult.compute_global_trivialization" title="circle_bundles.bundle.BundleResult.compute_global_trivialization"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_global_trivialization</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">GlobalTrivializationResult</span></code></span></p>
@@ -585,7 +363,7 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dd><p>Compute fiber coordinates via the bundle-map solver.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -603,10 +381,10 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.bundle.BundleResult.get_bundle_map">
 <span class="sig-name descname"><span class="pre">get_bundle_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_semicircle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semicircle_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reducer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">packing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coloring'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_summary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_chart_disagreement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_bundle_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult.get_bundle_map" title="Link to this definition"></a></dt>
-<dd><p>Cached wrapper around <cite>compute_bundle_map</cite>.</p>
+<dd><p>Cached wrapper around <a class="reference internal" href="../reference/bundle.html#circle_bundles.bundle.BundleResult.compute_bundle_map" title="circle_bundles.bundle.BundleResult.compute_bundle_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_bundle_map</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.bundle.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
@@ -629,11 +407,11 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <dd><p>Build a pullback total space (base | fiber) with a product metric.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.bundle.PullbackTotalSpaceResult" title="circle_bundles.bundle.PullbackTotalSpaceResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult</span></code></span></p>
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>bundle_map</strong> (<a class="reference internal" href="#circle_bundles.bundle.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><em>BundleMapResult</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>bundle_map</strong> (<em>BundleMapResult</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>edges</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
 <li><p><strong>subcomplex</strong> (<em>Literal</em><em>[</em><em>'full'</em><em>, </em><em>'cocycle'</em><em>, </em><em>'max_trivial'</em><em>]</em>)</p></li>
 <li><p><strong>strict_semicircle</strong> (<em>bool</em>)</p></li>
@@ -660,7 +438,7 @@ landmarks, and nerve accessors (<code class="docutils literal notranslate"><span
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#circle_bundles.bundle.BundleResult.show_bundle" title="circle_bundles.bundle.BundleResult.show_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_bundle</span></code></a></dt><dd><p>runs the app.</p>
+<dt><a class="reference internal" href="../reference/bundle.html#circle_bundles.bundle.BundleResult.show_bundle" title="circle_bundles.bundle.BundleResult.show_bundle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">show_bundle</span></code></a></dt><dd><p>runs the app.</p>
 </dd>
 </dl>
 </div>
@@ -752,8 +530,8 @@ where the class representatives become coboundaries.</p>
 <span class="sig-name descname"><span class="pre">show_circle_nerve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_max_trivial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights_for_max_trivial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_if_not_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'orient_if_possible'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.show_circle_nerve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.BundleResult.show_circle_nerve" title="Link to this definition"></a></dt>
 <dd><p>Circle-layout nerve visualization for cycle graphs.</p>
 <p>Convenience behavior:
-- If <cite>auto_omega=True</cite> and omega is None, uses <cite>bundle.classes.omega_O1_used</cite> when available.
-- If <cite>compute_phi=True</cite> and phi is None, computes a vertex potential using orient_if_possible().</p>
+- If <code class="xref py py-obj docutils literal notranslate"><span class="pre">auto_omega=True</span></code> and omega is None, uses <code class="xref py py-obj docutils literal notranslate"><span class="pre">bundle.classes.omega_O1_used</span></code> when available.
+- If <code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_phi=True</span></code> and phi is None, computes a vertex potential using orient_if_possible().</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -822,50 +600,15 @@ where the class representatives become coboundaries.</p>
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="circle_bundles.bundle.build_bundle">
-<span class="sig-prename descclassname"><span class="pre">circle_bundles.bundle.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.bundle.build_bundle" title="Link to this definition"></a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#circle_bundles.bundle.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a></span></p>
-</dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>data</strong> (<em>ndarray</em>)</p></li>
-<li><p><strong>cc</strong> (<em>object</em>)</p></li>
-<li><p><strong>min_patch_size</strong> (<em>int</em>)</p></li>
-<li><p><strong>min_points_edge</strong> (<em>int</em>)</p></li>
-<li><p><strong>ref_angle</strong> (<em>float</em>)</p></li>
-<li><p><strong>delta_min_points</strong> (<em>int</em>)</p></li>
-<li><p><strong>compute_witness</strong> (<em>bool</em>)</p></li>
-<li><p><strong>show</strong> (<em>bool</em>)</p></li>
-<li><p><strong>verbose</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="simple">
-<dt>End-to-end pipeline (core only):</dt><dd><p>cover + data -&gt; local triv -&gt; transitions -&gt; quality -&gt; classes</p>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><dl class="simple">
-<dt>Characteristic class computation is always performed with:</dt><dd><p>try_orient=True and compute_euler_num=True.</p>
-</dd>
-</dl>
-</li>
-<li><p>Missing edges during transition estimation are treated as an error.</p></li>
-</ul>
-</dd></dl>
-
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="workflow.html" class="btn btn-neutral float-right" title="Core workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="building.html" class="btn btn-neutral float-left" title="Building a bundle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="methods.html" class="btn btn-neutral float-right" title="User-facing methods" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

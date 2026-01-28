@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Geometry and algebra helpers &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
@@ -18,9 +18,7 @@
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Visualization" href="visualization.html" />
-    <link rel="prev" title="Trivializations" href="trivializations.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,32 +40,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Geometry and algebra helpers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#unwrapping-cocycle-utilities">Unwrapping / cocycle utilities</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_cocycle_dict"><code class="docutils literal notranslate"><span class="pre">get_cocycle_dict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.lift_base_points"><code class="docutils literal notranslate"><span class="pre">lift_base_points()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#z2-linear-algebra">Z2 linear algebra</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.solve_Z2_linear_system"><code class="docutils literal notranslate"><span class="pre">solve_Z2_linear_system()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.solve_Z2_edge_coboundary"><code class="docutils literal notranslate"><span class="pre">solve_Z2_edge_coboundary()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
-</ul>
-</li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -84,7 +59,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
       <li class="breadcrumb-item active">Geometry and algebra helpers</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/geometry.rst.txt" rel="nofollow"> View page source</a>
@@ -139,7 +113,7 @@ different values, that’s either an error (default) or we take OR.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>G</strong> (<em>nx.Graph</em>) – Cluster graph with nodes (fiber_index, cluster_label). If edges have
 attribute ‘indices_shared’, we use that to propagate faster/cleaner.</p></li>
-<li><p><strong>cl</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_points</em><em>) </em><em>int</em>) – Fiberwise cluster labels; noise indicated by <cite>noise_label</cite>.</p></li>
+<li><p><strong>cl</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_points</em><em>) </em><em>int</em>) – Fiberwise cluster labels; noise indicated by <code class="xref py py-obj docutils literal notranslate"><span class="pre">noise_label</span></code>.</p></li>
 <li><p><strong>base_points</strong> (<em>(</em><em>n_points</em><em>, </em><em>d</em><em>) </em><em>float</em>) – Vector representative for each base point.</p></li>
 <li><p><strong>seed_fiber</strong> (<em>ints</em>) – Seed a starting cluster to orient.</p></li>
 <li><p><strong>seed_cluster</strong> (<em>ints</em>) – Seed a starting cluster to orient.</p></li>
@@ -230,10 +204,7 @@ enforce that each fiber has &lt;= 2 non-noise labels (when present).</p></li>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="trivializations.html" class="btn btn-neutral float-left" title="Trivializations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="visualization.html" class="btn btn-neutral float-right" title="Visualization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 

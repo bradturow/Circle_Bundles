@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Synthetic data &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
@@ -18,8 +18,7 @@
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Optical flow utilities" href="optical_flow.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -41,78 +40,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="analysis.html">Analysis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Synthetic data</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#densities">Densities</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.mesh_to_density"><code class="docutils literal notranslate"><span class="pre">mesh_to_density()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_density_axes"><code class="docutils literal notranslate"><span class="pre">get_density_axes()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.rotate_density"><code class="docutils literal notranslate"><span class="pre">rotate_density()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_mesh_sample"><code class="docutils literal notranslate"><span class="pre">get_mesh_sample()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#meshes-mesh-visualization">Meshes + mesh visualization</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_tri_prism"><code class="docutils literal notranslate"><span class="pre">make_tri_prism()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_star_pyramid"><code class="docutils literal notranslate"><span class="pre">make_star_pyramid()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_density_visualizer"><code class="docutils literal notranslate"><span class="pre">make_density_visualizer()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_tri_prism_visualizer"><code class="docutils literal notranslate"><span class="pre">make_tri_prism_visualizer()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_star_pyramid_visualizer"><code class="docutils literal notranslate"><span class="pre">make_star_pyramid_visualizer()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_rotating_mesh_clip"><code class="docutils literal notranslate"><span class="pre">make_rotating_mesh_clip()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#natural-image-patches">Natural image patches</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_nat_img_kb"><code class="docutils literal notranslate"><span class="pre">sample_nat_img_kb()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_gradient_dirs"><code class="docutils literal notranslate"><span class="pre">get_gradient_dirs()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#optical-flow-patch-models">Optical-flow patch models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_opt_flow_torus"><code class="docutils literal notranslate"><span class="pre">sample_opt_flow_torus()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_flow_patches"><code class="docutils literal notranslate"><span class="pre">make_flow_patches()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#s2-hopf-unit-tangent-models">S2 / Hopf / unit tangent models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_sphere"><code class="docutils literal notranslate"><span class="pre">sample_sphere()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.hopf_projection"><code class="docutils literal notranslate"><span class="pre">hopf_projection()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.spin3_adjoint_to_so3"><code class="docutils literal notranslate"><span class="pre">spin3_adjoint_to_so3()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.so3_to_s2_projection"><code class="docutils literal notranslate"><span class="pre">so3_to_s2_projection()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_s2_trivial"><code class="docutils literal notranslate"><span class="pre">sample_s2_trivial()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.tangent_frame_on_s2"><code class="docutils literal notranslate"><span class="pre">tangent_frame_on_s2()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_s2_unit_tangent"><code class="docutils literal notranslate"><span class="pre">sample_s2_unit_tangent()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#so-3-sampling">SO(3) sampling</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_so3"><code class="docutils literal notranslate"><span class="pre">sample_so3()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.project_o3"><code class="docutils literal notranslate"><span class="pre">project_o3()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#step-edge-patches">Step-edge patches</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_patch_types_list"><code class="docutils literal notranslate"><span class="pre">get_patch_types_list()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_step_edges"><code class="docutils literal notranslate"><span class="pre">make_step_edges()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.make_all_step_edges"><code class="docutils literal notranslate"><span class="pre">make_all_step_edges()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_binary_step_edges"><code class="docutils literal notranslate"><span class="pre">sample_binary_step_edges()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.mean_center"><code class="docutils literal notranslate"><span class="pre">mean_center()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_step_edge_torus"><code class="docutils literal notranslate"><span class="pre">sample_step_edge_torus()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#tori-klein-bottle-helpers">Tori / Klein bottle helpers</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.const"><code class="docutils literal notranslate"><span class="pre">const()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.small_to_big"><code class="docutils literal notranslate"><span class="pre">small_to_big()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.sample_C2_torus"><code class="docutils literal notranslate"><span class="pre">sample_C2_torus()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -129,7 +59,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
       <li class="breadcrumb-item active">Synthetic data</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/synthetic.rst.txt" rel="nofollow"> View page source</a>
@@ -1090,9 +1019,7 @@ z2 = R(theta) * exp(i theta)</p>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="optical_flow.html" class="btn btn-neutral float-left" title="Optical flow utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-    </div>
+          <footer>
 
   <hr/>
 

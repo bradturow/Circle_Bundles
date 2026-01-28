@@ -32,14 +32,30 @@ exclude_patterns: list[str] = []
 
 # Autosummary / autodoc behavior
 autosummary_generate = True
+autosummary_imported_members = False
 autodoc_member_order = "bysource"
 
 autodoc_typehints = "description"
 autoclass_content = "class"
 
+# sphinx_autodoc_typehints tweaks
+typehints_fully_qualified = False
+typehints_document_rtype = True
+
 # Napoleon (Google / NumPy docstrings)
 napoleon_google_docstring = True
 napoleon_numpy_docstring = True
+
+# Nice defaults
+default_role = "py:obj"
+pygments_style = "sphinx"
+
+# Optional: avoid doc-build failures if optional deps aren't installed
+autodoc_mock_imports = [
+    "plotly",
+    "dash",
+    "sklearn",
+]
 
 # -- Options for HTML output -------------------------------------------------
 

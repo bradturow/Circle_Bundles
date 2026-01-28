@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Analysis &mdash; circle_bundles 0.1.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
@@ -18,9 +18,7 @@
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Covers" href="covers.html" />
-    <link rel="prev" title="Core workflow" href="workflow.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -42,39 +40,9 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="bundle.html">bundle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflow.html">Core workflow</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Analysis</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#fiberwise-clustering">Fiberwise clustering</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.safe_add_edges"><code class="docutils literal notranslate"><span class="pre">safe_add_edges()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_weights"><code class="docutils literal notranslate"><span class="pre">get_weights()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.fiberwise_clustering"><code class="docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.plot_fiberwise_pca_grid"><code class="docutils literal notranslate"><span class="pre">plot_fiberwise_pca_grid()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.plot_fiberwise_summary_bars"><code class="docutils literal notranslate"><span class="pre">plot_fiberwise_summary_bars()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_cluster_persistence"><code class="docutils literal notranslate"><span class="pre">get_cluster_persistence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_filtered_cluster_graph"><code class="docutils literal notranslate"><span class="pre">get_filtered_cluster_graph()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#local-analysis">Local analysis</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_local_pca"><code class="docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.plot_local_pca"><code class="docutils literal notranslate"><span class="pre">plot_local_pca()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.get_local_rips"><code class="docutils literal notranslate"><span class="pre">get_local_rips()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#circle_bundles.plot_local_rips"><code class="docutils literal notranslate"><span class="pre">plot_local_rips()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="trivializations.html">Trivializations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="geometry.html">Geometry and algebra helpers</a></li>
-<li class="toctree-l2"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="optical_flow.html">Optical flow utilities</a></li>
-<li class="toctree-l2"><a class="reference internal" href="synthetic.html">Synthetic data</a></li>
-</ul>
-</li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../bundle/index.html">Bundle objects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">Reference</a></li>
 </ul>
 
         </div>
@@ -91,7 +59,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
       <li class="breadcrumb-item active">Analysis</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/api/analysis.rst.txt" rel="nofollow"> View page source</a>
@@ -369,10 +336,7 @@ and recompute global components.</p>
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="workflow.html" class="btn btn-neutral float-left" title="Core workflow" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="covers.html" class="btn btn-neutral float-right" title="Covers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 
