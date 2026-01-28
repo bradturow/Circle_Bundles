@@ -63,7 +63,7 @@ class BundleMapMeta(TypedDict, total=False):
     semicircle_tol: float
     reducer: Optional[Dict[str, Any]]
     compute_chart_disagreement: bool
-    packing: str
+    packing: FramePacking   # or Literal["none","coloring","coloring2"]
 
 
 class PullbackMeta(TypedDict, total=False):
@@ -71,7 +71,7 @@ class PullbackMeta(TypedDict, total=False):
     strict_semicircle: bool
     semicircle_tol: float
     compute_chart_disagreement: bool
-    packing: str
+    packing: FramePacking
 
 
 @runtime_checkable
@@ -99,24 +99,42 @@ class BundleMapResult:
     - local circle coordinates ``f`` on each chart, and
     - estimated transition functions ``Omega`` on overlaps,
 
-    and produces a globally consistent set of fiber coordinates.
+    and produces a globally consistent set of fiber coordinates (and supporting diagnostics).
 
     Attributes
     ----------
     F:
-        Final fiber coordinates of shape ``(n_samples, d_fiber)``.
-        In the default circle-bundle setting, ``d_fiber`` is typically 1 (an angle coordinate).
+        Final global bundle coordinates of shape ``(n_samples, D_used)`` where
+        ``D_used`` is the ambient frame dimension used by the solver at the moment
+        it outputs coordinates (after optional packing / projection / reduction).
+
+        In the current implementation, ``F`` lives in the same ambient space as the
+        projected frames used for gluing (i.e. columns correspond to the ambient
+        coordinates of the Stiefel-projected frames).
+
     pre_F:
-        Pre-projection / pre-normalization fiber coordinates, same shape as ``F``.
-        Useful for debugging and diagnostics.
+        Per-chart (pre-gluing) coordinates of shape ``(n_charts, n_samples, D_used)``.
+        For each chart j and sample s with ``U[j,s]=True``, ``pre_F[j,s]`` stores the
+        chartwise value ``F_j(s)``. Else it is zero.
+
+        This is the main object used to compute chart disagreement diagnostics.
+
     Omega_used:
-        Dictionary mapping nerve edges ``(i, j)`` to the O(2) matrix actually used on that edge
-        after restricting to a subcomplex and/or applying internal filtering.
+        The O(2)-valued cocycle actually used by the solver for diagnostics/gluing,
+        stored as a dict ``(i,j) -> (n_samples,2,2)`` with canonical undirected edges.
+        (This may differ from the raw simplicial cocycle on a restricted edge set,
+        or after optional post-projection processing.)
+
     Phi_used:
-        Orientation gauge (typically ±1 per chart) used internally by the solver, shape ``(n_charts,)``.
-        When present, this indicates the solver has aligned chart orientations.
+        The Stiefel-projected frames actually used for gluing, of shape
+        ``(n_charts, n_samples, D_used, 2)``.
+
+        (Despite the name, this is *not* a ±1 orientation gauge vector; it is the
+        frame field in the ambient space used by the solver.)
+
     report:
         A solver report object (implementation-defined) with diagnostic statistics and warnings.
+
     meta:
         Lightweight provenance (solver options such as semicircle constraints, packing mode, etc.).
     """
@@ -760,38 +778,6 @@ class BundleResult:
         compute_chart_disagreement: bool = True,
         packing: FramePacking = "coloring",
     ) -> BundleMapResult:
-        """
-        Compute global fiber coordinates via the bundle-map solver.
-
-        Parameters
-        ----------
-        edges:
-            Optional subset of nerve edges to use. If omitted, the solver uses its default edge set.
-            Supplying a restricted set can improve robustness on noisy bundles.
-        strict_semicircle:
-            If True, enforce a semicircle consistency constraint when reconciling local angles.
-            This is often helpful when local coordinates are only defined up to a flip/shift.
-        semicircle_tol:
-            Numerical tolerance used by the semicircle constraint.
-        reducer:
-            Optional reducer / frame selection configuration to speed up or stabilize the solver.
-        show_summary:
-            If True, print a solver summary (diagnostics and basic statistics).
-        compute_chart_disagreement:
-            If True, compute per-chart disagreement diagnostics in the solver report.
-        packing:
-            Frame packing strategy controlling how local constraints are selected (implementation-defined).
-
-        Returns
-        -------
-        bundle_map:
-            A :class:`BundleMapResult` containing fiber coordinates and solver diagnostics.
-
-        Raises
-        ------
-        AttributeError:
-            If required cocycle fields (e.g. ``cocycle.Omega``) are missing.
-        """
         from .trivializations.bundle_map import get_bundle_map
 
         Omega = getattr(self.cocycle, "Omega", None)
@@ -812,6 +798,18 @@ class BundleResult:
             packing=packing,
         )
 
+        # --- stable, curated reducer metadata (avoid dumping whole __dict__) ---
+        reducer_meta = None
+        if reducer is not None:
+            reducer_meta = {
+                "method": getattr(reducer, "method", None),
+                "stage": getattr(reducer, "stage", None),
+                "d": getattr(reducer, "d", None),
+                "max_frames": getattr(reducer, "max_frames", None),
+                "rng_seed": getattr(reducer, "rng_seed", None),
+                "psc_verbosity": getattr(reducer, "psc_verbosity", None),
+            }
+
         return BundleMapResult(
             F=np.asarray(F),
             pre_F=np.asarray(pre_F),
@@ -821,11 +819,13 @@ class BundleResult:
             meta={
                 "strict_semicircle": bool(strict_semicircle),
                 "semicircle_tol": float(semicircle_tol),
-                "reducer": None if reducer is None else getattr(reducer, "__dict__", str(reducer)),
+                "reducer": reducer_meta,
                 "compute_chart_disagreement": bool(compute_chart_disagreement),
-                "packing": str(packing),
+                "packing": packing,  # keep as FramePacking for consistency
             },
         )
+        
+  
 
     def get_bundle_map(
         self,
@@ -884,10 +884,12 @@ class BundleResult:
                 from .analysis.class_persistence import _edges_for_subcomplex_from_persistence
                 edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
 
+
         red_key = None
         if reducer is not None:
             red_key = (
                 getattr(reducer, "method", None),
+                getattr(reducer, "stage", None),      # <-- IMPORTANT: include stage
                 getattr(reducer, "d", None),
                 getattr(reducer, "max_frames", None),
                 getattr(reducer, "rng_seed", None),
@@ -1045,7 +1047,7 @@ class BundleResult:
                 "strict_semicircle": bool(strict_semicircle),
                 "semicircle_tol": float(semicircle_tol),
                 "compute_chart_disagreement": bool(compute_chart_disagreement),
-                "packing": str(packing),
+                "packing": packing,
             },
         )
 

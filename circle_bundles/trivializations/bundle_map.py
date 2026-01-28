@@ -373,7 +373,7 @@ def get_local_frames(
         slot_of = np.arange(n_sets, dtype=int)
     elif packing in {"coloring", "coloring2"}:
         if colors is None:
-            raise ValueError("colors must be provided when packing='coloring'.")
+            raise ValueError("colors must be provided when packing in {'coloring','coloring2'}.")
         colors = np.asarray(colors, dtype=int).reshape(-1)
         if colors.shape != (n_sets,):
             raise ValueError("colors must have shape (n_sets,).")
@@ -446,6 +446,67 @@ def get_classifying_map(
         P[s] = Ps
         sup_dist = max(sup_dist, dist)
     return P, float(sup_dist)
+
+# ============================================================
+# Steps 3–4 (paper): classifying map + cocycle projection
+# ============================================================
+
+@dataclass
+class CocycleProjectionResult:
+    """
+    Steps 3–4 (paper):
+      - classifying map (Grassmann) via weighted projector sum
+      - rank-2 projection in ambient space
+      - Stiefel polar projection of frames onto the projected plane
+      - cocycle projection Omega_true from projected frames
+    """
+    cl: np.ndarray                     # (n_samples, D, D) rank-2 projectors
+    Phi_true: np.ndarray               # (n_sets, n_samples, D, 2) projected Stiefel frames
+    Omega_true: Dict[Edge, np.ndarray] # edges -> (n_samples,2,2)
+    cl_proj_dist: float
+    frame_proj_dist: float
+
+
+def cocycle_project_from_raw_frames(
+    *,
+    U: np.ndarray,
+    pou: np.ndarray,
+    Phi: np.ndarray,
+    edges: Iterable[Edge],
+) -> CocycleProjectionResult:
+    """
+    Input:
+      Phi: (n_sets,n_samples,D,2) "raw" frames (your \hat{Psi}_j, possibly already reduced to d)
+
+    Output:
+      rank-2 projector field cl, projected Stiefel frames Phi_true, and cocycle Omega_true.
+    """
+    U = np.asarray(U, dtype=bool)
+    pou = np.asarray(pou, dtype=float)
+    Phi = np.asarray(Phi, dtype=float)
+
+    n_sets, n_samples = U.shape
+    if pou.shape != (n_sets, n_samples):
+        raise ValueError("pou shape mismatch with U.")
+    if Phi.shape[:2] != (n_sets, n_samples) or Phi.shape[3] != 2:
+        raise ValueError("Phi must have shape (n_sets,n_samples,D,2).")
+
+    edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
+
+    # Step 3: classifying map (weighted projector sum) + rank-2 projection
+    P, cl_proj_dist = get_classifying_map(Phi, pou, project=True)
+
+    # Step 4: Stiefel projection + cocycle projection
+    Phi_true, frame_proj_dist = project_frames_to_stiefel(U=U, Phi=Phi, P=P)
+    Omega_true = cocycle_from_frames(Phi_true=Phi_true, edges=edges_list)
+
+    return CocycleProjectionResult(
+        cl=P,
+        Phi_true=Phi_true,
+        Omega_true=Omega_true,
+        cl_proj_dist=float(cl_proj_dist),
+        frame_proj_dist=float(frame_proj_dist),
+    )
 
 
 def project_frames_to_stiefel(
@@ -760,16 +821,30 @@ def chart_disagreement_stats(*, U: np.ndarray, pre_F: np.ndarray) -> ChartDisagr
 
 @dataclass
 class TrueFramesResult:
-    Phi: np.ndarray               # (n_sets,n_samples,D,2) approximate frames
-    cl: np.ndarray                # (n_samples,D,D) projected rank-2 projectors
-    Phi_true: np.ndarray          # (n_sets,n_samples,D,2) Stiefel frames
-    Omega_true: Dict[Edge, np.ndarray]
-    cl_proj_dist: float
-    frame_proj_dist: float
-    # optional debug info for packing
+    """
+    Step 2 result (paper): raw frames in ambient space, plus optional cached Step 3–4 outputs.
+
+    Phi:
+        Raw stacked frames \hat{Psi}_j(b_s) (paper Step 2), shape (n_sets,n_samples,D,2).
+
+    Optional cached Step 3–4 outputs (computed lazily by ensure_projected_frames):
+      - Phi_true: projected Stiefel frames (post polar projection), (n_sets,n_samples,D,2)
+      - Omega_true: cocycle projection from Phi_true, edges -> (n_samples,2,2)
+      - cl: rank-2 projector field (Grassmann projection), (n_samples,D,D)
+      - cl_proj_dist, frame_proj_dist: projection diagnostics (sup norms)
+    """
+    Phi: np.ndarray               # (n_sets,n_samples,D,2) raw frames (hat-Psi)
+    D: int                        # ambient dim
     packing: FramePacking = "none"
     n_colors: Optional[int] = None
-    colors: Optional[np.ndarray] = None  # (n_sets,) if packing="coloring"
+    colors: Optional[np.ndarray] = None  # (n_sets,)
+
+    # ---- cached Step 3–4 outputs (None until computed) ----
+    Phi_true: Optional[np.ndarray] = None                 # (n_sets,n_samples,D,2)
+    Omega_true: Optional[Dict[Edge, np.ndarray]] = None   # edges -> (n_samples,2,2)
+    cl: Optional[np.ndarray] = None                       # (n_samples,D,D)
+    cl_proj_dist: Optional[float] = None
+    frame_proj_dist: Optional[float] = None
 
 
 def build_true_frames(
@@ -780,7 +855,18 @@ def build_true_frames(
     edges: Optional[Iterable[Edge]] = None,
     packing: FramePacking = "none",
 ) -> TrueFramesResult:
-    """Phi -> classifying map -> rank-2 projectors -> Stiefel projection -> Omega_true."""
+    """
+    Step 2 (paper): build raw stacked frames \hat{Psi}_j over the sampled base points.
+
+    Returns:
+      TrueFramesResult with only Phi (= \hat{Psi}), plus packing metadata.
+
+    IMPORTANT:
+      This function does NOT compute:
+        - classifying map / Grassmann projection
+        - Stiefel projection (true frames)
+        - Omega_true cocycle projection
+    """
     U = np.asarray(U, dtype=bool)
     pou = np.asarray(pou, dtype=float)
 
@@ -790,9 +876,14 @@ def build_true_frames(
 
     colors: Optional[np.ndarray] = None
     n_colors: Optional[int] = None
+
     if packing in {"coloring", "coloring2"}:
         k = 1 if packing == "coloring" else 2
-        edges_for_coloring = edges_list if k == 1 else edges_power_k(n_sets=int(U.shape[0]), edges=edges_list, k=k)
+        edges_for_coloring = edges_list if k == 1 else edges_power_k(
+            n_sets=int(U.shape[0]),
+            edges=edges_list,
+            k=k,
+        )
         colors, n_colors = greedy_graph_coloring(n_sets=int(U.shape[0]), edges=edges_for_coloring)
 
     Phi = get_local_frames(
@@ -803,21 +894,43 @@ def build_true_frames(
         packing=packing,
         colors=colors,
     )
-    P, cl_proj_dist = get_classifying_map(Phi, pou, project=True)
-    Phi_true, frame_proj_dist = project_frames_to_stiefel(U=U, Phi=Phi, P=P)
-    Omega_true = cocycle_from_frames(Phi_true=Phi_true, edges=edges_list)
+
+    D = int(Phi.shape[2])
 
     return TrueFramesResult(
         Phi=Phi,
-        cl=P,
-        Phi_true=Phi_true,
-        Omega_true=Omega_true,
-        cl_proj_dist=float(cl_proj_dist),
-        frame_proj_dist=float(frame_proj_dist),
+        D=D,
         packing=packing,
         n_colors=n_colors,
         colors=colors,
     )
+
+
+def ensure_projected_frames(
+    tf: TrueFramesResult,
+    *,
+    U: np.ndarray,
+    pou: np.ndarray,
+    edges: Iterable[Edge],
+) -> TrueFramesResult:
+    """
+    Ensure that tf has cached Step 3–4 outputs (cl, Phi_true, Omega_true, projection diagnostics).
+
+    If already computed, returns tf unchanged.
+    Otherwise, runs cocycle_project_from_raw_frames on tf.Phi and stores results.
+    """
+    if tf.Phi_true is not None and tf.Omega_true is not None and tf.cl is not None:
+        return tf
+
+    proj = cocycle_project_from_raw_frames(U=U, pou=pou, Phi=tf.Phi, edges=edges)
+
+    tf.Phi_true = proj.Phi_true
+    tf.Omega_true = proj.Omega_true
+    tf.cl = proj.cl
+    tf.cl_proj_dist = float(proj.cl_proj_dist)
+    tf.frame_proj_dist = float(proj.frame_proj_dist)
+    return tf
+
 
 
 def apply_frame_reduction(
@@ -948,35 +1061,64 @@ def get_frame_dataset(
     Build and return a packed frame dataset at a specified pipeline stage.
 
     stage ∈ {
-      "pre_projection",   # TrueFramesResult.Phi
-      "post_projection",  # TrueFramesResult.Phi_true
-      "post_reduction"    # Phi after reducer (if reducer provided; else Phi_true)
+      "pre_projection",   # raw hat-Psi frames tf.Phi
+      "post_projection",  # projected Stiefel frames tf.Phi_true  (Steps 3–4)
+      "post_reduction"    # reduction applied to tf.Phi_true (if reducer provided)
     }
+
+    Notes
+    -----
+    - "post_projection" and "post_reduction" require running Steps 3–4 once.
+      We do that via ensure_projected_frames(tf, ...), which caches results on tf.
     """
     stage = str(stage)
 
-    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges, packing=packing)
+    U = np.asarray(U, dtype=bool)
+    pou = np.asarray(pou, dtype=float)
 
+    if edges is None:
+        edges = infer_edges_from_U(U)
+    edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
+
+    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges_list, packing=packing)
+
+    # ------------------------------------------------------------
+    # Choose Phi_stage according to stage
+    # ------------------------------------------------------------
     if stage == "pre_projection":
         Phi_stage = tf.Phi
+
     elif stage == "post_projection":
+        tf = ensure_projected_frames(tf, U=U, pou=pou, edges=edges_list)
+        assert tf.Phi_true is not None
         Phi_stage = tf.Phi_true
+
     elif stage == "post_reduction":
+        tf = ensure_projected_frames(tf, U=U, pou=pou, edges=edges_list)
+        assert tf.Phi_true is not None
+
         if reducer is None or getattr(reducer, "method", "none") == "none":
             Phi_stage = tf.Phi_true
         else:
             Phi_stage, _rep = apply_frame_reduction(Phi_true=tf.Phi_true, U=U, reducer=reducer)
+
     else:
         raise ValueError(
             "stage must be one of: 'pre_projection', 'post_projection', 'post_reduction'. "
             f"Got: {stage!r}"
         )
 
+    # ------------------------------------------------------------
+    # Optional vertex-induced restriction from persistence/subcomplex
+    # ------------------------------------------------------------
     allowed_vertices: Optional[Set[int]] = None
     if persistence is not None and subcomplex != "full":
         kept_edges = _edges_for_subcomplex_from_persistence(persistence, subcomplex)
         allowed_vertices = _vertices_from_edges(kept_edges)
 
+    # ------------------------------------------------------------
+    # Pack active frames into (m, D, 2)
+    # ------------------------------------------------------------
     rng = None if rng_seed is None else np.random.default_rng(int(rng_seed))
     Y, idx = stack_active_frames(
         Phi=Phi_stage,
@@ -986,7 +1128,7 @@ def get_frame_dataset(
         allowed_vertices=allowed_vertices,
     )
 
-    n_sets, n_samples = np.asarray(U, dtype=bool).shape
+    n_sets, n_samples = U.shape
     D = int(Phi_stage.shape[2])
 
     return FrameDataset(
@@ -1281,14 +1423,15 @@ def get_bundle_map(
     """
     End-to-end coordinatization.
 
-    Stages:
-      (A) build_true_frames(): Phi, Π(classifying map), Phi_true, Omega_true
-      (B) diagnostics in ambient space
-      (C) optional frame reduction Phi_true -> Phi_used (and rebuild Omega_true on reduced frames)
-      (D) build_bundle_map() to produce F and pre_F (with anchored averaging)
+    Paper-aligned stages (default when reducer.stage == "pre_classifying"):
+      Step 2: build raw frames \hat{Psi} in ambient dimension D (optionally packed)
+              (optionally reduce to d via PSC/subspace-PCA)
+      Step 3: classifying map + Grassmann projection
+      Step 4: Stiefel projection + cocycle projection (Omega_used)
+      Step 5: bundle map gluing (anchored averaging)
 
-    Returns:
-      F, pre_F, Omega_used, Phi_used, report
+    If reducer.stage == "post_stiefel":
+      project first in ambient D (Steps 3–4), then reduce frames and rebuild Omega.
     """
     U = np.asarray(U, dtype=bool)
     pou = np.asarray(pou, dtype=float)
@@ -1304,32 +1447,70 @@ def get_bundle_map(
         edges = infer_edges_from_U(U)
     edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
 
-    # (A) true frames
+    # ------------------------------------------------------------
+    # Step 2: build raw frames (and optionally pack)
+    # ------------------------------------------------------------
     tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges_list, packing=packing)
 
-    # (B) diagnostics in ambient space
-    cocycle_proj_dist = cocycle_projection_distance(
-        U=U, Omega_simplicial=Omega, Omega_true=tf.Omega_true, edges=edges_list
-    )
-    eps_geo, eps_geo_mean, eps_c, eps_c_mean = witness_error_stats(
-        U=U, f=f, Omega_true=tf.Omega_true, edges=edges_list
-    )
+    # Keep Step-2 metadata for reporting (independent of later branches)
+    packing_used = str(tf.packing) if tf.packing is not None else None
+    n_colors_used = tf.n_colors
 
-    # (C) optional reduction
-    Phi_used = tf.Phi_true
-    Omega_used = tf.Omega_true
+    
+    # ------------------------------------------------------------
+    # Optional reduction bookkeeping
+    # ------------------------------------------------------------
     reduction_report: Optional[FrameReductionReport] = None
 
-    if reducer is not None and reducer.method != "none":
-        Phi_used, reduction_report = apply_frame_reduction(Phi_true=tf.Phi_true, U=U, reducer=reducer)
-        Omega_used = cocycle_from_frames(Phi_true=Phi_used, edges=edges_list)
+    reducer_stage = "pre_classifying"
+    if reducer is not None:
+        reducer_stage = str(getattr(reducer, "stage", "pre_classifying"))
 
-        # recompute triv error stats using reduced Π(Ω)
-        eps_geo, eps_geo_mean, eps_c, eps_c_mean = witness_error_stats(
-            U=U, f=f, Omega_true=Omega_used, edges=edges_list
-        )
+    # ------------------------------------------------------------
+    # Steps 3–4: cocycle projection, with reduction either pre or post
+    # ------------------------------------------------------------
+    if reducer is not None and reducer.method != "none" and reducer_stage == "pre_classifying":
+        # PAPER-FAITHFUL: reduce raw frames BEFORE classifying map / Stiefel projection
+        Phi_red, reduction_report = apply_frame_reduction(Phi_true=tf.Phi, U=U, reducer=reducer)
 
-    # (D) bundle map (with anchored averaging)
+        proj = cocycle_project_from_raw_frames(U=U, pou=pou, Phi=Phi_red, edges=edges_list)
+        Phi_used = proj.Phi_true
+        Omega_used = proj.Omega_true
+
+        cl_proj_dist = float(proj.cl_proj_dist)
+        frame_proj_dist = float(proj.frame_proj_dist)
+
+    else:
+        # Default: project first (Steps 3–4) in ambient dimension, cached into tf
+        tf = ensure_projected_frames(tf, U=U, pou=pou, edges=edges_list)
+        assert tf.Phi_true is not None and tf.Omega_true is not None
+        Phi_used = tf.Phi_true
+        Omega_used = tf.Omega_true
+
+        cl_proj_dist = float(tf.cl_proj_dist) if tf.cl_proj_dist is not None else 0.0
+        frame_proj_dist = float(tf.frame_proj_dist) if tf.frame_proj_dist is not None else 0.0
+
+        # LEGACY/EXPERIMENTAL: optional post-stiefel reduction
+        if reducer is not None and reducer.method != "none" and reducer_stage == "post_stiefel":
+            Phi_used, reduction_report = apply_frame_reduction(Phi_true=Phi_used, U=U, reducer=reducer)
+            Omega_used = cocycle_from_frames(Phi_true=Phi_used, edges=edges_list)
+
+    # ------------------------------------------------------------
+    # Diagnostics (computed using Omega_used)
+    # ------------------------------------------------------------
+    cocycle_proj_dist = cocycle_projection_distance(
+        U=U, Omega_simplicial=Omega, Omega_true=Omega_used, edges=edges_list
+    )
+
+    # witness_error_stats returns:
+    #   (eps_geo_sup, eps_geo_mean, eps_C_sup, eps_C_mean)
+    eps_geo_sup, eps_geo_mean, eps_c_sup, eps_c_mean = witness_error_stats(
+        U=U, f=f, Omega_true=Omega_used, edges=edges_list
+    )
+
+    # ------------------------------------------------------------
+    # Step 5: bundle map (anchored averaging gluing)
+    # ------------------------------------------------------------
     F, pre_F = build_bundle_map(
         U=U,
         pou=pou,
@@ -1341,12 +1522,14 @@ def get_bundle_map(
         semicircle_tol=float(semicircle_tol),
     )
 
-    # (E) chart disagreement
+    # Chart disagreement (optional)
     cd_val: Optional[float] = None
     if compute_chart_disagreement:
         cd_val = float(chart_disagreement_stats(U=U, pre_F=pre_F).max)
 
-    # (F) reduction summary fields
+    # ------------------------------------------------------------
+    # Reduction summary fields (optional)
+    # ------------------------------------------------------------
     red_method: Optional[str] = None
     red_D_in: Optional[int] = None
     red_d: Optional[int] = None
@@ -1354,51 +1537,51 @@ def get_bundle_map(
     eps_red_mean: Optional[float] = None
 
     if reduction_report is not None:
-        red_method = getattr(reduction_report, "method", None)
-        if red_method is None:
-            red_method = getattr(reduction_report, "name", None)
-        if red_method is not None:
-            red_method = str(red_method)
+        red_method = getattr(reduction_report, "method", None) or getattr(reduction_report, "name", None)
+        red_method = None if red_method is None else str(red_method)
 
         red_D_in = getattr(reduction_report, "D_in", None)
-        if red_D_in is not None:
-            red_D_in = int(red_D_in)
+        red_D_in = None if red_D_in is None else int(red_D_in)
 
         red_d = getattr(reduction_report, "d_out", None)
         if red_d is None:
             red_d = getattr(reduction_report, "d", None)
-        if red_d is not None:
-            red_d = int(red_d)
+        red_d = None if red_d is None else int(red_d)
 
         eps_red_mean = getattr(reduction_report, "mean_proj_err", None)
         if eps_red_mean is None:
             eps_red_mean = getattr(reduction_report, "mean_projection_error", None)
-        if eps_red_mean is not None:
-            eps_red_mean = float(eps_red_mean)
+        eps_red_mean = None if eps_red_mean is None else float(eps_red_mean)
 
         eps_red = getattr(reduction_report, "sup_proj_err", None)
         if eps_red is None:
             eps_red = getattr(reduction_report, "sup_projection_error", None)
-        if eps_red is not None:
-            eps_red = float(eps_red)
+        eps_red = None if eps_red is None else float(eps_red)
 
-    # (G) Assemble report
+    # ------------------------------------------------------------
+    # Assemble report
+    # ------------------------------------------------------------
     report = BundleMapReport(
-        cl_proj_dist=float(tf.cl_proj_dist),
-        frame_proj_dist=float(tf.frame_proj_dist),
+        cl_proj_dist=float(cl_proj_dist),
+        frame_proj_dist=float(frame_proj_dist),
         cocycle_proj_dist=float(cocycle_proj_dist),
-        eps_triv=eps_c,
-        eps_triv_geo=eps_geo,
+
+        # witness stats (IMPORTANT: consistent with witness_error_stats return order)
+        eps_triv=eps_c_sup,
+        eps_triv_geo=eps_geo_sup,
         eps_triv_mean=eps_c_mean,
         eps_triv_geo_mean=eps_geo_mean,
+
         chart_disagreement=cd_val,
+
         reduction_method=red_method,
         reduction_D_in=red_D_in,
         reduction_d_out=red_d,
         eps_red=eps_red,
         eps_red_mean=eps_red_mean,
-        packing=str(tf.packing) if tf.packing is not None else None,
-        n_colors=tf.n_colors,
+
+        packing=packing_used,
+        n_colors=n_colors_used,
     )
 
     if show_summary:

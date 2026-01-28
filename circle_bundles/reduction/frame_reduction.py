@@ -23,6 +23,10 @@ from ..trivializations.gauge_canon import GaugeCanonConfig, compute_samplewise_g
 
 ReduceMethod = Literal["none", "subspace_pca", "psc"]
 
+
+ReduceStage = Literal["pre_classifying", "post_stiefel"]
+
+
 __all__ = [
     "ReduceMethod",
     "FrameReducerConfig",
@@ -77,6 +81,12 @@ class FrameReducerConfig:
       - "subspace_pca": always-available, O(2)-equivariant baseline
       - "psc": PSC package hook (HarlinLee/PSC)
 
+    stage:
+      - "pre_classifying": (paper-faithful)
+          reduce the raw Stiefel point cloud X_V before building the classifying map.
+      - "post_stiefel": (legacy / experimental)
+          reduce after the Stiefel projection step.
+
     d:
       target ambient dimension after reduction (2 <= d <= D).
 
@@ -90,6 +100,7 @@ class FrameReducerConfig:
       forwarded to PSC.manopt_alpha.
     """
     method: ReduceMethod = "none"
+    stage: ReduceStage = "pre_classifying"
     d: int = 0
     max_frames: Optional[int] = None
     rng_seed: int = 0
