@@ -148,13 +148,54 @@ def make_s2_fibonacci_star_cover(
     n_vertices: int = 256,
     eps: float = 1e-12,
 ) -> TriangulationStarCover:
-    """
-    S^2 star cover built from the convex-hull triangulation of Fibonacci landmarks.
+    r"""
+    Build a fast star cover of :math:`\mathbb{S}^2` using Fibonacci landmarks and a hull triangulation.
+
+    This constructs a triangulation of a set of nearly-uniform landmark points on the sphere
+    (via a spherical Fibonacci lattice), then assigns each sample to **the unique** hull face hit
+    by the ray in its direction. The resulting cover is the **open star cover** of the triangulation
+    vertices: each sample lies in exactly the three vertex stars of its containing triangle
+    (so overlap order is at most 3).
+
+    The returned cover is a :class:`~circle_bundles.base_covers.TriangulationStarCover` that is
+    already built (its ``U`` and ``pou`` are populated).
+
+    Parameters
+    ----------
+    base_points :
+        Array of shape ``(n_samples, 3)`` representing directions in :math:`\mathbb{R}^3`.
+        Rows are normalized internally and interpreted as points on :math:`\mathbb{S}^2`.
+    n_vertices :
+        Number of Fibonacci landmark vertices used to build the hull triangulation.
+        Larger values yield a finer cover (more sets, smaller stars). Default is ``256``.
+    eps :
+        Numerical stability parameter used for normalization and ray–facet intersection tests.
+
+    Returns
+    -------
+    cover :
+        A built :class:`~circle_bundles.base_covers.TriangulationStarCover` representing the star cover.
+        Key fields include:
+
+        - ``cover.base_points``: normalized samples on :math:`\mathbb{S}^2` (shape ``(n,3)``)
+        - ``cover.landmarks``: landmark vertex coordinates (shape ``(n_vertices,3)``)
+        - ``cover.U``: membership matrix (shape ``(n_vertices, n_samples)``)
+        - ``cover.pou``: barycentric partition of unity weights (same shape as ``U``)
 
     Notes
     -----
-    - Overlap order <= 3 (each point lies in one hull face => 3 vertex stars).
-    - Fast: no "search all triangles"; we use the hit facet index.
+    - **Overlap order** is at most 3, since each sample is assigned to one triangle and hence
+      belongs to exactly three vertex stars.
+    - This builder uses a “hit facet index” fast path (no searching over all triangles),
+      so it scales well to large sample sizes.
+
+    Examples
+    --------
+    >>> import circle_bundles as cb
+    >>> cover = cb.make_s2_fibonacci_star_cover(base_points, n_vertices=512)
+    >>> summ = cover.summarize(plot=False)
+    >>> # Use the cover in the main pipeline
+    >>> bundle = cb.build_bundle(total_space_data, cover, show=True)
     """
     P = _normalize_rows(np.asarray(base_points, dtype=float), eps=eps)
     if P.ndim != 2 or P.shape[1] != 3:
@@ -279,17 +320,83 @@ def _pick_rp2_landmarks(
 # RP^2 star cover (witnessed Čech nerve, BOTH lifts)
 # -----------------------------------------------------------------------------
 
-class RP2StarCover(CoverBase):
+def make_rp2_fibonacci_star_cover(
+    base_points: np.ndarray,
+    *,
+    n_pairs: int = 256,
+    landmark_oversample: int = 20,
+    landmark_seed: Optional[int] = 0,
+    eps: float = 1e-12,
+    atol: float = 1e-12,
+) -> RP2StarCover:
+    r"""
+    Build a star cover of :math:`\mathbb{RP}^2` using Fibonacci landmarks and an antipodal-symmetric hull.
+
+    This constructs a cover downstairs on :math:`\mathbb{RP}^2` by working upstairs on :math:`\mathbb{S}^2`
+    and carefully pushing the result down through the antipodal quotient.
+
+    Pipeline (high-level)
+    ---------------------
+    1. Canonicalize each sample ``x`` to a *hemisphere representative* ``x_rep`` of its class ``[x]``.
+    2. Choose ``n_pairs`` well-spread landmark representatives in :math:`\mathbb{RP}^2` via:
+       Fibonacci oversampling + farthest point sampling (FPS) in the chordal RP² metric.
+    3. Lift landmarks to :math:`\mathbb{S}^2` by adding antipodes, then triangulate via the convex hull.
+    4. For each sample class ``[x]``, compute hull-face hits and barycentric weights for both lifts
+       ``x_rep`` and ``-x_rep``.
+    5. Push vertex contributions down to RP² vertex ids (pairing antipodes), sum weights, and keep the
+       top-3 vertices per sample (renormalized).
+    6. Build the cover membership matrix ``U`` and partition of unity ``pou``. The nerve is “witnessed”
+       from ``U`` (no ghost simplices).
+
+    The returned object is an :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`
+    that is already built (its ``U`` and ``pou`` are populated), and whose metric/labels are set to
+    :class:`~circle_bundles.metrics.RP2UnitVectorMetric`.
+
+    Parameters
+    ----------
+    base_points :
+        Array of shape ``(n_samples, 3)`` representing (approximate) unit vectors in :math:`\mathbb{R}^3`.
+        Each row represents a projective class ``[x]`` with the antipodal identification ``x ~ -x``.
+        Rows are normalized internally.
+    n_pairs :
+        Number of *projective* landmark vertices (i.e. the number of antipodal pairs).
+        The upstairs hull uses ``2*n_pairs`` vertices. Default is ``256``.
+    landmark_oversample :
+        Oversampling factor used before RP² farthest point sampling.
+        Candidates are generated with ``M = n_pairs * landmark_oversample`` Fibonacci points.
+    landmark_seed :
+        Random seed used only to choose the initial FPS index. FPS is otherwise deterministic.
+        Set to ``None`` for nondeterministic behavior.
+    eps :
+        Numerical stability parameter used for normalization and ray–facet intersection tests.
+    atol :
+        Tolerance used for deterministic hemisphere representative tie-breaking near the equator.
+
+    Returns
+    -------
+    cover :
+        A built :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`.
+        Important fields include:
+
+        - ``cover.base_points``: hemisphere reps of samples (shape ``(n,3)``)
+        - ``cover.landmarks``: hemisphere reps of RP² landmark vertices (shape ``(n_pairs,3)``)
+        - ``cover.U`` / ``cover.pou``: membership and partition-of-unity weights
+        - ``cover.metric``: :class:`~circle_bundles.metrics.RP2UnitVectorMetric`
+
+    Notes
+    -----
+    - Correct handling of :math:`\mathbb{RP}^2` requires considering **both lifts** of each sample
+      upstairs (``x`` and ``-x``) before pushing weights down.
+    - The cover is not a triangulation star cover in the same sense as the S² builder; instead,
+      it produces a barycentric-style star cover in RP² with a **witnessed** Čech nerve computed from ``U``.
+
+    Examples
+    --------
+    >>> import circle_bundles as cb
+    >>> cover = cb.make_rp2_fibonacci_star_cover(base_points, n_pairs=256)
+    >>> cover.summarize(plot=False)
+    >>> bundle = cb.build_bundle(total_space_data, cover, show=True)
     """
-    RP^2 cover built from barycentric weights on hull faces, pushed down by antipodal quotient.
-
-    Key point:
-      For each RP^2 sample [x], we must consider BOTH lifts x and -x upstairs, then push down.
-
-    Nerve:
-      Witnessed Čech nerve computed from U itself (no ghost simplices).
-    """
-
     def __init__(
         self,
         base_points: np.ndarray,            # (N,3) hemisphere reps of RP^2 samples

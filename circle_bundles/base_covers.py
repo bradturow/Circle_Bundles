@@ -33,6 +33,53 @@ def _as_2d_points(X: np.ndarray, *, name: str = "points") -> np.ndarray:
 
 @dataclass
 class NerveSummary:
+    """
+    Summary of a cover and the recorded nerve up to dimension 3.
+
+    This container is produced by :meth:`CoverBase.summarize` and is intended to be
+    lightweight: it stores basic counts, optional intersection cardinalities, and
+    optional evidence about higher-order overlaps detected directly from the cover
+    membership matrix ``U``.
+
+    Notes
+    -----
+    - The library may only *record* simplices up to dimension 3 (tetrahedra), but
+      the underlying cover matrix ``U`` can still contain higher-order overlaps.
+      When detected (sample overlap order ≥ 5), the summary exposes:
+        - ``max_overlap_order`` and
+        - ``n_samples_with_overlap_ge_5``
+      and typically includes warnings about the mismatch.
+
+    Attributes
+    ----------
+    n_sets :
+        Number of cover sets.
+    n_samples :
+        Number of samples/points covered.
+
+    n0, n1, n2, n3 :
+        Recorded simplex counts in dimensions 0..3.
+
+    vert_card, edge_card, tri_card, tet_card :
+        Optional intersection cardinalities for recorded simplices, i.e.
+        ``|⋂_{i in σ} U_i|`` for each recorded simplex ``σ``.
+        Shapes are ``(n0,)``, ``(n1,)``, ``(n2,)``, ``(n3,)`` respectively
+        when present.
+
+    sample_overlap_counts :
+        For each sample ``s``, the number of cover sets containing it, i.e.
+        ``(# of i with U[i,s] = True)``. Shape ``(n_samples,)``.
+
+    max_overlap_order :
+        Only populated when the maximum sample overlap order exceeds 4.
+        In that case this is ``max(sample_overlap_counts)``.
+    n_samples_with_overlap_ge_5 :
+        Only populated when ``max_overlap_order`` is set. Counts samples lying
+        in 5 or more cover sets.
+
+    warnings :
+        Tuple of human-readable warning strings surfaced by :meth:`summarize`.
+    """
     n_sets: int
     n_samples: int
 
@@ -208,23 +255,62 @@ def plot_cover_summary_boxplot(
     figsize: Optional[Tuple[float, float]] = None,
     save_path: Optional[str] = None,
     showfliers: bool = False,
-    whis=(0, 100),          # <--- full range by default
+    whis=(0, 100),
     sharey: bool = False,
     label_fmt: str = "{:g}",
-    label_dx: float = 0.06, # x-offset in axis units (relative)
+    label_dx: float = 0.06,
 ):
     """
-    Box-and-whisker plots for intersection cardinalities of recorded simplices.
+    Plot intersection cardinalities for recorded nerve simplices.
 
-    - Uses whis=(0,100) by default => whiskers are true min/max (no outlier logic).
-    - Adds min/max labels placed to the RIGHT of the whiskers.
-    - Prevents labels from messing up tight_layout by excluding them from layout.
+    Produces a 1×k grid of box-and-whisker plots for the cardinalities:
+
+    - 0-simplices: ``|U_i|`` (when available)
+    - 1-simplices: ``|U_i ∩ U_j|``
+    - 2-simplices: ``|U_i ∩ U_j ∩ U_k|``
+    - 3-simplices: ``|U_i ∩ U_j ∩ U_k ∩ U_ℓ|`` (optional)
+
+    By default, whiskers use the full range ``whis=(0,100)`` so min/max are the
+    actual extrema (not outlier-based). The plot annotates min/max next to the
+    whiskers.
+
+    Parameters
+    ----------
+    summary :
+        A :class:`NerveSummary` produced by :meth:`CoverBase.summarize` with
+        cardinalities computed.
+    show_tets :
+        If True, include the 3-simplex panel when ``summary.tet_card`` is present.
+    dpi :
+        Figure DPI.
+    figsize :
+        Optional figure size. If omitted, a width proportional to the number of
+        panels is chosen.
+    save_path :
+        Optional output prefix. If provided, saves a PDF named
+        ``<save_path>_cover_summary.pdf``.
+    showfliers :
+        Whether to show fliers in the boxplot.
+    whis :
+        Whisker definition passed to ``matplotlib.axes.Axes.boxplot``.
+        Default ``(0,100)`` gives true min/max.
+    sharey :
+        Share the y-axis across panels.
+    label_fmt :
+        Format string used for min/max labels.
+    label_dx :
+        Horizontal label offset (currently expressed as a small shift in x data units).
 
     Returns
     -------
-    (fig, ax_or_axes)
-      - If only one panel exists: returns (fig, ax)
-      - If multiple panels exist: returns (fig, axes_list)
+    fig, ax_or_axes :
+        ``(fig, ax)`` if only one panel is drawn, otherwise ``(fig, axes_list)``.
+        Returns ``(None, None)`` if no panels are available.
+
+    Notes
+    -----
+    This function is designed for quick diagnostics. For publication-style plots,
+    you may want custom axis limits, log scaling, or annotated quantiles.
     """
     import matplotlib.pyplot as plt
     import numpy as np
@@ -339,6 +425,53 @@ def plot_cover_summary_boxplot(
 
 @dataclass
 class CoverBase:
+    """
+    Base class for covers over a set of base points.
+
+    A cover is represented primarily by a boolean membership matrix ``U`` with shape
+    ``(n_sets, n_samples)``, where ``U[i,s]`` indicates whether sample ``s`` lies in
+    cover set ``U_i``. Most workflows also use a partition of unity ``pou`` of the
+    same shape.
+
+    Subclasses implement :meth:`build` to populate ``U`` and ``pou``, and implement
+    the nerve accessors (:meth:`nerve_edges`, :meth:`nerve_triangles`, optionally
+    :meth:`nerve_tetrahedra`) to report recorded simplices.
+
+    Parameters
+    ----------
+    base_points :
+        Array of shape ``(n_samples, dB)`` giving base coordinates for each sample.
+        One-dimensional inputs are reshaped to ``(n_samples, 1)``.
+    U :
+        Optional boolean membership matrix of shape ``(n_sets, n_samples)``.
+        If not provided, subclasses compute it in :meth:`build`.
+    pou :
+        Optional partition of unity weights of shape ``(n_sets, n_samples)``.
+        Typically satisfies ``pou[:,s].sum() == 1`` for each sample ``s`` (when covered).
+    landmarks :
+        Optional landmark coordinates of shape ``(n_sets, dB)`` used for visualization
+        and for some cover constructions (e.g. metric ball covers).
+    metric :
+        Distance model used by the cover (for constructions that require it).
+        May be a Metric object with ``pairwise`` or a scalar callable; it is normalized
+        by :meth:`ensure_metric`.
+    full_dist_mat :
+        Optional cached sample-sample distance matrix for visualization.
+
+    Attributes
+    ----------
+    base_name, base_name_latex :
+        Optional base labels used in plots and summaries. If not set explicitly,
+        :meth:`ensure_metric` will inherit these from the metric object when available.
+
+    Notes
+    -----
+    - Most downstream algorithms expect ``U`` and ``pou`` to be populated.
+      Use :meth:`ensure_built` to build lazily.
+    - The “recorded nerve” is whatever simplices the cover reports via
+      ``nerve_edges/nerve_triangles/...``. It may be truncated even if ``U``
+      contains higher-order overlaps.
+    """
     base_points: np.ndarray                 # (n_samples, dB)
     U: Optional[np.ndarray] = None          # (n_sets, n_samples) bool
     pou: Optional[np.ndarray] = None        # (n_sets, n_samples) float
@@ -424,10 +557,66 @@ class CoverBase:
         highlight_color: str = "red",
     ):
         """
-        Show the nerve of the cover.
+        Visualize the cover nerve as an interactive Plotly figure.
 
-        - If edge_weights is None: static plot (no slider).
-        - Otherwise: slider plot filtering by edge_weights.
+        This method requires the cover to have landmark coordinates (one per cover set)
+        and a built membership matrix ``U``. It plots:
+
+        - vertices at ``self.landmarks`` (one point per cover set),
+        - edges from :meth:`nerve_edges`,
+        - optional filled triangles from :meth:`nerve_triangles`.
+
+        Two modes are supported:
+
+        **Static mode (no slider)**
+            If ``edge_weights`` is None, a single figure is produced. Optionally, you may:
+            - show triangles with configurable opacity/color,
+            - highlight specific edges,
+            - overlay cochains.
+
+        **Slider mode (edge filtering)**
+            If ``edge_weights`` is provided, the visualization includes a slider that filters
+            edges by weight threshold (and displays the induced subcomplex). This delegates to
+            :func:`circle_bundles.viz.nerve_plotly.nerve_with_slider`.
+
+        Parameters
+        ----------
+        title :
+            Optional plot title.
+        show_labels :
+            Whether to show vertex labels (set indices) in the plot.
+        show_axes :
+            Whether to show 3D axes in the Plotly scene (useful for debugging).
+        tri_opacity :
+            Opacity for triangle faces (ignored if no triangles are drawn).
+        tri_color :
+            Color used for triangle faces (Plotly color string).
+        cochains :
+            Optional list of cochain dictionaries to overlay on the nerve.
+            Each cochain is a mapping from a simplex (tuple of vertex indices) to a value
+            used by the plotting code (e.g. for coloring). The exact interpretation depends
+            on the nerve plotting utilities.
+        edge_weights :
+            Optional mapping from edges to weights. If provided, enables slider mode.
+            The keys must be canonical edges as returned by :func:`canon_edge` /
+            :meth:`nerve_edges`.
+        edge_cutoff :
+            Optional edge cutoff for static plots (may be ignored in slider mode,
+            depending on the plotting utility).
+        highlight_edges :
+            Optional set of edges to emphasize in a separate style layer.
+        highlight_color :
+            Color used for highlighted edges.
+
+        Returns
+        -------
+        fig :
+            The Plotly figure object.
+
+        Raises
+        ------
+        AttributeError
+            If ``landmarks`` or ``U`` is missing (i.e., the cover cannot be visualized).
         """
         self.ensure_built()
         if self.landmarks is None:
@@ -485,18 +674,77 @@ class CoverBase:
         verbose: bool = True,
     ) -> NerveSummary:
         """
-        Summarize the cover and its recorded nerve (dims 0..3), plus overlap-order evidence from U.
+        Summarize the cover and its recorded nerve (dimensions 0..3), with optional plots.
 
-        Printing rules:
-          - If max sample overlap order > 4 (i.e. some sample lies in ≥5 sets),
-            then print recorded counts for 0..3 explicitly (even if 2/3 are zero),
-            and also print overlap info (max order + #samples in ≥5 sets).
-          - Otherwise, print counts only up to last nonzero recorded dimension,
-            plus a single 'no recorded simplices in dimensions ≥ ...' line.
+        This function builds (if needed) the cover membership matrix ``U`` and computes:
 
-        Plotting:
-          - plot_kind="box": box-and-whisker plot of intersection cardinalities for
-            recorded 1/2/3-simplices, omitting any missing dimensions.
+        - number of sets and samples,
+        - recorded simplex counts:
+          ``#0-simplices = n_sets``, and counts of recorded edges/triangles/tetrahedra
+          as returned by :meth:`nerve_edges`, :meth:`nerve_triangles`, :meth:`nerve_tetrahedra`,
+        - overlap-order evidence from ``U``:
+          for each sample, how many cover sets contain it (the “overlap order”).
+
+        A key consistency check is whether the data show overlaps beyond what the cover
+        explicitly records. For example, if some sample lies in ≥5 sets, then the *true*
+        nerve necessarily contains simplices of dimension ≥4. Since this library’s covers
+        typically record simplices only up to dimension 3, we surface this mismatch as a warning.
+
+        Parameters
+        ----------
+        compute_cardinalities :
+            If True, also compute intersection cardinalities for recorded simplices:
+            ``|U_i|``, ``|U_i ∩ U_j|``, ``|U_i ∩ U_j ∩ U_k|``, and optionally 4-way intersections.
+            These populate the ``*_card`` fields of the returned :class:`NerveSummary`.
+        plot :
+            If True, display a plot summarizing the intersection cardinalities.
+            Requires ``compute_cardinalities=True``.
+        plot_kind :
+            Currently only ``"box"`` is supported: box-and-whisker plots of recorded
+            simplex intersection cardinalities, omitting missing dimensions.
+        latex :
+            Controls printing style when ``verbose=True``:
+            - ``"auto"`` (default): attempt rich Markdown display in notebooks, else plain text
+            - True: force Markdown attempt
+            - False: force plain text printing
+        show_tets_plot :
+            If True and tetrahedra cardinalities exist, include them in the plot panel list.
+        dpi, figsize :
+            Plot formatting controls.
+        save_path :
+            If provided and ``plot=True``, save a PDF of the plot using this prefix/path.
+            The function appends ``"_cover_summary.pdf"``.
+        verbose :
+            If True, print/display the summary.
+
+        Returns
+        -------
+        summary :
+            A :class:`NerveSummary` object containing counts, optional cardinalities,
+            overlap evidence, and any warnings.
+
+        Raises
+        ------
+        AttributeError
+            If the cover has no membership matrix ``U`` after building (should not happen
+            for correct cover implementations).
+        ValueError
+            If ``plot=True`` but ``compute_cardinalities=False``, or if an unsupported
+            ``plot_kind`` is requested.
+
+        Notes
+        -----
+        **Printing / warning policy**
+        - If the maximum sample overlap order is > 4 (i.e. some sample lies in ≥5 sets),
+          the summary prints all recorded simplex counts for dimensions 0..3 and includes
+          overlap-order lines (max order and number of samples in ≥5 sets).
+        - Otherwise, it prints counts only up to the last nonzero recorded dimension and
+          adds a single “no recorded simplices in dimensions ≥ …” line.
+
+        **Interpretation**
+        - Overlap order is computed directly from ``U`` and reflects *evidence in the data*.
+        - Simplex counts are the *recorded* nerve simplices returned by the cover methods.
+          If those counts disagree with the overlap evidence, warnings highlight the mismatch.
         """
         self.ensure_built()
         if self.U is None:
@@ -595,31 +843,83 @@ class CoverBase:
 # ----------------------------
 
 class MetricBallCover(CoverBase):
+    """
+    Cover by metric balls centered at landmark points.
+
+    Given base points ``x_s`` and landmark centers ``ℓ_i``, this cover defines:
+
+    - membership: ``U[i,s] = (d(ℓ_i, x_s) < radius)``
+    - partition of unity: a linear “hat” weight
+      ``w[i,s] = max(0, 1 - d(ℓ_i, x_s) / radius)``, normalized across sets for each sample.
+
+    This is a simple, widely useful cover construction for point clouds in Euclidean
+    space or in any space equipped with a vectorized metric.
+
+    Parameters
+    ----------
+    base_points :
+        Array of shape ``(n_samples, dB)`` giving base coordinates.
+    landmarks :
+        Array of shape ``(n_sets, dB)`` giving the cover centers.
+    radius :
+        Ball radius (in the units of the chosen metric).
+    metric :
+        Distance model. May be:
+        - a Metric-like object with ``pairwise(X, Y=None)``, or
+        - a scalar callable ``metric(p, q)`` (requires SciPy for vectorization fallback), or
+        - None (defaults to :class:`~circle_bundles.metrics.EuclideanMetric`).
+
+    Notes
+    -----
+    - The cover sets are *open* balls (strict inequality).
+    - The recorded nerve is computed directly from ``U`` by checking whether
+      intersections are nonempty (for edges, triangles, and tetrahedra).
+    - If a sample lies in no sets (possible if radius is too small), the current
+      POU normalization leaves that sample with all-zero weights.
+
+    See Also
+    --------
+    TriangulationStarCover :
+        Cover induced by open stars in a triangulation.
+    """
+
     def __init__(
         self,
         base_points: np.ndarray,
         landmarks: np.ndarray,
         radius: float,
         metric: Any = None,
-
     ):
         super().__init__(base_points=np.asarray(base_points))
         self.landmarks = np.asarray(landmarks)
         self.radius = float(radius)
         self.metric = metric
         self.ensure_metric()
-        self.normalize_shapes()  
-        
+        self.normalize_shapes()
+
     def build(self) -> "MetricBallCover":
+        """
+        Build the cover membership matrix ``U`` and partition of unity ``pou``.
+
+        Populates
+        ---------
+        U :
+            Boolean array of shape ``(n_sets, n_samples)`` where ``U[i,s]`` indicates
+            whether sample ``s`` lies in the radius-ball around landmark ``i``.
+        pou :
+            Float array of shape ``(n_sets, n_samples)`` giving normalized linear
+            hat weights over the sets containing each sample.
+
+        Returns
+        -------
+        self :
+            The built cover (for chaining).
+        """
         if self.landmarks is None:
             raise ValueError("MetricBallCover requires landmarks.")
 
-            
         M = self.ensure_metric()
         dist = M.pairwise(np.asarray(self.landmarks), np.asarray(self.base_points))  # (n_sets, n_samples)
-
-        # optional cache for viz (sample-sample)
-#        self.full_dist_mat = M.pairwise(np.asarray(self.base_points))
 
         self.U = dist < self.radius
 
@@ -632,6 +932,17 @@ class MetricBallCover(CoverBase):
         return self
 
     def nerve_edges(self) -> List[Edge]:
+        """
+        Recorded 1-simplices of the nerve.
+
+        An edge (i,j) is included when the intersection ``U_i ∩ U_j`` contains
+        at least one sample.
+
+        Returns
+        -------
+        edges :
+            List of canonical edges ``(i,j)`` with ``i < j``.
+        """
         self.ensure_built()
         assert self.U is not None
 
@@ -645,6 +956,17 @@ class MetricBallCover(CoverBase):
         return edges
 
     def nerve_triangles(self) -> List[Tri]:
+        """
+        Recorded 2-simplices of the nerve.
+
+        A triangle (i,j,k) is included when the triple intersection
+        ``U_i ∩ U_j ∩ U_k`` is nonempty.
+
+        Returns
+        -------
+        triangles :
+            List of canonical triangles ``(i,j,k)`` with ``i < j < k``.
+        """
         self.ensure_built()
         assert self.U is not None
 
@@ -663,7 +985,15 @@ class MetricBallCover(CoverBase):
 
     def nerve_tetrahedra(self) -> List[Tet]:
         """
-        3-simplices in the nerve: 4-way overlaps U_i ∩ U_j ∩ U_k ∩ U_l ≠ ∅.
+        Recorded 3-simplices of the nerve.
+
+        A tetrahedron (i,j,k,ℓ) is included when the 4-way intersection
+        ``U_i ∩ U_j ∩ U_k ∩ U_ℓ`` is nonempty.
+
+        Returns
+        -------
+        tetrahedra :
+            List of canonical 4-tuples ``(i,j,k,ℓ)`` with ``i < j < k < ℓ``.
         """
         self.ensure_built()
         assert self.U is not None
@@ -685,20 +1015,64 @@ class MetricBallCover(CoverBase):
                             tets.append(canon_tet(i, j, k, l))
         return tets
 
-
 # ----------------------------
 # Triangulation star cover
 # ----------------------------
 
 class TriangulationStarCover(CoverBase):
     """
-    Cover by open stars of vertices in a triangulation K.
-    Uses K_preimages: the location of each base point in |K| coordinates.
+    Cover by open stars of vertices in a triangulation.
 
-    Expected:
-      - K.get_simplices() yields (simplex_tuple, filtration_value) like Gudhi.
-      - vertex_coords_dict maps old_vertex_id -> coords (D,)
+    This cover is defined from a simplicial complex ``K`` that triangulates a base
+    space (typically 2D for this implementation), together with “preimages”
+    ``K_preimages`` giving each sample’s location in the geometric realization ``|K|``.
+
+    Each cover set corresponds to a vertex ``v`` of ``K`` and contains samples whose
+    assigned triangle includes that vertex (i.e. samples lying in triangles incident
+    to ``v``). The partition of unity is defined using barycentric coordinates within
+    the assigned triangle: the three vertices of the triangle receive the barycentric
+    weights, and all other vertices receive weight 0.
+
+    Parameters
+    ----------
+    base_points :
+        Array of shape ``(n_samples, dB)``. Kept for consistency with other covers.
+        (This cover uses ``K_preimages`` for assignment/POU.)
+    K_preimages :
+        Array of shape ``(n_samples, D)`` giving each sample’s position in the
+        coordinate system used by ``vertex_coords_dict`` (i.e. coordinates for
+        the geometric realization of ``K``).
+    K :
+        Simplicial complex object with a Gudhi-like interface:
+        ``K.get_simplices()`` yields ``(simplex_tuple, filtration_value)``.
+        This implementation expects at least 1- and 2-simplices.
+    vertex_coords_dict :
+        Mapping ``old_vertex_id -> coords`` where ``coords`` has shape ``(D,)``.
+        Vertex ids need not be contiguous; this cover relabels them to ``0..nV-1``.
+    metric :
+        Optional metric (not used for construction here), but accepted for API
+        uniformity and for downstream plotting/labels.
+
+    Attributes
+    ----------
+    landmarks :
+        Set to the relabeled vertex coordinates of shape ``(nV, D)`` (after build).
+        These are used for nerve visualization.
+
+    Notes
+    -----
+    - This implementation builds ``U`` and ``pou`` from *triangle membership*.
+      It is effectively a 2-complex cover: :meth:`nerve_tetrahedra` is intentionally
+      not exposed (returns ``[]``), even if ``K`` contains 3-simplices.
+    - Every sample must be assigned to some triangle. If not, :meth:`build` raises
+      an error, typically indicating inconsistent preimages or a too-strict tolerance.
+
+    See Also
+    --------
+    MetricBallCover :
+        A cover built from metric balls around landmark points.
     """
+
     def __init__(
         self,
         base_points: np.ndarray,
@@ -706,7 +1080,6 @@ class TriangulationStarCover(CoverBase):
         K: Any,
         vertex_coords_dict: dict,
         metric: Any = None,
-
     ):
         super().__init__(base_points=np.asarray(base_points))
         self.K_preimages = np.asarray(K_preimages)
@@ -724,15 +1097,44 @@ class TriangulationStarCover(CoverBase):
         self.sample_bary: Optional[np.ndarray] = None    # (n_samples,3)
 
     def build(self) -> "TriangulationStarCover":
+        """
+        Build the star cover membership matrix ``U`` and barycentric POU ``pou``.
+
+        This method:
+        1) relabels vertices to contiguous ids and sets ``landmarks``,
+        2) extracts triangles from ``K``,
+        3) assigns each sample to a triangle using barycentric coordinates,
+        4) builds ``U`` by marking membership in the three incident vertex stars,
+        5) builds ``pou`` from barycentric weights.
+
+        Returns
+        -------
+        self :
+            The built cover (for chaining).
+
+        Raises
+        ------
+        ValueError
+            If any sample cannot be assigned to a triangle (e.g. inconsistent
+            coordinates or tolerance too strict).
+        """
         self._relabel_vertices()
         self._extract_triangles()
-        self._extract_tetrahedra()          # extracted, but note nerve_tetrahedra() below
+        self._extract_tetrahedra()          # extracted but not exposed via the nerve API
         self._assign_samples_to_triangles()
         self._build_star_sets_U()
         self._build_pou_from_barycentric()
         return self
 
     def nerve_edges(self) -> List[Edge]:
+        """
+        Recorded 1-simplices of the nerve (edges of the triangulation).
+
+        Returns
+        -------
+        edges :
+            Sorted list of canonical edges in the relabeled vertex ids.
+        """
         self.ensure_built()
         assert self.vid_old_to_new is not None
 
@@ -744,17 +1146,45 @@ class TriangulationStarCover(CoverBase):
         return sorted(edges)
 
     def nerve_triangles(self) -> List[Tri]:
+        """
+        Recorded 2-simplices of the nerve (triangles of the triangulation).
+
+        Returns
+        -------
+        triangles :
+            List of canonical triangles in relabeled vertex ids.
+        """
         self.ensure_built()
         assert self.triangles is not None
         return list(self.triangles)
 
     def nerve_tetrahedra(self) -> List[Tet]:
-        # Explicitly: “this cover currently models a 2-complex”
-        # (We still extract tetrahedra from K and store them in self.tetrahedra,
-        #  but we do not expose them here unless/when you decide to.)
+        """
+        Recorded 3-simplices of the nerve.
+
+        This cover currently models a 2-complex (triangle-based stars), so we do not
+        expose tetrahedra even if the underlying complex ``K`` contains them.
+
+        Returns
+        -------
+        tetrahedra :
+            Always returns ``[]``.
+        """
         return []
 
     def _relabel_vertices(self) -> None:
+        """
+        Relabel vertex ids to contiguous integers and populate landmark coordinates.
+
+        Populates
+        ---------
+        vid_old_to_new, vid_new_to_old :
+            Dictionaries mapping between original ids and contiguous ids.
+        vertex_coords :
+            Array of shape ``(nV, D)`` of vertex coordinates.
+        landmarks :
+            Same as ``vertex_coords`` (for nerve visualization).
+        """
         old_vids = sorted(int(v) for v in self.vertex_coords_dict.keys())
         self.vid_old_to_new = {v: i for i, v in enumerate(old_vids)}
         self.vid_new_to_old = {i: v for v, i in self.vid_old_to_new.items()}
@@ -762,6 +1192,9 @@ class TriangulationStarCover(CoverBase):
         self.landmarks = self.vertex_coords.copy()
 
     def _extract_triangles(self) -> None:
+        """
+        Extract 2-simplices from ``K`` and store them in canonical form.
+        """
         assert self.vid_old_to_new is not None
         tris: set[Tri] = set()
         for s, _ in self.K.get_simplices():
@@ -772,9 +1205,12 @@ class TriangulationStarCover(CoverBase):
 
     def _extract_tetrahedra(self) -> None:
         """
-        Extract 3-simplices from K, if any exist.
-        This does NOT change how U/POU are built (still triangle-based).
-        It simply stores them for possible future use.
+        Extract 3-simplices from ``K`` (if present) and store them.
+
+        Note
+        ----
+        This does not change how ``U`` or ``pou`` are constructed (still triangle-based).
+        The tetrahedra are stored only for possible future use.
         """
         assert self.vid_old_to_new is not None
         tets: set[Tet] = set()
@@ -785,6 +1221,28 @@ class TriangulationStarCover(CoverBase):
         self.tetrahedra = sorted(tets)
 
     def _assign_samples_to_triangles(self, tol: float = 1e-8) -> None:
+        """
+        Assign each sample to a triangle by barycentric containment.
+
+        Parameters
+        ----------
+        tol :
+            Numerical tolerance used when deciding whether barycentric coordinates
+            are inside the triangle.
+
+        Populates
+        ---------
+        sample_tri :
+            Integer array of shape ``(n_samples,)`` giving the assigned triangle index.
+        sample_bary :
+            Float array of shape ``(n_samples, 3)`` giving barycentric coordinates
+            relative to the assigned triangle.
+
+        Raises
+        ------
+        ValueError
+            If any sample cannot be assigned to any triangle.
+        """
         assert self.vertex_coords is not None
         assert self.triangles is not None
 
@@ -806,6 +1264,11 @@ class TriangulationStarCover(CoverBase):
             raise ValueError("Some samples were not assigned to any triangle (bad preimage / tol too strict).")
 
     def _build_star_sets_U(self) -> None:
+        """
+        Build membership matrix ``U`` from the assigned triangle per sample.
+
+        Each sample belongs to exactly three vertex stars: the vertices of its assigned triangle.
+        """
         assert self.vertex_coords is not None
         assert self.triangles is not None
         assert self.sample_tri is not None
@@ -823,6 +1286,12 @@ class TriangulationStarCover(CoverBase):
         self.U = U
 
     def _build_pou_from_barycentric(self) -> None:
+        """
+        Build partition of unity ``pou`` from stored barycentric coordinates.
+
+        For each sample, the three incident vertices receive weights equal to the
+        barycentric coordinates within the assigned triangle.
+        """
         assert self.U is not None
         assert self.triangles is not None
         assert self.sample_tri is not None
