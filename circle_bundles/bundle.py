@@ -954,45 +954,34 @@ class BundleResult:
         base_weight: float = 1.0,
         fiber_weight: float = 1.0,
         show_summary: bool = True,
+        verbose: Optional[bool] = None,
     ) -> "PullbackTotalSpaceResult":
         """
         Construct the pullback total space ``Z = (base | fiber)`` and a compatible product metric.
-
-        This is a convenience method for downstream tasks that want an explicit
-        Euclidean-like representation of the reconstructed bundle, e.g. clustering
-        or nearest-neighbor search in a product space.
-
-        Parameters
-        ----------
-        bundle_map:
-            Optional precomputed :class:`BundleMapResult`. If provided, bundle-map options are ignored.
-        edges, subcomplex, persistence, strict_semicircle, semicircle_tol, reducer, compute_chart_disagreement, packing:
-            Options used to compute the bundle map when ``bundle_map`` is not provided.
-            See :meth:`get_bundle_map`.
-        recompute_bundle_map:
-            If True and ``bundle_map`` is not provided, forces recomputation of the bundle map.
-        base_weight:
-            Weight applied to base distances in the product metric.
-        fiber_weight:
-            Weight applied to fiber distances in the product metric.
-        show_summary:
-            If True, display a short summary of the bundle-map report and the ambient product space.
-
-        Returns
-        -------
-        pullback:
-            A :class:`PullbackTotalSpaceResult` containing concatenated data and a product metric.
-
-        Raises
-        ------
-        ValueError:
-            If base/fiber shapes are incompatible (e.g. different number of samples).
         """
         from .metrics import ProductMetricConcat, EuclideanMetric, as_metric
         from .trivializations.bundle_map import show_bundle_map_summary
+        from .utils.status_utils import _status, _status_clear
 
+        if verbose is None:
+            verbose = bool(show_summary)
+
+        def _v(msg: str):
+            if verbose:
+                _status(msg)
+
+        # ----------------------------
+        # Bundle map (often the expensive part)
+        # ----------------------------
         bm = bundle_map
         if bm is None:
+            if verbose:
+                _status_clear()
+            # Give a compact “plan” line (helps when you forget what options you passed)
+            _v(
+                "Computing bundle map..."
+                
+            )
             bm = self.get_bundle_map(
                 edges=edges,
                 subcomplex=subcomplex,
@@ -1005,6 +994,13 @@ class BundleResult:
                 compute_chart_disagreement=compute_chart_disagreement,
                 packing=packing,
             )
+        else:
+            _v("Using provided bundle_map (skipping solver)...")
+
+        # ----------------------------
+        # Assemble concatenated data
+        # ----------------------------
+        _v("Assembling pullback vectors (base | fiber)...")
 
         fiber = np.asarray(bm.F, dtype=float)
         base = np.asarray(self.cover.base_points, dtype=float)
@@ -1012,14 +1008,25 @@ class BundleResult:
         if base.ndim == 1:
             base = base.reshape(-1, 1)
         elif base.ndim != 2:
+            if verbose:
+                _status_clear()
             raise ValueError(f"cover.base_points must be 1D or 2D. Got {base.shape}.")
 
         if fiber.ndim != 2:
+            if verbose:
+                _status_clear()
             raise ValueError(f"bundle_map.F must be 2D. Got {fiber.shape}.")
         if base.shape[0] != fiber.shape[0]:
+            if verbose:
+                _status_clear()
             raise ValueError(f"base and fiber must have same n_samples: {base.shape[0]} vs {fiber.shape[0]}")
 
         total_data = np.concatenate([base, fiber], axis=1)
+
+        # ----------------------------
+        # Build product metric
+        # ----------------------------
+        _v("Building product metric...")
 
         base_metric = getattr(self.cover, "metric", None)
         if base_metric is None:
@@ -1047,11 +1054,15 @@ class BundleResult:
                 "strict_semicircle": bool(strict_semicircle),
                 "semicircle_tol": float(semicircle_tol),
                 "compute_chart_disagreement": bool(compute_chart_disagreement),
-                "packing": packing,
+                "packing": str(packing),
             },
         )
 
+        # ----------------------------
+        # Optional summary
+        # ----------------------------
         if show_summary:
+            _v("Rendering bundle-map summary...")
             rep = getattr(bm, "report", None)
             if rep is not None:
                 ambient_dim = int(total_data.shape[1])
@@ -1078,6 +1089,9 @@ class BundleResult:
 
                 extra_rows = [(r"\text{Ambient space}", rhs)]
 
+                if verbose:
+                    _status_clear()
+                    
                 show_bundle_map_summary(
                     bm.report,
                     show=True,
@@ -1085,6 +1099,9 @@ class BundleResult:
                     rounding=3,
                     extra_rows=extra_rows,
                 )
+
+        if verbose:
+            _status_clear()
 
         return out
 
