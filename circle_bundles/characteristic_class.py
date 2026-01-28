@@ -1125,11 +1125,12 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
 
     # (2) Euler class nontrivial + Euler number available -> report ONLY Euler number (no Euler class line).
     if eZ is not None:
+        k = abs(int(eZ))
         if orientable:
-            parity_note = " (spin)" if (int(eZ) % 2 == 0) else " (not spin)"
-            lines.append(_tline("Euler number:", f"{int(eZ)}{parity_note}"))
+            parity_note = " (spin)" if (k % 2 == 0) else " (not spin)"
+            lines.append(_tline("Euler number:", f"±{k}{parity_note}"))
         else:
-            lines.append(_tline("(twisted) Euler number:", f"{int(eZ)}"))
+            lines.append(_tline("(twisted) Euler number:", f"±{k}"))
     else:
         # (3) Euler class nontrivial + Euler number unavailable -> report Euler class nontrivial,
         #     and (orientable only) report spin class fallback when available.
@@ -1331,11 +1332,12 @@ def _display_summary_latex(
             # Euler class nontrivial
             if eZ is not None:
                 # Euler number available -> report ONLY Euler number (no Euler class line)
+                k = abs(int(eZ))
                 if orientable:
-                    parity_note = r"\ (\text{spin})" if (int(eZ) % 2 == 0) else r"\ (\text{not spin})"
-                    class_rows.append((r"\text{Euler number}", str(int(eZ)) + parity_note))
+                    parity_note = r"\ (\text{spin})" if (k % 2 == 0) else r"\ (\text{not spin})"
+                    class_rows.append((r"\text{Euler number}", rf"\pm {k}" + parity_note))
                 else:
-                    class_rows.append((r"\text{(twisted) Euler number}", str(int(eZ))))
+                    class_rows.append((r"\text{(twisted) Euler number}", rf"\pm {k}"))
             else:
                 # Euler number unavailable -> report Euler class nontrivial (+ spin fallback if available)
                 if orientable:
