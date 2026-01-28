@@ -875,7 +875,6 @@ def compute_classes(
         sw1_O1=sw1_O1,
         sw1_is_cocycle=sw1_is_cocycle,
 
-        # NEW fields (make sure your ClassResult dataclass includes them)
         sw1_is_coboundary_Z2=sw1_is_coboundary_Z2,
         euler_is_coboundary_Z=euler_is_coboundary_Z,
 
@@ -956,8 +955,12 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     User-facing conventions:
     - No explicit pairing notation is shown.
     - Euler number displayed as:
-        * orientable:     "Euler number: e = k"
-        * non-orientable: "(twisted) Euler number: ẽ = k"
+        * orientable:     "Euler number: k (spin/not spin)"
+        * non-orientable: "(twisted) Euler number: k"
+    - Reporting rules:
+        * If (twisted) Euler class is trivial: report the (twisted) Euler class line and do NOT report Euler number.
+        * If (twisted) Euler class is nontrivial and Euler number is available: report ONLY Euler number (do NOT also report Euler class).
+        * If (twisted) Euler class is nontrivial and Euler number is unavailable (orientable only): report Euler class + spin class fallback.
     - If orientable AND Euler class is nontrivial BUT Euler number is undefined,
       report the spin class instead:
         "Spin class: w₂ = 0 (spin)" or "Spin class: w₂ ≠ 0 (not spin)"
@@ -990,7 +993,7 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     # Euler number (integer pairing), when computed
     eZ = getattr(classes, "twisted_euler_number_Z", None)
 
-    # w2 / spin fallback (only used in the special case described above)
+    # w2 / spin fallback (only used when orientable + Euler number undefined)
     def _infer_w2_is_zero() -> Optional[bool]:
         """
         Returns:
@@ -1024,45 +1027,51 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
         lines.append(f"{IND}(no quality report provided)")
     else:
         if eps_triv is not None:
-            lines.append(_tline(
-                "trivialization error:",
-                "ε_triv := sup_{(j k)∈N(U)} sup_{x∈π^{-1}(U_j∩U_k)} d_𝕮(Ω_{jk} f_k(x), f_j(x))"
-                f" = {_fmt_euc_with_geo_pi(eps_triv)}"
-            ))
+            lines.append(
+                _tline(
+                    "trivialization error:",
+                    "ε_triv := sup_{(j k)∈N(U)} sup_{x∈π^{-1}(U_j∩U_k)} d_𝕮(Ω_{jk} f_k(x), f_j(x))"
+                    f" = {_fmt_euc_with_geo_pi(eps_triv)}",
+                )
+            )
         if eps_triv_mean is not None:
-            lines.append(_tline(
-                "mean triv error:",
-                f"\\bar{{ε}}_triv = {_fmt_mean_euc_with_geo_pi(eps_triv_mean)}"
-            ))
+            lines.append(
+                _tline(
+                    "mean triv error:",
+                    f"\\bar{{ε}}_triv = {_fmt_mean_euc_with_geo_pi(eps_triv_mean)}",
+                )
+            )
         if delta is not None:
-            lines.append(_tline(
-                "surjectivity defect:",
-                "δ := sup_{(i j k)∈N(U)} min_{v∈{i,j,k}} d_H(f_v(π^{-1}(U_i∩U_j∩U_k)), S^1)"
-                f" = {float(delta):.3f}"
-            ))
+            lines.append(
+                _tline(
+                    "surjectivity defect:",
+                    "δ := sup_{(i j k)∈N(U)} min_{v∈{i,j,k}} d_H(f_v(π^{-1}(U_i∩U_j∩U_k)), S^1)"
+                    f" = {float(delta):.3f}",
+                )
+            )
         if alpha is not None:
             if alpha == float("inf"):
                 lines.append(_tline("stability ratio:", "α := ε_triv/(1-δ) = ∞  (since δ ≥ 1)"))
             else:
                 lines.append(_tline("stability ratio:", f"α := ε_triv/(1-δ) = {float(alpha):.3f}"))
         if eps_coc is not None:
-            lines.append(_tline(
-                "cocycle error:",
-                "ε_coc := sup_{(i j k)∈N(U)} ‖Ω_{ij}Ω_{jk}Ω_{ki} - I‖_F"
-                f" = {float(eps_coc):.3f}"
-            ))
+            lines.append(
+                _tline(
+                    "cocycle error:",
+                    "ε_coc := sup_{(i j k)∈N(U)} ‖Ω_{ij}Ω_{jk}Ω_{ki} - I‖_F" f" = {float(eps_coc):.3f}",
+                )
+            )
 
-        lines.append(_tline(
-            "Euler rounding diag:",
-            f"d_∞(δ_ω θ, ẽ) = {rounding_dist:.6g}"
-        ))
+        lines.append(_tline("Euler rounding diag:", f"d_∞(δ_ω θ, ẽ) = {rounding_dist:.6g}"))
 
     lines.append("")
     lines.append("=== Characteristic Classes ===")
-    lines.append(_tline(
-        "Stiefel–Whitney:",
-        "w₁ = 0 (orientable)" if bool(w1_is_cob) else "w₁ ≠ 0 (non-orientable)"
-    ))
+    lines.append(
+        _tline(
+            "Stiefel–Whitney:",
+            "w₁ = 0 (orientable)" if bool(w1_is_cob) else "w₁ ≠ 0 (non-orientable)",
+        )
+    )
 
     if n_tri == 0:
         lines.append(_tline("Euler class:", "0 (no 2-simplices)"))
@@ -1081,23 +1090,19 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
+    # ------------------------------------------------------------
+    # Euler class / Euler number reporting (per your rules)
+    # ------------------------------------------------------------
 
-    # Euler class line 
-    if orientable:
-        lines.append(_tline(
-            "Euler class:",
-            "e = 0 (trivial)" if e_zero_for_print else "e ≠ 0 (non-trivial)"
-        ))
-    else:
-        lines.append(_tline(
-            "(twisted) Euler class:",
-            "ẽ = 0" if e_zero_for_print else "ẽ ≠ 0"
-        ))
-
-
-    # If Euler class is trivial, optionally report bundle_trivial and stop
+    # (1) Euler class trivial -> always report Euler class, never Euler number.
     if e_zero_for_print:
         bt = getattr(classes, "bundle_trivial_on_this_complex", None)
+
+        if orientable:
+            lines.append(_tline("Euler class:", "e = 0 (trivial)"))
+        else:
+            lines.append(_tline("(twisted) Euler class:", "ẽ = 0"))
+
         if bt is not None:
             lines.append(_tline("bundle trivial:", f"{bool(bt)}"))
 
@@ -1116,29 +1121,30 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    # Euler class is nontrivial from here on.
+    # From here on, Euler class is nontrivial.
 
+    # (2) Euler class nontrivial + Euler number available -> report ONLY Euler number (no Euler class line).
     if eZ is not None:
         if orientable:
-            parity_note = "(spin)" if (int(eZ) % 2 == 0) else "(not spin)"
-            lines.append(_tline(
-                "Euler number:",
-                f"e = {int(eZ)} {parity_note}"
-            ))
+            parity_note = " (spin)" if (int(eZ) % 2 == 0) else " (not spin)"
+            lines.append(_tline("Euler number:", f"{int(eZ)}{parity_note}"))
         else:
-            lines.append(_tline(
-                "(twisted) Euler number:",
-                f"ẽ = {int(eZ)}"
-            ))
+            lines.append(_tline("(twisted) Euler number:", f"{int(eZ)}"))
     else:
-        # Special case: orientable + nontrivial Euler class but Euler number undefined -> show spin class
+        # (3) Euler class nontrivial + Euler number unavailable -> report Euler class nontrivial,
+        #     and (orientable only) report spin class fallback when available.
         if orientable:
+            lines.append(_tline("Euler class:", "e ≠ 0 (non-trivial)"))
             w2_is_zero = _infer_w2_is_zero()
             if w2_is_zero is not None:
-                lines.append(_tline(
-                    "Spin class:",
-                    "w₂ = 0 (spin)" if bool(w2_is_zero) else "w₂ ≠ 0 (not spin)"
-                ))
+                lines.append(
+                    _tline(
+                        "Spin class:",
+                        "w₂ = 0 (spin)" if bool(w2_is_zero) else "w₂ ≠ 0 (not spin)",
+                    )
+                )
+        else:
+            lines.append(_tline("(twisted) Euler class:", "ẽ ≠ 0"))
 
     bt = getattr(classes, "bundle_trivial_on_this_complex", None)
     if bt is not None:
@@ -1175,10 +1181,13 @@ def _display_summary_latex(
 
     Rules:
     - No explicit pairings shown.
-    - Euler number displayed as e = k (orientable) or \\tilde{e} = k (non-orientable),
-      with label "(twisted) Euler number" when non-orientable.
-    - If orientable AND Euler class is nontrivial BUT Euler number undefined,
-      report the spin class instead: w2 = 0 (spin) or w2 != 0 (not spin).
+    - Euler number is displayed as:
+        * orientable:     "Euler number: k (spin/not spin)"  (no "e =")
+        * non-orientable: "(twisted) Euler number: k"        (no "\\tilde{e} =")
+    - Reporting rules:
+        * If (twisted) Euler class is trivial: report Euler class line and do NOT report Euler number.
+        * If (twisted) Euler class is nontrivial and Euler number is available: report ONLY Euler number.
+        * If orientable and Euler class is nontrivial but Euler number undefined: report Euler class + spin class fallback.
     """
     try:
         from IPython.display import display, Math  # type: ignore
@@ -1242,90 +1251,107 @@ def _display_summary_latex(
         diag_rows.append((r"\text{(no quality report provided)}", r""))
     else:
         if eps_triv is not None:
-            diag_rows.append((
-                r"\text{Trivialization error}",
-                r"\varepsilon_{\text{triv}} := "
-                r"\sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} "
-                r"d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x))"
-                + r" = " + _latex_eps_with_geo_pi(eps_triv, mean=False)
-            ))
+            diag_rows.append(
+                (
+                    r"\text{Trivialization error}",
+                    r"\varepsilon_{\text{triv}} := "
+                    r"\sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} "
+                    r"d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x))"
+                    + r" = "
+                    + _latex_eps_with_geo_pi(eps_triv, mean=False),
+                )
+            )
         if eps_triv_mean is not None:
-            diag_rows.append((
-                r"\text{Mean triv error}",
-                r"\bar{\varepsilon}_{\text{triv}}"
-                + r" = " + _latex_eps_with_geo_pi(eps_triv_mean, mean=True)
-            ))
+            diag_rows.append(
+                (
+                    r"\text{Mean triv error}",
+                    r"\bar{\varepsilon}_{\text{triv}}" + r" = " + _latex_eps_with_geo_pi(eps_triv_mean, mean=True),
+                )
+            )
         if delta is not None:
-            diag_rows.append((
-                r"\text{Surjectivity defect}",
-                r"\delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} "
-                r"d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right)"
-                + r" = " + f"{float(delta):.3f}"
-            ))
+            diag_rows.append(
+                (
+                    r"\text{Surjectivity defect}",
+                    r"\delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} "
+                    r"d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right)"
+                    + r" = "
+                    + f"{float(delta):.3f}",
+                )
+            )
         if alpha is not None:
             if alpha == float("inf"):
                 diag_rows.append((r"\text{Stability ratio}", r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = \infty"))
             else:
-                diag_rows.append((r"\text{Stability ratio}", r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = " + f"{float(alpha):.3f}"))
+                diag_rows.append(
+                    (
+                        r"\text{Stability ratio}",
+                        r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = " + f"{float(alpha):.3f}",
+                    )
+                )
         if eps_coc is not None:
-            diag_rows.append((
-                r"\text{Cocycle error}",
-                r"\varepsilon_{\mathrm{coc}} := "
-                r"\sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F"
-                + r" = " + f"{float(eps_coc):.3f}"
-            ))
+            diag_rows.append(
+                (
+                    r"\text{Cocycle error}",
+                    r"\varepsilon_{\mathrm{coc}} := "
+                    r"\sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F"
+                    + r" = "
+                    + f"{float(eps_coc):.3f}",
+                )
+            )
 
-        diag_rows.append((
-            r"\text{Euler rounding dist.}",
-            r"d_\infty(\delta_\omega\theta,\tilde{e}) = " + f"{float(rounding_dist):.3f}"
-        ))
+        diag_rows.append(
+            (
+                r"\text{Euler rounding dist.}",
+                r"d_\infty(\delta_\omega\theta,\tilde{e}) = " + f"{float(rounding_dist):.3f}",
+            )
+        )
 
     class_rows: List[Tuple[str, str]] = []
-    class_rows.append((
-        r"\text{Stiefel--Whitney}",
-        r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})"
-    ))
+    class_rows.append(
+        (
+            r"\text{Stiefel--Whitney}",
+            r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})",
+        )
+    )
 
     if n_tri == 0:
         class_rows.append((r"\text{Euler class}", r"e = 0\ \text{(no 2-simplices)}"))
     else:
-        if orientable:
-            class_rows.append((
-                r"\text{Euler class}",
-                r"e = 0\ (\text{trivial})" if e_zero_for_print else r"e \neq 0\ (\text{non-trivial})"
-            ))
-        else:
-            class_rows.append((
-                r"\text{(twisted) Euler class}",
-                r"\tilde{e} = 0" if e_zero_for_print else r"\tilde{e} \neq 0"
-            ))
+        # ------------------------------------------------------------
+        # Euler class / Euler number reporting (per your rules)
+        # ------------------------------------------------------------
 
-        # Euler class is nontrivial -> either show Euler number (if defined),
-        # or show spin class (orientable only) when Euler number is undefined.
-        if not e_zero_for_print:
-            if eZ is not None:
-                if orientable:
-                    parity_note = (
-                        r"\ (\text{spin})" if (int(eZ) % 2 == 0)
-                        else r"\ (\text{not spin})"
-                    )
-                    class_rows.append((
-                        r"\text{Euler number}",
-                        r"e = " + str(int(eZ)) + parity_note
-                    ))
-                else:
-                    class_rows.append((
-                        r"\text{(twisted) Euler number}",
-                        r"\tilde{e} = " + str(int(eZ))
-                    ))
+        if e_zero_for_print:
+            # Euler class trivial -> always report Euler class, never Euler number
+            if orientable:
+                class_rows.append((r"\text{Euler class}", r"e = 0\ (\text{trivial})"))
             else:
+                class_rows.append((r"\text{(twisted) Euler class}", r"\tilde{e} = 0"))
+        else:
+            # Euler class nontrivial
+            if eZ is not None:
+                # Euler number available -> report ONLY Euler number (no Euler class line)
                 if orientable:
+                    parity_note = r"\ (\text{spin})" if (int(eZ) % 2 == 0) else r"\ (\text{not spin})"
+                    class_rows.append((r"\text{Euler number}", str(int(eZ)) + parity_note))
+                else:
+                    class_rows.append((r"\text{(twisted) Euler number}", str(int(eZ))))
+            else:
+                # Euler number unavailable -> report Euler class nontrivial (+ spin fallback if available)
+                if orientable:
+                    class_rows.append((r"\text{Euler class}", r"e \neq 0\ (\text{non-trivial})"))
                     w2_is_zero = _infer_w2_is_zero()
                     if w2_is_zero is not None:
-                        class_rows.append((
-                            r"\text{Spin class}",
-                            r"w_2 = 0\ (\text{spin})" if bool(w2_is_zero) else r"w_2 \neq 0\ (\text{not spin})"
-                        ))
+                        class_rows.append(
+                            (
+                                r"\text{Spin class}",
+                                r"w_2 = 0\ (\text{spin})"
+                                if bool(w2_is_zero)
+                                else r"w_2 \neq 0\ (\text{not spin})",
+                            )
+                        )
+                else:
+                    class_rows.append((r"\text{(twisted) Euler class}", r"\tilde{e} \neq 0"))
 
     def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:
         out: List[str] = []
