@@ -92,7 +92,33 @@ class HasWitnessErr(Protocol):
 @dataclass
 class BundleMapResult:
     """
-    Result of computing a bundle map / frame coordinates.
+    Result of the bundle-map solver (global fiber coordinates from local trivializations).
+
+    The bundle-map solver takes:
+    - cover data (membership matrix ``U`` and partition of unity ``pou``),
+    - local circle coordinates ``f`` on each chart, and
+    - estimated transition functions ``Omega`` on overlaps,
+
+    and produces a globally consistent set of fiber coordinates.
+
+    Attributes
+    ----------
+    F:
+        Final fiber coordinates of shape ``(n_samples, d_fiber)``.
+        In the default circle-bundle setting, ``d_fiber`` is typically 1 (an angle coordinate).
+    pre_F:
+        Pre-projection / pre-normalization fiber coordinates, same shape as ``F``.
+        Useful for debugging and diagnostics.
+    Omega_used:
+        Dictionary mapping nerve edges ``(i, j)`` to the O(2) matrix actually used on that edge
+        after restricting to a subcomplex and/or applying internal filtering.
+    Phi_used:
+        Orientation gauge (typically ±1 per chart) used internally by the solver, shape ``(n_charts,)``.
+        When present, this indicates the solver has aligned chart orientations.
+    report:
+        A solver report object (implementation-defined) with diagnostic statistics and warnings.
+    meta:
+        Lightweight provenance (solver options such as semicircle constraints, packing mode, etc.).
     """
     F: np.ndarray
     pre_F: np.ndarray
@@ -105,7 +131,32 @@ class BundleMapResult:
 @dataclass
 class PullbackTotalSpaceResult:
     """
-    Pullback total space Z = (base | fiber) with a product metric.
+    Pullback total space data ``Z = (base | fiber)`` equipped with a product metric.
+
+    This object is returned by :meth:`BundleResult.get_pullback_data`. It packages:
+
+    - ``total_data``: concatenation of base coordinates and computed fiber coordinates
+    - ``metric``: a product metric compatible with that concatenation
+    - ``bundle_map``: the underlying :class:`BundleMapResult` used to build the fiber block
+
+    Attributes
+    ----------
+    total_data:
+        Array of shape ``(n_samples, base_dim + fiber_dim)`` equal to
+        ``np.concatenate([base, fiber], axis=1)``.
+    metric:
+        Product metric on concatenated vectors. Typically an instance of
+        ``ProductMetricConcat`` (or anything satisfying your Metric protocol).
+    bundle_map:
+        The :class:`BundleMapResult` used to obtain the fiber coordinates.
+    base_dim:
+        Number of base columns in ``total_data``.
+    fiber_dim:
+        Number of fiber columns in ``total_data``.
+    base_weight, fiber_weight:
+        Weights used by the product metric.
+    meta:
+        Provenance and options used to construct this pullback object.
     """
     total_data: np.ndarray
     metric: Any
@@ -119,12 +170,32 @@ class PullbackTotalSpaceResult:
     meta: PullbackMeta = field(default_factory=dict)
 
     def base_proj_map(self, X: Optional[np.ndarray] = None) -> np.ndarray:
-        """Project to the base block (first base_dim columns)."""
+        """
+        Project concatenated vectors onto their base block.
+
+        Parameters
+        ----------
+        X:
+            Optional array of concatenated vectors of shape ``(n, base_dim + fiber_dim)``.
+            If omitted, projects ``self.total_data``.
+
+        Returns
+        -------
+        base:
+            The base block of shape ``(n, base_dim)``.
+        """        
         A = self.total_data if X is None else np.asarray(X, dtype=float)
         return A[:, : self.base_dim]
 
     def to_text(self) -> str:
-        """Short human-readable summary."""
+        """
+        Return a short human-readable summary.
+
+        Returns
+        -------
+        summary:
+            A multi-line string describing array shapes and the metric name.
+        """
         return (
             "=== Pullback Total Space ===\n"
             f"total_data shape: {tuple(self.total_data.shape)}\n"
@@ -141,11 +212,11 @@ class BundleResult:
     r"""
     Output of :func:`circle_bundles.bundle.build_bundle`.
 
-    A ``BundleResult`` packages the core artifacts of a discrete circle-bundle
-    reconstruction:
+    A :class:`~circle_bundles.bundle.BundleResult` collects the user-facing artifacts of a
+    discrete circle-bundle reconstruction:
 
-    - a **cover** of the base space (charts + nerve + partition of unity),
-    - a **local trivialization** (local circle coordinates per chart),
+    - a **cover** of the base space (charts, nerve, partition of unity),
+    - a **local trivialization** (local circle coordinates on each chart),
     - an estimated **O(2) cocycle** (transition functions on overlaps),
     - **quality diagnostics** and **characteristic class representatives**,
     - plus cached convenience methods for downstream analysis and visualization.
@@ -154,62 +225,52 @@ class BundleResult:
     ----------------
     Build a bundle:
 
+    >>> import circle_bundles as cb
     >>> bundle = cb.build_bundle(data, cover, show=True)
 
-    Inspect characteristic classes / quality (already computed by ``build_bundle``):
+    Inspect already-computed outputs:
 
     >>> bundle.classes
     >>> bundle.quality
 
-    Compute a persistence-style filtration over the nerve (cached):
+    Compute and reuse cached downstream results:
 
-    >>> pers = bundle.get_persistence(show=True)
-
-    Extract a large subcomplex where class representatives become coboundaries (cached):
-
+    >>> pers = bundle.get_persistence()
     >>> mt = bundle.get_max_trivial_subcomplex()
-
-    Compute a global trivialization on that subcomplex (cached):
-
     >>> gt = bundle.get_global_trivialization()
-    >>> F = gt.F   # global fiber coordinates
-
-    Compute fiber coordinates via the bundle-map solver (cached):
-
     >>> bm = bundle.get_bundle_map()
-    >>> bm.F
-
-    Build a pullback total space (base | fiber) with a product metric:
-
-    >>> pb = bundle.get_pullback_data(base_weight=1.0, fiber_weight=1.0)
-    >>> pb.total_data, pb.metric
+    >>> pb = bundle.get_pullback_data()
 
     Notes on caching
     ---------------
-    Methods named ``get_*`` cache results in ``bundle._cache`` (and also populate
-    the corresponding attribute like ``bundle.persistence`` when called with
-    default settings). Methods named ``compute_*`` perform an explicit recomputation
-    and are intended for power users; they are typically not shown in the rendered docs.
+    Most user-facing computations are exposed as ``get_*`` methods which cache their result
+    in ``bundle._cache``. Passing ``recompute=True`` forces a fresh computation.
+    Cached results may also be stored on a corresponding attribute (e.g. ``bundle.persistence``)
+    when the call uses default settings.
 
     Attributes
     ----------
     cover:
-        Cover object with fields like ``U`` (membership matrix), ``pou`` (partition of unity),
-        landmarks, and nerve accessors (``nerve_edges()``, ``nerve_triangles()``, ...).
+        Cover object over the base space. Expected to provide:
+        ``U`` (membership matrix), ``pou`` (partition of unity),
+        landmark/base data (e.g. ``landmarks`` and ``base_points`` when applicable),
+        and nerve accessors (``nerve_edges()``, ``nerve_triangles()``, ``nerve_tetrahedra()``).
     data:
         Original data array of shape ``(n_samples, ambient_dim)``.
     local_triv:
-        Local trivialization result (typically contains ``f`` = local angles per chart).
+        Local trivialization result. Typically contains ``f`` (local angles per chart)
+        and a ``valid`` mask over charts.
     cocycle:
-        Estimated O(2) cocycle / transition data.
+        Estimated cocycle / transition data. Typically provides ``Omega`` and (for oriented
+        variants) ``theta``.
     transitions:
-        Transition-fit report / errors (often includes per-edge RMS angle error).
+        Transition-fit report and per-overlap diagnostics (often includes per-edge RMS errors).
     quality:
-        Diagnostic information (edge/triangle consistency, optional witness errors, etc.).
+        Bundle quality diagnostics (consistency checks; optional witness errors when enabled).
     classes:
-        Characteristic class representatives (e.g. SW1, Euler, and oriented variants when available).
+        Characteristic class representatives (e.g. SW1 and Euler-type representatives when available).
     meta:
-        Light provenance and default preferences used in construction.
+        Lightweight provenance and default preferences used in construction.
     """
     cover: Any
     data: np.ndarray
@@ -240,8 +301,33 @@ class BundleResult:
         show: bool = False,
     ):
         """
-        Compute bundle persistence (edge-driven filtration) from already-computed classes.
+        Compute an edge-driven persistence-style filtration for class representatives.
+
+        This constructs a filtration of the nerve by assigning a scalar weight to each edge,
+        then tracking when characteristic class representatives become coboundaries as edges
+        are added in increasing-weight order.
+
+        Parameters
+        ----------
+        prefer_edge_weight:
+            Which built-in edge weight source to use when ``edge_weights`` is not provided.
+            Common options are ``"rms"`` (transition RMS angle error) or ``"witness"`` (witness error),
+            depending on what is available in this bundle.
+            If omitted, defaults to ``bundle.meta["prefer_edge_weight"]`` (fallback: ``"rms"``).
+        edge_weights:
+            Explicit per-edge weights keyed by nerve edges ``(i, j)``.
+            If provided, this overrides ``prefer_edge_weight``.
+        show:
+            If True, print a short summary of the resulting filtration / birth-death information.
+
+        Returns
+        -------
+        persistence:
+            A persistence result object (implementation-defined) containing at least:
+            - an ordered edge list / filtration
+            - class-specific birth/death information used downstream.
         """
+
         from .analysis.class_persistence import compute_bundle_persistence, summarize_edge_driven_persistence
 
         if prefer_edge_weight is None:
@@ -270,7 +356,24 @@ class BundleResult:
         recompute: bool = False,
         show: bool = False,
     ):
-        """Cached wrapper around `compute_persistence`."""
+        """
+        Cached wrapper for :meth:`compute_persistence`.
+
+        Parameters
+        ----------
+        prefer_edge_weight, edge_weights:
+            See :meth:`compute_persistence`.
+        recompute:
+            If True, ignore cached results and recompute.
+        show:
+            If True, print a summary (passed through to :meth:`compute_persistence`).
+
+        Returns
+        -------
+        persistence:
+            The cached or newly computed persistence object.
+        """
+
         if prefer_edge_weight is None:
             prefer_edge_weight = self.meta.get("prefer_edge_weight", "rms")
 
@@ -302,7 +405,32 @@ class BundleResult:
         prefer_edge_weight: Optional[str] = None,
         edge_weights: Optional[Dict[Edge, float]] = None,
     ) -> MaxTrivialSubcomplex:
-        """Compute a maximal subcomplex where SW1 and Euler reps are coboundaries."""
+        """
+        Compute a maximal subcomplex on which selected class representatives become coboundaries.
+
+        Informally: this finds a large subcomplex (in the edge-driven filtration sense)
+        where the obstruction information has “died,” so that trivializations / lifts can
+        be constructed reliably on that subcomplex.
+
+        Parameters
+        ----------
+        persistence:
+            A persistence object as returned by :meth:`get_persistence`.
+            If omitted, it will be computed using ``prefer_edge_weight`` / ``edge_weights``.
+        prefer_edge_weight, edge_weights:
+            Used only when ``persistence`` is not provided. See :meth:`get_persistence`.
+
+        Returns
+        -------
+        max_trivial:
+            A :class:`~circle_bundles.trivializations.coordinatization.MaxTrivialSubcomplex`
+            containing kept/removed simplices and filtration index information.
+
+        Raises
+        ------
+        ValueError:
+            If no such subcomplex is achieved (e.g. required codeath conditions never occur).
+        """
         if persistence is None:
             persistence = self.get_persistence(
                 prefer_edge_weight=prefer_edge_weight,
@@ -326,7 +454,21 @@ class BundleResult:
         edge_weights: Optional[Dict[Edge, float]] = None,
         recompute: bool = False,
     ) -> MaxTrivialSubcomplex:
-        """Cached wrapper around `compute_max_trivial_subcomplex`."""
+        """
+        Cached wrapper for :meth:`compute_max_trivial_subcomplex`.
+
+        Parameters
+        ----------
+        prefer_edge_weight, edge_weights:
+            See :meth:`get_persistence`.
+        recompute:
+            If True, ignore cached results and recompute.
+
+        Returns
+        -------
+        max_trivial:
+            The cached or newly computed max-trivial subcomplex.
+        """
         if prefer_edge_weight is None:
             prefer_edge_weight = self.meta.get("prefer_edge_weight", "rms")
 
@@ -359,7 +501,40 @@ class BundleResult:
         orient: bool = True,
         require_orientable: bool = True,
     ) -> GlobalTrivializationResult:
-        """Compute a global trivialization on the max-trivial subcomplex."""
+        """
+        Compute a global fiber coordinate on a max-trivial subcomplex.
+
+        This uses a subset of edges (typically from :meth:`get_max_trivial_subcomplex`) and
+        combines local trivializations into a single globally consistent fiber coordinate ``F``.
+
+        Parameters
+        ----------
+        method:
+            Global trivialization method identifier. If omitted, uses
+            ``bundle.meta["trivialization_method"]`` (fallback: ``"singer"``).
+        prefer_edge_weight, edge_weights:
+            Used to determine the max-trivial subcomplex when needed.
+            See :meth:`get_max_trivial_subcomplex`.
+        orient:
+            If True, attempt to orient the cocycle on the chosen edge set and apply the
+            induced gauge to local coordinates before trivializing.
+        require_orientable:
+            If True and ``orient=True``, raise an error when the cocycle cannot be oriented
+            on the chosen edge set.
+
+        Returns
+        -------
+        global_triv:
+            A :class:`~circle_bundles.trivializations.coordinatization.GlobalTrivializationResult`
+            containing a global coordinate array ``F`` and metadata.
+
+        Raises
+        ------
+        ValueError:
+            If orientation is required but not possible on the chosen edge set.
+        AttributeError:
+            If required cocycle fields (e.g. ``cocycle.theta``) are missing.
+        """
         from .trivializations.coordinatization import (
             build_global_trivialization,
             theta_dict_to_edge_vector_radians,
@@ -447,7 +622,25 @@ class BundleResult:
         orient: bool = True,
         require_orientable: bool = True,
     ) -> GlobalTrivializationResult:
-        """Cached wrapper around `compute_global_trivialization`."""
+        """
+        Cached wrapper for :meth:`compute_global_trivialization`.
+
+        Parameters
+        ----------
+        method:
+            See :meth:`compute_global_trivialization`.
+        prefer_edge_weight, edge_weights:
+            See :meth:`get_max_trivial_subcomplex`.
+        recompute:
+            If True, ignore cached results and recompute.
+        orient, require_orientable:
+            See :meth:`compute_global_trivialization`.
+
+        Returns
+        -------
+        global_triv:
+            The cached or newly computed global trivialization result.
+        """
         if method is None:
             method = self.meta.get("trivialization_method", "singer")
         if prefer_edge_weight is None:
@@ -494,7 +687,38 @@ class BundleResult:
         persistence=None,
         packing: FramePacking = "coloring",
     ):
-        """Build a frame dataset used internally by the bundle-map solver."""
+        """
+        Build a frame dataset used by the bundle-map solver.
+
+        This is a lower-level helper primarily used to debug or experiment with the solver.
+        Most users should call :meth:`get_bundle_map` directly.
+
+        Parameters
+        ----------
+        stage:
+            Which internal stage of the frame pipeline to return (implementation-defined).
+        reducer:
+            Optional dimensionality reducer / frame selection configuration.
+        max_frames:
+            Optional cap on the number of frames generated.
+        rng_seed:
+            Random seed used when frame sampling is randomized.
+        edges:
+            Optional explicit edge list on which to build frames. If omitted, edges may be
+            chosen based on ``subcomplex`` and ``persistence``.
+        subcomplex:
+            Which edge set to use when ``edges`` is not provided:
+            ``"full"`` uses all nerve edges; other modes use edges derived from persistence.
+        persistence:
+            Persistence object required when ``subcomplex != "full"``.
+        packing:
+            Frame packing strategy (implementation-defined; affects which local frames are selected).
+
+        Returns
+        -------
+        frames:
+            A frame dataset object (implementation-defined) used as solver input.
+        """
         from .trivializations.bundle_map import get_frame_dataset as _get_frame_dataset
 
         Omega = getattr(self.cocycle, "Omega", None)
@@ -536,7 +760,38 @@ class BundleResult:
         compute_chart_disagreement: bool = True,
         packing: FramePacking = "coloring",
     ) -> BundleMapResult:
-        """Compute fiber coordinates via the bundle-map solver."""
+        """
+        Compute global fiber coordinates via the bundle-map solver.
+
+        Parameters
+        ----------
+        edges:
+            Optional subset of nerve edges to use. If omitted, the solver uses its default edge set.
+            Supplying a restricted set can improve robustness on noisy bundles.
+        strict_semicircle:
+            If True, enforce a semicircle consistency constraint when reconciling local angles.
+            This is often helpful when local coordinates are only defined up to a flip/shift.
+        semicircle_tol:
+            Numerical tolerance used by the semicircle constraint.
+        reducer:
+            Optional reducer / frame selection configuration to speed up or stabilize the solver.
+        show_summary:
+            If True, print a solver summary (diagnostics and basic statistics).
+        compute_chart_disagreement:
+            If True, compute per-chart disagreement diagnostics in the solver report.
+        packing:
+            Frame packing strategy controlling how local constraints are selected (implementation-defined).
+
+        Returns
+        -------
+        bundle_map:
+            A :class:`BundleMapResult` containing fiber coordinates and solver diagnostics.
+
+        Raises
+        ------
+        AttributeError:
+            If required cocycle fields (e.g. ``cocycle.Omega``) are missing.
+        """
         from .trivializations.bundle_map import get_bundle_map
 
         Omega = getattr(self.cocycle, "Omega", None)
@@ -586,7 +841,30 @@ class BundleResult:
         show_summary: bool = False,
         compute_chart_disagreement: bool = True,
     ) -> BundleMapResult:
-        """Cached wrapper around `compute_bundle_map`."""
+        """
+        Cached wrapper for :meth:`compute_bundle_map`.
+
+        Parameters
+        ----------
+        edges:
+            Explicit edge set to use. If provided, ``subcomplex`` is ignored.
+        subcomplex:
+            If ``edges`` is not provided, choose edges from:
+            ``"full"`` (all nerve edges), ``"cocycle"``, or ``"max_trivial"`` (derived from persistence).
+        persistence:
+            Required when ``subcomplex != "full"``.
+        strict_semicircle, semicircle_tol, reducer, packing, compute_chart_disagreement:
+            See :meth:`compute_bundle_map`.
+        recompute:
+            If True, ignore cached results and recompute.
+        show_summary:
+            If True, print a solver summary (passed through to :meth:`compute_bundle_map`).
+
+        Returns
+        -------
+        bundle_map:
+            The cached or newly computed :class:`BundleMapResult`.
+        """
         edges_used = edges
         subcomplex_key = None
 
@@ -662,7 +940,6 @@ class BundleResult:
         self,
         *,
         bundle_map: Optional["BundleMapResult"] = None,
-        # bundle map options if bundle_map is None
         edges: Optional[Iterable[Edge]] = None,
         subcomplex: SubcomplexMode = "full",
         persistence=None,
@@ -672,12 +949,43 @@ class BundleResult:
         recompute_bundle_map: bool = False,
         compute_chart_disagreement: bool = True,
         packing: FramePacking = "coloring2",
-        # pullback metric options
         base_weight: float = 1.0,
         fiber_weight: float = 1.0,
         show_summary: bool = True,
     ) -> "PullbackTotalSpaceResult":
-        """Build a pullback total space (base | fiber) with a product metric."""
+        """
+        Construct the pullback total space ``Z = (base | fiber)`` and a compatible product metric.
+
+        This is a convenience method for downstream tasks that want an explicit
+        Euclidean-like representation of the reconstructed bundle, e.g. clustering
+        or nearest-neighbor search in a product space.
+
+        Parameters
+        ----------
+        bundle_map:
+            Optional precomputed :class:`BundleMapResult`. If provided, bundle-map options are ignored.
+        edges, subcomplex, persistence, strict_semicircle, semicircle_tol, reducer, compute_chart_disagreement, packing:
+            Options used to compute the bundle map when ``bundle_map`` is not provided.
+            See :meth:`get_bundle_map`.
+        recompute_bundle_map:
+            If True and ``bundle_map`` is not provided, forces recomputation of the bundle map.
+        base_weight:
+            Weight applied to base distances in the product metric.
+        fiber_weight:
+            Weight applied to fiber distances in the product metric.
+        show_summary:
+            If True, display a short summary of the bundle-map report and the ambient product space.
+
+        Returns
+        -------
+        pullback:
+            A :class:`PullbackTotalSpaceResult` containing concatenated data and a product metric.
+
+        Raises
+        ------
+        ValueError:
+            If base/fiber shapes are incompatible (e.g. different number of samples).
+        """
         from .metrics import ProductMetricConcat, EuclideanMetric, as_metric
         from .trivializations.bundle_map import show_bundle_map_summary
 
@@ -797,16 +1105,44 @@ class BundleResult:
         rng=None,
     ):
         """
-        Create a Dash app for interactive exploration (does not run it).
+        Create a Dash application for interactive bundle exploration (does not run it).
 
-        Requires optional dependencies:
-        - dash
-        - plotly
-        - scikit-learn
+        This constructs and returns a Dash app object. To actually run the app, use
+        :meth:`show_bundle`.
 
-        See also
-        --------
-        show_bundle : runs the app.
+        Parameters
+        ----------
+        get_dist_mat:
+            Callable used to compute pairwise distances among sampled points for interactive filtering.
+            Signature is implementation-defined (typically ``get_dist_mat(X) -> (n,n)``).
+        initial_r:
+            Initial distance threshold for the interactive neighborhood slider.
+        r_max:
+            Maximum value of the neighborhood slider.
+        colors:
+            Optional per-sample colors (passed through to the viewer).
+        densities:
+            Optional per-sample density visualizations or payloads (viewer-dependent).
+        data_landmark_inds:
+            Optional indices mapping samples to landmarks (viewer-dependent).
+        landmarks:
+            Optional base landmark coordinates. Defaults to ``cover.landmarks`` when available.
+        max_samples:
+            Maximum number of samples shown in the viewer (subsamples if needed).
+        base_metric:
+            Optional base metric object used for landmark embedding / distances.
+        rng:
+            Optional RNG used for subsampling.
+
+        Returns
+        -------
+        app:
+            A Dash app instance.
+
+        Raises
+        ------
+        ImportError:
+            If optional visualization dependencies (dash/plotly/scikit-learn) are not installed.
         """
         # Default base landmarks from cover unless explicitly overridden
         if landmarks is None:
@@ -860,12 +1196,29 @@ class BundleResult:
         port: Optional[int] = None,
     ):
         """
-        Run the interactive Dash viewer.
+        Run the interactive Dash bundle viewer.
 
-        Requires optional dependencies:
-        - dash
-        - plotly
-        - scikit-learn
+        This is a convenience wrapper that constructs the app (see :meth:`bundle_app`)
+        and runs it in a local server.
+
+        Parameters
+        ----------
+        get_dist_mat, initial_r, r_max, colors, densities, data_landmark_inds, landmarks, max_samples, base_metric, rng:
+            Passed through to :meth:`bundle_app`.
+        debug:
+            If True, run the Dash server in debug mode.
+        port:
+            Optional port to bind the server to. If omitted, Dash chooses a default (or internal logic may pick a free port).
+
+        Returns
+        -------
+        app:
+            The Dash app instance that was run.
+
+        Raises
+        ------
+        ImportError:
+            If optional visualization dependencies (dash/plotly/scikit-learn) are not installed.
         """
         if base_metric is None:
             base_metric = getattr(self.cover, "metric", None)
@@ -931,8 +1284,33 @@ class BundleResult:
 
         Parameters
         ----------
+        title:
+            Optional plot title.
+        show_labels:
+            If True, display vertex labels.
+        show_axes:
+            If True, show coordinate axes.
+        tri_opacity, tri_color:
+            Appearance options for triangle faces (if present).
+        cochains:
+            Optional list of cochains to visualize (passed through to the cover nerve plotter).
         edge_weight_source:
-            If edge_weights is None, pick from {"rms","witness","none"}.
+            If ``edge_weights`` is not provided, choose a built-in source:
+            ``"rms"`` (transition RMS error), ``"witness"`` (witness error), or ``"none"``.
+            Defaults to ``bundle.meta["prefer_edge_weight"]`` when available.
+        edge_weights:
+            Explicit per-edge weights keyed by nerve edges ``(i, j)``.
+        edge_cutoff:
+            Optional cutoff threshold for displaying edges based on weight.
+        highlight_edges:
+            Optional set of edges to highlight.
+        highlight_color:
+            Color used for highlighted edges.
+
+        Returns
+        -------
+        fig:
+            A Plotly figure object (or whatever the cover’s ``show_nerve`` returns).
         """
         cover = self.cover
 
@@ -980,10 +1358,36 @@ class BundleResult:
         kept_color: str = "green",
     ):
         """
-        Plot the max-trivial subcomplex (Plotly).
+        Visualize the max-trivial subcomplex (Plotly).
 
-        This is the “largest” subcomplex (in the edge-driven filtration sense)
-        where the class representatives become coboundaries.
+        The max-trivial subcomplex is the largest subcomplex (in the edge-filtration sense)
+        on which selected characteristic class representatives become coboundaries.
+
+        Parameters
+        ----------
+        prefer_edge_weight, edge_weights, recompute:
+            Used to compute the max-trivial subcomplex. See :meth:`get_max_trivial_subcomplex`.
+        title:
+            Optional plot title.
+        show_labels, show_axes:
+            Display options for landmark labels / axes.
+        tri_opacity, tri_color:
+            Appearance options for triangle faces.
+        hide_removed_edges:
+            If True, draw only the kept edges (and triangles supported by kept edges).
+        highlight_removed:
+            If True, highlight removed edges.
+        removed_color:
+            Color for removed edges when highlighted.
+        highlight_kept:
+            If True, additionally highlight kept edges (thicker overlay).
+        kept_color:
+            Color for kept-edge highlighting overlay.
+
+        Returns
+        -------
+        fig:
+            A Plotly figure.
         """
         from .viz.nerve_plotly import make_nerve_figure, embed_landmarks
 
@@ -1083,9 +1487,41 @@ class BundleResult:
         """
         Circle-layout nerve visualization for cycle graphs.
 
-        Convenience behavior:
-        - If `auto_omega=True` and omega is None, uses `bundle.classes.omega_O1_used` when available.
-        - If `compute_phi=True` and phi is None, computes a vertex potential using orient_if_possible().
+        This helper is intended for covers whose nerve graph is a single cycle. It can display:
+        - optional per-edge weights (e.g. RMS transition errors),
+        - an O(1) cocycle ``omega`` when available, and
+        - an optional vertex potential ``phi`` (orientation gauge) derived from orientability.
+
+        Parameters
+        ----------
+        use_max_trivial:
+            If True, compute and display the kept edge set from the max-trivial subcomplex.
+        prefer_edge_weight, edge_weights_for_max_trivial, recompute:
+            Options for computing the max-trivial subcomplex (used only when ``use_max_trivial=True``).
+        omega:
+            Optional O(1) data keyed by edges. If omitted and ``auto_omega=True``, uses
+            ``bundle.classes.omega_O1_used`` when available.
+        weights:
+            Optional per-edge weights. If omitted, ``weights_source`` chooses a built-in source.
+        phi:
+            Optional vertex potential (e.g. ±1 per chart). If omitted and ``compute_phi=True``,
+            it will be computed from orientability logic (see ``phi_source``).
+        weights_source:
+            Which built-in weight source to use when ``weights`` is omitted:
+            ``"rms"``, ``"witness"``, or ``"none"``.
+        reorder_cycle:
+            If True, reorder vertices along the cycle before plotting for a cleaner layout.
+        fail_if_not_cycle:
+            If True, raise an error when the nerve is not a single cycle.
+        title, save_path, show:
+            Plot labeling/output options.
+        kwargs:
+            Passed through to the underlying circle-nerve visualizer.
+
+        Returns
+        -------
+        out:
+            The underlying visualizer return value (often a Plotly/Matplotlib object depending on implementation).
         """
         from .viz.nerve_circle import (
             show_circle_nerve,
@@ -1180,7 +1616,37 @@ class BundleResult:
         show: bool = True,
         return_selected: bool = False,
     ):
-        """Compare local trivializations over overlaps (static visualization)."""
+        """
+        Compare local trivializations on overlaps (static diagnostic plot).
+
+        This renders a grid of overlap comparisons to help identify problematic chart pairs.
+
+        Parameters
+        ----------
+        ncols:
+            Number of columns in the comparison grid (or ``"auto"`` to choose automatically).
+        title_size:
+            Font size for subplot titles.
+        align:
+            If True, align trivializations before comparison (implementation-defined).
+        s:
+            Marker size scaling (visualization parameter).
+        save_path:
+            If provided, save the figure to this path.
+        max_pairs:
+            Maximum number of overlap pairs to display.
+        metric:
+            Scoring method used to rank/choose overlap pairs (implementation-defined; e.g. ``"mean"``).
+        show:
+            If True, display the plot.
+        return_selected:
+            If True, also return which overlap pairs were selected.
+
+        Returns
+        -------
+        fig_or_output:
+            Whatever the underlying ``compare_trivs`` returns (often a Matplotlib figure).
+        """
         from .viz.angles import compare_trivs
         return compare_trivs(
             cover=self.cover,
@@ -1211,28 +1677,72 @@ def build_bundle(
     *,
     total_metric=None,
     cc: object = "pca2",
-    # --- Local triv robustness ---
     min_patch_size: int = 10,
-    # --- Transition estimation ---
     weights=None,
     min_points_edge: int = 5,
     ref_angle: float = 0.0,
-    # --- Quality / diagnostics ---
     delta_min_points: int = 5,
     compute_witness: bool = False,
-    # --- UX ---
     show: bool = False,
     verbose: Optional[bool] = None,
 ) -> "BundleResult":
     """
-    End-to-end pipeline (core only):
-        cover + data -> local triv -> transitions -> quality -> classes
+    Build a discrete circle bundle from data over a specified base-space cover.
 
-    Notes
-    -----
-    - Characteristic class computation is always performed with:
-        try_orient=True and compute_euler_num=True.
-    - Missing edges during transition estimation are treated as an error.
+    This is the core end-to-end pipeline:
+
+    1. ensure/build the cover (membership matrix ``U`` and partition of unity ``pou``),
+    2. compute local circle coordinates on each chart (local trivialization),
+    3. estimate O(2) transition functions on overlaps,
+    4. compute quality diagnostics, and
+    5. compute characteristic class representatives (e.g. SW1/Euler-type data when available).
+
+    Parameters
+    ----------
+    data:
+        Data array of shape ``(n_samples, ambient_dim)`` representing points in the total space.
+    cover:
+        Cover object over the base space. Must provide (after ``cover.build()``):
+        ``U`` (membership matrix), ``pou`` (partition of unity), and nerve accessors.
+        If ``U``/``pou`` are missing, this function calls ``cover.build()``.
+    total_metric:
+        Optional metric used by local trivialization routines (when they support it).
+        If omitted, routines typically default to Euclidean behavior.
+    cc:
+        Local circle-coordinate method/config. Common choices include:
+        - ``"pca2"`` for a fast PCA-based circle coordinate method, or
+        - a Dreimac configuration object, or
+        - a custom callable implementing your CC interface.
+    min_patch_size:
+        Minimum number of points required in a chart to attempt local trivialization.
+        Charts with fewer points are treated as failures.
+    weights:
+        Optional per-sample or per-overlap weights used in transition estimation
+        (implementation-defined; pass only if you know the expected format).
+    min_points_edge:
+        Minimum number of overlap points required to fit a transition on an edge.
+        Overlaps with fewer points are treated as errors.
+    ref_angle:
+        Reference angle (in radians) used to fix reflection conventions in O(2) fitting.
+    delta_min_points:
+        Minimum number of points used by certain consistency/quality checks on simplices.
+    compute_witness:
+        If True, compute witness-based diagnostics (may be slower).
+    show:
+        If True, display a summary visualization after construction.
+    verbose:
+        If True, print status messages during construction. Defaults to ``show``.
+
+    Returns
+    -------
+    bundle:
+        A :class:`BundleResult` packaging the cover, local trivialization, transitions,
+        diagnostics, characteristic classes, and convenience methods.
+
+    Raises
+    ------
+    ValueError:
+        If local trivialization fails on any chart or if required overlaps are missing.
     """
     from .trivializations.local_triv import compute_local_triv, DreimacCCConfig
     from .o2_cocycle import estimate_transitions
