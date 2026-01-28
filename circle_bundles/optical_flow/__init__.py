@@ -1,16 +1,84 @@
 """
-Optical flow utilities (Sintel pipeline support).
-
-This subpackage contains functions for:
-- contrast computations on patches/frames
-- loading / organizing flow frames
-- preprocessing / patch extraction pipelines
-- optional visualization helpers
+Optical flow utilities: preprocessing, contrast/feature extraction, patch sampling,
+frame I/O helpers, and visualization helpers.
 """
 
+from __future__ import annotations
 
-from .contrast import *         
-from .flow_frames import *
-from .flow_processing import *
+# Keep submodules importable as namespaces
+from . import (
+    contrast,
+    flow_frames,
+    flow_processing,
+    patch_viz,
+)
 
-__all__ = []  
+# ----------------------------
+# contrast
+# ----------------------------
+from .contrast import (
+    get_contrast_norms,
+    get_dct_basis,
+    get_predominant_dirs,
+    get_lifted_predominant_dirs,
+)
+
+# ----------------------------
+# flow_frames
+# ----------------------------
+from .flow_frames import (
+    change_path,
+    get_labeled_frame,
+    write_video_from_frames,
+    get_labeled_video,
+    annotate_optical_flow,
+    get_sintel_scene_folders,
+)
+
+# ----------------------------
+# flow_processing
+# ----------------------------
+from .flow_processing import (
+    read_flo,
+    sample_from_frame,
+    get_patch_sample,
+    preprocess_flow_patches,
+)
+
+# ----------------------------
+# patch_viz
+# ----------------------------
+from .patch_viz import (
+    make_patch_visualizer,
+)
+
+__all__ = [
+    # namespaces
+    "contrast",
+    "flow_frames",
+    "flow_processing",
+    "patch_viz",
+
+    # contrast
+    "get_contrast_norms",
+    "get_dct_basis",
+    "get_predominant_dirs",
+    "get_lifted_predominant_dirs",
+
+    # flow_frames
+    "change_path",
+    "get_labeled_frame",
+    "write_video_from_frames",
+    "get_labeled_video",
+    "annotate_optical_flow",
+    "get_sintel_scene_folders",
+
+    # flow_processing
+    "read_flo",
+    "sample_from_frame",
+    "get_patch_sample",
+    "preprocess_flow_patches",
+
+    # patch_viz
+    "make_patch_visualizer",
+]

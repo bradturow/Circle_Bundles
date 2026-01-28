@@ -3,107 +3,137 @@ from __future__ import annotations
 """
 Public API for circle_bundles (curated).
 
-Guiding principles
-------------------
-- Keep the public surface small and stable (JOSS-friendly).
-- Expose theorem-level artifacts: bundle construction, bundle map, characteristic classes,
-  and persistence.
-- Avoid importing heavy/optional visualization dependencies at import time.
-- Everything else remains available via submodules (e.g. circle_bundles.viz.*, circle_bundles.synthetic.*).
+Design
+------
+The primary entry point is :func:`build_bundle`, which returns a :class:`BundleResult`.
+Downstream computations are exposed as cached methods on :class:`BundleResult`
+(e.g. ``get_persistence()``, ``get_global_trivialization()``, ``get_bundle_map()``,
+``get_pullback_data()``).
+
+This module also exposes common *on-ramps* (covers + metrics) so typical users can
+start workflows without deep imports.
+
+Everything else remains accessible via submodules (covers, metrics, viz, synthetic, optical_flow).
 """
 
-# ----------------------------
-# Core bundle construction / results
-# ----------------------------
+# =============================================================================
+# Core bundle construction + main result objects
+# =============================================================================
 from .bundle import (
     BundleResult,
     BundleMapResult,
+    PullbackTotalSpaceResult,
     GlobalTrivializationResult,
     MaxTrivialSubcomplex,
     build_bundle,
 )
 
-# ----------------------------
-# Bundle map (theorem-level artifact)
-# ----------------------------
-from .trivializations.bundle_map import (
-    BundleMapReport,
-    ChartDisagreementStats,
-    FrameDataset,
-    FrameReducerConfig,
-    FrameReductionReport,
-    TrueFramesResult,
-    build_bundle_map,
-    get_bundle_map,
-    show_bundle_map_summary,
+# =============================================================================
+# Covers 
+# =============================================================================
+from .base_covers import (
+    MetricBallCover,
+    TriangulationStarCover,
 )
 
-from .reduction.frame_reduction import (
-    reduction_curve_psc,
-    reduction_curve_subspace_pca,
+from .covers.metric_ball_cover_builders import (
+    S2GeodesicMetric,
+    RP2GeodesicMetric,
 )
 
-from .trivializations.gauge_canon import (
-    GaugeCanonConfig,
+from .covers.triangle_cover_builders_fibonacci import (
+    make_s2_fibonacci_star_cover,
+    make_rp2_fibonacci_star_cover,
 )
 
-# ----------------------------
-# Characteristic classes
-# ----------------------------
-from .characteristic_class import (
-    ClassResult,
-    compute_classes,
-    compute_twisted_euler_class,
-)
-
-# ----------------------------
-# Characteristic class persistence
-# ----------------------------
-from .analysis.class_persistence import (
-    CobirthResult,
-    CodeathResult,
-    PersistenceResult,
-    compute_bundle_persistence,
-    summarize_edge_driven_persistence,
-    build_edge_weights_from_transition_report,
+# =============================================================================
+# Metrics 
+# =============================================================================
+from .metrics import (
+    EuclideanMetric,
+    S1AngleMetric,
+    RP1AngleMetric,
+    S1UnitVectorMetric,
+    RP1UnitVectorMetric,
+    RP2UnitVectorMetric,
+    T2FlatMetric,
+    Torus_DiagQuotientMetric_R4,
+    Torus_KleinQuotientMetric_R4,    
+    RP2_TrivialMetric,
+    RP2_TwistMetric,
+    RP2_FlipMetric,
+    S3QuotientMetric,
 )
 
 
 # ----------------------------
-# Public __all__
+# Fiberwise analysis utilities
 # ----------------------------
+from .analysis.fiberwise_clustering import (
+    fiberwise_clustering,
+    get_cluster_persistence,
+    get_filtered_cluster_graph,
+    plot_fiberwise_pca_grid,
+    plot_fiberwise_summary_bars,
+)
+
+from .analysis.local_analysis import (
+    get_local_pca,
+    plot_local_pca,
+    get_local_rips,
+    plot_local_rips,
+)
+
+from .geometry.geometric_unwrapping import (
+    get_cocycle_dict,
+    lift_base_points,
+)
+
+
 __all__ = [
-    # bundle
+    # core
+    "build_bundle",
     "BundleResult",
     "BundleMapResult",
+    "PullbackTotalSpaceResult",
     "GlobalTrivializationResult",
     "MaxTrivialSubcomplex",
-    "build_bundle",
 
-    # bundle map
-    "BundleMapReport",
-    "ChartDisagreementStats",
-    "FrameDataset",
-    "FrameReducerConfig",
-    "FrameReductionReport",
-    "TrueFramesResult",
-    "build_bundle_map",
-    "get_bundle_map",
-    "show_bundle_map_summary",
-    "reduction_curve_psc",
-    "reduction_curve_subspace_pca",
-    "GaugeCanonConfig",
+    # covers
+    "MetricBallCover",
+    "TriangulationStarCover",
+    "S2GeodesicMetric",
+    "RP2GeodesicMetric",
+    "make_s2_fibonacci_star_cover",
+    "make_rp2_fibonacci_star_cover",
 
-    # classes
-    "ClassResult",
-    "compute_classes",
-    "compute_twisted_euler_class",
+    # metrics
+    "EuclideanMetric",
+    "S1AngleMetric",
+    "RP1AngleMetric",
+    "S1UnitVectorMetric",
+    "RP1UnitVectorMetric",
+    "RP2UnitVectorMetric",
+    "T2FlatMetric",
+    "Torus_DiagQuotientMetric_R4",
+    "Torus_KleinQuotientMetric_R4",
+    "RP2_TrivialMetric",
+    "RP2_TwistMetric",
+    "RP2_FlipMetric",
+    "S3QuotientMetric",
 
-    # persistence
-    "CobirthResult",
-    "CodeathResult",
-    "PersistenceResult",
-    "compute_bundle_persistence",
-    "summarize_edge_driven_persistence",
-    "build_edge_weights_from_transition_report",
+    # fiberwise analysis utilities
+    "fiberwise_clustering",
+    "get_cluster_persistence",
+    "get_filtered_cluster_graph",
+    "plot_fiberwise_pca_grid",
+    "plot_fiberwise_summary_bars",
+    "get_local_pca",
+    "plot_local_pca",
+    "get_local_rips",
+    "plot_local_rips",
+    "get_cocycle_dict",
+    "lift_base_points",   
 ]
+
+

@@ -17,18 +17,88 @@ except Exception:  # pragma: no cover
 # ============================================================
 
 class Metric(Protocol):
-    """Vectorized metric interface: returns full distance matrices."""
+    """
+    Vectorized metric interface.
+
+    A ``Metric`` represents a distance function that can be evaluated *in batch*
+    on two collections of points.
+
+    Implementations must provide:
+    - a human-readable ``name`` attribute, and
+    - a :meth:`pairwise` method returning a full distance matrix.
+
+    This interface is intentionally minimal so metrics can be passed seamlessly
+    to covers, bundle construction, and visualization utilities.
+
+    Notes
+    -----
+    - The library assumes (but does not enforce) that distances satisfy the
+      metric axioms.
+    - All metrics operate on NumPy arrays and return NumPy arrays.
+
+    See Also
+    --------
+    as_metric :
+        Utility for converting scalar distance functions into vectorized metrics.
+    """
     name: str
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute pairwise distances between two point clouds.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, d)`` or ``(n,)`` representing ``n`` points.
+        Y :
+            Optional array of shape ``(m, d)`` or ``(m,)``.
+            If omitted, distances are computed between rows of ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)``, where
+            ``D[i, j] = d(X[i], Y[j])``.
+        """
         ...
 
 
 @dataclass(frozen=True)
 class EuclideanMetric:
+    """
+    Standard Euclidean metric on :math:`\\mathbb{R}^d`.
+
+    This metric computes ordinary Euclidean distances between vectors
+    using the ℓ² norm.
+
+    It is the default metric used throughout the library whenever no
+    other metric is specified.
+
+    Attributes
+    ----------
+    name :
+        Display name for the metric (default ``"euclidean"``).
+    """
     name: str = "euclidean"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute Euclidean pairwise distances.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, d)`` or ``(n,)`` representing ``n`` points.
+        Y :
+            Optional array of shape ``(m, d)`` or ``(m,)``.
+            If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Euclidean distance matrix of shape ``(n, m)``.
+        """
         X = np.asarray(X)
         Y = X if Y is None else np.asarray(Y)
 
@@ -42,12 +112,50 @@ class EuclideanMetric:
 
 @dataclass(frozen=True)
 class S1AngleMetric:
-    """Angles in radians; distance on S^1."""
+    r"""
+    Geodesic distance on the circle :math:`\mathbb{S}^1` using angles.
+
+    Points are represented by angles (in radians). The distance between
+    two angles is the shorter arc length between them on the circle:
+
+    .. math::
+        d(\theta_1, \theta_2)
+        = \min\left(|\theta_2 - \theta_1|,
+                    2\pi - |\theta_2 - \theta_1|\right).
+
+    This metric is appropriate when the base space is a circle and data
+    are naturally parameterized by angles.
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"S1_angle"``).
+    base_name :
+        Short name of the base space for plots/UI.
+    base_name_latex :
+        LaTeX symbol used in summaries and tables.
+    """
     name: str = "S1_angle"
     base_name: str = "S^1"
-    base_name_latex: str = r"\mathbb{S}^1"        
+    base_name_latex: str = r"\mathbb{S}^1"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute circular geodesic distances between angle arrays.
+
+        Parameters
+        ----------
+        X :
+            Array of angles (any real values), shape ``(n,)``.
+        Y :
+            Optional array of angles, shape ``(m,)``.
+            If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)``.
+        """
         t1 = np.asarray(X).reshape(-1)[:, None]
         t2 = t1.T if Y is None else np.asarray(Y).reshape(-1)[None, :]
         d = np.abs(t2 - t1)
@@ -56,26 +164,112 @@ class S1AngleMetric:
 
 @dataclass(frozen=True)
 class RP1AngleMetric:
-    """Angles in radians; theta ~ theta+pi. Accepts any real angles."""
+    r"""
+    Geodesic distance on the real projective line :math:`\mathbb{RP}^1`
+    using angular coordinates.
+
+    The space :math:`\mathbb{RP}^1` can be viewed as a circle with antipodal
+    points identified. Angles are therefore taken modulo :math:`\pi`.
+
+    The distance between two angles is
+
+    .. math::
+        d(\theta_1, \theta_2)
+        = \min\left(|\Delta|, \pi - |\Delta|\right),
+        \quad \Delta = (\theta_2 - \theta_1) \bmod \pi.
+
+    This metric is commonly used when the base variable represents
+    *unoriented directions*.
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"RP1_angle"``).
+    base_name :
+        Short name of the base space for plots/UI.
+    base_name_latex :
+        LaTeX symbol used in summaries and tables.
+    """
     name: str = "RP1_angle"
     base_name: str = "RP^1"
-    base_name_latex: str = r"\mathbb{RP}^1"        
+    base_name_latex: str = r"\mathbb{RP}^1"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute projective geodesic distances between angle arrays.
+
+        Parameters
+        ----------
+        X :
+            Array of angles (any real values), shape ``(n,)``.
+        Y :
+            Optional array of angles, shape ``(m,)``.
+            If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)``.
+        """
         t1 = np.mod(np.asarray(X, dtype=float).reshape(-1), np.pi)[:, None]
-        t2 = t1.T if Y is None else np.mod(np.asarray(Y, dtype=float).reshape(-1), np.pi)[None, :]
+        t2 = t1.T if Y is None else np.mod(
+            np.asarray(Y, dtype=float).reshape(-1), np.pi
+        )[None, :]
         d = np.abs(t2 - t1)
         return np.minimum(d, np.pi - d)
 
 
 @dataclass(frozen=True)
 class S1UnitVectorMetric:
-    """Unit vectors in R^2; geodesic distance arccos(<p,q>)."""
+    r"""
+    Geodesic distance on :math:`\mathbb{S}^1` using unit vectors in :math:`\mathbb{R}^2`.
+
+    Points are represented as (approximately) unit vectors ``p, q ∈ R^2`` lying on the
+    unit circle. The geodesic distance is the angle between the vectors:
+
+    .. math::
+        d(p, q) = \arccos(\langle p, q \rangle),
+
+    where the dot product is clamped to ``[-1, 1]`` for numerical stability.
+
+    Use this metric when your base points are stored as 2D unit vectors
+    (e.g. ``(cos θ, sin θ)``) rather than angles.
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"S1_unitvec"``).
+    base_name :
+        Short name of the base space for plots/UI.
+    base_name_latex :
+        LaTeX symbol used in summaries and tables.
+
+    Notes
+    -----
+    - This metric assumes inputs are unit vectors. If your vectors are not normalized,
+      you should normalize them before calling :meth:`pairwise`, or use a different metric.
+    - Values are in radians in the range ``[0, π]``.
+    """
     name: str = "S1_unitvec"
     base_name: str = "S^1"
-    base_name_latex: str = r"\mathbb{S}^1"        
+    base_name_latex: str = r"\mathbb{S}^1"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute geodesic distances on :math:`\mathbb{S}^1` between unit-vector samples.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, 2)`` containing unit vectors in :math:`\mathbb{R}^2`.
+        Y :
+            Optional array of shape ``(m, 2)``. If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)`` with entries in radians.
+        """
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
         dots = np.clip(X @ Y.T, -1.0, 1.0)
@@ -84,12 +278,65 @@ class S1UnitVectorMetric:
 
 @dataclass(frozen=True)
 class RP1UnitVectorMetric:
-    """Unit vectors in R^2 with antipodal ID; distance arccos(|<p,q>|)."""
+    r"""
+    Geodesic distance on :math:`\mathbb{RP}^1` using unit vectors in :math:`\mathbb{R}^2`.
+
+    Points are represented by unit vectors in :math:`\mathbb{R}^2`, but with the antipodal
+    identification:
+
+    .. math::
+        p \sim -p.
+
+    Therefore the distance between classes ``[p]`` and ``[q]`` is:
+
+    .. math::
+        d([p],[q]) = \arccos(|\langle p, q \rangle|).
+
+    This is the correct metric when the base variable represents *unoriented directions*
+    (i.e. an axis rather than an arrow).
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"RP1_unitvec"``).
+    base_name :
+        Short name of the base space for plots/UI.
+    base_name_latex :
+        LaTeX symbol used in summaries and tables.
+
+    Notes
+    -----
+    - This implementation is robust to small deviations from unit norm: it normalizes
+      input rows internally.
+    - Distances are in radians in the range ``[0, π/2]`` for true unit inputs
+      (because of antipodal identification).
+    """
     name: str = "RP1_unitvec"
     base_name: str = "RP^1"
-    base_name_latex: str = r"\mathbb{RP}^1"        
-       
+    base_name_latex: str = r"\mathbb{RP}^1"
+
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute projective geodesic distances between unit-vector samples.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, 2)`` representing vectors in :math:`\mathbb{R}^2`.
+            Rows should be (approximately) unit length.
+        Y :
+            Optional array of shape ``(m, 2)``. If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)`` with entries in radians.
+
+        Raises
+        ------
+        ValueError
+            If ``X`` or ``Y`` does not have shape ``(*, 2)`` after reshaping 1D inputs.
+        """
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
 
@@ -108,15 +355,62 @@ class RP1UnitVectorMetric:
         dots = np.clip(Xn @ Yn.T, -1.0, 1.0)
         return np.arccos(np.abs(dots))
 
-
+    
+    
 @dataclass(frozen=True)
 class RP2UnitVectorMetric:
-    """Unit vectors in R^3 with antipodal ID; min(||p-q||, ||p+q||)."""
+    r"""
+    Metric on :math:`\mathbb{RP}^2` using antipodal unit vectors in :math:`\mathbb{R}^3`.
+
+    Points in :math:`\mathbb{RP}^2` can be represented by unit vectors
+    ``p ∈ S^2 ⊂ R^3`` with the antipodal identification ``p ~ -p``.
+
+    This implementation uses the *chordal* quotient distance induced from
+    Euclidean distance in :math:`\mathbb{R}^3`:
+
+    .. math::
+        d([p],[q]) = \min(\|p - q\|,\; \|p + q\|).
+
+    This is a common practical choice for embedding-based computations and
+    is fast to compute in batch.
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"RP2_unitvec"``).
+    base_name :
+        Short name of the base space for plots/UI.
+    base_name_latex :
+        LaTeX symbol used in summaries and tables.
+
+    Notes
+    -----
+    - This is a *chordal* metric, not the intrinsic geodesic metric on :math:`\mathbb{RP}^2`.
+      For most cover-building and neighborhood computations, chordal behavior is appropriate.
+    - If you need the intrinsic projective geodesic distance, you’d implement a different class
+      (e.g. based on ``arccos(|<p,q>|)``).
+    """
     name: str = "RP2_unitvec"
     base_name: str = "RP^2"
-    base_name_latex: str = r"\mathbb{RP}^2"        
-        
+    base_name_latex: str = r"\mathbb{RP}^2"
+
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute chordal quotient distances on :math:`\mathbb{RP}^2`.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, 3)`` representing vectors in :math:`\mathbb{R}^3`.
+            Rows are ideally unit vectors on :math:`S^2`.
+        Y :
+            Optional array of shape ``(m, 3)``. If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)``.
+        """
         X = np.asarray(X, dtype=float)
         Y = X if Y is None else np.asarray(Y, dtype=float)
         Dpos = np.linalg.norm(X[:, None, :] - Y[None, :, :], axis=-1)
@@ -125,9 +419,39 @@ class RP2UnitVectorMetric:
 
 
 def _t2_flat_pairwise_angles(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
-    """
-    Flat torus distance on [0,2pi)^2 using coordinatewise circular distance.
-    X: (n,2), Y: (m,2) -> (n,m)
+    r"""
+    Pairwise flat torus distance on :math:`\mathbb{T}^2 = (\mathbb{R}/2\pi\mathbb{Z})^2`
+    using angle coordinates.
+
+    This helper computes the standard *flat* (product) metric on the 2-torus by
+    applying circular distance in each angular coordinate and then taking the
+    Euclidean norm:
+
+    .. math::
+        d((\theta_1,\theta_2),(\phi_1,\phi_2))
+        = \sqrt{ d_{S^1}(\theta_1,\phi_1)^2 + d_{S^1}(\theta_2,\phi_2)^2 },
+
+    where
+    :math:`d_{S^1}(a,b) = \min(|a-b|, 2\pi - |a-b|)`.
+
+    Parameters
+    ----------
+    X :
+        Array of shape ``(n, 2)`` containing angles in radians, interpreted modulo
+        ``2π``.
+    Y :
+        Array of shape ``(m, 2)`` containing angles in radians.
+
+    Returns
+    -------
+    D :
+        Distance matrix of shape ``(n, m)``.
+
+    Notes
+    -----
+    - This is the *flat* torus metric, not a quotient metric.
+    - Used internally by several quotient constructions (Klein bottle,
+      diagonal Z₂ quotients).
     """
     X = np.asarray(X, dtype=float)
     Y = np.asarray(Y, dtype=float)
@@ -138,12 +462,60 @@ def _t2_flat_pairwise_angles(X: np.ndarray, Y: np.ndarray) -> np.ndarray:
 
 @dataclass(frozen=True)
 class T2FlatMetric:
-    """Flat torus distance for coords in [0,2pi)^2 (angles)."""
+    r"""
+    Flat metric on the 2-torus :math:`\mathbb{T}^2`.
+
+    Points are represented as angle pairs ``(θ₁, θ₂)`` in radians, interpreted
+    modulo ``2π`` in each coordinate. The distance is computed using the product
+    of circular distances in each factor:
+
+    .. math::
+        d(x,y) = \sqrt{ d_{S^1}(x_1,y_1)^2 + d_{S^1}(x_2,y_2)^2 }.
+
+    This metric is appropriate when:
+    - your base space is a genuine torus (no quotient identifications), and
+    - coordinates are stored explicitly as angles.
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"T2_flat"``).
+    base_name :
+        Short name of the base space for plots/UI.
+    base_name_latex :
+        LaTeX symbol used in summaries and tables.
+
+    Notes
+    -----
+    - Input angles may lie outside ``[0, 2π)``; wrapping is handled implicitly.
+    - This metric is frequently used as the *upstairs* metric before taking
+      Z₂ quotients (e.g. Klein bottle, diagonal quotients).
+    """
     name: str = "T2_flat"
     base_name: str = "T^2"
-    base_name_latex: str = r"\mathbb{T}^2"        
+    base_name_latex: str = r"\mathbb{T}^2"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute flat torus distances between angle-coordinate samples.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, 2)`` containing angles in radians.
+        Y :
+            Optional array of shape ``(m, 2)``. If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)``.
+
+        Raises
+        ------
+        ValueError
+            If ``X`` or ``Y`` does not have shape ``(*, 2)``.
+        """
         X = np.asarray(X, dtype=float)
         Y0 = X if Y is None else np.asarray(Y, dtype=float)
         if X.ndim != 2 or X.shape[1] != 2:
@@ -206,21 +578,65 @@ class ProductMetricConcat:
 
 @dataclass(frozen=True)
 class KleinBottleFlatMetric:
-    """
-    Flat Klein bottle metric induced as a Z2 quotient of the flat torus.
+    r"""
+    Flat Klein bottle metric as a :math:`\mathbb{Z}_2` quotient of the flat torus.
 
-    Coordinates are angles (base, fiber) in radians, wrapped into [0,2pi).
+    We represent points by angle coordinates ``(b, f)`` in radians (interpreted mod ``2π``),
+    using the **base-first convention**:
 
-    Identification (base-first convention):
-        (b, f) ~ (b + pi, -f)
+    - ``b`` = base angle
+    - ``f`` = fiber angle
 
-    Quotient distance:
-        d([x],[y]) = min( d_T2(x,y), d_T2(x, g(y)) )
-    where g(b,f) = (b+pi, -f).
+    The Klein bottle arises as the quotient of :math:`\mathbb{T}^2` by the action
+
+    .. math::
+        g(b,f) = (b+\pi,\,-f).
+
+    The induced quotient distance is
+
+    .. math::
+        d_{\mathrm{KB}}([x],[y]) = \min\{ d_{\mathbb{T}^2}(x,y),\ d_{\mathbb{T}^2}(x,g(y)) \},
+
+    where :math:`d_{\mathbb{T}^2}` is the flat torus metric (coordinatewise circular
+    distance, then Euclidean norm).
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"KB_flat"``).
+
+    Notes
+    -----
+    - This is an *intrinsic quotient metric* computed via minimizing over the two
+      representatives ``y`` and ``g(y)``.
+    - Inputs may be any real angles; wrapping into ``[0,2π)`` is handled internally.
+    - This is the natural metric to use when your total-space coordinates already
+      live in angle form (base,fiber) and you want the Klein identification.
     """
     name: str = "KB_flat"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute pairwise Klein bottle distances on angle-coordinate data.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, 2)`` containing angles ``(b, f)`` in radians.
+        Y :
+            Optional array of shape ``(m, 2)``. If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)`` where ``D[i,j]`` is the quotient
+            distance between ``X[i]`` and ``Y[j]``.
+
+        Raises
+        ------
+        ValueError
+            If ``X`` or ``Y`` is not a 2D array of shape ``(*, 2)``.
+        """
         X = np.asarray(X, dtype=float)
         Y0 = X if Y is None else np.asarray(Y, dtype=float)
 
@@ -241,16 +657,61 @@ class KleinBottleFlatMetric:
 
 @dataclass(frozen=True)
 class TorusDiagFlatMetric:
-    """
-    Flat metric on the quotient of the flat torus by the Z2 action
+    r"""
+    Flat metric on the :math:`\mathbb{Z}_2` quotient of the flat torus by a diagonal
+    π-shift.
 
-        (base, fiber) ~ (base + pi, fiber + pi)
+    Points are angle pairs ``(b, f)`` in radians (mod ``2π``), again using the
+    **base-first convention**.
 
-    Homeomorphic to RP^1 x S^1 (a trivial circle bundle over RP^1).
+    The :math:`\mathbb{Z}_2` action is
+
+    .. math::
+        g(b,f) = (b+\pi,\ f+\pi).
+
+    The induced quotient distance is
+
+    .. math::
+        d([x],[y]) = \min\{ d_{\mathbb{T}^2}(x,y),\ d_{\mathbb{T}^2}(x,g(y)) \}.
+
+    Topologically, this quotient is homeomorphic to :math:`\mathbb{RP}^1 \times \mathbb{S}^1`
+    (i.e. a trivial circle bundle over :math:`\mathbb{RP}^1`), but this class only
+    encodes the metric structure via the quotient construction.
+
+    Attributes
+    ----------
+    name :
+        Metric identifier (default ``"T2_diag_flat"``).
+
+    Notes
+    -----
+    - Symmetric in the two coordinates as a space, but we keep the (base,fiber)
+      naming for consistency with the rest of the library.
+    - Inputs may be any real angles; wrapping is handled internally.
     """
     name: str = "T2_diag_flat"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
+        """
+        Compute pairwise distances for the diagonal π-shift quotient.
+
+        Parameters
+        ----------
+        X :
+            Array of shape ``(n, 2)`` containing angles ``(b, f)`` in radians.
+        Y :
+            Optional array of shape ``(m, 2)``. If omitted, uses ``X``.
+
+        Returns
+        -------
+        D :
+            Distance matrix of shape ``(n, m)`` giving quotient distances.
+
+        Raises
+        ------
+        ValueError
+            If ``X`` or ``Y`` is not a 2D array of shape ``(*, 2)``.
+        """
         X = np.asarray(X, dtype=float)
         Y0 = X if Y is None else np.asarray(Y, dtype=float)
 
@@ -270,12 +731,38 @@ class TorusDiagFlatMetric:
 
 
 def T2_Z2QuotientFlatMetric(kind: str = "klein") -> Metric:
-    """
-    Factory for Z2 quotient metrics on angle-coordinates (base,fiber) in [0,2pi)^2.
+    r"""
+    Factory for :math:`\mathbb{Z}_2` quotient metrics on angle-coordinate data
+    ``(base, fiber)`` in ``[0,2π)²``.
 
-    kind:
-      - "klein": (b,f) ~ (b+pi, -f)
-      - "diag":  (b,f) ~ (b+pi, f+pi)
+    This returns a metric object implementing the quotient distance induced by the
+    flat torus metric upstairs.
+
+    Parameters
+    ----------
+    kind :
+        Which :math:`\mathbb{Z}_2` action to use:
+
+        - ``"klein"`` (aliases: ``"kb"``, ``"klein_bottle"``):
+          :math:`(b,f) \sim (b+\pi,\,-f)` giving the Klein bottle.
+        - ``"diag"`` (aliases: ``"diagonal"``, ``"diag_pi"``, ``"diagonal_pi"``):
+          :math:`(b,f) \sim (b+\pi,\ f+\pi)` giving the diagonal π-shift quotient.
+
+    Returns
+    -------
+    metric :
+        A metric object with a vectorized ``pairwise(X, Y=None)`` method, suitable for
+        passing anywhere the library expects a :class:`Metric`.
+
+    Raises
+    ------
+    ValueError
+        If ``kind`` is not recognized.
+
+    Examples
+    --------
+    >>> M = T2_Z2QuotientFlatMetric("klein")
+    >>> D = M.pairwise(X)   # X has shape (n,2) of (base,fiber) angles
     """
     kind = str(kind).lower().strip()
     if kind in {"klein", "kb", "klein_bottle"}:
