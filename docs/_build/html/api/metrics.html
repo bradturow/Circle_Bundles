@@ -1,0 +1,1185 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Metrics &#8212; circle_bundles 0+unknown documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=27db1736"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/metrics';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Analysis utilities" href="analysis.html" />
+    <link rel="prev" title="Covers" href="covers.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">circle_bundles 0+unknown documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/concepts.html">
+    Concepts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/workflows.html">
+    Workflows
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="public_api.html">
+    Public API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="covers.html">
+    Covers
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
+    Metrics
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="analysis.html">
+    Analysis utilities
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/concepts.html">
+    Concepts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/workflows.html">
+    Workflows
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="public_api.html">
+    Public API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="covers.html">
+    Covers
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Metrics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="analysis.html">
+    Analysis utilities
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Metrics</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="metrics">
+<h1>Metrics<a class="headerlink" href="#metrics" title="Link to this heading">#</a></h1>
+<p>Vectorized metric objects expose a <code class="docutils literal notranslate"><span class="pre">pairwise(X,</span> <span class="pre">Y=None)</span></code> method returning a full distance matrix.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.EuclideanMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">EuclideanMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'euclidean'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#EuclideanMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.EuclideanMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Standard Euclidean metric on <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span>.</p>
+<p>This metric computes ordinary Euclidean distances between vectors
+using the ℓ² norm.</p>
+<p>It is the default metric used throughout the library whenever no
+other metric is specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.EuclideanMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.EuclideanMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Display name for the metric (default <code class="docutils literal notranslate"><span class="pre">&quot;euclidean&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.EuclideanMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#EuclideanMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.EuclideanMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute Euclidean pairwise distances.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">d)</span></code> or <code class="docutils literal notranslate"><span class="pre">(n,)</span></code> representing <code class="docutils literal notranslate"><span class="pre">n</span></code> points.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">d)</span></code> or <code class="docutils literal notranslate"><span class="pre">(m,)</span></code>.
+If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Euclidean distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1AngleMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">S1AngleMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S1_angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{S}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#S1AngleMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.S1AngleMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Geodesic distance on the circle <span class="math notranslate nohighlight">\(\mathbb{S}^1\)</span> using angles.</p>
+<p>Points are represented by angles (in radians). The distance between
+two angles is the shorter arc length between them on the circle:</p>
+<div class="math notranslate nohighlight">
+\[d(\theta_1, \theta_2)
+= \min\left(|\theta_2 - \theta_1|,
+            2\pi - |\theta_2 - \theta_1|\right).\]</div>
+<p>This metric is appropriate when the base space is a circle and data
+are naturally parameterized by angles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1AngleMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.S1AngleMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;S1_angle&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1AngleMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.metrics.S1AngleMetric.base_name" title="Link to this definition">#</a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1AngleMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.metrics.S1AngleMetric.base_name_latex" title="Link to this definition">#</a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1AngleMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#S1AngleMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.S1AngleMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute circular geodesic distances between angle arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of angles (any real values), shape <code class="docutils literal notranslate"><span class="pre">(n,)</span></code>.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of angles, shape <code class="docutils literal notranslate"><span class="pre">(m,)</span></code>.
+If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1AngleMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">RP1AngleMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP1_angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{RP}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP1AngleMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP1AngleMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Geodesic distance on the real projective line <span class="math notranslate nohighlight">\(\mathbb{RP}^1\)</span>
+using angular coordinates.</p>
+<p>The space <span class="math notranslate nohighlight">\(\mathbb{RP}^1\)</span> can be viewed as a circle with antipodal
+points identified. Angles are therefore taken modulo <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+<p>The distance between two angles is</p>
+<div class="math notranslate nohighlight">
+\[d(\theta_1, \theta_2)
+= \min\left(|\Delta|, \pi - |\Delta|\right),
+\quad \Delta = (\theta_2 - \theta_1) \bmod \pi.\]</div>
+<p>This metric is commonly used when the base variable represents
+<em>unoriented directions</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1AngleMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.RP1AngleMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;RP1_angle&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1AngleMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.metrics.RP1AngleMetric.base_name" title="Link to this definition">#</a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1AngleMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.metrics.RP1AngleMetric.base_name_latex" title="Link to this definition">#</a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1AngleMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP1AngleMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP1AngleMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute projective geodesic distances between angle arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of angles (any real values), shape <code class="docutils literal notranslate"><span class="pre">(n,)</span></code>.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of angles, shape <code class="docutils literal notranslate"><span class="pre">(m,)</span></code>.
+If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1UnitVectorMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">S1UnitVectorMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S1_unitvec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'S^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{S}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#S1UnitVectorMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.S1UnitVectorMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Geodesic distance on <span class="math notranslate nohighlight">\(\mathbb{S}^1\)</span> using unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>.</p>
+<p>Points are represented as (approximately) unit vectors <code class="docutils literal notranslate"><span class="pre">p,</span> <span class="pre">q</span> <span class="pre">∈</span> <span class="pre">R^2</span></code> lying on the
+unit circle. The geodesic distance is the angle between the vectors:</p>
+<div class="math notranslate nohighlight">
+\[d(p, q) = \arccos(\langle p, q \rangle),\]</div>
+<p>where the dot product is clamped to <code class="docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">1]</span></code> for numerical stability.</p>
+<p>Use this metric when your base points are stored as 2D unit vectors
+(e.g. <code class="docutils literal notranslate"><span class="pre">(cos</span> <span class="pre">θ,</span> <span class="pre">sin</span> <span class="pre">θ)</span></code>) rather than angles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1UnitVectorMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.S1UnitVectorMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;S1_unitvec&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1UnitVectorMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.metrics.S1UnitVectorMetric.base_name" title="Link to this definition">#</a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1UnitVectorMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.metrics.S1UnitVectorMetric.base_name_latex" title="Link to this definition">#</a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This metric assumes inputs are unit vectors. If your vectors are not normalized,
+you should normalize them before calling <a class="reference internal" href="#circle_bundles.metrics.S1UnitVectorMetric.pairwise" title="circle_bundles.metrics.S1UnitVectorMetric.pairwise"><code class="xref py py-meth docutils literal notranslate"><span class="pre">pairwise()</span></code></a>, or use a different metric.</p></li>
+<li><p>Values are in radians in the range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">π]</span></code>.</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S1UnitVectorMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#S1UnitVectorMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.S1UnitVectorMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute geodesic distances on <span class="math notranslate nohighlight">\(\mathbb{S}^1\)</span> between unit-vector samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">2)</span></code> containing unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">2)</span></code>. If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code> with entries in radians.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1UnitVectorMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">RP1UnitVectorMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP1_unitvec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{RP}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP1UnitVectorMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP1UnitVectorMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Geodesic distance on <span class="math notranslate nohighlight">\(\mathbb{RP}^1\)</span> using unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>.</p>
+<p>Points are represented by unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>, but with the antipodal
+identification:</p>
+<div class="math notranslate nohighlight">
+\[p \sim -p.\]</div>
+<p>Therefore the distance between classes <code class="docutils literal notranslate"><span class="pre">[p]</span></code> and <code class="docutils literal notranslate"><span class="pre">[q]</span></code> is:</p>
+<div class="math notranslate nohighlight">
+\[d([p],[q]) = \arccos(|\langle p, q \rangle|).\]</div>
+<p>This is the correct metric when the base variable represents <em>unoriented directions</em>
+(i.e. an axis rather than an arrow).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1UnitVectorMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.RP1UnitVectorMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;RP1_unitvec&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1UnitVectorMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.metrics.RP1UnitVectorMetric.base_name" title="Link to this definition">#</a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1UnitVectorMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.metrics.RP1UnitVectorMetric.base_name_latex" title="Link to this definition">#</a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This implementation is robust to small deviations from unit norm: it normalizes
+input rows internally.</p></li>
+<li><p>Distances are in radians in the range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">π/2]</span></code> for true unit inputs
+(because of antipodal identification).</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP1UnitVectorMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP1UnitVectorMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP1UnitVectorMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute projective geodesic distances between unit-vector samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">2)</span></code> representing vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>.
+Rows should be (approximately) unit length.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">2)</span></code>. If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code> with entries in radians.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">X</span></code> or <code class="docutils literal notranslate"><span class="pre">Y</span></code> does not have shape <code class="docutils literal notranslate"><span class="pre">(*,</span> <span class="pre">2)</span></code> after reshaping 1D inputs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2UnitVectorMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">RP2UnitVectorMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP2_unitvec'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{RP}^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP2UnitVectorMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP2UnitVectorMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Metric on <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span> using antipodal unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>.</p>
+<p>Points in <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span> can be represented by unit vectors
+<code class="docutils literal notranslate"><span class="pre">p</span> <span class="pre">∈</span> <span class="pre">S^2</span> <span class="pre">⊂</span> <span class="pre">R^3</span></code> with the antipodal identification <code class="docutils literal notranslate"><span class="pre">p</span> <span class="pre">~</span> <span class="pre">-p</span></code>.</p>
+<p>This implementation uses the <em>chordal</em> quotient distance induced from
+Euclidean distance in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[d([p],[q]) = \min(\|p - q\|,\; \|p + q\|).\]</div>
+<p>This is a common practical choice for embedding-based computations and
+is fast to compute in batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2UnitVectorMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.RP2UnitVectorMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;RP2_unitvec&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2UnitVectorMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.metrics.RP2UnitVectorMetric.base_name" title="Link to this definition">#</a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2UnitVectorMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.metrics.RP2UnitVectorMetric.base_name_latex" title="Link to this definition">#</a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This is a <em>chordal</em> metric, not the intrinsic geodesic metric on <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span>.
+For most cover-building and neighborhood computations, chordal behavior is appropriate.</p></li>
+<li><p>If you need the intrinsic projective geodesic distance, you’d implement a different class
+(e.g. based on <code class="docutils literal notranslate"><span class="pre">arccos(|&lt;p,q&gt;|)</span></code>).</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2UnitVectorMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP2UnitVectorMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP2UnitVectorMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute chordal quotient distances on <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">3)</span></code> representing vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>.
+Rows are ideally unit vectors on <span class="math notranslate nohighlight">\(S^2\)</span>.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">3)</span></code>. If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.metrics.T2FlatMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">T2FlatMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T2_flat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T^2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{T}^2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#T2FlatMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.T2FlatMetric" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Flat metric on the 2-torus <span class="math notranslate nohighlight">\(\mathbb{T}^2\)</span>.</p>
+<p>Points are represented as angle pairs <code class="docutils literal notranslate"><span class="pre">(θ₁,</span> <span class="pre">θ₂)</span></code> in radians, interpreted
+modulo <code class="docutils literal notranslate"><span class="pre">2π</span></code> in each coordinate. The distance is computed using the product
+of circular distances in each factor:</p>
+<div class="math notranslate nohighlight">
+\[d(x,y) = \sqrt{ d_{S^1}(x_1,y_1)^2 + d_{S^1}(x_2,y_2)^2 }.\]</div>
+<p>This metric is appropriate when:
+- your base space is a genuine torus (no quotient identifications), and
+- coordinates are stored explicitly as angles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.T2FlatMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.metrics.T2FlatMetric.name" title="Link to this definition">#</a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;T2_flat&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.T2FlatMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.metrics.T2FlatMetric.base_name" title="Link to this definition">#</a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.metrics.T2FlatMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.metrics.T2FlatMetric.base_name_latex" title="Link to this definition">#</a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Input angles may lie outside <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">2π)</span></code>; wrapping is handled implicitly.</p></li>
+<li><p>This metric is frequently used as the <em>upstairs</em> metric before taking
+Z₂ quotients (e.g. Klein bottle, diagonal quotients).</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.metrics.T2FlatMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#T2FlatMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.T2FlatMetric.pairwise" title="Link to this definition">#</a></dt>
+<dd><p>Compute flat torus distances between angle-coordinate samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">2)</span></code> containing angles in radians.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of shape <code class="docutils literal notranslate"><span class="pre">(m,</span> <span class="pre">2)</span></code>. If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">X</span></code> or <code class="docutils literal notranslate"><span class="pre">Y</span></code> does not have shape <code class="docutils literal notranslate"><span class="pre">(*,</span> <span class="pre">2)</span></code>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.metrics.Torus_KleinQuotientMetric_R4">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">Torus_KleinQuotientMetric_R4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'z2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#Torus_KleinQuotientMetric_R4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.Torus_KleinQuotientMetric_R4" title="Link to this definition">#</a></dt>
+<dd><p>Z2 quotient metric on R^4 C^2-torus embedding that implements the Klein identification
+(base,fiber) ~ (base+pi, -fiber) with an explicit base-factor choice.</p>
+<dl class="simple">
+<dt>base_in:</dt><dd><ul class="simple">
+<li><p>“z1” (default): base angle is encoded in z1</p></li>
+<li><p>“z2”:            base angle is encoded in z2</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_in</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Metric</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.metrics.Torus_DiagQuotientMetric_R4">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">Torus_DiagQuotientMetric_R4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'z2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#Torus_DiagQuotientMetric_R4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.Torus_DiagQuotientMetric_R4" title="Link to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Z2 quotient metric on R^4 C^2-torus embedding for the diagonal pi-shift:</dt><dd><p>(base,fiber) ~ (base+pi, fiber+pi)</p>
+</dd>
+</dl>
+<p>This is symmetric under swapping base/fiber, but we keep base_in for API consistency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>base_in</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Metric</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2_TrivialMetric">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">RP2_TrivialMetric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP2_TrivialMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP2_TrivialMetric" title="Link to this definition">#</a></dt>
+<dd><p>Trivial circle bundle over RP^2: (v,z)~(-v,z).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Z2QuotientMetricR5</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2_TwistMetric">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">RP2_TwistMetric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP2_TwistMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP2_TwistMetric" title="Link to this definition">#</a></dt>
+<dd><p>Orientable nontrivial (monodromy -1): (v,z)~(-v,-z).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Z2QuotientMetricR5</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.metrics.RP2_FlipMetric">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">RP2_FlipMetric</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#RP2_FlipMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.RP2_FlipMetric" title="Link to this definition">#</a></dt>
+<dd><p>Non-orientable (reflection on fiber): (v,z)~(-v,conj z).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>Z2QuotientMetricR5</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.metrics.S3QuotientMetric">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.metrics.</span></span><span class="sig-name descname"><span class="pre">S3QuotientMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">array([1.,</span> <span class="pre">0.,</span> <span class="pre">0.])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">antipodal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'geodesic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/metrics.html#S3QuotientMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.metrics.S3QuotientMetric" title="Link to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>v_axis</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>antipodal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>base</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>u_axis</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Metric</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="covers.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Covers</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="analysis.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Analysis utilities</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.EuclideanMetric"><code class="docutils literal notranslate"><span class="pre">EuclideanMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.EuclideanMetric.name"><code class="docutils literal notranslate"><span class="pre">EuclideanMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.EuclideanMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">EuclideanMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1AngleMetric"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1AngleMetric.name"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1AngleMetric.base_name"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric.base_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1AngleMetric.base_name_latex"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric.base_name_latex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1AngleMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">S1AngleMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1AngleMetric"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1AngleMetric.name"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1AngleMetric.base_name"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric.base_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1AngleMetric.base_name_latex"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric.base_name_latex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1AngleMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">RP1AngleMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1UnitVectorMetric.name"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1UnitVectorMetric.base_name"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric.base_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1UnitVectorMetric.base_name_latex"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric.base_name_latex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S1UnitVectorMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">S1UnitVectorMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1UnitVectorMetric.name"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1UnitVectorMetric.base_name"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric.base_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1UnitVectorMetric.base_name_latex"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric.base_name_latex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP1UnitVectorMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">RP1UnitVectorMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2UnitVectorMetric"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2UnitVectorMetric.name"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2UnitVectorMetric.base_name"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric.base_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2UnitVectorMetric.base_name_latex"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric.base_name_latex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2UnitVectorMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">RP2UnitVectorMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.T2FlatMetric"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.T2FlatMetric.name"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric.name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.T2FlatMetric.base_name"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric.base_name</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.T2FlatMetric.base_name_latex"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric.base_name_latex</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.T2FlatMetric.pairwise"><code class="docutils literal notranslate"><span class="pre">T2FlatMetric.pairwise()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.Torus_KleinQuotientMetric_R4"><code class="docutils literal notranslate"><span class="pre">Torus_KleinQuotientMetric_R4()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.Torus_DiagQuotientMetric_R4"><code class="docutils literal notranslate"><span class="pre">Torus_DiagQuotientMetric_R4()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2_TrivialMetric"><code class="docutils literal notranslate"><span class="pre">RP2_TrivialMetric()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2_TwistMetric"><code class="docutils literal notranslate"><span class="pre">RP2_TwistMetric()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.RP2_FlipMetric"><code class="docutils literal notranslate"><span class="pre">RP2_FlipMetric()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.metrics.S3QuotientMetric"><code class="docutils literal notranslate"><span class="pre">S3QuotientMetric()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/metrics.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Brad Turow.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

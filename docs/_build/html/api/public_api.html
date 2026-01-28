@@ -1,0 +1,1468 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Public API &#8212; circle_bundles 0+unknown documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=27db1736"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/public_api';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Covers" href="covers.html" />
+    <link rel="prev" title="Workflows" href="../user_guide/workflows.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">circle_bundles 0+unknown documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/concepts.html">
+    Concepts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/workflows.html">
+    Workflows
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Public API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="covers.html">
+    Covers
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="metrics.html">
+    Metrics
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="analysis.html">
+    Analysis utilities
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../quickstart.html">
+    Quickstart
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/concepts.html">
+    Concepts
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../user_guide/workflows.html">
+    Workflows
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Public API
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="covers.html">
+    Covers
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="metrics.html">
+    Metrics
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="analysis.html">
+    Analysis utilities
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Public API</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="public-api">
+<h1>Public API<a class="headerlink" href="#public-api" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.api.build_bundle">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.api.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.build_bundle" title="Link to this definition">#</a></dt>
+<dd><p>Build a discrete circle bundle from data over a specified base-space cover.</p>
+<p>This is the core end-to-end pipeline:</p>
+<ol class="arabic simple">
+<li><p>ensure/build the cover (membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code> and partition of unity <code class="docutils literal notranslate"><span class="pre">pou</span></code>),</p></li>
+<li><p>compute local circle coordinates on each chart (local trivialization),</p></li>
+<li><p>estimate O(2) transition functions on overlaps,</p></li>
+<li><p>compute quality diagnostics, and</p></li>
+<li><p>compute characteristic class representatives (e.g. SW1/Euler-type data when available).</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Data array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">ambient_dim)</span></code> representing points in the total space.</p></li>
+<li><p><strong>cover</strong> – Cover object over the base space. Must provide (after <code class="docutils literal notranslate"><span class="pre">cover.build()</span></code>):
+<code class="docutils literal notranslate"><span class="pre">U</span></code> (membership matrix), <code class="docutils literal notranslate"><span class="pre">pou</span></code> (partition of unity), and nerve accessors.
+If <code class="docutils literal notranslate"><span class="pre">U</span></code>/<code class="docutils literal notranslate"><span class="pre">pou</span></code> are missing, this function calls <code class="docutils literal notranslate"><span class="pre">cover.build()</span></code>.</p></li>
+<li><p><strong>total_metric</strong> – Optional metric used by local trivialization routines (when they support it).
+If omitted, routines typically default to Euclidean behavior.</p></li>
+<li><p><strong>cc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a>) – Local circle-coordinate method/config. Common choices include:
+- <code class="docutils literal notranslate"><span class="pre">&quot;pca2&quot;</span></code> for a fast PCA-based circle coordinate method, or
+- a Dreimac configuration object, or
+- a custom callable implementing your CC interface.</p></li>
+<li><p><strong>min_patch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of points required in a chart to attempt local trivialization.
+Charts with fewer points are treated as failures.</p></li>
+<li><p><strong>weights</strong> – Optional per-sample or per-overlap weights used in transition estimation
+(implementation-defined; pass only if you know the expected format).</p></li>
+<li><p><strong>min_points_edge</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of overlap points required to fit a transition on an edge.
+Overlaps with fewer points are treated as errors.</p></li>
+<li><p><strong>ref_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Reference angle (in radians) used to fix reflection conventions in O(2) fitting.</p></li>
+<li><p><strong>delta_min_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of points used by certain consistency/quality checks on simplices.</p></li>
+<li><p><strong>compute_witness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute witness-based diagnostics (may be slower).</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, display a summary visualization after construction.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>) – If True, print status messages during construction. Defaults to <code class="docutils literal notranslate"><span class="pre">show</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#circle_bundles.api.BundleResult" title="circle_bundles.api.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a> packaging the cover, local trivialization, transitions,
+diagnostics, characteristic classes, and convenience methods.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bundle</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError:</strong> – If local trivialization fails on any chart or if required overlaps are missing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.api.</span></span><span class="sig-name descname"><span class="pre">BundleResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_triv</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cocycle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transitions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quality</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_trivial=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_trivialization=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_map=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_cache=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Output of <code class="xref py py-func docutils literal notranslate"><span class="pre">circle_bundles.bundle.build_bundle()</span></code>.</p>
+<p>A <a class="reference internal" href="#circle_bundles.api.BundleResult" title="circle_bundles.bundle.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a> collects the user-facing artifacts of a
+discrete circle-bundle reconstruction:</p>
+<ul class="simple">
+<li><p>a <strong>cover</strong> of the base space (charts, nerve, partition of unity),</p></li>
+<li><p>a <strong>local trivialization</strong> (local circle coordinates on each chart),</p></li>
+<li><p>an estimated <strong>O(2) cocycle</strong> (transition functions on overlaps),</p></li>
+<li><p><strong>quality diagnostics</strong> and <strong>characteristic class representatives</strong>,</p></li>
+<li><p>plus cached convenience methods for downstream analysis and visualization.</p></li>
+</ul>
+<section id="typical-workflow">
+<h2>Typical workflow<a class="headerlink" href="#typical-workflow" title="Link to this heading">#</a></h2>
+<p>Build a bundle:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cover</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Inspect already-computed outputs:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span><span class="o">.</span><span class="n">classes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span><span class="o">.</span><span class="n">quality</span>
+</pre></div>
+</div>
+<p>Compute and reuse cached downstream results:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pers</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_persistence</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mt</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_max_trivial_subcomplex</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gt</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_global_trivialization</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bm</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_bundle_map</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pb</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_pullback_data</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="notes-on-caching">
+<h2>Notes on caching<a class="headerlink" href="#notes-on-caching" title="Link to this heading">#</a></h2>
+<p>Most user-facing computations are exposed as <code class="docutils literal notranslate"><span class="pre">get_*</span></code> methods which cache their result
+in <code class="docutils literal notranslate"><span class="pre">bundle._cache</span></code>. Passing <code class="docutils literal notranslate"><span class="pre">recompute=True</span></code> forces a fresh computation.
+Cached results may also be stored on a corresponding attribute (e.g. <code class="docutils literal notranslate"><span class="pre">bundle.persistence</span></code>)
+when the call uses default settings.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.cover">
+<span class="sig-name descname"><span class="pre">cover</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.cover" title="Link to this definition">#</a></dt>
+<dd><p>Cover object over the base space. Expected to provide:
+<code class="docutils literal notranslate"><span class="pre">U</span></code> (membership matrix), <code class="docutils literal notranslate"><span class="pre">pou</span></code> (partition of unity),
+landmark/base data (e.g. <code class="docutils literal notranslate"><span class="pre">landmarks</span></code> and <code class="docutils literal notranslate"><span class="pre">base_points</span></code> when applicable),
+and nerve accessors (<code class="docutils literal notranslate"><span class="pre">nerve_edges()</span></code>, <code class="docutils literal notranslate"><span class="pre">nerve_triangles()</span></code>, <code class="docutils literal notranslate"><span class="pre">nerve_tetrahedra()</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.data">
+<span class="sig-name descname"><span class="pre">data</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.data" title="Link to this definition">#</a></dt>
+<dd><p>Original data array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">ambient_dim)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.local_triv">
+<span class="sig-name descname"><span class="pre">local_triv</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.local_triv" title="Link to this definition">#</a></dt>
+<dd><p>Local trivialization result. Typically contains <code class="docutils literal notranslate"><span class="pre">f</span></code> (local angles per chart)
+and a <code class="docutils literal notranslate"><span class="pre">valid</span></code> mask over charts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.cocycle">
+<span class="sig-name descname"><span class="pre">cocycle</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.cocycle" title="Link to this definition">#</a></dt>
+<dd><p>Estimated cocycle / transition data. Typically provides <code class="docutils literal notranslate"><span class="pre">Omega</span></code> and (for oriented
+variants) <code class="docutils literal notranslate"><span class="pre">theta</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.transitions">
+<span class="sig-name descname"><span class="pre">transitions</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.transitions" title="Link to this definition">#</a></dt>
+<dd><p>Transition-fit report and per-overlap diagnostics (often includes per-edge RMS errors).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.quality">
+<span class="sig-name descname"><span class="pre">quality</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.quality" title="Link to this definition">#</a></dt>
+<dd><p>Bundle quality diagnostics (consistency checks; optional witness errors when enabled).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.classes">
+<span class="sig-name descname"><span class="pre">classes</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.classes" title="Link to this definition">#</a></dt>
+<dd><p>Characteristic class representatives (e.g. SW1 and Euler-type representatives when available).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.meta">
+<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#circle_bundles.api.BundleResult.meta" title="Link to this definition">#</a></dt>
+<dd><p>Lightweight provenance and default preferences used in construction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>circle_bundles.bundle.BundleMeta</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.compute_persistence">
+<span class="sig-name descname"><span class="pre">compute_persistence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.compute_persistence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.compute_persistence" title="Link to this definition">#</a></dt>
+<dd><p>Compute an edge-driven persistence-style filtration for class representatives.</p>
+<p>This constructs a filtration of the nerve by assigning a scalar weight to each edge,
+then tracking when characteristic class representatives become coboundaries as edges
+are added in increasing-weight order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Which built-in edge weight source to use when <code class="docutils literal notranslate"><span class="pre">edge_weights</span></code> is not provided.
+Common options are <code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code> (transition RMS angle error) or <code class="docutils literal notranslate"><span class="pre">&quot;witness&quot;</span></code> (witness error),
+depending on what is available in this bundle.
+If omitted, defaults to <code class="docutils literal notranslate"><span class="pre">bundle.meta[&quot;prefer_edge_weight&quot;]</span></code> (fallback: <code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code>).</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Explicit per-edge weights keyed by nerve edges <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code>.
+If provided, this overrides <code class="docutils literal notranslate"><span class="pre">prefer_edge_weight</span></code>.</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, print a short summary of the resulting filtration / birth-death information.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A persistence result object (implementation-defined) containing at least:
+- an ordered edge list / filtration
+- class-specific birth/death information used downstream.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>persistence</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.get_persistence">
+<span class="sig-name descname"><span class="pre">get_persistence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_persistence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.get_persistence" title="Link to this definition">#</a></dt>
+<dd><p>Cached wrapper for <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_persistence" title="circle_bundles.api.BundleResult.compute_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_persistence()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_persistence" title="circle_bundles.api.BundleResult.compute_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_persistence()</span></code></a>.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_persistence" title="circle_bundles.api.BundleResult.compute_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_persistence()</span></code></a>.</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, ignore cached results and recompute.</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, print a summary (passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_persistence" title="circle_bundles.api.BundleResult.compute_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_persistence()</span></code></a>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cached or newly computed persistence object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>persistence</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.compute_max_trivial_subcomplex">
+<span class="sig-name descname"><span class="pre">compute_max_trivial_subcomplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.compute_max_trivial_subcomplex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.compute_max_trivial_subcomplex" title="Link to this definition">#</a></dt>
+<dd><p>Compute a maximal subcomplex on which selected class representatives become coboundaries.</p>
+<p>Informally: this finds a large subcomplex (in the edge-driven filtration sense)
+where the obstruction information has “died,” so that trivializations / lifts can
+be constructed reliably on that subcomplex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>persistence</strong> – A persistence object as returned by <a class="reference internal" href="#circle_bundles.api.BundleResult.get_persistence" title="circle_bundles.api.BundleResult.get_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_persistence()</span></code></a>.
+If omitted, it will be computed using <code class="docutils literal notranslate"><span class="pre">prefer_edge_weight</span></code> / <code class="docutils literal notranslate"><span class="pre">edge_weights</span></code>.</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Used only when <code class="docutils literal notranslate"><span class="pre">persistence</span></code> is not provided. See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_persistence" title="circle_bundles.api.BundleResult.get_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_persistence()</span></code></a>.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Used only when <code class="docutils literal notranslate"><span class="pre">persistence</span></code> is not provided. See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_persistence" title="circle_bundles.api.BundleResult.get_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_persistence()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#circle_bundles.api.MaxTrivialSubcomplex" title="circle_bundles.trivializations.coordinatization.MaxTrivialSubcomplex"><code class="xref py py-class docutils literal notranslate"><span class="pre">MaxTrivialSubcomplex</span></code></a>
+containing kept/removed simplices and filtration index information.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>max_trivial</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError:</strong> – If no such subcomplex is achieved (e.g. required codeath conditions never occur).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.get_max_trivial_subcomplex">
+<span class="sig-name descname"><span class="pre">get_max_trivial_subcomplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_max_trivial_subcomplex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="Link to this definition">#</a></dt>
+<dd><p>Cached wrapper for <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.compute_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_max_trivial_subcomplex()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_persistence" title="circle_bundles.api.BundleResult.get_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_persistence()</span></code></a>.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_persistence" title="circle_bundles.api.BundleResult.get_persistence"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_persistence()</span></code></a>.</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, ignore cached results and recompute.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cached or newly computed max-trivial subcomplex.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>max_trivial</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.compute_global_trivialization">
+<span class="sig-name descname"><span class="pre">compute_global_trivialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_orientable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.compute_global_trivialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.compute_global_trivialization" title="Link to this definition">#</a></dt>
+<dd><p>Compute a global fiber coordinate on a max-trivial subcomplex.</p>
+<p>This uses a subset of edges (typically from <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>) and
+combines local trivializations into a single globally consistent fiber coordinate <code class="docutils literal notranslate"><span class="pre">F</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Global trivialization method identifier. If omitted, uses
+<code class="docutils literal notranslate"><span class="pre">bundle.meta[&quot;trivialization_method&quot;]</span></code> (fallback: <code class="docutils literal notranslate"><span class="pre">&quot;singer&quot;</span></code>).</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Used to determine the max-trivial subcomplex when needed.
+See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Used to determine the max-trivial subcomplex when needed.
+See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>orient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, attempt to orient the cocycle on the chosen edge set and apply the
+induced gauge to local coordinates before trivializing.</p></li>
+<li><p><strong>require_orientable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True and <code class="docutils literal notranslate"><span class="pre">orient=True</span></code>, raise an error when the cocycle cannot be oriented
+on the chosen edge set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#circle_bundles.api.GlobalTrivializationResult" title="circle_bundles.trivializations.coordinatization.GlobalTrivializationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">GlobalTrivializationResult</span></code></a>
+containing a global coordinate array <code class="docutils literal notranslate"><span class="pre">F</span></code> and metadata.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>global_triv</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError:</strong> – If orientation is required but not possible on the chosen edge set.</p></li>
+<li><p><strong>AttributeError:</strong> – If required cocycle fields (e.g. <code class="docutils literal notranslate"><span class="pre">cocycle.theta</span></code>) are missing.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.get_global_trivialization">
+<span class="sig-name descname"><span class="pre">get_global_trivialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orient</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">require_orientable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_global_trivialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.get_global_trivialization" title="Link to this definition">#</a></dt>
+<dd><p>Cached wrapper for <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_global_trivialization" title="circle_bundles.api.BundleResult.compute_global_trivialization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_global_trivialization()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_global_trivialization" title="circle_bundles.api.BundleResult.compute_global_trivialization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_global_trivialization()</span></code></a>.</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, ignore cached results and recompute.</p></li>
+<li><p><strong>orient</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_global_trivialization" title="circle_bundles.api.BundleResult.compute_global_trivialization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_global_trivialization()</span></code></a>.</p></li>
+<li><p><strong>require_orientable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – See <a class="reference internal" href="#circle_bundles.api.BundleResult.compute_global_trivialization" title="circle_bundles.api.BundleResult.compute_global_trivialization"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_global_trivialization()</span></code></a>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cached or newly computed global trivialization result.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>global_triv</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.get_frame_dataset">
+<span class="sig-name descname"><span class="pre">get_frame_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'post_projection'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reducer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_frames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">packing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coloring'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_frame_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.get_frame_dataset" title="Link to this definition">#</a></dt>
+<dd><p>Build a frame dataset used by the bundle-map solver.</p>
+<p>This is a lower-level helper primarily used to debug or experiment with the solver.
+Most users should call <a class="reference internal" href="#circle_bundles.api.BundleResult.get_bundle_map" title="circle_bundles.api.BundleResult.get_bundle_map"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_bundle_map()</span></code></a> directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stage</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Which internal stage of the frame pipeline to return (implementation-defined).</p></li>
+<li><p><strong>reducer</strong> – Optional dimensionality reducer / frame selection configuration.</p></li>
+<li><p><strong>max_frames</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Optional cap on the number of frames generated.</p></li>
+<li><p><strong>rng_seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Random seed used when frame sampling is randomized.</p></li>
+<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – Optional explicit edge list on which to build frames. If omitted, edges may be
+chosen based on <code class="docutils literal notranslate"><span class="pre">subcomplex</span></code> and <code class="docutils literal notranslate"><span class="pre">persistence</span></code>.</p></li>
+<li><p><strong>subcomplex</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'full'</em><em>, </em><em>'cocycle'</em><em>, </em><em>'max_trivial'</em><em>]</em>) – Which edge set to use when <code class="docutils literal notranslate"><span class="pre">edges</span></code> is not provided:
+<code class="docutils literal notranslate"><span class="pre">&quot;full&quot;</span></code> uses all nerve edges; other modes use edges derived from persistence.</p></li>
+<li><p><strong>persistence</strong> – Persistence object required when <code class="docutils literal notranslate"><span class="pre">subcomplex</span> <span class="pre">!=</span> <span class="pre">&quot;full&quot;</span></code>.</p></li>
+<li><p><strong>packing</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'none'</em><em>, </em><em>'coloring'</em><em>, </em><em>'coloring2'</em><em>]</em>) – Frame packing strategy (implementation-defined; affects which local frames are selected).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A frame dataset object (implementation-defined) used as solver input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>frames</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.get_bundle_map">
+<span class="sig-name descname"><span class="pre">get_bundle_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_semicircle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semicircle_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reducer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">packing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coloring'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_summary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_chart_disagreement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_bundle_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.get_bundle_map" title="Link to this definition">#</a></dt>
+<dd><p>Cached wrapper for <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – Explicit edge set to use. If provided, <code class="docutils literal notranslate"><span class="pre">subcomplex</span></code> is ignored.</p></li>
+<li><p><strong>subcomplex</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'full'</em><em>, </em><em>'cocycle'</em><em>, </em><em>'max_trivial'</em><em>]</em>) – If <code class="docutils literal notranslate"><span class="pre">edges</span></code> is not provided, choose edges from:
+<code class="docutils literal notranslate"><span class="pre">&quot;full&quot;</span></code> (all nerve edges), <code class="docutils literal notranslate"><span class="pre">&quot;cocycle&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;max_trivial&quot;</span></code> (derived from persistence).</p></li>
+<li><p><strong>persistence</strong> – Required when <code class="docutils literal notranslate"><span class="pre">subcomplex</span> <span class="pre">!=</span> <span class="pre">&quot;full&quot;</span></code>.</p></li>
+<li><p><strong>strict_semicircle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>.</p></li>
+<li><p><strong>semicircle_tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>.</p></li>
+<li><p><strong>reducer</strong> – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>.</p></li>
+<li><p><strong>packing</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'none'</em><em>, </em><em>'coloring'</em><em>, </em><em>'coloring2'</em><em>]</em>) – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>.</p></li>
+<li><p><strong>compute_chart_disagreement</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – See <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>.</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, ignore cached results and recompute.</p></li>
+<li><p><strong>show_summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, print a solver summary (passed through to <code class="xref py py-meth docutils literal notranslate"><span class="pre">compute_bundle_map()</span></code>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The cached or newly computed <a class="reference internal" href="#circle_bundles.api.BundleMapResult" title="circle_bundles.api.BundleMapResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bundle_map</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.get_pullback_data">
+<span class="sig-name descname"><span class="pre">get_pullback_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcomplex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'full'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict_semicircle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">semicircle_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reducer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute_bundle_map</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_chart_disagreement</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">packing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coloring2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fiber_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_summary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.get_pullback_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.get_pullback_data" title="Link to this definition">#</a></dt>
+<dd><p>Construct the pullback total space <code class="docutils literal notranslate"><span class="pre">Z</span> <span class="pre">=</span> <span class="pre">(base</span> <span class="pre">|</span> <span class="pre">fiber)</span></code> and a compatible product metric.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bundle_map</strong> (<a class="reference internal" href="#circle_bundles.api.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><em>BundleMapResult</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>subcomplex</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'full'</em><em>, </em><em>'cocycle'</em><em>, </em><em>'max_trivial'</em><em>]</em>)</p></li>
+<li><p><strong>strict_semicircle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>semicircle_tol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>recompute_bundle_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>compute_chart_disagreement</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>packing</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'none'</em><em>, </em><em>'coloring'</em><em>, </em><em>'coloring2'</em><em>]</em>)</p></li>
+<li><p><strong>base_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>fiber_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>show_summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#circle_bundles.api.PullbackTotalSpaceResult" title="circle_bundles.bundle.PullbackTotalSpaceResult"><em>PullbackTotalSpaceResult</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.bundle_app">
+<span class="sig-name descname"><span class="pre">bundle_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_dist_mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">densities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_landmark_inds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.bundle_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.bundle_app" title="Link to this definition">#</a></dt>
+<dd><p>Create a Dash application for interactive bundle exploration (does not run it).</p>
+<p>This constructs and returns a Dash app object. To actually run the app, use
+<a class="reference internal" href="#circle_bundles.api.BundleResult.show_bundle" title="circle_bundles.api.BundleResult.show_bundle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">show_bundle()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>get_dist_mat</strong> – Callable used to compute pairwise distances among sampled points for interactive filtering.
+Signature is implementation-defined (typically <code class="docutils literal notranslate"><span class="pre">get_dist_mat(X)</span> <span class="pre">-&gt;</span> <span class="pre">(n,n)</span></code>).</p></li>
+<li><p><strong>initial_r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Initial distance threshold for the interactive neighborhood slider.</p></li>
+<li><p><strong>r_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Maximum value of the neighborhood slider.</p></li>
+<li><p><strong>colors</strong> – Optional per-sample colors (passed through to the viewer).</p></li>
+<li><p><strong>densities</strong> – Optional per-sample density visualizations or payloads (viewer-dependent).</p></li>
+<li><p><strong>data_landmark_inds</strong> – Optional indices mapping samples to landmarks (viewer-dependent).</p></li>
+<li><p><strong>landmarks</strong> – Optional base landmark coordinates. Defaults to <code class="docutils literal notranslate"><span class="pre">cover.landmarks</span></code> when available.</p></li>
+<li><p><strong>max_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of samples shown in the viewer (subsamples if needed).</p></li>
+<li><p><strong>base_metric</strong> – Optional base metric object used for landmark embedding / distances.</p></li>
+<li><p><strong>rng</strong> – Optional RNG used for subsampling.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Dash app instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>app</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError:</strong> – If optional visualization dependencies (dash/plotly/scikit-learn) are not installed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.show_bundle">
+<span class="sig-name descname"><span class="pre">show_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">get_dist_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">colors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">densities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_landmark_inds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.show_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.show_bundle" title="Link to this definition">#</a></dt>
+<dd><p>Run the interactive Dash bundle viewer.</p>
+<p>This is a convenience wrapper that constructs the app (see <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>)
+and runs it in a local server.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>get_dist_mat</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a><em>[</em><em>[</em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>] </em><em>| </em><em>None</em>) – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>initial_r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>r_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>colors</strong> – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>densities</strong> – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>data_landmark_inds</strong> – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>landmarks</strong> – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>max_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>base_metric</strong> – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>rng</strong> – Passed through to <a class="reference internal" href="#circle_bundles.api.BundleResult.bundle_app" title="circle_bundles.api.BundleResult.bundle_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">bundle_app()</span></code></a>.</p></li>
+<li><p><strong>debug</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, run the Dash server in debug mode.</p></li>
+<li><p><strong>port</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Optional port to bind the server to. If omitted, Dash chooses a default (or internal logic may pick a free port).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Dash app instance that was run.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>app</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError:</strong> – If optional visualization dependencies (dash/plotly/scikit-learn) are not installed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.show_nerve">
+<span class="sig-name descname"><span class="pre">show_nerve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cochains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weight_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.show_nerve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.show_nerve" title="Link to this definition">#</a></dt>
+<dd><p>Visualize the cover nerve (Plotly).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Optional plot title.</p></li>
+<li><p><strong>show_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, display vertex labels.</p></li>
+<li><p><strong>show_axes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, show coordinate axes.</p></li>
+<li><p><strong>tri_opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Appearance options for triangle faces (if present).</p></li>
+<li><p><strong>tri_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Appearance options for triangle faces (if present).</p></li>
+<li><p><strong>cochains</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – Optional list of cochains to visualize (passed through to the cover nerve plotter).</p></li>
+<li><p><strong>edge_weight_source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If <code class="docutils literal notranslate"><span class="pre">edge_weights</span></code> is not provided, choose a built-in source:
+<code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code> (transition RMS error), <code class="docutils literal notranslate"><span class="pre">&quot;witness&quot;</span></code> (witness error), or <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">bundle.meta[&quot;prefer_edge_weight&quot;]</span></code> when available.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Explicit per-edge weights keyed by nerve edges <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code>.</p></li>
+<li><p><strong>edge_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>) – Optional cutoff threshold for displaying edges based on weight.</p></li>
+<li><p><strong>highlight_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.14)"><em>Set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – Optional set of edges to highlight.</p></li>
+<li><p><strong>highlight_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Color used for highlighted edges.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Plotly figure object (or whatever the cover’s <code class="docutils literal notranslate"><span class="pre">show_nerve</span></code> returns).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.show_max_trivial">
+<span class="sig-name descname"><span class="pre">show_max_trivial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hide_removed_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_removed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_kept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'green'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.show_max_trivial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.show_max_trivial" title="Link to this definition">#</a></dt>
+<dd><p>Visualize the max-trivial subcomplex (Plotly).</p>
+<p>The max-trivial subcomplex is the largest subcomplex (in the edge-filtration sense)
+on which selected characteristic class representatives become coboundaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Used to compute the max-trivial subcomplex. See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Used to compute the max-trivial subcomplex. See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Used to compute the max-trivial subcomplex. See <a class="reference internal" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex" title="circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_max_trivial_subcomplex()</span></code></a>.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Optional plot title.</p></li>
+<li><p><strong>show_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Display options for landmark labels / axes.</p></li>
+<li><p><strong>show_axes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Display options for landmark labels / axes.</p></li>
+<li><p><strong>tri_opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Appearance options for triangle faces.</p></li>
+<li><p><strong>tri_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Appearance options for triangle faces.</p></li>
+<li><p><strong>hide_removed_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, draw only the kept edges (and triangles supported by kept edges).</p></li>
+<li><p><strong>highlight_removed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, highlight removed edges.</p></li>
+<li><p><strong>removed_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Color for removed edges when highlighted.</p></li>
+<li><p><strong>highlight_kept</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, additionally highlight kept edges (thicker overlay).</p></li>
+<li><p><strong>kept_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Color for kept-edge highlighting overlay.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Plotly figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.show_circle_nerve">
+<span class="sig-name descname"><span class="pre">show_circle_nerve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_max_trivial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights_for_max_trivial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reorder_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_if_not_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'orient_if_possible'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.show_circle_nerve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.show_circle_nerve" title="Link to this definition">#</a></dt>
+<dd><p>Circle-layout nerve visualization for cycle graphs.</p>
+<p>This helper is intended for covers whose nerve graph is a single cycle. It can display:
+- optional per-edge weights (e.g. RMS transition errors),
+- an O(1) cocycle <code class="docutils literal notranslate"><span class="pre">omega</span></code> when available, and
+- an optional vertex potential <code class="docutils literal notranslate"><span class="pre">phi</span></code> (orientation gauge) derived from orientability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_max_trivial</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute and display the kept edge set from the max-trivial subcomplex.</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Options for computing the max-trivial subcomplex (used only when <code class="docutils literal notranslate"><span class="pre">use_max_trivial=True</span></code>).</p></li>
+<li><p><strong>edge_weights_for_max_trivial</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Options for computing the max-trivial subcomplex (used only when <code class="docutils literal notranslate"><span class="pre">use_max_trivial=True</span></code>).</p></li>
+<li><p><strong>recompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Options for computing the max-trivial subcomplex (used only when <code class="docutils literal notranslate"><span class="pre">use_max_trivial=True</span></code>).</p></li>
+<li><p><strong>omega</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>) – Optional O(1) data keyed by edges. If omitted and <code class="docutils literal notranslate"><span class="pre">auto_omega=True</span></code>, uses
+<code class="docutils literal notranslate"><span class="pre">bundle.classes.omega_O1_used</span></code> when available.</p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Optional per-edge weights. If omitted, <code class="docutils literal notranslate"><span class="pre">weights_source</span></code> chooses a built-in source.</p></li>
+<li><p><strong>phi</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>) – Optional vertex potential (e.g. ±1 per chart). If omitted and <code class="docutils literal notranslate"><span class="pre">compute_phi=True</span></code>,
+it will be computed from orientability logic (see <code class="docutils literal notranslate"><span class="pre">phi_source</span></code>).</p></li>
+<li><p><strong>weights_source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Which built-in weight source to use when <code class="docutils literal notranslate"><span class="pre">weights</span></code> is omitted:
+<code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;witness&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>.</p></li>
+<li><p><strong>reorder_cycle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, reorder vertices along the cycle before plotting for a cleaner layout.</p></li>
+<li><p><strong>fail_if_not_cycle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, raise an error when the nerve is not a single cycle.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Plot labeling/output options.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Plot labeling/output options.</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Plot labeling/output options.</p></li>
+<li><p><strong>kwargs</strong> – Passed through to the underlying circle-nerve visualizer.</p></li>
+<li><p><strong>auto_omega</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>compute_phi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>phi_source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The underlying visualizer return value (often a Plotly/Matplotlib object depending on implementation).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>out</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleResult.compare_trivs">
+<span class="sig-name descname"><span class="pre">compare_trivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleResult.compare_trivs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleResult.compare_trivs" title="Link to this definition">#</a></dt>
+<dd><p>Compare local trivializations on overlaps (static diagnostic plot).</p>
+<p>This renders a grid of overlap comparisons to help identify problematic chart pairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ncols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Number of columns in the comparison grid (or <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> to choose automatically).</p></li>
+<li><p><strong>title_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for subplot titles.</p></li>
+<li><p><strong>align</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, align trivializations before comparison (implementation-defined).</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Marker size scaling (visualization parameter).</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided, save the figure to this path.</p></li>
+<li><p><strong>max_pairs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of overlap pairs to display.</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Scoring method used to rank/choose overlap pairs (implementation-defined; e.g. <code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>).</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, display the plot.</p></li>
+<li><p><strong>return_selected</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, also return which overlap pairs were selected.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whatever the underlying <code class="docutils literal notranslate"><span class="pre">compare_trivs</span></code> returns (often a Matplotlib figure).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig_or_output</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cover</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>local_triv</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>cocycle</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>transitions</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>quality</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>meta</strong> (<em>BundleMeta</em>)</p></li>
+<li><p><strong>total_metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>persistence</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>max_trivial</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>global_trivialization</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>bundle_map</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>_cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.api.</span></span><span class="sig-name descname"><span class="pre">BundleMapResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_F</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Omega_used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Phi_used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#BundleMapResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.BundleMapResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Result of the bundle-map solver (global fiber coordinates from local trivializations).</p>
+<p>The bundle-map solver takes:
+- cover data (membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code> and partition of unity <code class="docutils literal notranslate"><span class="pre">pou</span></code>),
+- local circle coordinates <code class="docutils literal notranslate"><span class="pre">f</span></code> on each chart, and
+- estimated transition functions <code class="docutils literal notranslate"><span class="pre">Omega</span></code> on overlaps,</p>
+<p>and produces a globally consistent set of fiber coordinates (and supporting diagnostics).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>F</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>pre_F</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>Omega_used</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em>]</em>)</p></li>
+<li><p><strong>Phi_used</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>report</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>meta</strong> (<em>BundleMapMeta</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult.F">
+<span class="sig-name descname"><span class="pre">F</span></span><a class="headerlink" href="#circle_bundles.api.BundleMapResult.F" title="Link to this definition">#</a></dt>
+<dd><p>Final global bundle coordinates of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">D_used)</span></code> where
+<code class="docutils literal notranslate"><span class="pre">D_used</span></code> is the ambient frame dimension used by the solver at the moment
+it outputs coordinates (after optional packing / projection / reduction).</p>
+<p>In the current implementation, <code class="docutils literal notranslate"><span class="pre">F</span></code> lives in the same ambient space as the
+projected frames used for gluing (i.e. columns correspond to the ambient
+coordinates of the Stiefel-projected frames).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult.pre_F">
+<span class="sig-name descname"><span class="pre">pre_F</span></span><a class="headerlink" href="#circle_bundles.api.BundleMapResult.pre_F" title="Link to this definition">#</a></dt>
+<dd><p>Per-chart (pre-gluing) coordinates of shape <code class="docutils literal notranslate"><span class="pre">(n_charts,</span> <span class="pre">n_samples,</span> <span class="pre">D_used)</span></code>.
+For each chart j and sample s with <code class="docutils literal notranslate"><span class="pre">U[j,s]=True</span></code>, <code class="docutils literal notranslate"><span class="pre">pre_F[j,s]</span></code> stores the
+chartwise value <code class="docutils literal notranslate"><span class="pre">F_j(s)</span></code>. Else it is zero.</p>
+<p>This is the main object used to compute chart disagreement diagnostics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult.Omega_used">
+<span class="sig-name descname"><span class="pre">Omega_used</span></span><a class="headerlink" href="#circle_bundles.api.BundleMapResult.Omega_used" title="Link to this definition">#</a></dt>
+<dd><p>The O(2)-valued cocycle actually used by the solver for diagnostics/gluing,
+stored as a dict <code class="docutils literal notranslate"><span class="pre">(i,j)</span> <span class="pre">-&gt;</span> <span class="pre">(n_samples,2,2)</span></code> with canonical undirected edges.
+(This may differ from the raw simplicial cocycle on a restricted edge set,
+or after optional post-projection processing.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[Tuple[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>], <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult.Phi_used">
+<span class="sig-name descname"><span class="pre">Phi_used</span></span><a class="headerlink" href="#circle_bundles.api.BundleMapResult.Phi_used" title="Link to this definition">#</a></dt>
+<dd><p>The Stiefel-projected frames actually used for gluing, of shape
+<code class="docutils literal notranslate"><span class="pre">(n_charts,</span> <span class="pre">n_samples,</span> <span class="pre">D_used,</span> <span class="pre">2)</span></code>.</p>
+<p>(Despite the name, this is <em>not</em> a ±1 orientation gauge vector; it is the
+frame field in the ambient space used by the solver.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult.report">
+<span class="sig-name descname"><span class="pre">report</span></span><a class="headerlink" href="#circle_bundles.api.BundleMapResult.report" title="Link to this definition">#</a></dt>
+<dd><p>A solver report object (implementation-defined) with diagnostic statistics and warnings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.BundleMapResult.meta">
+<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#circle_bundles.api.BundleMapResult.meta" title="Link to this definition">#</a></dt>
+<dd><p>Lightweight provenance (solver options such as semicircle constraints, packing mode, etc.).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>circle_bundles.bundle.BundleMapMeta</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.api.</span></span><span class="sig-name descname"><span class="pre">PullbackTotalSpaceResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">total_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bundle_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fiber_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fiber_weight</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#PullbackTotalSpaceResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Pullback total space data <code class="docutils literal notranslate"><span class="pre">Z</span> <span class="pre">=</span> <span class="pre">(base</span> <span class="pre">|</span> <span class="pre">fiber)</span></code> equipped with a product metric.</p>
+<p>This object is returned by <a class="reference internal" href="#circle_bundles.api.BundleResult.get_pullback_data" title="circle_bundles.api.BundleResult.get_pullback_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BundleResult.get_pullback_data()</span></code></a>. It packages:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">total_data</span></code>: concatenation of base coordinates and computed fiber coordinates</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metric</span></code>: a product metric compatible with that concatenation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bundle_map</span></code>: the underlying <a class="reference internal" href="#circle_bundles.api.BundleMapResult" title="circle_bundles.api.BundleMapResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a> used to build the fiber block</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>total_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>bundle_map</strong> (<a class="reference internal" href="#circle_bundles.api.BundleMapResult" title="circle_bundles.bundle.BundleMapResult"><em>BundleMapResult</em></a>)</p></li>
+<li><p><strong>base_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>fiber_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>base_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>fiber_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>meta</strong> (<em>PullbackMeta</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.total_data">
+<span class="sig-name descname"><span class="pre">total_data</span></span><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.total_data" title="Link to this definition">#</a></dt>
+<dd><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">base_dim</span> <span class="pre">+</span> <span class="pre">fiber_dim)</span></code> equal to
+<code class="docutils literal notranslate"><span class="pre">np.concatenate([base,</span> <span class="pre">fiber],</span> <span class="pre">axis=1)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.metric">
+<span class="sig-name descname"><span class="pre">metric</span></span><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.metric" title="Link to this definition">#</a></dt>
+<dd><p>Product metric on concatenated vectors. Typically an instance of
+<code class="docutils literal notranslate"><span class="pre">ProductMetricConcat</span></code> (or anything satisfying your Metric protocol).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.bundle_map">
+<span class="sig-name descname"><span class="pre">bundle_map</span></span><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.bundle_map" title="Link to this definition">#</a></dt>
+<dd><p>The <a class="reference internal" href="#circle_bundles.api.BundleMapResult" title="circle_bundles.api.BundleMapResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a> used to obtain the fiber coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#circle_bundles.api.BundleMapResult" title="circle_bundles.bundle.BundleMapResult">circle_bundles.bundle.BundleMapResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.base_dim">
+<span class="sig-name descname"><span class="pre">base_dim</span></span><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.base_dim" title="Link to this definition">#</a></dt>
+<dd><p>Number of base columns in <code class="docutils literal notranslate"><span class="pre">total_data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.fiber_dim">
+<span class="sig-name descname"><span class="pre">fiber_dim</span></span><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.fiber_dim" title="Link to this definition">#</a></dt>
+<dd><p>Number of fiber columns in <code class="docutils literal notranslate"><span class="pre">total_data</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">base_weight,</span> <span class="pre">fiber_weight</span></span></dt>
+<dd><p>Weights used by the product metric.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.meta">
+<span class="sig-name descname"><span class="pre">meta</span></span><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.meta" title="Link to this definition">#</a></dt>
+<dd><p>Provenance and options used to construct this pullback object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>circle_bundles.bundle.PullbackMeta</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.base_proj_map">
+<span class="sig-name descname"><span class="pre">base_proj_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#PullbackTotalSpaceResult.base_proj_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.base_proj_map" title="Link to this definition">#</a></dt>
+<dd><p>Project concatenated vectors onto their base block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of concatenated vectors of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">base_dim</span> <span class="pre">+</span> <span class="pre">fiber_dim)</span></code>.
+If omitted, projects <code class="docutils literal notranslate"><span class="pre">self.total_data</span></code>.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The base block of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">base_dim)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>base</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.api.PullbackTotalSpaceResult.to_text">
+<span class="sig-name descname"><span class="pre">to_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle.html#PullbackTotalSpaceResult.to_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.PullbackTotalSpaceResult.to_text" title="Link to this definition">#</a></dt>
+<dd><p>Return a short human-readable summary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A multi-line string describing array shapes and the metric name.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>summary</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.api.GlobalTrivializationResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.api.</span></span><span class="sig-name descname"><span class="pre">GlobalTrivializationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges_used</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'List[Edge]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'np.ndarray'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Dict[str,</span> <span class="pre">Any]'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/trivializations/coordinatization.html#GlobalTrivializationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.GlobalTrivializationResult" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>edges_used</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>F</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.api.MaxTrivialSubcomplex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.api.</span></span><span class="sig-name descname"><span class="pre">MaxTrivialSubcomplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k_removed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'List[Edge]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_edges</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'List[Edge]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_triangles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'List[Tri]'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_tetrahedra</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'List[Tet]'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/trivializations/coordinatization.html#MaxTrivialSubcomplex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.api.MaxTrivialSubcomplex" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>k_removed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>removed_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>kept_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>kept_triangles</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>]</em>)</p></li>
+<li><p><strong>kept_tetrahedra</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>]</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../user_guide/workflows.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Workflows</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="covers.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Covers</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.build_bundle"><code class="docutils literal notranslate"><span class="pre">build_bundle()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult"><code class="docutils literal notranslate"><span class="pre">BundleResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.cover"><code class="docutils literal notranslate"><span class="pre">BundleResult.cover</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.data"><code class="docutils literal notranslate"><span class="pre">BundleResult.data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.local_triv"><code class="docutils literal notranslate"><span class="pre">BundleResult.local_triv</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.cocycle"><code class="docutils literal notranslate"><span class="pre">BundleResult.cocycle</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.transitions"><code class="docutils literal notranslate"><span class="pre">BundleResult.transitions</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.quality"><code class="docutils literal notranslate"><span class="pre">BundleResult.quality</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.classes"><code class="docutils literal notranslate"><span class="pre">BundleResult.classes</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.meta"><code class="docutils literal notranslate"><span class="pre">BundleResult.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.compute_persistence"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_persistence()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.get_persistence"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_persistence()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.compute_max_trivial_subcomplex"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_max_trivial_subcomplex()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.get_max_trivial_subcomplex"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_max_trivial_subcomplex()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.compute_global_trivialization"><code class="docutils literal notranslate"><span class="pre">BundleResult.compute_global_trivialization()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.get_global_trivialization"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_global_trivialization()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.get_frame_dataset"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_frame_dataset()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.get_bundle_map"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_bundle_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.get_pullback_data"><code class="docutils literal notranslate"><span class="pre">BundleResult.get_pullback_data()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.bundle_app"><code class="docutils literal notranslate"><span class="pre">BundleResult.bundle_app()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.show_bundle"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_bundle()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.show_nerve"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_nerve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.show_max_trivial"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_max_trivial()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.show_circle_nerve"><code class="docutils literal notranslate"><span class="pre">BundleResult.show_circle_nerve()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleResult.compare_trivs"><code class="docutils literal notranslate"><span class="pre">BundleResult.compare_trivs()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult"><code class="docutils literal notranslate"><span class="pre">BundleMapResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult.F"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.F</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult.pre_F"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.pre_F</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult.Omega_used"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.Omega_used</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult.Phi_used"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.Phi_used</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult.report"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.report</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.BundleMapResult.meta"><code class="docutils literal notranslate"><span class="pre">BundleMapResult.meta</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.total_data"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.total_data</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.metric"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.metric</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.bundle_map"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.bundle_map</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.base_dim"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.base_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.fiber_dim"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.fiber_dim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.meta"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.meta</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.base_proj_map"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.base_proj_map()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.PullbackTotalSpaceResult.to_text"><code class="docutils literal notranslate"><span class="pre">PullbackTotalSpaceResult.to_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.GlobalTrivializationResult"><code class="docutils literal notranslate"><span class="pre">GlobalTrivializationResult</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.api.MaxTrivialSubcomplex"><code class="docutils literal notranslate"><span class="pre">MaxTrivialSubcomplex</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/public_api.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Brad Turow.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
