@@ -7,8 +7,8 @@ import numpy as np
 from scipy.spatial import ConvexHull
 
 from ..base_covers import CoverBase, TriangulationStarCover
-from ..nerve.combinatorics import canon_edge, canon_tri, Edge, Tri
 from ..geometry.geometry import get_bary_coords
+from ..nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 from .triangle_covers import _require_gudhi  # lazy gudhi import helper
 
 __all__ = [
@@ -16,12 +16,14 @@ __all__ = [
     "hemisphere_rep",
     "make_s2_fibonacci_star_cover",
     "make_rp2_fibonacci_star_cover",
+    "RP2StarCover",
 ]
 
 
 # -----------------------------------------------------------------------------
 # Basic helpers
 # -----------------------------------------------------------------------------
+
 
 def _normalize_rows(X: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
     X = np.asarray(X, dtype=float)
@@ -77,6 +79,7 @@ def hemisphere_rep(x: np.ndarray, *, atol: float = 1e-12) -> np.ndarray:
 # Hull triangulation + ray projection (shared)
 # -----------------------------------------------------------------------------
 
+
 def _build_hull(points_s2: np.ndarray) -> Tuple[ConvexHull, np.ndarray]:
     P = np.asarray(points_s2, dtype=float)
     if P.ndim != 2 or P.shape[1] != 3:
@@ -111,15 +114,15 @@ def _project_rays_to_hull(
         raise ValueError(f"directions_s2 must be (N,3). Got {X.shape}.")
 
     eq = np.asarray(hull.equations, dtype=float)  # (F,4)
-    n = eq[:, :3]                                 # (F,3)
-    d = eq[:, 3]                                  # (F,)
+    n = eq[:, :3]  # (F,3)
+    d = eq[:, 3]  # (F,)
 
-    denom = n @ X.T                                # (F,N)
-    num = (-d)[:, None]                            # (F,1)
-    t = np.where(denom > eps, num / denom, np.inf) # (F,N)
+    denom = n @ X.T  # (F,N)
+    num = (-d)[:, None]  # (F,1)
+    t = np.where(denom > eps, num / denom, np.inf)  # (F,N)
 
-    face_idx = np.argmin(t, axis=0)                # (N,)
-    t_min = t[face_idx, np.arange(X.shape[0])]     # (N,)
+    face_idx = np.argmin(t, axis=0)  # (N,)
+    t_min = t[face_idx, np.arange(X.shape[0])]  # (N,)
     if not np.all(np.isfinite(t_min)):
         raise RuntimeError(
             "Ray projection failed for some points (no forward-intersecting facet). "
@@ -141,6 +144,7 @@ def _make_gudhi_triangle_complex(faces: np.ndarray):
 # -----------------------------------------------------------------------------
 # S^2 star cover from Fibonacci hull (TriangulationStarCover)
 # -----------------------------------------------------------------------------
+
 
 def make_s2_fibonacci_star_cover(
     base_points: np.ndarray,
@@ -194,7 +198,6 @@ def make_s2_fibonacci_star_cover(
     >>> import circle_bundles as cb
     >>> cover = cb.make_s2_fibonacci_star_cover(base_points, n_vertices=512)
     >>> summ = cover.summarize(plot=False)
-    >>> # Use the cover in the main pipeline
     >>> bundle = cb.build_bundle(total_space_data, cover, show=True)
     """
     P = _normalize_rows(np.asarray(base_points, dtype=float), eps=eps)
@@ -216,8 +219,8 @@ def make_s2_fibonacci_star_cover(
 
     # 5) Build the cover object
     cover = TriangulationStarCover(
-        base_points=P,               # keep base points on S^2 for bookkeeping/viz
-        K_preimages=K_preimages,     # points on hull surface
+        base_points=P,  # keep base points on S^2 for bookkeeping/viz
+        K_preimages=K_preimages,  # points on hull surface
         K=K,
         vertex_coords_dict=vertex_coords_dict,
     )
@@ -237,11 +240,11 @@ def make_s2_fibonacci_star_cover(
     cover.sample_bary = np.zeros((N, 3), dtype=float)
     sample_tri = cover.sample_tri
     for t_idx in np.unique(sample_tri):
-        mask = (sample_tri == t_idx)
+        mask = sample_tri == t_idx
         i, j, k = cover.triangles[int(t_idx)]
-        tri_xyz = cover.vertex_coords[[i, j, k]]   # (3,3)
-        pts = cover.K_preimages[mask]              # (m,3)
-        bc = get_bary_coords(pts, tri_xyz)         # (m,3)
+        tri_xyz = cover.vertex_coords[[i, j, k]]  # (3,3)
+        pts = cover.K_preimages[mask]  # (m,3)
+        bc = get_bary_coords(pts, tri_xyz)  # (m,3)
         s = bc.sum(axis=1, keepdims=True)
         s[s == 0] = 1.0
         cover.sample_bary[mask] = bc / s
@@ -249,13 +252,13 @@ def make_s2_fibonacci_star_cover(
     cover._build_star_sets_U()
     cover._build_pou_from_barycentric()
     cover.ensure_metric()
-
     return cover
 
 
 # -----------------------------------------------------------------------------
 # RP^2: landmark selection (Fibonacci oversample + RP^2 FPS)
 # -----------------------------------------------------------------------------
+
 
 def _rp2_dist_chordal(a: np.ndarray, b: np.ndarray) -> float:
     """
@@ -320,89 +323,24 @@ def _pick_rp2_landmarks(
 # RP^2 star cover (witnessed Čech nerve, BOTH lifts)
 # -----------------------------------------------------------------------------
 
-def make_rp2_fibonacci_star_cover(
-    base_points: np.ndarray,
-    *,
-    n_pairs: int = 256,
-    landmark_oversample: int = 20,
-    landmark_seed: Optional[int] = 0,
-    eps: float = 1e-12,
-    atol: float = 1e-12,
-) -> RP2StarCover:
-    r"""
-    Build a star cover of :math:`\mathbb{RP}^2` using Fibonacci landmarks and an antipodal-symmetric hull.
 
-    This constructs a cover downstairs on :math:`\mathbb{RP}^2` by working upstairs on :math:`\mathbb{S}^2`
-    and carefully pushing the result down through the antipodal quotient.
-
-    Pipeline (high-level)
-    ---------------------
-    1. Canonicalize each sample ``x`` to a *hemisphere representative* ``x_rep`` of its class ``[x]``.
-    2. Choose ``n_pairs`` well-spread landmark representatives in :math:`\mathbb{RP}^2` via:
-       Fibonacci oversampling + farthest point sampling (FPS) in the chordal RP² metric.
-    3. Lift landmarks to :math:`\mathbb{S}^2` by adding antipodes, then triangulate via the convex hull.
-    4. For each sample class ``[x]``, compute hull-face hits and barycentric weights for both lifts
-       ``x_rep`` and ``-x_rep``.
-    5. Push vertex contributions down to RP² vertex ids (pairing antipodes), sum weights, and keep the
-       top-3 vertices per sample (renormalized).
-    6. Build the cover membership matrix ``U`` and partition of unity ``pou``. The nerve is “witnessed”
-       from ``U`` (no ghost simplices).
-
-    The returned object is an :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`
-    that is already built (its ``U`` and ``pou`` are populated), and whose metric/labels are set to
-    :class:`~circle_bundles.metrics.RP2UnitVectorMetric`.
-
-    Parameters
-    ----------
-    base_points :
-        Array of shape ``(n_samples, 3)`` representing (approximate) unit vectors in :math:`\mathbb{R}^3`.
-        Each row represents a projective class ``[x]`` with the antipodal identification ``x ~ -x``.
-        Rows are normalized internally.
-    n_pairs :
-        Number of *projective* landmark vertices (i.e. the number of antipodal pairs).
-        The upstairs hull uses ``2*n_pairs`` vertices. Default is ``256``.
-    landmark_oversample :
-        Oversampling factor used before RP² farthest point sampling.
-        Candidates are generated with ``M = n_pairs * landmark_oversample`` Fibonacci points.
-    landmark_seed :
-        Random seed used only to choose the initial FPS index. FPS is otherwise deterministic.
-        Set to ``None`` for nondeterministic behavior.
-    eps :
-        Numerical stability parameter used for normalization and ray–facet intersection tests.
-    atol :
-        Tolerance used for deterministic hemisphere representative tie-breaking near the equator.
-
-    Returns
-    -------
-    cover :
-        A built :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`.
-        Important fields include:
-
-        - ``cover.base_points``: hemisphere reps of samples (shape ``(n,3)``)
-        - ``cover.landmarks``: hemisphere reps of RP² landmark vertices (shape ``(n_pairs,3)``)
-        - ``cover.U`` / ``cover.pou``: membership and partition-of-unity weights
-        - ``cover.metric``: :class:`~circle_bundles.metrics.RP2UnitVectorMetric`
-
-    Notes
-    -----
-    - Correct handling of :math:`\mathbb{RP}^2` requires considering **both lifts** of each sample
-      upstairs (``x`` and ``-x``) before pushing weights down.
-    - The cover is not a triangulation star cover in the same sense as the S² builder; instead,
-      it produces a barycentric-style star cover in RP² with a **witnessed** Čech nerve computed from ``U``.
-
-    Examples
-    --------
-    >>> import circle_bundles as cb
-    >>> cover = cb.make_rp2_fibonacci_star_cover(base_points, n_pairs=256)
-    >>> cover.summarize(plot=False)
-    >>> bundle = cb.build_bundle(total_space_data, cover, show=True)
+class RP2StarCover(CoverBase):
     """
+    RP^2 cover built from barycentric weights on hull faces, pushed down by antipodal quotient.
+
+    Key point:
+      For each RP^2 sample [x], we must consider BOTH lifts x and -x upstairs, then push down.
+
+    Nerve:
+      Witnessed Čech nerve computed from U itself (no ghost simplices).
+    """
+
     def __init__(
         self,
-        base_points: np.ndarray,            # (N,3) hemisphere reps of RP^2 samples
-        landmarks: np.ndarray,              # (M,3) hemisphere reps for RP^2 vertices
+        base_points: np.ndarray,  # (N,3) hemisphere reps of RP^2 samples
+        landmarks: np.ndarray,  # (M,3) hemisphere reps for RP^2 vertices
         sample_vertex_triples: np.ndarray,  # (N,3) ints: top-3 RP^2 vertex ids
-        sample_weights: np.ndarray,         # (N,3) weights (sum=1)
+        sample_weights: np.ndarray,  # (N,3) weights (sum=1)
     ):
         super().__init__(base_points=np.asarray(base_points, float))
         self.landmarks = np.asarray(landmarks, float)
@@ -470,21 +408,64 @@ def make_rp2_fibonacci_star_cover(
     eps: float = 1e-12,
     atol: float = 1e-12,
 ) -> RP2StarCover:
-    """
-    RP^2 star cover built from a symmetric hull triangulation.
+    r"""
+    Build a star cover of :math:`\mathbb{RP}^2` using Fibonacci landmarks and an antipodal-symmetric hull.
 
-    Pipeline
+    This constructs a cover downstairs on :math:`\mathbb{RP}^2` by working upstairs on :math:`\mathbb{S}^2`
+    and carefully pushing the result down through the antipodal quotient.
+
+    Pipeline (high-level)
+    ---------------------
+    1. Canonicalize each sample ``x`` to a *hemisphere representative* ``x_rep`` of its class ``[x]``.
+    2. Choose ``n_pairs`` well-spread landmark representatives in :math:`\mathbb{RP}^2` via:
+       Fibonacci oversampling + farthest point sampling (FPS) in the chordal RP² metric.
+    3. Lift landmarks to :math:`\mathbb{S}^2` by adding antipodes, then triangulate via the convex hull.
+    4. For each sample class ``[x]``, compute hull-face hits and barycentric weights for both lifts
+       ``x_rep`` and ``-x_rep``.
+    5. Push vertex contributions down to RP² vertex ids (pairing antipodes), sum weights, and keep the
+       top-3 vertices per sample (renormalized).
+    6. Build the cover membership matrix ``U`` and partition of unity ``pou``. The nerve is “witnessed”
+       from ``U`` (no ghost simplices).
+
+    The returned object is an :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`
+    that is already built (its ``U`` and ``pou`` are populated).
+
+    Parameters
+    ----------
+    base_points :
+        Array of shape ``(n_samples, 3)`` representing (approximate) unit vectors in :math:`\mathbb{R}^3`.
+        Each row represents a projective class ``[x]`` with the antipodal identification ``x ~ -x``.
+        Rows are normalized internally.
+    n_pairs :
+        Number of *projective* landmark vertices (i.e. the number of antipodal pairs).
+        The upstairs hull uses ``2*n_pairs`` vertices. Default is ``256``.
+    landmark_oversample :
+        Oversampling factor used before RP² farthest point sampling.
+        Candidates are generated with ``M = n_pairs * landmark_oversample`` Fibonacci points.
+    landmark_seed :
+        Random seed used only to choose the initial FPS index. FPS is otherwise deterministic.
+        Set to ``None`` for nondeterministic behavior.
+    eps :
+        Numerical stability parameter used for normalization and ray–facet intersection tests.
+    atol :
+        Tolerance used for deterministic hemisphere representative tie-breaking near the equator.
+
+    Returns
+    -------
+    cover :
+        A built :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`.
+
+    Notes
+    -----
+    - Correct handling of :math:`\mathbb{RP}^2` requires considering **both lifts** of each sample
+      upstairs (``x`` and ``-x``) before pushing weights down.
+
+    Examples
     --------
-    1) Canonicalize samples to hemisphere reps P_rep (RP^2 reps).
-    2) Choose n_pairs well-spread RP^2 landmark reps via:
-         Fibonacci(oversample*n_pairs) + hemisphere + RP^2 FPS
-       Call these L_rp2 (shape (n,3)).
-    3) Lift landmarks upstairs to S^2 by adding antipodes:
-         V_full = [L_rp2; -L_rp2]  (shape (2n,3))
-    4) Triangulate upstairs via convex hull.
-    5) For each sample [x], compute ray-hit + barycentric weights for both lifts x and -x.
-    6) Push both contributions down to RP^2 vertex ids and sum weights; keep top-3.
-    7) Build U/POU; compute witnessed Čech nerve from U.
+    >>> import circle_bundles as cb
+    >>> cover = cb.make_rp2_fibonacci_star_cover(base_points, n_pairs=256)
+    >>> cover.summarize(plot=False)
+    >>> bundle = cb.build_bundle(total_space_data, cover, show=True)
     """
     # 1) Samples as RP^2 hemisphere reps
     P = _normalize_rows(np.asarray(base_points, float), eps=eps)
@@ -519,7 +500,9 @@ def make_rp2_fibonacci_star_cover(
     sample_triples = np.zeros((N, 3), dtype=int)
     sample_weights = np.zeros((N, 3), dtype=float)
 
-    def _accumulate_from_hit(acc: Dict[int, float], *, face_idx: int, p_hit_row: np.ndarray) -> None:
+    def _accumulate_from_hit(
+        acc: Dict[int, float], *, face_idx: int, p_hit_row: np.ndarray
+    ) -> None:
         a, b, c = (int(x) for x in faces_full[face_idx])
         tri_xyz = V_full[[a, b, c]]  # (3,3)
         bc = get_bary_coords(p_hit_row[None, :], tri_xyz)[0]  # (3,)
@@ -543,7 +526,7 @@ def make_rp2_fibonacci_star_cover(
         (v0, w0), (v1, w1), (v2, w2) = items[:3]
         ws = np.array([w0, w1, w2], dtype=float)
         ssum = float(ws.sum())
-        ws = (ws / ssum) if ssum > 0 else np.array([1.0, 0.0, 0.0], dtype=float)
+        ws = ws / ssum if ssum > 0 else np.array([1.0, 0.0, 0.0], dtype=float)
 
         sample_triples[s] = np.array([int(v0), int(v1), int(v2)], dtype=int)
         sample_weights[s] = ws
@@ -553,18 +536,5 @@ def make_rp2_fibonacci_star_cover(
         landmarks=L_rp2,
         sample_vertex_triples=sample_triples,
         sample_weights=sample_weights,
-    )
-    cover.build()
-    
-    from ..metrics import RP2UnitVectorMetric
-    cover.metric = RP2UnitVectorMetric()
-
-    bn = getattr(cover.metric, "base_name", None)
-    if isinstance(bn, str) and bn.strip():
-        cover.base_name = bn.strip()
-
-    bL = getattr(cover.metric, "base_name_latex", None)
-    if isinstance(bL, str) and bL.strip():
-        cover.base_name_latex = bL.strip()
-
+    ).build()
     return cover
