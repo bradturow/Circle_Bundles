@@ -6,7 +6,6 @@ from typing import Sequence, Tuple, List
 import numpy as np
 
 __all__ = [
-    "get_dense_fiber_indices",
     "get_local_pca",
     "plot_local_pca",
     "get_local_rips",
@@ -134,13 +133,50 @@ def get_local_pca(
     random_state: int | None = None,
 ) -> tuple[list[int], list[np.ndarray], list[np.ndarray | None]]:
     """
-    Local PCA on each fiber (after optional subsampling).
+    Compute PCA embeddings separately on each fiber of a cover.
+
+    This is a lightweight diagnostic tool: for each fiber (row of ``U``), we take the
+    subset of samples belonging to that fiber, optionally subsample it, and run PCA on
+    those points only. The result is a per-fiber low-dimensional embedding that can be
+    visualized with :func:`plot_local_pca`.
+
+    Parameters
+    ----------
+    data:
+        Array of shape ``(n_points, d)`` containing the ambient data vectors.
+    U:
+        Boolean indicator matrix of shape ``(n_fibers, n_points)``. Entry ``U[r, i]``
+        should be True exactly when point ``i`` lies in fiber/patch ``r``.
+    p_values:
+        Optional per-fiber sampling fractions in ``[0, 1]``. If provided, must have
+        length ``n_fibers``. A value ``p_values[r] = p`` means “use approximately
+        ``floor(p * m_r)`` points from fiber ``r``”, where ``m_r`` is that fiber’s
+        membership size. If None, uses all points in each fiber.
+    to_view:
+        Optional list of fiber indices to process. If None, processes all fibers.
+    n_components:
+        Number of PCA components to compute per fiber.
+    random_state:
+        Seed used for subsampling and passed to PCA (for reproducibility).
 
     Returns
     -------
-    fiber_ids : list[int]
-    idx_list  : list[np.ndarray]          indices used in each fiber
-    proj_list : list[np.ndarray | None]   PCA projections (m_i, n_components) or None
+    fiber_ids:
+        The list of fiber indices actually processed (either all fibers, or ``to_view``).
+    idx_list:
+        List of integer index arrays, one per processed fiber. These are the point indices
+        used for PCA in that fiber (after subsampling, if any).
+    proj_list:
+        List of PCA projections, one per processed fiber. Entry ``proj_list[k]`` is an
+        array of shape ``(m_k, n_components)`` for fiber ``fiber_ids[k]``, or None if that
+        fiber contained fewer than 2 usable points.
+
+    Notes
+    -----
+    - This function lazily imports scikit-learn so importing this module does not require
+      scikit-learn unless you call it.
+    - If you want to control the subsampling behavior directly, see
+      ``get_dense_fiber_indices`` (currently not exported).
     """
     # lazy import so this module doesn't require sklearn unless used
     from sklearn.decomposition import PCA  # type: ignore
@@ -175,7 +211,38 @@ def plot_local_pca(
     save_path: str | None = None,
 ):
     """
-    Grid of PCA scatterplots. Returns (fig, axes).
+    Plot a grid of 2D PCA scatterplots for multiple fibers.
+
+    This function is typically used with the output of :func:`get_local_pca`.
+    Each subplot corresponds to one fiber; fibers whose PCA projection is missing
+    (None or too small) are hidden.
+
+    Parameters
+    ----------
+    fiber_ids:
+        Fiber indices (for labeling). Usually the first output of :func:`get_local_pca`.
+    proj_list:
+        Per-fiber PCA coordinates. Usually the third output of :func:`get_local_pca`.
+        Each entry should be an array of shape ``(m_i, 2)`` (at least 2 points),
+        or None to skip that fiber.
+    n_cols:
+        Number of columns in the subplot grid.
+    titles:
+        Title behavior:
+          - ``"default"``: uses LaTeX titles of the form ``\\pi^{-1}(U_j)``.
+          - None: no titles.
+          - sequence of strings: custom titles aligned with ``fiber_ids``.
+    font_size:
+        Title font size.
+    point_size:
+        Scatter marker size.
+    save_path:
+        If provided, save the figure to this path (any extension supported by matplotlib).
+
+    Returns
+    -------
+    fig, axes:
+        The matplotlib figure and a flat array of axes.
     """
     # lazy import
     import matplotlib.pyplot as plt  # noqa: F401  # (used via axes methods)
@@ -233,11 +300,53 @@ def get_local_rips(
     **ripser_kwargs,
 ) -> tuple[list[int], list[np.ndarray], list[dict | None]]:
     """
-    Run Ripser on each fiber after optional subsampling.
+    Compute Ripser persistence separately on each fiber of a cover.
+
+    For each fiber (row of ``U``), this function extracts the corresponding points
+    from ``data`` (optionally subsampling them), then runs ``ripser`` on that fiber’s
+    point cloud. The resulting persistence diagrams can be plotted with
+    :func:`plot_local_rips`.
+
+    Parameters
+    ----------
+    data:
+        Array of shape ``(n_points, d)`` containing the ambient data vectors.
+    U:
+        Boolean indicator matrix of shape ``(n_fibers, n_points)`` indicating fiber
+        membership (same convention as :func:`get_local_pca`).
+    p_values:
+        Optional per-fiber sampling fractions in ``[0, 1]`` (same convention as
+        :func:`get_local_pca`).
+    to_view:
+        Optional list of fiber indices to process. If None, processes all fibers.
+    maxdim:
+        Maximum homology dimension for Ripser. If ``maxdim < 0``, returns None results
+        for all fibers (useful as a quick “skip” switch).
+    n_perm:
+        Upper bound on the number of points passed to ripser per fiber. For each fiber,
+        we set ``n_use = min(n_perm, m_fiber)`` and pass ``n_perm=n_use`` to ripser.
+        (This leverages ripser’s internal subsampling/permutation behavior.)
+    random_state:
+        Seed used for the initial per-fiber subsampling (via ``p_values``).
+    **ripser_kwargs:
+        Additional keyword arguments forwarded directly to ``ripser(...)``.
+
+    Returns
+    -------
+    fiber_ids:
+        The list of fiber indices processed.
+    idx_list:
+        List of integer index arrays (points used in each fiber after subsampling).
+    rips_list:
+        List of ripser result dicts, one per fiber, or None for fibers with fewer than
+        2 usable points.
 
     Notes
     -----
-    Imports ripser lazily so importing this module doesn't require ripser.
+    - This function lazily imports ``ripser`` so importing this module does not require
+      ripser unless you call it.
+    - If you want exact control over which points go into each fiber computation, see
+      ``get_dense_fiber_indices`` (currently not exported).
     """
     from ripser import ripser  # type: ignore  # lazy import
 
@@ -275,11 +384,39 @@ def plot_local_rips(
     save_path: str | None = None,
 ):
     """
-    Grid of persistence diagrams. Returns (fig, axes).
+    Plot a grid of persistence diagrams for multiple fibers.
+
+    This function is typically used with the output of :func:`get_local_rips`.
+    Each subplot corresponds to one fiber; fibers with missing ripser output are hidden.
+
+    Parameters
+    ----------
+    fiber_ids:
+        Fiber indices (for labeling). Usually the first output of :func:`get_local_rips`.
+    rips_list:
+        Per-fiber ripser outputs. Usually the third output of :func:`get_local_rips`.
+        Each entry should be a dict containing a ``"dgms"`` key, or None to skip.
+    n_cols:
+        Number of columns in the subplot grid.
+    titles:
+        Title behavior:
+          - ``"default"``: uses LaTeX titles of the form ``\\pi^{-1}(U_j)``.
+          - None: no titles.
+          - sequence of strings: custom titles aligned with ``fiber_ids``.
+    font_size:
+        Title font size.
+    save_path:
+        If provided, save the figure to this path.
+
+    Returns
+    -------
+    fig, axes:
+        The matplotlib figure and a flat array of axes.
 
     Notes
     -----
-    Imports persim lazily so importing this module doesn't require persim.
+    - This function lazily imports ``persim`` (for ``plot_diagrams``) so importing this
+      module does not require persim unless you call it.
     """
     from persim import plot_diagrams  # type: ignore  # lazy import
 

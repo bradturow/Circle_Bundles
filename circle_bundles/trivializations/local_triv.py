@@ -21,6 +21,47 @@ __all__ = [
 
 @dataclass
 class LocalTrivResult:
+    """
+    Result container for local trivialization (circle-coordinate) computations.
+
+    This object is returned by :func:`compute_local_triv` and packages the
+    per-cover-set circular coordinates together with diagnostic metadata.
+
+    Conventions
+    -----------
+    - U has shape (n_sets, n_samples)
+    - f has shape (n_sets, n_samples)
+    - f[j, s] is meaningful only when U[j, s] is True
+
+    Attributes
+    ----------
+    f : ndarray of shape (n_sets, n_samples)
+        Local circular coordinates in radians, wrapped to [0, 2π).
+        Values are only meaningful on samples belonging to the corresponding
+        cover set.
+
+    valid : ndarray of shape (n_sets,)
+        Boolean mask indicating which cover sets were successfully
+        coordinatized.
+
+    n_retries : ndarray of shape (n_sets,)
+        Number of retries used for each cover set (relevant for iterative
+        methods such as Dreimac).
+
+    n_landmarks : ndarray of shape (n_sets,)
+        Number of landmarks ultimately used for each cover set
+        (method-dependent; meaningful for Dreimac-based methods).
+
+    errors : dict[int, str]
+        Mapping from cover-set index to error message for any set that
+        failed to produce valid coordinates.
+
+    Notes
+    -----
+    This class is intended as a lightweight, inspection-friendly summary
+    of the local trivialization step. Most users will encounter it through
+    higher-level bundle construction workflows.
+    """
     f: np.ndarray
     valid: np.ndarray
     n_retries: np.ndarray
@@ -35,13 +76,40 @@ class LocalTrivResult:
 @dataclass(frozen=True)
 class DreimacCCConfig:
     """
-    Configuration for Dreimac circular coordinates.
+    Configuration object for Dreimac-based circular coordinates.
+
+    This dataclass specifies how Dreimac's circular coordinates algorithm
+    should be applied within local trivialization routines such as
+    :func:`compute_local_triv`.
+
+    Attributes
+    ----------
+    CircularCoords_cls : Any
+        The Dreimac circular coordinates class (e.g. ``dreimac.CircularCoords``).
+
+    landmarks_per_patch : int, default=200
+        Initial number of landmarks to use per patch. The algorithm may
+        increase this value automatically if coverage is insufficient.
+
+    prime : int, default=41
+        Prime number used internally by Dreimac for coefficient computations.
+
+    update_frac : float, default=0.25
+        Fractional increase applied to the number of landmarks when a retry
+        is required.
+
+    standard_range : bool, default=False
+        Whether to return angles in Dreimac's standard range instead of
+        wrapping to [0, 2π).
 
     Notes
     -----
-    - CircularCoords_cls is required (e.g. dreimac.CircularCoords).
-    - If total_metric is provided to compute_local_triv, we pass a distance matrix
-      to Dreimac with distance_matrix=True.
+    - This configuration is passed as the ``cc`` argument to
+      :func:`compute_local_triv`.
+    - If a ``total_metric`` is supplied to :func:`compute_local_triv`,
+      distance matrices are passed to Dreimac with ``distance_matrix=True``.
+    - The dataclass is frozen to emphasize its role as an immutable
+      configuration object.
     """
     CircularCoords_cls: Any
     landmarks_per_patch: int = 200

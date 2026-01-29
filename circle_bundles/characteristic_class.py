@@ -45,6 +45,9 @@ from .nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 from .analysis.class_persistence import build_delta_C0_to_C1_Z2, build_delta_C1_to_C2_Z_twisted
 from .analysis.class_persistence import in_image_mod2, in_image_Z_fast_pipeline
 
+__all__ = [
+    "ClassResult"
+]
 
 # ============================================================
 # Canonicalization
@@ -602,6 +605,30 @@ def euler_pairing_Z2(e_class: Dict[Tri, int], triangles: List[Tri], z_fund_Z2: n
 
 @dataclass
 class ClassResult:
+    """
+    Output bundle invariants and diagnostics for an O(2)-cocycle on a finite nerve.
+
+    This object summarizes:
+    - the orientability obstruction (w1),
+    - the twisted Euler representative on triangles (ẽ) and its rounding quality,
+    - optional 3D consistency checks on tetrahedra,
+    - optional coboundary tests (“is the class trivial on this complex?”),
+    - optional Euler-number pairings when H2 has rank 1,
+    - and the mod-2 reduction (w2) used for spin diagnostics in the orientable case.
+
+    Notes
+    -----
+    - All keys for edges/triangles are canonicalized (undirected edges, sorted triangles).
+    - “On this complex” means with respect to the simplicial cochain complex induced by
+      the provided (edges, triangles, tets). Refining the nerve can change coboundary
+      tests and pairings.
+    - The Euler representative is computed by rounding ``δ_ω θ`` on triangles. In a
+      3-dimensional complex we explicitly check whether ``δ_ω ẽ = 0`` on tetrahedra
+      before interpreting it as a cohomology class.
+
+    The fields are intentionally explicit (rather than nested) so that summaries can be
+    printed without additional computation.
+    """
     n_vertices: int
     n_edges: int
     n_triangles: int
@@ -728,7 +755,7 @@ def compute_classes(
     if len(tris_list) > 0:
         sw1_is_cocycle = bool(_sw1_cocycle_check_on_triangles(tris_list, sw1_Z2))
 
-    # ---- NEW: SW1 coboundary check on edges (ω in Im δ: C^0->C^1 over Z2) ----
+    # ---- SW1 coboundary check on edges (ω in Im δ: C^0->C^1 over Z2) ----
     sw1_is_coboundary_Z2: Optional[bool] = None
     if len(edges_list) > 0:
         # vertices as 0-simplices

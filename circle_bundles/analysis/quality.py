@@ -11,6 +11,55 @@ from ..nerve.combinatorics import Edge, Tri
 
 @dataclass
 class BundleQualityReport:
+    """
+    Summary of diagnostic and quality metrics for a reconstructed bundle.
+
+    This object is intended for *inspection and reporting*, not as an input to
+    downstream algorithms. It aggregates several geometric, cohomological,
+    and numerical indicators that help assess how well the data supports a
+    coherent circle- (or O(2)-) bundle structure.
+
+    Notes
+    -----
+    - Users typically obtain this object via a bundle method (e.g. ``get_quality()``),
+      rather than constructing it directly.
+    - Individual fields may be None if the corresponding diagnostic was not
+      computed or not applicable to the current bundle model.
+
+    Fields
+    ------
+    delta:
+        Global transition inconsistency measure (smaller is better).
+    cocycle_defect:
+        Deviation of the recovered cocycle from being exactly closed.
+
+    max_edge_rms, mean_edge_rms:
+        Maximum and mean RMS angular transition error over edges.
+
+    eps_align_geo, eps_align_euc:
+        Worst-case alignment error (geodesic / Euclidean) for local trivializations.
+
+    eps_align_geo_mean, eps_align_euc_mean:
+        Mean alignment error (geodesic / Euclidean).
+
+    alpha:
+        Global scaling or regularization parameter used in alignment (if applicable).
+
+    n_edges_estimated:
+        Number of edges actually used for estimation.
+    n_edges_requested:
+        Number of edges originally requested.
+    n_triangles:
+        Number of triangles used in consistency checks.
+
+    witness_err, witness_err_geo:
+        Supremum witness error (chordal / geodesic).
+    witness_err_mean, witness_err_geo_mean:
+        Mean witness error (chordal / geodesic).
+
+    cocycle_proj_dist:
+        Distance from the cocycle to the nearest projected cocycle representative.
+    """
     delta: float
     cocycle_defect: float
 

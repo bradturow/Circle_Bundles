@@ -47,35 +47,19 @@ SummaryMode = Literal["auto", "text", "latex", "both"]
 FramePacking = Literal["none", "coloring", "coloring2"]
 
 __all__ = [
-    # angle utilities
-    "weighted_angle_mean_anchored",
-    "infer_edges_from_U",
-    # packing helpers
-    "FramePacking",
-    "greedy_graph_coloring",
-    # main pipeline pieces
-    "build_true_frames",
-    "apply_frame_reduction",
-    "build_bundle_map",
+    # main pipeline
     "get_bundle_map",
-    # frame dataset helper
-    "FrameDataset",
-    "get_frame_dataset",
-    # reporting
+
+    # reporting + results
+    "FramePacking",
     "BundleMapReport",
     "TrueFramesResult",
+    "CocycleProjectionResult",
     "ChartDisagreementStats",
     "chart_disagreement_stats",
+    "FrameDataset",
+    "get_frame_dataset",
     "show_bundle_map_summary",
-    # diagnostics helpers (exported because useful)
-    "cocycle_projection_distance",
-    "witness_error_stats",
-    "project_to_rank2_projection",
-    "polar_stiefel_projection",
-    "project_frames_to_stiefel",
-    "get_classifying_map",
-    "get_local_frames",
-    "cocycle_from_frames",
 ]
 
 
@@ -454,11 +438,42 @@ def get_classifying_map(
 @dataclass
 class CocycleProjectionResult:
     """
-    Steps 3–4 (paper):
-      - classifying map (Grassmann) via weighted projector sum
-      - rank-2 projection in ambient space
-      - Stiefel polar projection of frames onto the projected plane
-      - cocycle projection Omega_true from projected frames
+    Cached outputs for the *projection* stage of the bundle-map pipeline (paper Steps 3–4).
+
+    This container packages the intermediate objects produced by projecting stacked local
+    frames onto a rank-2 plane (Grassmann) and then onto the Stiefel manifold, along with
+    the resulting pointwise O(2) cocycle.
+
+    Attributes
+    ----------
+    cl : np.ndarray
+        Rank-2 projector field (Grassmann-valued classifying map), shape
+        ``(n_samples, D, D)``. Each ``cl[s]`` is (approximately) a rank-2 orthogonal
+        projection matrix in the ambient dimension ``D``.
+
+    Phi_true : np.ndarray
+        Projected Stiefel frames, shape ``(n_sets, n_samples, D, 2)``.
+        For each chart ``j`` and sample ``s`` with ``U[j,s]=True``, ``Phi_true[j,s]``
+        is an (approximately) orthonormal 2-frame spanning the projected plane ``cl[s]``.
+
+    Omega_true : Dict[Edge, np.ndarray]
+        Pointwise transition maps induced by ``Phi_true``, stored on canonical edges
+        ``(j,k)`` with ``j<k``. Each entry has shape ``(n_samples, 2, 2)`` and satisfies
+        (approximately)
+        ``Omega_true[(j,k)][s] = Phi_true[j,s].T @ Phi_true[k,s]``.
+
+        Interpretation:
+        ``Omega_true[(j,k)][s]`` maps *k-coordinates to j-coordinates* at sample ``s``.
+
+    cl_proj_dist : float
+        Supremum (over samples) of the Frobenius error between the symmetrized raw
+        classifying matrix and its nearest rank-2 projector:
+        ``sup_s || sym(C(s)) - Π_Gr(C(s)) ||_F``.
+
+    frame_proj_dist : float
+        Supremum (over active chart/sample pairs) of the Frobenius distance from the raw
+        frame to its Stiefel projection (polar factor), i.e.
+        ``sup_{j,s:U[j,s]=1} || Phi_true[j,s] - Phi_raw[j,s] ||_F``.
     """
     cl: np.ndarray                     # (n_samples, D, D) rank-2 projectors
     Phi_true: np.ndarray               # (n_sets, n_samples, D, 2) projected Stiefel frames
@@ -777,6 +792,21 @@ def build_bundle_map(
 
 @dataclass
 class ChartDisagreementStats:
+    """
+    Summary statistics for chart-to-chart disagreement in a glued bundle map.
+
+    This is a lightweight diagnostic for the consistency of the per-chart formulas
+    ``F_j(s)`` used during gluing. Ideally, on overlaps these agree exactly.
+
+    Attributes
+    ----------
+    max : float
+        The chart disagreement quantity
+
+        ``Δ := sup_{(jk) in N(U)} sup_{s in U_j ∩ U_k} ||F_j(s) - F_k(s)||_2``,
+
+        approximated using the discrete sample set and the computed ``pre_F`` array.
+    """
     max: float
 
     def to_text(self, *, decimals: int = 3) -> str:
@@ -822,16 +852,55 @@ def chart_disagreement_stats(*, U: np.ndarray, pre_F: np.ndarray) -> ChartDisagr
 @dataclass
 class TrueFramesResult:
     """
-    Step 2 result (paper): raw frames in ambient space, plus optional cached Step 3–4 outputs.
+    Step 2 result of the bundle-map pipeline: stacked local frames in an ambient space.
 
-    Phi:
-        Raw stacked frames \hat{Psi}_j(b_s) (paper Step 2), shape (n_sets,n_samples,D,2).
+    This object stores the *raw* stacked frames ``Phi`` (paper Step 2), together with
+    optional cached outputs of the subsequent projection stage (Steps 3–4). It is useful
+    for debugging and for downstream tooling (frame reduction, diagnostics, etc.).
 
-    Optional cached Step 3–4 outputs (computed lazily by ensure_projected_frames):
-      - Phi_true: projected Stiefel frames (post polar projection), (n_sets,n_samples,D,2)
-      - Omega_true: cocycle projection from Phi_true, edges -> (n_samples,2,2)
-      - cl: rank-2 projector field (Grassmann projection), (n_samples,D,D)
-      - cl_proj_dist, frame_proj_dist: projection diagnostics (sup norms)
+    Attributes
+    ----------
+    Phi : np.ndarray
+        Raw stacked frames ``\\hat{\\Psi}_j(b_s)``, shape ``(n_sets, n_samples, D, 2)``.
+        Entries are meaningful only where ``U[j,s]=True`` (inactive entries are typically
+        zero).
+
+    D : int
+        Ambient dimension of the stacked-frame representation. For example:
+        - packing="none": typically ``D = 2*n_sets``
+        - packing="coloring*": typically ``D = 2*K`` where ``K`` is #colors
+
+    packing : FramePacking
+        Frame packing mode used to construct ``Phi`` (e.g. "none", "coloring", "coloring2").
+
+    n_colors : Optional[int]
+        If packing uses a graph coloring, this is the number of colors ``K`` used.
+        Otherwise ``None``.
+
+    colors : Optional[np.ndarray]
+        If packing uses a graph coloring, an integer array of shape ``(n_sets,)`` giving
+        each chart's assigned color/slot. Otherwise ``None``.
+
+    Cached projection outputs (optional)
+    ----------------------------
+    These fields are ``None`` until the projection stage is computed (e.g. via
+    ``ensure_projected_frames`` or indirectly via ``get_bundle_map``).
+
+    Phi_true : Optional[np.ndarray]
+        Projected Stiefel frames, shape ``(n_sets, n_samples, D, 2)``.
+
+    Omega_true : Optional[Dict[Edge, np.ndarray]]
+        Pointwise cocycle induced by ``Phi_true``, keyed by canonical edges ``(j,k)``
+        with ``j<k`` and values of shape ``(n_samples,2,2)``.
+
+    cl : Optional[np.ndarray]
+        Rank-2 projector field (Grassmann classifying map), shape ``(n_samples, D, D)``.
+
+    cl_proj_dist : Optional[float]
+        Supremum Grassmann projection error (see ``CocycleProjectionResult.cl_proj_dist``).
+
+    frame_proj_dist : Optional[float]
+        Supremum Stiefel projection error (see ``CocycleProjectionResult.frame_proj_dist``).
     """
     Phi: np.ndarray               # (n_sets,n_samples,D,2) raw frames (hat-Psi)
     D: int                        # ambient dim
@@ -977,10 +1046,36 @@ def apply_frame_reduction(
 @dataclass
 class FrameDataset:
     """
-    Packed dataset of frames for downstream reducers/curves.
+    Packed dataset of frames extracted from active chart/sample pairs.
 
-    Y:   (m, D, 2) frames (only from active charts/samples)
-    idx: (m, 2) integer pairs (j, s) telling where each frame came from
+    This is a utility container for downstream reducers, curve fitting, and diagnostics.
+    It converts a sparse ``Phi[j,s]`` array (only meaningful where ``U[j,s]=True``) into a
+    dense list of frames ``Y`` together with indices telling where each frame came from.
+
+    Attributes
+    ----------
+    Y : np.ndarray
+        Packed frames, shape ``(m, D, 2)``, where each row is a 2-frame in ambient
+        dimension ``D``.
+
+    idx : np.ndarray
+        Integer index pairs, shape ``(m, 2)``. Row ``t`` is ``(j, s)`` meaning
+        ``Y[t] = Phi[j, s]`` (at the chosen pipeline stage).
+
+    stage : str
+        Which pipeline stage the frames were taken from. Expected values include:
+        - "pre_projection": raw stacked frames (Step 2)
+        - "post_projection": projected Stiefel frames (Steps 3–4)
+        - "post_reduction": after an optional dimensionality reduction
+
+    D : int
+        Ambient frame dimension of the stored frames.
+
+    n_sets : int
+        Number of cover sets/charts.
+
+    n_samples : int
+        Number of base samples.
     """
     Y: np.ndarray
     idx: np.ndarray
@@ -1147,6 +1242,66 @@ def get_frame_dataset(
 
 @dataclass
 class BundleMapReport:
+    """
+    Diagnostics and summary statistics for the bundle-map coordinatization pipeline.
+
+    This report aggregates sup/mean errors computed across overlaps and across the
+    projection/reduction steps. It is intended to be printed (text) or displayed (LaTeX)
+    via :func:`show_bundle_map_summary`.
+
+    Attributes
+    ----------
+    cl_proj_dist : float
+        Supremum Grassmann projection error from the classifying map to a rank-2 projector.
+
+    frame_proj_dist : float
+        Supremum Stiefel projection error (raw frames to projected orthonormal frames).
+
+    cocycle_proj_dist : float
+        Supremum Frobenius discrepancy between the simplicial cocycle ``Omega`` and its
+        pointwise projected cocycle ``Π(Omega)`` computed from projected frames:
+        ``sup_{(jk)} sup_{s in U_j ∩ U_k} ||Omega_{jk} - Π(Omega)_{jk}(s)||_F``.
+
+    eps_triv : Optional[float]
+        Supremum *chordal* trivialization error computed using ``Π(Omega)`` on overlaps.
+        ``None`` if no overlap samples were available.
+
+    eps_triv_geo : Optional[float]
+        Supremum *geodesic* trivialization error in radians, derived from chordal errors.
+        ``None`` if unavailable.
+
+    eps_triv_mean : Optional[float]
+        Mean chordal trivialization error over all overlap samples considered.
+
+    eps_triv_geo_mean : Optional[float]
+        Mean geodesic trivialization error (radians) over all overlap samples considered.
+
+    chart_disagreement : Optional[float]
+        Optional disagreement statistic Δ computed from the glued per-chart values
+        ``pre_F``. ``None`` if not requested.
+
+    reduction_method : Optional[str]
+        Name of the dimensionality reduction method used (if any), e.g. "psc" or
+        "subspace_pca".
+
+    reduction_D_in : Optional[int]
+        Input ambient dimension for reduction (if any).
+
+    reduction_d_out : Optional[int]
+        Output dimension after reduction (if any).
+
+    eps_red : Optional[float]
+        Supremum reduction projection error (if any).
+
+    eps_red_mean : Optional[float]
+        Mean reduction projection error (if any).
+
+    packing : Optional[str]
+        Frame packing mode used (if any), e.g. "none", "coloring", "coloring2".
+
+    n_colors : Optional[int]
+        If packing used a graph coloring, the number of colors/slots used.
+    """
     # core diagnostics
     cl_proj_dist: float
     frame_proj_dist: float

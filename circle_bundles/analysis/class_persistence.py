@@ -27,20 +27,6 @@ __all__ = [
     "CobirthResult",
     "CodeathResult",
     "PersistenceResult",
-    # helpers
-    "canon_simplex",
-    "simplex_dim",
-    "canon_edge_tuple",
-    "canon_tri_tuple",
-    "canon_tet_tuple",
-    "ensure_edges_tris_tets",
-    "ensure_edges_tris",
-    "build_edge_weights_from_transition_report",
-    # persistence
-    "compute_bundle_persistence",
-    "summarize_edge_driven_persistence",
-    # subcomplex helper
-    "_edges_for_subcomplex_from_persistence",
 ]
 
 
@@ -79,12 +65,31 @@ class CobirthResult:
     """
     Cobirth event for an edge-driven filtration.
 
-    k_removed:
-        Number of edges removed (heaviest-first) when the property first holds.
-    cutoff_weight:
-        The filtration cutoff weight at that stage (∞ for k_removed=0).
-    removed_edges:
-        The list of edges removed up to and including that stage (canonical form).
+    In the edge-driven filtration used here, edges are removed in descending
+    weight order (heaviest first). At each stage we consider the induced
+    subcomplex on the remaining edges (and any higher simplices whose edges
+    are all still present).
+
+    A *cobirth* is the first stage ``k_removed`` at which the relevant class
+    becomes a cocycle on the induced complex.
+
+    Attributes
+    ----------
+    k_removed :
+        Number of edges removed at the cobirth stage. ``0`` means the full complex.
+    cutoff_weight :
+        Filtration cutoff weight at that stage.
+
+        - ``+∞`` when ``k_removed = 0`` (no edges removed)
+        - ``-∞`` when ``k_removed`` is at least the number of edges (everything removed)
+    removed_edges :
+        List of canonical edges that were removed up to and including the stage,
+        in the order they were removed (heaviest first).
+
+    See Also
+    --------
+    CodeathResult
+    summarize_edge_driven_persistence
     """
     k_removed: int
     cutoff_weight: float
@@ -94,7 +99,12 @@ class CobirthResult:
 @dataclass
 class CodeathResult:
     """
-    Codeath event for an edge-driven filtration. Same fields as CobirthResult.
+    Codeath event for an edge-driven filtration.
+
+    A *codeath* is the first stage ``k_removed`` (at or after cobirth) at which
+    the relevant cocycle becomes a coboundary on the induced complex.
+
+    The fields match :class:`~circle_bundles.analysis.class_persistence.CobirthResult`.
     """
     k_removed: int
     cutoff_weight: float
@@ -840,11 +850,33 @@ def build_edge_weights_from_transition_report(
 @dataclass
 class PersistenceResult:
     """
-    Container for edge-driven persistence outputs.
+    Output of edge-driven persistence computations for characteristic classes.
 
-    sw1 and twisted_euler are dicts with keys:
-      "cobirth", "codeath", "removal_order"
-    and are typed as EdgeDrivenReport for docs/IDE help.
+    This is the object returned by :func:`compute_bundle_persistence`. It packages:
+
+    - The induced simplices (vertices/edges/triangles/tets) used in the computation.
+    - The edge weights defining the filtration order.
+    - Edge-driven persistence reports for:
+        1) the first Stiefel–Whitney class ``w1`` (over :math:`\\mathbb{Z}_2`)
+        2) the (twisted) Euler class representative (over :math:`\\mathbb{Z}_\\omega`)
+
+    Attributes
+    ----------
+    edges, triangles, tets :
+        Canonical simplex lists used for persistence.
+    vertices :
+        0-simplices as singleton tuples ``[(v,), ...]`` derived from the simplices.
+    edge_weights :
+        Edge weights used to order removals (larger = removed earlier).
+    sw1 :
+        Dict-like report containing ``"cobirth"``, ``"codeath"``, and ``"removal_order"``.
+    twisted_euler :
+        Dict-like report containing ``"cobirth"``, ``"codeath"``, and ``"removal_order"``.
+
+    Notes
+    -----
+    ``sw1`` and ``twisted_euler`` are typed as :class:`EdgeDrivenReport` for IDE/help,
+    but are plain dictionaries at runtime.
     """
     edges: List[Edge]
     triangles: List[Tri]
@@ -853,6 +885,7 @@ class PersistenceResult:
     edge_weights: Dict[Edge, float]
     sw1: EdgeDrivenReport
     twisted_euler: EdgeDrivenReport
+
 
 
 SubcomplexMode = Literal["full", "cocycle", "max_trivial"]

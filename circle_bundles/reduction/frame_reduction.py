@@ -1,13 +1,40 @@
 # circle_bundles/frame_reduction.py
 """
-frame_reduction.py
+O(2)-equivariant frame reduction for Stiefel frames Y ∈ V(2, D).
 
-Optional O(2)-equivariant dimensionality reduction for Stiefel frames Y ∈ V(2, D).
+This module provides optional dimensionality reduction for collections of 2-frames
+(`(D,2)` matrices with orthonormal columns), used in the bundle pipeline when the
+ambient feature dimension D is large.
 
-This module is intentionally separate from bundle_map.py so that:
-- bundle_map.py stays focused on the bundle/gluing math
-- PSC is an optional dependency (imported only inside PSC functions)
+Design goals
+------------
+- Keep bundle/gluing logic out of this file (this is a preprocessing utility).
+- Preserve the right O(2)-action: Y ↦ YQ for Q ∈ O(2) (i.e., equivariant reduction).
+- Provide two reducers:
+    * subspace_pca : always available, fast, deterministic baseline
+    * psc          : optional dependency (HarlinLee/PSC), higher-quality but heavier
+
+Conventions
+-----------
+- Frames are represented as real arrays of shape (D,2).
+- A "projection" Π(Y) refers to projecting Y into a learned d-dimensional subspace:
+      Π(Y) = B B^T Y   or   Π(Y) = α α^T Y
+  with B/α having orthonormal columns in R^D.
+- After projecting, we re-orthonormalize columns via the polar factor to return to V(2,d).
+
+Where it is used
+----------------
+This is intended to be called either:
+- "pre_classifying": reduce raw Stiefel frames before building the classifying map
+  (paper-faithful), or
+- "post_stiefel": reduce after a Stiefel projection step (legacy / experimental).
+
+Optional dependency
+-------------------
+The PSC reducer imports PSC lazily inside PSC functions so that PSC is not required
+for the rest of the package.
 """
+
 
 from __future__ import annotations
 
@@ -28,16 +55,8 @@ ReduceStage = Literal["pre_classifying", "post_stiefel"]
 
 
 __all__ = [
-    "ReduceMethod",
     "FrameReducerConfig",
     "FrameReductionReport",
-    "reduce_frames_subspace_pca",
-    "reduction_curve_subspace_pca",
-    "reduce_frames_psc",
-    "reduction_curve_psc",
-    "GaugeCanonConfig",
-    "GaugeCanonReport",
-    "canonicalize_frames_before_reduction",    
 ]
 
 
@@ -75,29 +94,29 @@ def canonicalize_frames_before_reduction(
 
 @dataclass
 class FrameReducerConfig:
+@dataclass
+class FrameReducerConfig:
     """
-    method:
-      - "none": no reduction
-      - "subspace_pca": always-available, O(2)-equivariant baseline
-      - "psc": PSC package hook (HarlinLee/PSC)
+    Configuration for O(2)-equivariant dimensionality reduction of Stiefel frames.
 
-    stage:
-      - "pre_classifying": (paper-faithful)
-          reduce the raw Stiefel point cloud X_V before building the classifying map.
-      - "post_stiefel": (legacy / experimental)
-          reduce after the Stiefel projection step.
-
-    d:
-      target ambient dimension after reduction (2 <= d <= D).
-
-    max_frames:
-      optional subsampling for speed (fit reducer on at most max_frames frames).
-
-    rng_seed:
-      used for subsampling.
-
-    psc_verbosity:
-      forwarded to PSC.manopt_alpha.
+    Attributes
+    ----------
+    method : ReduceMethod
+        - "none"        : no reduction
+        - "subspace_pca": always-available, O(2)-equivariant baseline
+        - "psc"         : PSC-based reducer (optional dependency)
+    stage : ReduceStage
+        - "pre_classifying": reduce the raw Stiefel point cloud before building the classifying map
+        - "post_stiefel"   : reduce after a Stiefel projection step (legacy / experimental)
+    d : int
+        Target ambient dimension after reduction (must satisfy 2 <= d <= D at runtime).
+        A value of 0 is treated as "unset" by callers (i.e., no reduction unless set).
+    max_frames : Optional[int]
+        Optional subsampling cap for fitting the reducer (speed control).
+    rng_seed : int
+        RNG seed used for subsampling.
+    psc_verbosity : int
+        Verbosity forwarded to PSC's optimization routine (if method="psc").
     """
     method: ReduceMethod = "none"
     stage: ReduceStage = "pre_classifying"
@@ -108,7 +127,25 @@ class FrameReducerConfig:
 
 
 @dataclass
-class FrameReductionReport:
+class FrameReductionReport:    
+    """
+    Summary statistics for a fitted frame reduction map Π : V(2,D) -> V(2,d).
+
+    Attributes
+    ----------
+    method : ReduceMethod
+        Reduction method used.
+    D_in : int
+        Original ambient dimension D.
+    d_out : int
+        Reduced ambient dimension d.
+    sup_proj_err : float
+        Supremum (over processed frames) of the ambient projection error:
+            sup ||Y - Π(Y)||_F
+    mean_proj_err : float
+        Mean (over processed frames) of the ambient projection error:
+            mean ||Y - Π(Y)||_F
+    """
     method: ReduceMethod
     D_in: int
     d_out: int
@@ -116,6 +153,19 @@ class FrameReductionReport:
     mean_proj_err: float  # mean ||Y - Π(Y)||_F  (\bar{ε}_red)
 
     def to_text(self, *, decimals: int = 3) -> str:
+        """
+        Render a human-readable multi-line summary (for notebooks/logging).
+
+        Parameters
+        ----------
+        decimals : int
+            Number of decimal places used for numeric fields.
+
+        Returns
+        -------
+        str
+            A formatted text block describing the fitted reduction and its errors.
+        """        
         r = int(decimals)
         return (
             "\n"
@@ -364,8 +414,18 @@ def reduction_curve_subspace_pca(
     progress: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    For each d in dims, fit B_d and compute mean ||Y - B_d B_d^T Y||_F^2
-    over sampled frames.
+    Compute a subspace PCA reconstruction-error curve across multiple target dimensions.
+
+    For each d in `dims`, this fits a subspace basis B_d (using the same sampled frames)
+    and reports the mean squared reconstruction error:
+        mean ||Y - B_d B_d^T Y||_F^2.
+
+    Returns
+    -------
+    dims_arr : np.ndarray
+        Target dimensions as an int array.
+    mean_sq_err : np.ndarray
+        Mean squared reconstruction errors corresponding to dims_arr.
     """
     Phi_true = np.asarray(Phi_true, dtype=float)
     U = np.asarray(U, dtype=bool)
@@ -515,14 +575,31 @@ def reduction_curve_psc(
     progress: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    PSC reconstruction curve:
-      For each d in dims:
-        fit alpha_d via PSC,
-        compute mean squared projection error:
-            mean ||Y - alpha_d alpha_d^T Y||_F^2  over sampled frames.
+    Compute a PSC reconstruction-error curve across multiple target dimensions.
 
-    If plot=True, produces a simple matplotlib plot.
+    For each d in `dims`, this fits α_d via PSC (optionally refined with manopt) and reports:
+        mean ||Y - α_d α_d^T Y||_F^2.
+
+    Parameters
+    ----------
+    use_manopt : bool
+        If True, refine the PCA initializer with PSC's manifold optimization routine.
+    plot : bool
+        If True, display a simple matplotlib curve in the current environment.
+
+    Returns
+    -------
+    dims_arr : np.ndarray
+        Target dimensions as an int array.
+    mean_sq_err : np.ndarray
+        Mean squared reconstruction errors corresponding to dims_arr.
+
+    Raises
+    ------
+    ImportError
+        If PSC is not importable.
     """
+
     Phi_true = np.asarray(Phi_true, dtype=float)
     U = np.asarray(U, dtype=bool)
 

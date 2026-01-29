@@ -12,6 +12,10 @@ Simp = Tuple[int, ...]
 Tet = Tuple[int, int, int, int]
 
 
+__all__ = [
+    "GlobalTrivializationResult",
+]
+
 # ============================================================
 # Canonicalization helpers
 # ============================================================
@@ -495,7 +499,41 @@ def build_global_trivialization(
 
 @dataclass
 class GlobalTrivializationResult:
+    """
+    Result container for a computed global circle coordinate (global trivialization).
+
+    This object summarizes the output of a global gauge-fixing / synchronization step
+    that combines local circular coordinates across a cover into a single global angle
+    function on the dataset.
+
+    Attributes
+    ----------
+    method : str
+        Name of the method used to compute the gauge / trivialization. Typical values:
+        - ``"singer"`` : spectral synchronization on the 1-skeleton
+        - ``"tree"``   : spanning-tree / DFS propagation
+        - ``"pu"``     : partition-of-unity pointwise gauge
+
+    edges_used : list[Edge]
+        The list of edges (cover-set adjacencies) used to define the gauge constraints.
+        Edges are typically canonicalized (j < k) unless otherwise stated by the caller.
+
+    F : ndarray of shape (n_samples,)
+        The resulting global angle in radians, wrapped to the range [0, 2π).
+        This is the global circle-valued coordinate defined on samples in the union
+        of the cover.
+
+    meta : dict[str, Any]
+        Additional method-dependent metadata (e.g. solver options, diagnostics, or
+        intermediate quantities used to construct ``F``).
+
+    Notes
+    -----
+    - This result is primarily intended for inspection and downstream visualization.
+    - In non-oriented settings (O(2)-bundles), callers typically first apply an
+      orientation gauge so that the transitions used here have determinant +1.
+    """
     method: str
     edges_used: List[Edge]
-    F: np.ndarray                    # (M,) radians global angle
+    F: np.ndarray
     meta: Dict[str, Any]
