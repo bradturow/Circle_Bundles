@@ -1,13 +1,22 @@
 Covers
 ======
 
+Cover classes
+-------------
+
 .. currentmodule:: circle_bundles.base_covers
 
 .. autoclass:: MetricBallCover
-   :members:
+   :members: build, ensure_built, nerve_edges, nerve_triangles, nerve_tetrahedra, show_nerve, summarize
+   :undoc-members: False
 
 .. autoclass:: TriangulationStarCover
-   :members:
+   :members: build, ensure_built, nerve_edges, nerve_triangles, nerve_tetrahedra, show_nerve, summarize
+   :undoc-members: False
+
+
+Cover builder helpers
+---------------------
 
 .. currentmodule:: circle_bundles.covers.metric_ball_cover_builders
 

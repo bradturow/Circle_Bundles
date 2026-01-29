@@ -365,13 +365,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;safe_add_edges&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;get_weights&quot;</span><span class="p">,</span>
     <span class="s2">&quot;fiberwise_clustering&quot;</span><span class="p">,</span>
     <span class="s2">&quot;plot_fiberwise_pca_grid&quot;</span><span class="p">,</span>
     <span class="s2">&quot;plot_fiberwise_summary_bars&quot;</span><span class="p">,</span>
     <span class="s2">&quot;get_cluster_persistence&quot;</span><span class="p">,</span>
     <span class="s2">&quot;get_filtered_cluster_graph&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_weights&quot;</span>
 <span class="p">]</span>
 
 
@@ -464,17 +463,39 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_weights</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cardinality&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Assign/overwrite edge &#39;weight&#39; based on overlap of endpoint node memberships.</span>
+<span class="sd">    Compute and attach edge weights for a fiberwise cluster graph.</span>
 
+<span class="sd">    This function assigns/overwrites the edge attribute ``&quot;weight&quot;`` in-place, based on</span>
+<span class="sd">    how much the endpoint clusters overlap in sample membership. It is typically used</span>
+<span class="sd">    after :func:`fiberwise_clustering` to enable thresholding and simple persistence-style</span>
+<span class="sd">    diagnostics via :func:`get_cluster_persistence` and :func:`get_filtered_cluster_graph`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    G:</span>
+<span class="sd">        A ``networkx.Graph`` whose nodes represent fiber-clusters, and whose nodes store</span>
+<span class="sd">        an ``&quot;indices&quot;`` attribute: the list of sample indices belonging to that cluster.</span>
+<span class="sd">        If edges contain ``&quot;indices_shared&quot;``, those will be used directly (faster and</span>
+<span class="sd">        consistent with the overlap construction in :func:`fiberwise_clustering`).</span>
 <span class="sd">    method:</span>
-<span class="sd">      - &#39;cardinality&#39; : |A ∩ B|</span>
-<span class="sd">      - &#39;rel_card&#39;    : |A ∩ B| / min(|A|,|B|)</span>
-<span class="sd">      - &#39;rel_card2&#39;   : |A ∩ B| / ((|A|+|B|)/2)</span>
+<span class="sd">        Overlap-to-weight rule. One of:</span>
+<span class="sd">          - ``&quot;cardinality&quot;``: weight = ``|A ∩ B|``</span>
+<span class="sd">          - ``&quot;rel_card&quot;``: weight = ``|A ∩ B| / min(|A|, |B|)``</span>
+<span class="sd">          - ``&quot;rel_card2&quot;``: weight = ``|A ∩ B| / ((|A| + |B|)/2)``</span>
+
+<span class="sd">        Here ``A`` and ``B`` are the endpoint node membership sets.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    G:</span>
+<span class="sd">        The same graph instance, returned for convenience, with edge attribute ``&quot;weight&quot;``</span>
+<span class="sd">        set on every edge.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    If present, uses edge attribute &#39;indices_shared&#39; as the overlap evidence</span>
-<span class="sd">    (faster + consistent with safe_add_edges()).</span>
+<span class="sd">    - The graph is modified in-place.</span>
+<span class="sd">    - If an edge has ``indices_shared``, we use ``len(indices_shared)`` as ``|A ∩ B|``.</span>
+<span class="sd">      Otherwise we fall back to computing the intersection from node ``indices``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;cardinality&quot;</span><span class="p">,</span> <span class="s2">&quot;rel_card&quot;</span><span class="p">,</span> <span class="s2">&quot;rel_card2&quot;</span><span class="p">}:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;method must be one of: &#39;cardinality&#39;, &#39;rel_card&#39;, &#39;rel_card2&#39;&quot;</span><span class="p">)</span>
@@ -513,7 +534,7 @@
 <span class="c1"># ---------------------------------</span>
 
 <div class="viewcode-block" id="fiberwise_clustering">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.fiberwise_clustering">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fiberwise_clustering</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -524,29 +545,74 @@
     <span class="n">pca_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fiberwise DBSCAN clustering, then a global cluster-graph built from overlaps.</span>
+<span class="sd">    Cluster each fiber with DBSCAN and then merge clusters globally via an overlap graph.</span>
+
+<span class="sd">    This is a useful diagnostic tool when you have a cover (fibers) over the dataset and</span>
+<span class="sd">    want to see whether local cluster structure aligns across overlaps.</span>
+
+<span class="sd">    Workflow</span>
+<span class="sd">    --------</span>
+<span class="sd">    1) For each fiber r (row of ``U``), run DBSCAN on the points ``data[U[r]]`` using</span>
+<span class="sd">       ``eps_values[r]`` and ``min_sample_values[r]``.</span>
+<span class="sd">    2) Create a graph whose nodes are *fiber-clusters* ``(r, label)`` (excluding label ``-1``).</span>
+<span class="sd">       Each node stores the list of sample indices belonging to that DBSCAN cluster.</span>
+<span class="sd">    3) Add an edge between two nodes if the corresponding fiber-clusters share at least one</span>
+<span class="sd">       sample index that is non-noise in both fibers. Edges store ``indices_shared``.</span>
+<span class="sd">    4) Define a global component label per sample by taking connected components of the graph</span>
+<span class="sd">       and assigning each sample that appears in any node of that connected component.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    data : (n_samples, d)</span>
-<span class="sd">    U : (n_fibers, n_samples) bool</span>
-<span class="sd">    eps_values : (n_fibers,) float</span>
-<span class="sd">    min_sample_values : (n_fibers,) int</span>
+<span class="sd">    data:</span>
+<span class="sd">        Array of shape ``(n_samples, d)`` containing the ambient data vectors.</span>
+<span class="sd">    U:</span>
+<span class="sd">        Boolean membership matrix of shape ``(n_fibers, n_samples)``. Row ``r`` indicates</span>
+<span class="sd">        which samples lie in fiber/cover set ``U_r``.</span>
+<span class="sd">    eps_values:</span>
+<span class="sd">        Array of shape ``(n_fibers,)`` with the DBSCAN ``eps`` parameter used for each fiber.</span>
+<span class="sd">    min_sample_values:</span>
+<span class="sd">        Array of shape ``(n_fibers,)`` with the DBSCAN ``min_samples`` parameter used for each fiber.</span>
+<span class="sd">    build_pca_embeddings:</span>
+<span class="sd">        If True, compute PCA embeddings (within each fiber) for quick plotting with</span>
+<span class="sd">        :func:`plot_fiberwise_pca_grid`.</span>
+<span class="sd">    pca_dim:</span>
+<span class="sd">        Number of PCA components to compute per fiber (typically 2).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    components : (n_samples,) int</span>
-<span class="sd">        Global component label per sample (based on connected components of the cluster-graph).</span>
-<span class="sd">        Unassigned samples remain -1.</span>
-<span class="sd">    G : nx.Graph</span>
-<span class="sd">        Nodes are (fiber_idx, cluster_label) with attribute &#39;indices&#39; (sample indices).</span>
-<span class="sd">        Edges indicate overlap; includes &#39;indices_shared&#39;.</span>
-<span class="sd">    graph_dict : dict</span>
-<span class="sd">        Simple serialization-friendly summary.</span>
-<span class="sd">    cl : (n_fibers, n_samples) int</span>
-<span class="sd">        DBSCAN labels within each fiber (-1 noise).</span>
-<span class="sd">    summary : dict</span>
-<span class="sd">        Useful arrays and optional PCA embeddings for plotting.</span>
+<span class="sd">    components:</span>
+<span class="sd">        Integer array of shape ``(n_samples,)`` giving a global component label per sample.</span>
+<span class="sd">        Samples not belonging to any non-noise fiber-cluster remain ``-1``.</span>
+<span class="sd">    G:</span>
+<span class="sd">        A ``networkx.Graph``. Nodes are tuples ``(fiber_idx, cluster_label)`` with node attribute</span>
+<span class="sd">        ``indices`` (list of sample indices). Edges indicate overlap, and store</span>
+<span class="sd">        ``indices_shared`` (the supporting sample indices).</span>
+<span class="sd">    graph_dict:</span>
+<span class="sd">        A simple serialization-friendly representation of the graph (nodes/links).</span>
+<span class="sd">    cl:</span>
+<span class="sd">        Integer array of shape ``(n_fibers, n_samples)`` giving the DBSCAN label of each sample</span>
+<span class="sd">        within each fiber. Label ``-1`` denotes noise (or not present in that fiber).</span>
+<span class="sd">    summary:</span>
+<span class="sd">        Dict of helpful arrays for downstream plotting, including:</span>
+<span class="sd">          - ``fiber_component_counts``: number of DBSCAN clusters per fiber (excluding noise)</span>
+<span class="sd">          - ``global_component_counts``: number of graph nodes per global component</span>
+<span class="sd">          - ``point_counts``: number of samples assigned to each global component</span>
+<span class="sd">          - ``pca_store``: per-fiber PCA embeddings if requested</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - This routine requires optional dependencies: ``networkx`` and ``scikit-learn``.</span>
+<span class="sd">    - Edge weights are not computed here. If you want a weighted filtration on the cluster graph,</span>
+<span class="sd">      call :func:`get_weights` (internal helper) or attach your own ``edge[&quot;weight&quot;]`` values.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; components, G, graph_dict, cl, summary = fiberwise_clustering(</span>
+<span class="sd">    ...     data, U,</span>
+<span class="sd">    ...     eps_values=np.full(U.shape[0], 0.25),</span>
+<span class="sd">    ...     min_sample_values=np.full(U.shape[0], 10),</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; fig, _ = plot_fiberwise_summary_bars(summary)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="n">_require_networkx</span><span class="p">()</span>
     <span class="n">DBSCAN</span><span class="p">,</span> <span class="n">PCA</span> <span class="o">=</span> <span class="n">_require_sklearn</span><span class="p">()</span>
@@ -662,7 +728,7 @@
 <span class="c1"># ---------------------------------</span>
 
 <div class="viewcode-block" id="plot_fiberwise_pca_grid">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.plot_fiberwise_pca_grid">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_pca_grid">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_fiberwise_pca_grid</span><span class="p">(</span>
     <span class="n">summary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -673,8 +739,37 @@
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Plot PCA scatter for selected fibers using summary[&#39;pca_store&#39;].</span>
-<span class="sd">    Requires fiberwise_clustering(..., build_pca_embeddings=True).</span>
+<span class="sd">    Plot per-fiber PCA scatter plots colored by DBSCAN cluster labels.</span>
+
+<span class="sd">    This function consumes the ``summary`` returned by :func:`fiberwise_clustering`</span>
+<span class="sd">    when called with ``build_pca_embeddings=True``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    summary:</span>
+<span class="sd">        The ``summary`` dict returned by :func:`fiberwise_clustering`.</span>
+<span class="sd">    to_view:</span>
+<span class="sd">        Optional list of fiber indices to plot. If omitted, plots all fibers that</span>
+<span class="sd">        have PCA data available.</span>
+<span class="sd">    cmap:</span>
+<span class="sd">        Matplotlib colormap name used to color points by cluster label.</span>
+<span class="sd">    point_size:</span>
+<span class="sd">        Scatter marker size passed to Matplotlib.</span>
+<span class="sd">    n_cols:</span>
+<span class="sd">        Number of columns in the subplot grid.</span>
+<span class="sd">    save_path:</span>
+<span class="sd">        If provided, save the figure to this path (PDF recommended).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig, axes:</span>
+<span class="sd">        The Matplotlib figure and a flattened array of axes. Returns ``(None, None)``</span>
+<span class="sd">        if there is nothing to plot.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If PCA data is missing (i.e. ``summary[&quot;pca_store&quot;]`` is empty).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
@@ -712,7 +807,7 @@
 
 
 <div class="viewcode-block" id="plot_fiberwise_summary_bars">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.plot_fiberwise_summary_bars">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_summary_bars">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_fiberwise_summary_bars</span><span class="p">(</span>
     <span class="n">summary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -720,6 +815,31 @@
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dpi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
 <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plot quick bar-chart summaries of fiberwise clustering and global components.</span>
+
+<span class="sd">    Produces three panels:</span>
+<span class="sd">      1) number of DBSCAN clusters per fiber (excluding noise)</span>
+<span class="sd">      2) number of cluster-nodes per global connected component (sorted)</span>
+<span class="sd">      3) number of samples per global connected component (sorted)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    summary:</span>
+<span class="sd">        The ``summary`` dict returned by :func:`fiberwise_clustering`.</span>
+<span class="sd">    hide_biggest:</span>
+<span class="sd">        If True, drop the single largest global component in the &quot;points per component&quot;</span>
+<span class="sd">        panel (useful when one component dominates the scale).</span>
+<span class="sd">    save_path:</span>
+<span class="sd">        If provided, saves a PDF with ``&quot;_summary&quot;`` appended to the filename.</span>
+<span class="sd">    dpi:</span>
+<span class="sd">        Figure DPI.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig, axs:</span>
+<span class="sd">        Matplotlib figure and axes array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
     <span class="n">fiber_component_counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">summary</span><span class="p">[</span><span class="s2">&quot;fiber_component_counts&quot;</span><span class="p">])</span>
@@ -783,7 +903,7 @@
 
 
 <div class="viewcode-block" id="get_cluster_persistence">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.get_cluster_persistence">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.fiberwise_clustering.get_cluster_persistence">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_cluster_persistence</span><span class="p">(</span>
     <span class="n">G</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -791,12 +911,38 @@
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Track number of connected components as we remove edges by nondecreasing weight.</span>
+<span class="sd">    Track connected-component count as low-weight edges are removed.</span>
 
-<span class="sd">    Requires that G edges have &#39;weight&#39; (e.g. computed by get_weights()).</span>
+<span class="sd">    Interprets the cluster graph ``G`` as a weighted graph (edge attribute ``&quot;weight&quot;``),</span>
+<span class="sd">    and forms a simple edge-threshold filtration:</span>
 
-<span class="sd">    Returns a list of dicts:</span>
-<span class="sd">      {&#39;weight&#39;: w, &#39;n_components&#39;: int, &#39;components&#39;: [set(nodes), ...]}</span>
+<span class="sd">    - Start with the full graph.</span>
+<span class="sd">    - For each distinct weight value ``w`` in increasing order, remove all edges with weight</span>
+<span class="sd">      exactly ``w`` (equivalently: keep only edges with weight &gt; w).</span>
+<span class="sd">    - Record the number of connected components after each removal step.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    G:</span>
+<span class="sd">        A ``networkx.Graph`` whose edges have a numeric ``&quot;weight&quot;`` attribute.</span>
+<span class="sd">        (Use the internal helper ``get_weights(G, method=...)`` or attach weights yourself.)</span>
+<span class="sd">    show_results:</span>
+<span class="sd">        If True, plot the curve ``(# components) vs (threshold weight)``.</span>
+<span class="sd">    save_path:</span>
+<span class="sd">        If provided and ``show_results=True``, save the plot to this path (PDF recommended).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    history:</span>
+<span class="sd">        List of dicts with keys:</span>
+<span class="sd">          - ``&quot;weight&quot;``: the threshold value (first entry uses ``-np.inf`` for the full graph)</span>
+<span class="sd">          - ``&quot;n_components&quot;``: number of connected components at that stage</span>
+<span class="sd">          - ``&quot;components&quot;``: the list of node-sets returned by ``nx.connected_components``</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the graph has edges but none have a ``&quot;weight&quot;`` attribute.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="n">_require_networkx</span><span class="p">()</span>
     <span class="n">_ensure_has_weights</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
@@ -913,7 +1059,7 @@
 
 
 <div class="viewcode-block" id="get_filtered_cluster_graph">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.get_filtered_cluster_graph">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.fiberwise_clustering.get_filtered_cluster_graph">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_filtered_cluster_graph</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">G</span><span class="p">,</span>
@@ -926,18 +1072,60 @@
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Threshold the weighted cluster graph, separate intersections for removed edges,</span>
-<span class="sd">    and recompute global components.</span>
+<span class="sd">    Threshold the weighted cluster graph and recompute global components.</span>
 
-<span class="sd">    Requires that G edges have &#39;weight&#39; (e.g. computed by get_weights()).</span>
+<span class="sd">    This is a “post-processing” step for :func:`fiberwise_clustering` once you have</span>
+<span class="sd">    a weighted cluster graph ``G``:</span>
+
+<span class="sd">    1) Remove edges with ``weight &lt;= thresh`` (keep only edges with ``weight &gt; thresh``).</span>
+<span class="sd">    2) For each removed edge, resolve shared sample indices so that intersection samples are</span>
+<span class="sd">       assigned to only one endpoint cluster (controlled by ``rule``). This updates the node</span>
+<span class="sd">       membership lists and also produces a cleaned label matrix ``cl_clean``.</span>
+<span class="sd">    3) Recompute connected components of the filtered graph and assign samples accordingly.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data:</span>
+<span class="sd">        Original data array of shape ``(n_samples, d)`` (used here only for shape validation).</span>
+<span class="sd">    G:</span>
+<span class="sd">        A ``networkx.Graph`` whose edges have a numeric ``&quot;weight&quot;`` attribute and whose nodes</span>
+<span class="sd">        store an ``&quot;indices&quot;`` list of member sample indices.</span>
+<span class="sd">    cl:</span>
+<span class="sd">        The per-fiber DBSCAN label matrix returned by :func:`fiberwise_clustering`</span>
+<span class="sd">        (shape ``(n_fibers, n_samples)``).</span>
+<span class="sd">    thresh:</span>
+<span class="sd">        Edge threshold. Edges with ``weight &lt;= thresh`` are removed.</span>
+<span class="sd">    rule:</span>
+<span class="sd">        How to resolve intersection samples on removed edges:</span>
+<span class="sd">          - ``&quot;to_smaller_cluster&quot;``: keep shared samples in the smaller endpoint cluster</span>
+<span class="sd">          - ``&quot;to_larger_cluster&quot;``: keep shared samples in the larger endpoint cluster</span>
+<span class="sd">    show_results:</span>
+<span class="sd">        If True, plot bar charts for clusters-per-component and points-per-component.</span>
+<span class="sd">    hide_biggest:</span>
+<span class="sd">        If True, drop the largest component from the points-per-component panel.</span>
+<span class="sd">    save_path:</span>
+<span class="sd">        If provided and ``show_results=True``, save a PDF with ``&quot;_summary&quot;`` appended.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    components_filtered : (n_samples,) int</span>
-<span class="sd">    filtered_G : nx.Graph</span>
-<span class="sd">    graph_dict_filtered : dict</span>
-<span class="sd">    cl_clean : (n_fibers, n_samples) int</span>
-<span class="sd">    comp_inds : (n_components, n_samples) bool</span>
+<span class="sd">    components_filtered:</span>
+<span class="sd">        Integer array of shape ``(n_samples,)`` giving the new global component label per sample.</span>
+<span class="sd">        Unassigned samples remain ``-1``.</span>
+<span class="sd">    filtered_G:</span>
+<span class="sd">        The thresholded graph containing only edges with ``weight &gt; thresh``.</span>
+<span class="sd">    graph_dict_filtered:</span>
+<span class="sd">        Serialization-friendly representation of the filtered graph.</span>
+<span class="sd">    cl_clean:</span>
+<span class="sd">        Cleaned copy of ``cl`` where samples removed from a cluster due to intersection resolution</span>
+<span class="sd">        are set to ``-1`` for that fiber.</span>
+<span class="sd">    comp_inds:</span>
+<span class="sd">        Boolean array of shape ``(n_components, n_samples)`` indicating membership of each</span>
+<span class="sd">        global component.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the graph has edges but none have a ``&quot;weight&quot;`` attribute.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="n">_require_networkx</span><span class="p">()</span>
 

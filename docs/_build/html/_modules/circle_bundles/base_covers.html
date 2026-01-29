@@ -391,6 +391,53 @@
 
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">NerveSummary</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Summary of a cover and the recorded nerve up to dimension 3.</span>
+
+<span class="sd">    This container is produced by :meth:`CoverBase.summarize` and is intended to be</span>
+<span class="sd">    lightweight: it stores basic counts, optional intersection cardinalities, and</span>
+<span class="sd">    optional evidence about higher-order overlaps detected directly from the cover</span>
+<span class="sd">    membership matrix ``U``.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The library may only *record* simplices up to dimension 3 (tetrahedra), but</span>
+<span class="sd">      the underlying cover matrix ``U`` can still contain higher-order overlaps.</span>
+<span class="sd">      When detected (sample overlap order ≥ 5), the summary exposes:</span>
+<span class="sd">        - ``max_overlap_order`` and</span>
+<span class="sd">        - ``n_samples_with_overlap_ge_5``</span>
+<span class="sd">      and typically includes warnings about the mismatch.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_sets :</span>
+<span class="sd">        Number of cover sets.</span>
+<span class="sd">    n_samples :</span>
+<span class="sd">        Number of samples/points covered.</span>
+
+<span class="sd">    n0, n1, n2, n3 :</span>
+<span class="sd">        Recorded simplex counts in dimensions 0..3.</span>
+
+<span class="sd">    vert_card, edge_card, tri_card, tet_card :</span>
+<span class="sd">        Optional intersection cardinalities for recorded simplices, i.e.</span>
+<span class="sd">        ``|⋂_{i in σ} U_i|`` for each recorded simplex ``σ``.</span>
+<span class="sd">        Shapes are ``(n0,)``, ``(n1,)``, ``(n2,)``, ``(n3,)`` respectively</span>
+<span class="sd">        when present.</span>
+
+<span class="sd">    sample_overlap_counts :</span>
+<span class="sd">        For each sample ``s``, the number of cover sets containing it, i.e.</span>
+<span class="sd">        ``(# of i with U[i,s] = True)``. Shape ``(n_samples,)``.</span>
+
+<span class="sd">    max_overlap_order :</span>
+<span class="sd">        Only populated when the maximum sample overlap order exceeds 4.</span>
+<span class="sd">        In that case this is ``max(sample_overlap_counts)``.</span>
+<span class="sd">    n_samples_with_overlap_ge_5 :</span>
+<span class="sd">        Only populated when ``max_overlap_order`` is set. Counts samples lying</span>
+<span class="sd">        in 5 or more cover sets.</span>
+
+<span class="sd">    warnings :</span>
+<span class="sd">        Tuple of human-readable warning strings surfaced by :meth:`summarize`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_sets</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span>
 
@@ -566,23 +613,62 @@
     <span class="n">figsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">showfliers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">whis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>          <span class="c1"># &lt;--- full range by default</span>
+    <span class="n">whis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
     <span class="n">sharey</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">label_fmt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:g}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">label_dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.06</span><span class="p">,</span> <span class="c1"># x-offset in axis units (relative)</span>
+    <span class="n">label_dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.06</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Box-and-whisker plots for intersection cardinalities of recorded simplices.</span>
+<span class="sd">    Plot intersection cardinalities for recorded nerve simplices.</span>
 
-<span class="sd">    - Uses whis=(0,100) by default =&gt; whiskers are true min/max (no outlier logic).</span>
-<span class="sd">    - Adds min/max labels placed to the RIGHT of the whiskers.</span>
-<span class="sd">    - Prevents labels from messing up tight_layout by excluding them from layout.</span>
+<span class="sd">    Produces a 1×k grid of box-and-whisker plots for the cardinalities:</span>
+
+<span class="sd">    - 0-simplices: ``|U_i|`` (when available)</span>
+<span class="sd">    - 1-simplices: ``|U_i ∩ U_j|``</span>
+<span class="sd">    - 2-simplices: ``|U_i ∩ U_j ∩ U_k|``</span>
+<span class="sd">    - 3-simplices: ``|U_i ∩ U_j ∩ U_k ∩ U_ℓ|`` (optional)</span>
+
+<span class="sd">    By default, whiskers use the full range ``whis=(0,100)`` so min/max are the</span>
+<span class="sd">    actual extrema (not outlier-based). The plot annotates min/max next to the</span>
+<span class="sd">    whiskers.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    summary :</span>
+<span class="sd">        A :class:`NerveSummary` produced by :meth:`CoverBase.summarize` with</span>
+<span class="sd">        cardinalities computed.</span>
+<span class="sd">    show_tets :</span>
+<span class="sd">        If True, include the 3-simplex panel when ``summary.tet_card`` is present.</span>
+<span class="sd">    dpi :</span>
+<span class="sd">        Figure DPI.</span>
+<span class="sd">    figsize :</span>
+<span class="sd">        Optional figure size. If omitted, a width proportional to the number of</span>
+<span class="sd">        panels is chosen.</span>
+<span class="sd">    save_path :</span>
+<span class="sd">        Optional output prefix. If provided, saves a PDF named</span>
+<span class="sd">        ``&lt;save_path&gt;_cover_summary.pdf``.</span>
+<span class="sd">    showfliers :</span>
+<span class="sd">        Whether to show fliers in the boxplot.</span>
+<span class="sd">    whis :</span>
+<span class="sd">        Whisker definition passed to ``matplotlib.axes.Axes.boxplot``.</span>
+<span class="sd">        Default ``(0,100)`` gives true min/max.</span>
+<span class="sd">    sharey :</span>
+<span class="sd">        Share the y-axis across panels.</span>
+<span class="sd">    label_fmt :</span>
+<span class="sd">        Format string used for min/max labels.</span>
+<span class="sd">    label_dx :</span>
+<span class="sd">        Horizontal label offset (currently expressed as a small shift in x data units).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    (fig, ax_or_axes)</span>
-<span class="sd">      - If only one panel exists: returns (fig, ax)</span>
-<span class="sd">      - If multiple panels exist: returns (fig, axes_list)</span>
+<span class="sd">    fig, ax_or_axes :</span>
+<span class="sd">        ``(fig, ax)`` if only one panel is drawn, otherwise ``(fig, axes_list)``.</span>
+<span class="sd">        Returns ``(None, None)`` if no panels are available.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is designed for quick diagnostics. For publication-style plots,</span>
+<span class="sd">    you may want custom axis limits, log scaling, or annotated quantiles.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -697,6 +783,53 @@
 
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CoverBase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for covers over a set of base points.</span>
+
+<span class="sd">    A cover is represented primarily by a boolean membership matrix ``U`` with shape</span>
+<span class="sd">    ``(n_sets, n_samples)``, where ``U[i,s]`` indicates whether sample ``s`` lies in</span>
+<span class="sd">    cover set ``U_i``. Most workflows also use a partition of unity ``pou`` of the</span>
+<span class="sd">    same shape.</span>
+
+<span class="sd">    Subclasses implement :meth:`build` to populate ``U`` and ``pou``, and implement</span>
+<span class="sd">    the nerve accessors (:meth:`nerve_edges`, :meth:`nerve_triangles`, optionally</span>
+<span class="sd">    :meth:`nerve_tetrahedra`) to report recorded simplices.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_points :</span>
+<span class="sd">        Array of shape ``(n_samples, dB)`` giving base coordinates for each sample.</span>
+<span class="sd">        One-dimensional inputs are reshaped to ``(n_samples, 1)``.</span>
+<span class="sd">    U :</span>
+<span class="sd">        Optional boolean membership matrix of shape ``(n_sets, n_samples)``.</span>
+<span class="sd">        If not provided, subclasses compute it in :meth:`build`.</span>
+<span class="sd">    pou :</span>
+<span class="sd">        Optional partition of unity weights of shape ``(n_sets, n_samples)``.</span>
+<span class="sd">        Typically satisfies ``pou[:,s].sum() == 1`` for each sample ``s`` (when covered).</span>
+<span class="sd">    landmarks :</span>
+<span class="sd">        Optional landmark coordinates of shape ``(n_sets, dB)`` used for visualization</span>
+<span class="sd">        and for some cover constructions (e.g. metric ball covers).</span>
+<span class="sd">    metric :</span>
+<span class="sd">        Distance model used by the cover (for constructions that require it).</span>
+<span class="sd">        May be a Metric object with ``pairwise`` or a scalar callable; it is normalized</span>
+<span class="sd">        by :meth:`ensure_metric`.</span>
+<span class="sd">    full_dist_mat :</span>
+<span class="sd">        Optional cached sample-sample distance matrix for visualization.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_name, base_name_latex :</span>
+<span class="sd">        Optional base labels used in plots and summaries. If not set explicitly,</span>
+<span class="sd">        :meth:`ensure_metric` will inherit these from the metric object when available.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Most downstream algorithms expect ``U`` and ``pou`` to be populated.</span>
+<span class="sd">      Use :meth:`ensure_built` to build lazily.</span>
+<span class="sd">    - The “recorded nerve” is whatever simplices the cover reports via</span>
+<span class="sd">      ``nerve_edges/nerve_triangles/...``. It may be truncated even if ``U``</span>
+<span class="sd">      contains higher-order overlaps.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>                 <span class="c1"># (n_samples, dB)</span>
     <span class="n">U</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>          <span class="c1"># (n_sets, n_samples) bool</span>
     <span class="n">pou</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>        <span class="c1"># (n_sets, n_samples) float</span>
@@ -782,10 +915,66 @@
         <span class="n">highlight_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Show the nerve of the cover.</span>
+<span class="sd">        Visualize the cover nerve as an interactive Plotly figure.</span>
 
-<span class="sd">        - If edge_weights is None: static plot (no slider).</span>
-<span class="sd">        - Otherwise: slider plot filtering by edge_weights.</span>
+<span class="sd">        This method requires the cover to have landmark coordinates (one per cover set)</span>
+<span class="sd">        and a built membership matrix ``U``. It plots:</span>
+
+<span class="sd">        - vertices at ``self.landmarks`` (one point per cover set),</span>
+<span class="sd">        - edges from :meth:`nerve_edges`,</span>
+<span class="sd">        - optional filled triangles from :meth:`nerve_triangles`.</span>
+
+<span class="sd">        Two modes are supported:</span>
+
+<span class="sd">        **Static mode (no slider)**</span>
+<span class="sd">            If ``edge_weights`` is None, a single figure is produced. Optionally, you may:</span>
+<span class="sd">            - show triangles with configurable opacity/color,</span>
+<span class="sd">            - highlight specific edges,</span>
+<span class="sd">            - overlay cochains.</span>
+
+<span class="sd">        **Slider mode (edge filtering)**</span>
+<span class="sd">            If ``edge_weights`` is provided, the visualization includes a slider that filters</span>
+<span class="sd">            edges by weight threshold (and displays the induced subcomplex). This delegates to</span>
+<span class="sd">            :func:`circle_bundles.viz.nerve_plotly.nerve_with_slider`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        title :</span>
+<span class="sd">            Optional plot title.</span>
+<span class="sd">        show_labels :</span>
+<span class="sd">            Whether to show vertex labels (set indices) in the plot.</span>
+<span class="sd">        show_axes :</span>
+<span class="sd">            Whether to show 3D axes in the Plotly scene (useful for debugging).</span>
+<span class="sd">        tri_opacity :</span>
+<span class="sd">            Opacity for triangle faces (ignored if no triangles are drawn).</span>
+<span class="sd">        tri_color :</span>
+<span class="sd">            Color used for triangle faces (Plotly color string).</span>
+<span class="sd">        cochains :</span>
+<span class="sd">            Optional list of cochain dictionaries to overlay on the nerve.</span>
+<span class="sd">            Each cochain is a mapping from a simplex (tuple of vertex indices) to a value</span>
+<span class="sd">            used by the plotting code (e.g. for coloring). The exact interpretation depends</span>
+<span class="sd">            on the nerve plotting utilities.</span>
+<span class="sd">        edge_weights :</span>
+<span class="sd">            Optional mapping from edges to weights. If provided, enables slider mode.</span>
+<span class="sd">            The keys must be canonical edges as returned by :func:`canon_edge` /</span>
+<span class="sd">            :meth:`nerve_edges`.</span>
+<span class="sd">        edge_cutoff :</span>
+<span class="sd">            Optional edge cutoff for static plots (may be ignored in slider mode,</span>
+<span class="sd">            depending on the plotting utility).</span>
+<span class="sd">        highlight_edges :</span>
+<span class="sd">            Optional set of edges to emphasize in a separate style layer.</span>
+<span class="sd">        highlight_color :</span>
+<span class="sd">            Color used for highlighted edges.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fig :</span>
+<span class="sd">            The Plotly figure object.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If ``landmarks`` or ``U`` is missing (i.e., the cover cannot be visualized).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -843,18 +1032,77 @@
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NerveSummary</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Summarize the cover and its recorded nerve (dims 0..3), plus overlap-order evidence from U.</span>
+<span class="sd">        Summarize the cover and its recorded nerve (dimensions 0..3), with optional plots.</span>
 
-<span class="sd">        Printing rules:</span>
-<span class="sd">          - If max sample overlap order &gt; 4 (i.e. some sample lies in ≥5 sets),</span>
-<span class="sd">            then print recorded counts for 0..3 explicitly (even if 2/3 are zero),</span>
-<span class="sd">            and also print overlap info (max order + #samples in ≥5 sets).</span>
-<span class="sd">          - Otherwise, print counts only up to last nonzero recorded dimension,</span>
-<span class="sd">            plus a single &#39;no recorded simplices in dimensions ≥ ...&#39; line.</span>
+<span class="sd">        This function builds (if needed) the cover membership matrix ``U`` and computes:</span>
 
-<span class="sd">        Plotting:</span>
-<span class="sd">          - plot_kind=&quot;box&quot;: box-and-whisker plot of intersection cardinalities for</span>
-<span class="sd">            recorded 1/2/3-simplices, omitting any missing dimensions.</span>
+<span class="sd">        - number of sets and samples,</span>
+<span class="sd">        - recorded simplex counts:</span>
+<span class="sd">          ``#0-simplices = n_sets``, and counts of recorded edges/triangles/tetrahedra</span>
+<span class="sd">          as returned by :meth:`nerve_edges`, :meth:`nerve_triangles`, :meth:`nerve_tetrahedra`,</span>
+<span class="sd">        - overlap-order evidence from ``U``:</span>
+<span class="sd">          for each sample, how many cover sets contain it (the “overlap order”).</span>
+
+<span class="sd">        A key consistency check is whether the data show overlaps beyond what the cover</span>
+<span class="sd">        explicitly records. For example, if some sample lies in ≥5 sets, then the *true*</span>
+<span class="sd">        nerve necessarily contains simplices of dimension ≥4. Since this library’s covers</span>
+<span class="sd">        typically record simplices only up to dimension 3, we surface this mismatch as a warning.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        compute_cardinalities :</span>
+<span class="sd">            If True, also compute intersection cardinalities for recorded simplices:</span>
+<span class="sd">            ``|U_i|``, ``|U_i ∩ U_j|``, ``|U_i ∩ U_j ∩ U_k|``, and optionally 4-way intersections.</span>
+<span class="sd">            These populate the ``*_card`` fields of the returned :class:`NerveSummary`.</span>
+<span class="sd">        plot :</span>
+<span class="sd">            If True, display a plot summarizing the intersection cardinalities.</span>
+<span class="sd">            Requires ``compute_cardinalities=True``.</span>
+<span class="sd">        plot_kind :</span>
+<span class="sd">            Currently only ``&quot;box&quot;`` is supported: box-and-whisker plots of recorded</span>
+<span class="sd">            simplex intersection cardinalities, omitting missing dimensions.</span>
+<span class="sd">        latex :</span>
+<span class="sd">            Controls printing style when ``verbose=True``:</span>
+<span class="sd">            - ``&quot;auto&quot;`` (default): attempt rich Markdown display in notebooks, else plain text</span>
+<span class="sd">            - True: force Markdown attempt</span>
+<span class="sd">            - False: force plain text printing</span>
+<span class="sd">        show_tets_plot :</span>
+<span class="sd">            If True and tetrahedra cardinalities exist, include them in the plot panel list.</span>
+<span class="sd">        dpi, figsize :</span>
+<span class="sd">            Plot formatting controls.</span>
+<span class="sd">        save_path :</span>
+<span class="sd">            If provided and ``plot=True``, save a PDF of the plot using this prefix/path.</span>
+<span class="sd">            The function appends ``&quot;_cover_summary.pdf&quot;``.</span>
+<span class="sd">        verbose :</span>
+<span class="sd">            If True, print/display the summary.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        summary :</span>
+<span class="sd">            A :class:`NerveSummary` object containing counts, optional cardinalities,</span>
+<span class="sd">            overlap evidence, and any warnings.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        AttributeError</span>
+<span class="sd">            If the cover has no membership matrix ``U`` after building (should not happen</span>
+<span class="sd">            for correct cover implementations).</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``plot=True`` but ``compute_cardinalities=False``, or if an unsupported</span>
+<span class="sd">            ``plot_kind`` is requested.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        **Printing / warning policy**</span>
+<span class="sd">        - If the maximum sample overlap order is &gt; 4 (i.e. some sample lies in ≥5 sets),</span>
+<span class="sd">          the summary prints all recorded simplex counts for dimensions 0..3 and includes</span>
+<span class="sd">          overlap-order lines (max order and number of samples in ≥5 sets).</span>
+<span class="sd">        - Otherwise, it prints counts only up to the last nonzero recorded dimension and</span>
+<span class="sd">          adds a single “no recorded simplices in dimensions ≥ …” line.</span>
+
+<span class="sd">        **Interpretation**</span>
+<span class="sd">        - Overlap order is computed directly from ``U`` and reflects *evidence in the data*.</span>
+<span class="sd">        - Simplex counts are the *recorded* nerve simplices returned by the cover methods.</span>
+<span class="sd">          If those counts disagree with the overlap evidence, warnings highlight the mismatch.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -953,35 +1201,87 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="MetricBallCover">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.MetricBallCover">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">MetricBallCover</span><span class="p">(</span><span class="n">CoverBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cover by metric balls centered at landmark points.</span>
+
+<span class="sd">    Given base points ``x_s`` and landmark centers ``ℓ_i``, this cover defines:</span>
+
+<span class="sd">    - membership: ``U[i,s] = (d(ℓ_i, x_s) &lt; radius)``</span>
+<span class="sd">    - partition of unity: a linear “hat” weight</span>
+<span class="sd">      ``w[i,s] = max(0, 1 - d(ℓ_i, x_s) / radius)``, normalized across sets for each sample.</span>
+
+<span class="sd">    This is a simple, widely useful cover construction for point clouds in Euclidean</span>
+<span class="sd">    space or in any space equipped with a vectorized metric.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_points :</span>
+<span class="sd">        Array of shape ``(n_samples, dB)`` giving base coordinates.</span>
+<span class="sd">    landmarks :</span>
+<span class="sd">        Array of shape ``(n_sets, dB)`` giving the cover centers.</span>
+<span class="sd">    radius :</span>
+<span class="sd">        Ball radius (in the units of the chosen metric).</span>
+<span class="sd">    metric :</span>
+<span class="sd">        Distance model. May be:</span>
+<span class="sd">        - a Metric-like object with ``pairwise(X, Y=None)``, or</span>
+<span class="sd">        - a scalar callable ``metric(p, q)`` (requires SciPy for vectorization fallback), or</span>
+<span class="sd">        - None (defaults to :class:`~circle_bundles.metrics.EuclideanMetric`).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The cover sets are *open* balls (strict inequality).</span>
+<span class="sd">    - The recorded nerve is computed directly from ``U`` by checking whether</span>
+<span class="sd">      intersections are nonempty (for edges, triangles, and tetrahedra).</span>
+<span class="sd">    - If a sample lies in no sets (possible if radius is too small), the current</span>
+<span class="sd">      POU normalization leaves that sample with all-zero weights.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    TriangulationStarCover :</span>
+<span class="sd">        Cover induced by open stars in a triangulation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">landmarks</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">landmarks</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span class="n">metric</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_metric</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">normalize_shapes</span><span class="p">()</span>  
-        
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalize_shapes</span><span class="p">()</span>
+
 <div class="viewcode-block" id="MetricBallCover.build">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover.build">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.MetricBallCover.build">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MetricBallCover&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the cover membership matrix ``U`` and partition of unity ``pou``.</span>
+
+<span class="sd">        Populates</span>
+<span class="sd">        ---------</span>
+<span class="sd">        U :</span>
+<span class="sd">            Boolean array of shape ``(n_sets, n_samples)`` where ``U[i,s]`` indicates</span>
+<span class="sd">            whether sample ``s`` lies in the radius-ball around landmark ``i``.</span>
+<span class="sd">        pou :</span>
+<span class="sd">            Float array of shape ``(n_sets, n_samples)`` giving normalized linear</span>
+<span class="sd">            hat weights over the sets containing each sample.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self :</span>
+<span class="sd">            The built cover (for chaining).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">landmarks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;MetricBallCover requires landmarks.&quot;</span><span class="p">)</span>
 
-            
         <span class="n">M</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ensure_metric</span><span class="p">()</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">M</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">landmarks</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_points</span><span class="p">))</span>  <span class="c1"># (n_sets, n_samples)</span>
-
-        <span class="c1"># optional cache for viz (sample-sample)</span>
-<span class="c1">#        self.full_dist_mat = M.pairwise(np.asarray(self.base_points))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span>
 
@@ -995,8 +1295,19 @@
 
 
 <div class="viewcode-block" id="MetricBallCover.nerve_edges">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover.nerve_edges">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.MetricBallCover.nerve_edges">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recorded 1-simplices of the nerve.</span>
+
+<span class="sd">        An edge (i,j) is included when the intersection ``U_i ∩ U_j`` contains</span>
+<span class="sd">        at least one sample.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        edges :</span>
+<span class="sd">            List of canonical edges ``(i,j)`` with ``i &lt; j``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -1011,8 +1322,19 @@
 
 
 <div class="viewcode-block" id="MetricBallCover.nerve_triangles">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover.nerve_triangles">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.MetricBallCover.nerve_triangles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_triangles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recorded 2-simplices of the nerve.</span>
+
+<span class="sd">        A triangle (i,j,k) is included when the triple intersection</span>
+<span class="sd">        ``U_i ∩ U_j ∩ U_k`` is nonempty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        triangles :</span>
+<span class="sd">            List of canonical triangles ``(i,j,k)`` with ``i &lt; j &lt; k``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -1031,10 +1353,18 @@
 
 
 <div class="viewcode-block" id="MetricBallCover.nerve_tetrahedra">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.MetricBallCover.nerve_tetrahedra">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.MetricBallCover.nerve_tetrahedra">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_tetrahedra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        3-simplices in the nerve: 4-way overlaps U_i ∩ U_j ∩ U_k ∩ U_l ≠ ∅.</span>
+<span class="sd">        Recorded 3-simplices of the nerve.</span>
+
+<span class="sd">        A tetrahedron (i,j,k,ℓ) is included when the 4-way intersection</span>
+<span class="sd">        ``U_i ∩ U_j ∩ U_k ∩ U_ℓ`` is nonempty.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tetrahedra :</span>
+<span class="sd">            List of canonical 4-tuples ``(i,j,k,ℓ)`` with ``i &lt; j &lt; k &lt; ℓ``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1058,22 +1388,66 @@
 </div>
 
 
-
 <span class="c1"># ----------------------------</span>
 <span class="c1"># Triangulation star cover</span>
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="TriangulationStarCover">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.TriangulationStarCover">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.TriangulationStarCover">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">TriangulationStarCover</span><span class="p">(</span><span class="n">CoverBase</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Cover by open stars of vertices in a triangulation K.</span>
-<span class="sd">    Uses K_preimages: the location of each base point in |K| coordinates.</span>
+<span class="sd">    Cover by open stars of vertices in a triangulation.</span>
 
-<span class="sd">    Expected:</span>
-<span class="sd">      - K.get_simplices() yields (simplex_tuple, filtration_value) like Gudhi.</span>
-<span class="sd">      - vertex_coords_dict maps old_vertex_id -&gt; coords (D,)</span>
+<span class="sd">    This cover is defined from a simplicial complex ``K`` that triangulates a base</span>
+<span class="sd">    space (typically 2D for this implementation), together with “preimages”</span>
+<span class="sd">    ``K_preimages`` giving each sample’s location in the geometric realization ``|K|``.</span>
+
+<span class="sd">    Each cover set corresponds to a vertex ``v`` of ``K`` and contains samples whose</span>
+<span class="sd">    assigned triangle includes that vertex (i.e. samples lying in triangles incident</span>
+<span class="sd">    to ``v``). The partition of unity is defined using barycentric coordinates within</span>
+<span class="sd">    the assigned triangle: the three vertices of the triangle receive the barycentric</span>
+<span class="sd">    weights, and all other vertices receive weight 0.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_points :</span>
+<span class="sd">        Array of shape ``(n_samples, dB)``. Kept for consistency with other covers.</span>
+<span class="sd">        (This cover uses ``K_preimages`` for assignment/POU.)</span>
+<span class="sd">    K_preimages :</span>
+<span class="sd">        Array of shape ``(n_samples, D)`` giving each sample’s position in the</span>
+<span class="sd">        coordinate system used by ``vertex_coords_dict`` (i.e. coordinates for</span>
+<span class="sd">        the geometric realization of ``K``).</span>
+<span class="sd">    K :</span>
+<span class="sd">        Simplicial complex object with a Gudhi-like interface:</span>
+<span class="sd">        ``K.get_simplices()`` yields ``(simplex_tuple, filtration_value)``.</span>
+<span class="sd">        This implementation expects at least 1- and 2-simplices.</span>
+<span class="sd">    vertex_coords_dict :</span>
+<span class="sd">        Mapping ``old_vertex_id -&gt; coords`` where ``coords`` has shape ``(D,)``.</span>
+<span class="sd">        Vertex ids need not be contiguous; this cover relabels them to ``0..nV-1``.</span>
+<span class="sd">    metric :</span>
+<span class="sd">        Optional metric (not used for construction here), but accepted for API</span>
+<span class="sd">        uniformity and for downstream plotting/labels.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    landmarks :</span>
+<span class="sd">        Set to the relabeled vertex coordinates of shape ``(nV, D)`` (after build).</span>
+<span class="sd">        These are used for nerve visualization.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - This implementation builds ``U`` and ``pou`` from *triangle membership*.</span>
+<span class="sd">      It is effectively a 2-complex cover: :meth:`nerve_tetrahedra` is intentionally</span>
+<span class="sd">      not exposed (returns ``[]``), even if ``K`` contains 3-simplices.</span>
+<span class="sd">    - Every sample must be assigned to some triangle. If not, :meth:`build` raises</span>
+<span class="sd">      an error, typically indicating inconsistent preimages or a too-strict tolerance.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    MetricBallCover :</span>
+<span class="sd">        A cover built from metric balls around landmark points.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -1081,7 +1455,6 @@
         <span class="n">K</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
         <span class="n">vertex_coords_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
         <span class="n">metric</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">base_points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K_preimages</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">K_preimages</span><span class="p">)</span>
@@ -1099,11 +1472,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sample_bary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>    <span class="c1"># (n_samples,3)</span>
 
 <div class="viewcode-block" id="TriangulationStarCover.build">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.TriangulationStarCover.build">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.TriangulationStarCover.build">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;TriangulationStarCover&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the star cover membership matrix ``U`` and barycentric POU ``pou``.</span>
+
+<span class="sd">        This method:</span>
+<span class="sd">        1) relabels vertices to contiguous ids and sets ``landmarks``,</span>
+<span class="sd">        2) extracts triangles from ``K``,</span>
+<span class="sd">        3) assigns each sample to a triangle using barycentric coordinates,</span>
+<span class="sd">        4) builds ``U`` by marking membership in the three incident vertex stars,</span>
+<span class="sd">        5) builds ``pou`` from barycentric weights.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self :</span>
+<span class="sd">            The built cover (for chaining).</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If any sample cannot be assigned to a triangle (e.g. inconsistent</span>
+<span class="sd">            coordinates or tolerance too strict).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_relabel_vertices</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_extract_triangles</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_tetrahedra</span><span class="p">()</span>          <span class="c1"># extracted, but note nerve_tetrahedra() below</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extract_tetrahedra</span><span class="p">()</span>          <span class="c1"># extracted but not exposed via the nerve API</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_assign_samples_to_triangles</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_star_sets_U</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_build_pou_from_barycentric</span><span class="p">()</span>
@@ -1111,8 +1505,16 @@
 
 
 <div class="viewcode-block" id="TriangulationStarCover.nerve_edges">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.TriangulationStarCover.nerve_edges">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.TriangulationStarCover.nerve_edges">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recorded 1-simplices of the nerve (edges of the triangulation).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        edges :</span>
+<span class="sd">            Sorted list of canonical edges in the relabeled vertex ids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -1125,23 +1527,51 @@
 
 
 <div class="viewcode-block" id="TriangulationStarCover.nerve_triangles">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.TriangulationStarCover.nerve_triangles">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.TriangulationStarCover.nerve_triangles">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_triangles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recorded 2-simplices of the nerve (triangles of the triangulation).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        triangles :</span>
+<span class="sd">            List of canonical triangles in relabeled vertex ids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ensure_built</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">triangles</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TriangulationStarCover.nerve_tetrahedra">
-<a class="viewcode-back" href="../../api/covers.html#circle_bundles.TriangulationStarCover.nerve_tetrahedra">[docs]</a>
+<a class="viewcode-back" href="../../api/covers.html#circle_bundles.base_covers.TriangulationStarCover.nerve_tetrahedra">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">nerve_tetrahedra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]:</span>
-        <span class="c1"># Explicitly: “this cover currently models a 2-complex”</span>
-        <span class="c1"># (We still extract tetrahedra from K and store them in self.tetrahedra,</span>
-        <span class="c1">#  but we do not expose them here unless/when you decide to.)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recorded 3-simplices of the nerve.</span>
+
+<span class="sd">        This cover currently models a 2-complex (triangle-based stars), so we do not</span>
+<span class="sd">        expose tetrahedra even if the underlying complex ``K`` contains them.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tetrahedra :</span>
+<span class="sd">            Always returns ``[]``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[]</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_relabel_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Relabel vertex ids to contiguous integers and populate landmark coordinates.</span>
+
+<span class="sd">        Populates</span>
+<span class="sd">        ---------</span>
+<span class="sd">        vid_old_to_new, vid_new_to_old :</span>
+<span class="sd">            Dictionaries mapping between original ids and contiguous ids.</span>
+<span class="sd">        vertex_coords :</span>
+<span class="sd">            Array of shape ``(nV, D)`` of vertex coordinates.</span>
+<span class="sd">        landmarks :</span>
+<span class="sd">            Same as ``vertex_coords`` (for nerve visualization).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">old_vids</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_coords_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">old_vids</span><span class="p">)}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">vid_new_to_old</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -1149,6 +1579,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">landmarks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_coords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_extract_triangles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract 2-simplices from ``K`` and store them in canonical form.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">tris</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Tri</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">K</span><span class="o">.</span><span class="n">get_simplices</span><span class="p">():</span>
@@ -1159,9 +1592,12 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_extract_tetrahedra</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extract 3-simplices from K, if any exist.</span>
-<span class="sd">        This does NOT change how U/POU are built (still triangle-based).</span>
-<span class="sd">        It simply stores them for possible future use.</span>
+<span class="sd">        Extract 3-simplices from ``K`` (if present) and store them.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This does not change how ``U`` or ``pou`` are constructed (still triangle-based).</span>
+<span class="sd">        The tetrahedra are stored only for possible future use.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">vid_old_to_new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">tets</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="n">Tet</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
@@ -1172,6 +1608,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">tetrahedra</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">tets</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_assign_samples_to_triangles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign each sample to a triangle by barycentric containment.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tol :</span>
+<span class="sd">            Numerical tolerance used when deciding whether barycentric coordinates</span>
+<span class="sd">            are inside the triangle.</span>
+
+<span class="sd">        Populates</span>
+<span class="sd">        ---------</span>
+<span class="sd">        sample_tri :</span>
+<span class="sd">            Integer array of shape ``(n_samples,)`` giving the assigned triangle index.</span>
+<span class="sd">        sample_bary :</span>
+<span class="sd">            Float array of shape ``(n_samples, 3)`` giving barycentric coordinates</span>
+<span class="sd">            relative to the assigned triangle.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If any sample cannot be assigned to any triangle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -1193,6 +1651,11 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Some samples were not assigned to any triangle (bad preimage / tol too strict).&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_build_star_sets_U</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build membership matrix ``U`` from the assigned triangle per sample.</span>
+
+<span class="sd">        Each sample belongs to exactly three vertex stars: the vertices of its assigned triangle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertex_coords</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_tri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -1210,6 +1673,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="o">=</span> <span class="n">U</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_build_pou_from_barycentric</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build partition of unity ``pou`` from stored barycentric coordinates.</span>
+
+<span class="sd">        For each sample, the three incident vertices receive weights equal to the</span>
+<span class="sd">        barycentric coordinates within the assigned triangle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">triangles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_tri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>

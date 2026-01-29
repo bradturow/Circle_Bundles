@@ -364,7 +364,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;get_dense_fiber_indices&quot;</span><span class="p">,</span>
     <span class="s2">&quot;get_local_pca&quot;</span><span class="p">,</span>
     <span class="s2">&quot;plot_local_pca&quot;</span><span class="p">,</span>
     <span class="s2">&quot;get_local_rips&quot;</span><span class="p">,</span>
@@ -484,7 +483,7 @@
 
 
 <div class="viewcode-block" id="get_local_pca">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.get_local_pca">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.local_analysis.get_local_pca">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_local_pca</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -494,13 +493,50 @@
     <span class="n">random_state</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Local PCA on each fiber (after optional subsampling).</span>
+<span class="sd">    Compute PCA embeddings separately on each fiber of a cover.</span>
+
+<span class="sd">    This is a lightweight diagnostic tool: for each fiber (row of ``U``), we take the</span>
+<span class="sd">    subset of samples belonging to that fiber, optionally subsample it, and run PCA on</span>
+<span class="sd">    those points only. The result is a per-fiber low-dimensional embedding that can be</span>
+<span class="sd">    visualized with :func:`plot_local_pca`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data:</span>
+<span class="sd">        Array of shape ``(n_points, d)`` containing the ambient data vectors.</span>
+<span class="sd">    U:</span>
+<span class="sd">        Boolean indicator matrix of shape ``(n_fibers, n_points)``. Entry ``U[r, i]``</span>
+<span class="sd">        should be True exactly when point ``i`` lies in fiber/patch ``r``.</span>
+<span class="sd">    p_values:</span>
+<span class="sd">        Optional per-fiber sampling fractions in ``[0, 1]``. If provided, must have</span>
+<span class="sd">        length ``n_fibers``. A value ``p_values[r] = p`` means “use approximately</span>
+<span class="sd">        ``floor(p * m_r)`` points from fiber ``r``”, where ``m_r`` is that fiber’s</span>
+<span class="sd">        membership size. If None, uses all points in each fiber.</span>
+<span class="sd">    to_view:</span>
+<span class="sd">        Optional list of fiber indices to process. If None, processes all fibers.</span>
+<span class="sd">    n_components:</span>
+<span class="sd">        Number of PCA components to compute per fiber.</span>
+<span class="sd">    random_state:</span>
+<span class="sd">        Seed used for subsampling and passed to PCA (for reproducibility).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    fiber_ids : list[int]</span>
-<span class="sd">    idx_list  : list[np.ndarray]          indices used in each fiber</span>
-<span class="sd">    proj_list : list[np.ndarray | None]   PCA projections (m_i, n_components) or None</span>
+<span class="sd">    fiber_ids:</span>
+<span class="sd">        The list of fiber indices actually processed (either all fibers, or ``to_view``).</span>
+<span class="sd">    idx_list:</span>
+<span class="sd">        List of integer index arrays, one per processed fiber. These are the point indices</span>
+<span class="sd">        used for PCA in that fiber (after subsampling, if any).</span>
+<span class="sd">    proj_list:</span>
+<span class="sd">        List of PCA projections, one per processed fiber. Entry ``proj_list[k]`` is an</span>
+<span class="sd">        array of shape ``(m_k, n_components)`` for fiber ``fiber_ids[k]``, or None if that</span>
+<span class="sd">        fiber contained fewer than 2 usable points.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - This function lazily imports scikit-learn so importing this module does not require</span>
+<span class="sd">      scikit-learn unless you call it.</span>
+<span class="sd">    - If you want to control the subsampling behavior directly, see</span>
+<span class="sd">      ``get_dense_fiber_indices`` (currently not exported).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># lazy import so this module doesn&#39;t require sklearn unless used</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>  <span class="c1"># type: ignore</span>
@@ -526,7 +562,7 @@
 
 
 <div class="viewcode-block" id="plot_local_pca">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.plot_local_pca">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.local_analysis.plot_local_pca">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_local_pca</span><span class="p">(</span>
     <span class="n">fiber_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">proj_list</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
@@ -538,7 +574,38 @@
     <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Grid of PCA scatterplots. Returns (fig, axes).</span>
+<span class="sd">    Plot a grid of 2D PCA scatterplots for multiple fibers.</span>
+
+<span class="sd">    This function is typically used with the output of :func:`get_local_pca`.</span>
+<span class="sd">    Each subplot corresponds to one fiber; fibers whose PCA projection is missing</span>
+<span class="sd">    (None or too small) are hidden.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fiber_ids:</span>
+<span class="sd">        Fiber indices (for labeling). Usually the first output of :func:`get_local_pca`.</span>
+<span class="sd">    proj_list:</span>
+<span class="sd">        Per-fiber PCA coordinates. Usually the third output of :func:`get_local_pca`.</span>
+<span class="sd">        Each entry should be an array of shape ``(m_i, 2)`` (at least 2 points),</span>
+<span class="sd">        or None to skip that fiber.</span>
+<span class="sd">    n_cols:</span>
+<span class="sd">        Number of columns in the subplot grid.</span>
+<span class="sd">    titles:</span>
+<span class="sd">        Title behavior:</span>
+<span class="sd">          - ``&quot;default&quot;``: uses LaTeX titles of the form ``\\pi^{-1}(U_j)``.</span>
+<span class="sd">          - None: no titles.</span>
+<span class="sd">          - sequence of strings: custom titles aligned with ``fiber_ids``.</span>
+<span class="sd">    font_size:</span>
+<span class="sd">        Title font size.</span>
+<span class="sd">    point_size:</span>
+<span class="sd">        Scatter marker size.</span>
+<span class="sd">    save_path:</span>
+<span class="sd">        If provided, save the figure to this path (any extension supported by matplotlib).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig, axes:</span>
+<span class="sd">        The matplotlib figure and a flat array of axes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># lazy import</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>  <span class="c1"># noqa: F401  # (used via axes methods)</span>
@@ -586,7 +653,7 @@
 
 
 <div class="viewcode-block" id="get_local_rips">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.get_local_rips">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.local_analysis.get_local_rips">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_local_rips</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -599,11 +666,53 @@
     <span class="o">**</span><span class="n">ripser_kwargs</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Run Ripser on each fiber after optional subsampling.</span>
+<span class="sd">    Compute Ripser persistence separately on each fiber of a cover.</span>
+
+<span class="sd">    For each fiber (row of ``U``), this function extracts the corresponding points</span>
+<span class="sd">    from ``data`` (optionally subsampling them), then runs ``ripser`` on that fiber’s</span>
+<span class="sd">    point cloud. The resulting persistence diagrams can be plotted with</span>
+<span class="sd">    :func:`plot_local_rips`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data:</span>
+<span class="sd">        Array of shape ``(n_points, d)`` containing the ambient data vectors.</span>
+<span class="sd">    U:</span>
+<span class="sd">        Boolean indicator matrix of shape ``(n_fibers, n_points)`` indicating fiber</span>
+<span class="sd">        membership (same convention as :func:`get_local_pca`).</span>
+<span class="sd">    p_values:</span>
+<span class="sd">        Optional per-fiber sampling fractions in ``[0, 1]`` (same convention as</span>
+<span class="sd">        :func:`get_local_pca`).</span>
+<span class="sd">    to_view:</span>
+<span class="sd">        Optional list of fiber indices to process. If None, processes all fibers.</span>
+<span class="sd">    maxdim:</span>
+<span class="sd">        Maximum homology dimension for Ripser. If ``maxdim &lt; 0``, returns None results</span>
+<span class="sd">        for all fibers (useful as a quick “skip” switch).</span>
+<span class="sd">    n_perm:</span>
+<span class="sd">        Upper bound on the number of points passed to ripser per fiber. For each fiber,</span>
+<span class="sd">        we set ``n_use = min(n_perm, m_fiber)`` and pass ``n_perm=n_use`` to ripser.</span>
+<span class="sd">        (This leverages ripser’s internal subsampling/permutation behavior.)</span>
+<span class="sd">    random_state:</span>
+<span class="sd">        Seed used for the initial per-fiber subsampling (via ``p_values``).</span>
+<span class="sd">    **ripser_kwargs:</span>
+<span class="sd">        Additional keyword arguments forwarded directly to ``ripser(...)``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fiber_ids:</span>
+<span class="sd">        The list of fiber indices processed.</span>
+<span class="sd">    idx_list:</span>
+<span class="sd">        List of integer index arrays (points used in each fiber after subsampling).</span>
+<span class="sd">    rips_list:</span>
+<span class="sd">        List of ripser result dicts, one per fiber, or None for fibers with fewer than</span>
+<span class="sd">        2 usable points.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Imports ripser lazily so importing this module doesn&#39;t require ripser.</span>
+<span class="sd">    - This function lazily imports ``ripser`` so importing this module does not require</span>
+<span class="sd">      ripser unless you call it.</span>
+<span class="sd">    - If you want exact control over which points go into each fiber computation, see</span>
+<span class="sd">      ``get_dense_fiber_indices`` (currently not exported).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">ripser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ripser</span>  <span class="c1"># type: ignore  # lazy import</span>
 
@@ -633,7 +742,7 @@
 
 
 <div class="viewcode-block" id="plot_local_rips">
-<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.plot_local_rips">[docs]</a>
+<a class="viewcode-back" href="../../../api/analysis.html#circle_bundles.analysis.local_analysis.plot_local_rips">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">plot_local_rips</span><span class="p">(</span>
     <span class="n">fiber_ids</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
     <span class="n">rips_list</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">],</span>
@@ -644,11 +753,39 @@
     <span class="n">save_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Grid of persistence diagrams. Returns (fig, axes).</span>
+<span class="sd">    Plot a grid of persistence diagrams for multiple fibers.</span>
+
+<span class="sd">    This function is typically used with the output of :func:`get_local_rips`.</span>
+<span class="sd">    Each subplot corresponds to one fiber; fibers with missing ripser output are hidden.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fiber_ids:</span>
+<span class="sd">        Fiber indices (for labeling). Usually the first output of :func:`get_local_rips`.</span>
+<span class="sd">    rips_list:</span>
+<span class="sd">        Per-fiber ripser outputs. Usually the third output of :func:`get_local_rips`.</span>
+<span class="sd">        Each entry should be a dict containing a ``&quot;dgms&quot;`` key, or None to skip.</span>
+<span class="sd">    n_cols:</span>
+<span class="sd">        Number of columns in the subplot grid.</span>
+<span class="sd">    titles:</span>
+<span class="sd">        Title behavior:</span>
+<span class="sd">          - ``&quot;default&quot;``: uses LaTeX titles of the form ``\\pi^{-1}(U_j)``.</span>
+<span class="sd">          - None: no titles.</span>
+<span class="sd">          - sequence of strings: custom titles aligned with ``fiber_ids``.</span>
+<span class="sd">    font_size:</span>
+<span class="sd">        Title font size.</span>
+<span class="sd">    save_path:</span>
+<span class="sd">        If provided, save the figure to this path.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fig, axes:</span>
+<span class="sd">        The matplotlib figure and a flat array of axes.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    Imports persim lazily so importing this module doesn&#39;t require persim.</span>
+<span class="sd">    - This function lazily imports ``persim`` (for ``plot_diagrams``) so importing this</span>
+<span class="sd">      module does not require persim unless you call it.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">persim</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_diagrams</span>  <span class="c1"># type: ignore  # lazy import</span>
 

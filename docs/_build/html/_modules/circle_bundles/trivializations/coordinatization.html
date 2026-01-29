@@ -370,6 +370,10 @@
 <span class="n">Tet</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
 
 
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;GlobalTrivializationResult&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
 <span class="c1"># ============================================================</span>
 <span class="c1"># Canonicalization helpers</span>
 <span class="c1"># ============================================================</span>
@@ -397,7 +401,7 @@
 <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="MaxTrivialSubcomplex">
-<a class="viewcode-back" href="../../../api/public_api.html#circle_bundles.MaxTrivialSubcomplex">[docs]</a>
+<a class="viewcode-back" href="../../../api/public_api.html#circle_bundles.api.MaxTrivialSubcomplex">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MaxTrivialSubcomplex</span><span class="p">:</span>
     <span class="n">k_removed</span><span class="p">:</span> <span class="nb">int</span>
@@ -855,12 +859,46 @@
 <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="GlobalTrivializationResult">
-<a class="viewcode-back" href="../../../api/public_api.html#circle_bundles.GlobalTrivializationResult">[docs]</a>
+<a class="viewcode-back" href="../../../api/public_api.html#circle_bundles.api.GlobalTrivializationResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">GlobalTrivializationResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Result container for a computed global circle coordinate (global trivialization).</span>
+
+<span class="sd">    This object summarizes the output of a global gauge-fixing / synchronization step</span>
+<span class="sd">    that combines local circular coordinates across a cover into a single global angle</span>
+<span class="sd">    function on the dataset.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : str</span>
+<span class="sd">        Name of the method used to compute the gauge / trivialization. Typical values:</span>
+<span class="sd">        - ``&quot;singer&quot;`` : spectral synchronization on the 1-skeleton</span>
+<span class="sd">        - ``&quot;tree&quot;``   : spanning-tree / DFS propagation</span>
+<span class="sd">        - ``&quot;pu&quot;``     : partition-of-unity pointwise gauge</span>
+
+<span class="sd">    edges_used : list[Edge]</span>
+<span class="sd">        The list of edges (cover-set adjacencies) used to define the gauge constraints.</span>
+<span class="sd">        Edges are typically canonicalized (j &lt; k) unless otherwise stated by the caller.</span>
+
+<span class="sd">    F : ndarray of shape (n_samples,)</span>
+<span class="sd">        The resulting global angle in radians, wrapped to the range [0, 2π).</span>
+<span class="sd">        This is the global circle-valued coordinate defined on samples in the union</span>
+<span class="sd">        of the cover.</span>
+
+<span class="sd">    meta : dict[str, Any]</span>
+<span class="sd">        Additional method-dependent metadata (e.g. solver options, diagnostics, or</span>
+<span class="sd">        intermediate quantities used to construct ``F``).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - This result is primarily intended for inspection and downstream visualization.</span>
+<span class="sd">    - In non-oriented settings (O(2)-bundles), callers typically first apply an</span>
+<span class="sd">      orientation gauge so that the transitions used here have determinant +1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">edges_used</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span>
-    <span class="n">F</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>                    <span class="c1"># (M,) radians global angle</span>
+    <span class="n">F</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
     <span class="n">meta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></div>
 
 </pre></div>

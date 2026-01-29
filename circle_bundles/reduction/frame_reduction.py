@@ -94,8 +94,6 @@ def canonicalize_frames_before_reduction(
 
 @dataclass
 class FrameReducerConfig:
-@dataclass
-class FrameReducerConfig:
     """
     Configuration for O(2)-equivariant dimensionality reduction of Stiefel frames.
 

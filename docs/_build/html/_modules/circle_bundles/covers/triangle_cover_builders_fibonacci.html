@@ -501,20 +501,61 @@
 <span class="c1"># -----------------------------------------------------------------------------</span>
 
 <div class="viewcode-block" id="make_s2_fibonacci_star_cover">
-<a class="viewcode-back" href="../../../api/covers.html#circle_bundles.make_s2_fibonacci_star_cover">[docs]</a>
+<a class="viewcode-back" href="../../../api/covers.html#circle_bundles.covers.triangle_cover_builders_fibonacci.make_s2_fibonacci_star_cover">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_s2_fibonacci_star_cover</span><span class="p">(</span>
     <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">n_vertices</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
     <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TriangulationStarCover</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    S^2 star cover built from the convex-hull triangulation of Fibonacci landmarks.</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a fast star cover of :math:`\mathbb{S}^2` using Fibonacci landmarks and a hull triangulation.</span>
+
+<span class="sd">    This constructs a triangulation of a set of nearly-uniform landmark points on the sphere</span>
+<span class="sd">    (via a spherical Fibonacci lattice), then assigns each sample to **the unique** hull face hit</span>
+<span class="sd">    by the ray in its direction. The resulting cover is the **open star cover** of the triangulation</span>
+<span class="sd">    vertices: each sample lies in exactly the three vertex stars of its containing triangle</span>
+<span class="sd">    (so overlap order is at most 3).</span>
+
+<span class="sd">    The returned cover is a :class:`~circle_bundles.base_covers.TriangulationStarCover` that is</span>
+<span class="sd">    already built (its ``U`` and ``pou`` are populated).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_points :</span>
+<span class="sd">        Array of shape ``(n_samples, 3)`` representing directions in :math:`\mathbb{R}^3`.</span>
+<span class="sd">        Rows are normalized internally and interpreted as points on :math:`\mathbb{S}^2`.</span>
+<span class="sd">    n_vertices :</span>
+<span class="sd">        Number of Fibonacci landmark vertices used to build the hull triangulation.</span>
+<span class="sd">        Larger values yield a finer cover (more sets, smaller stars). Default is ``256``.</span>
+<span class="sd">    eps :</span>
+<span class="sd">        Numerical stability parameter used for normalization and ray–facet intersection tests.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cover :</span>
+<span class="sd">        A built :class:`~circle_bundles.base_covers.TriangulationStarCover` representing the star cover.</span>
+<span class="sd">        Key fields include:</span>
+
+<span class="sd">        - ``cover.base_points``: normalized samples on :math:`\mathbb{S}^2` (shape ``(n,3)``)</span>
+<span class="sd">        - ``cover.landmarks``: landmark vertex coordinates (shape ``(n_vertices,3)``)</span>
+<span class="sd">        - ``cover.U``: membership matrix (shape ``(n_vertices, n_samples)``)</span>
+<span class="sd">        - ``cover.pou``: barycentric partition of unity weights (same shape as ``U``)</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    - Overlap order &lt;= 3 (each point lies in one hull face =&gt; 3 vertex stars).</span>
-<span class="sd">    - Fast: no &quot;search all triangles&quot;; we use the hit facet index.</span>
+<span class="sd">    - **Overlap order** is at most 3, since each sample is assigned to one triangle and hence</span>
+<span class="sd">      belongs to exactly three vertex stars.</span>
+<span class="sd">    - This builder uses a “hit facet index” fast path (no searching over all triangles),</span>
+<span class="sd">      so it scales well to large sample sizes.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import circle_bundles as cb</span>
+<span class="sd">    &gt;&gt;&gt; cover = cb.make_s2_fibonacci_star_cover(base_points, n_vertices=512)</span>
+<span class="sd">    &gt;&gt;&gt; summ = cover.summarize(plot=False)</span>
+<span class="sd">    &gt;&gt;&gt; # Use the cover in the main pipeline</span>
+<span class="sd">    &gt;&gt;&gt; bundle = cb.build_bundle(total_space_data, cover, show=True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">P</span> <span class="o">=</span> <span class="n">_normalize_rows</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">P</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">P</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
@@ -640,17 +681,83 @@
 <span class="c1"># RP^2 star cover (witnessed Čech nerve, BOTH lifts)</span>
 <span class="c1"># -----------------------------------------------------------------------------</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">RP2StarCover</span><span class="p">(</span><span class="n">CoverBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    RP^2 cover built from barycentric weights on hull faces, pushed down by antipodal quotient.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_rp2_fibonacci_star_cover</span><span class="p">(</span>
+    <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">n_pairs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="n">landmark_oversample</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">landmark_seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+    <span class="n">atol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RP2StarCover</span><span class="p">:</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a star cover of :math:`\mathbb{RP}^2` using Fibonacci landmarks and an antipodal-symmetric hull.</span>
 
-<span class="sd">    Key point:</span>
-<span class="sd">      For each RP^2 sample [x], we must consider BOTH lifts x and -x upstairs, then push down.</span>
+<span class="sd">    This constructs a cover downstairs on :math:`\mathbb{RP}^2` by working upstairs on :math:`\mathbb{S}^2`</span>
+<span class="sd">    and carefully pushing the result down through the antipodal quotient.</span>
 
-<span class="sd">    Nerve:</span>
-<span class="sd">      Witnessed Čech nerve computed from U itself (no ghost simplices).</span>
+<span class="sd">    Pipeline (high-level)</span>
+<span class="sd">    ---------------------</span>
+<span class="sd">    1. Canonicalize each sample ``x`` to a *hemisphere representative* ``x_rep`` of its class ``[x]``.</span>
+<span class="sd">    2. Choose ``n_pairs`` well-spread landmark representatives in :math:`\mathbb{RP}^2` via:</span>
+<span class="sd">       Fibonacci oversampling + farthest point sampling (FPS) in the chordal RP² metric.</span>
+<span class="sd">    3. Lift landmarks to :math:`\mathbb{S}^2` by adding antipodes, then triangulate via the convex hull.</span>
+<span class="sd">    4. For each sample class ``[x]``, compute hull-face hits and barycentric weights for both lifts</span>
+<span class="sd">       ``x_rep`` and ``-x_rep``.</span>
+<span class="sd">    5. Push vertex contributions down to RP² vertex ids (pairing antipodes), sum weights, and keep the</span>
+<span class="sd">       top-3 vertices per sample (renormalized).</span>
+<span class="sd">    6. Build the cover membership matrix ``U`` and partition of unity ``pou``. The nerve is “witnessed”</span>
+<span class="sd">       from ``U`` (no ghost simplices).</span>
+
+<span class="sd">    The returned object is an :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`</span>
+<span class="sd">    that is already built (its ``U`` and ``pou`` are populated), and whose metric/labels are set to</span>
+<span class="sd">    :class:`~circle_bundles.metrics.RP2UnitVectorMetric`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_points :</span>
+<span class="sd">        Array of shape ``(n_samples, 3)`` representing (approximate) unit vectors in :math:`\mathbb{R}^3`.</span>
+<span class="sd">        Each row represents a projective class ``[x]`` with the antipodal identification ``x ~ -x``.</span>
+<span class="sd">        Rows are normalized internally.</span>
+<span class="sd">    n_pairs :</span>
+<span class="sd">        Number of *projective* landmark vertices (i.e. the number of antipodal pairs).</span>
+<span class="sd">        The upstairs hull uses ``2*n_pairs`` vertices. Default is ``256``.</span>
+<span class="sd">    landmark_oversample :</span>
+<span class="sd">        Oversampling factor used before RP² farthest point sampling.</span>
+<span class="sd">        Candidates are generated with ``M = n_pairs * landmark_oversample`` Fibonacci points.</span>
+<span class="sd">    landmark_seed :</span>
+<span class="sd">        Random seed used only to choose the initial FPS index. FPS is otherwise deterministic.</span>
+<span class="sd">        Set to ``None`` for nondeterministic behavior.</span>
+<span class="sd">    eps :</span>
+<span class="sd">        Numerical stability parameter used for normalization and ray–facet intersection tests.</span>
+<span class="sd">    atol :</span>
+<span class="sd">        Tolerance used for deterministic hemisphere representative tie-breaking near the equator.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cover :</span>
+<span class="sd">        A built :class:`~circle_bundles.triangle_cover_builders_fibonacci.RP2StarCover`.</span>
+<span class="sd">        Important fields include:</span>
+
+<span class="sd">        - ``cover.base_points``: hemisphere reps of samples (shape ``(n,3)``)</span>
+<span class="sd">        - ``cover.landmarks``: hemisphere reps of RP² landmark vertices (shape ``(n_pairs,3)``)</span>
+<span class="sd">        - ``cover.U`` / ``cover.pou``: membership and partition-of-unity weights</span>
+<span class="sd">        - ``cover.metric``: :class:`~circle_bundles.metrics.RP2UnitVectorMetric`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Correct handling of :math:`\mathbb{RP}^2` requires considering **both lifts** of each sample</span>
+<span class="sd">      upstairs (``x`` and ``-x``) before pushing weights down.</span>
+<span class="sd">    - The cover is not a triangulation star cover in the same sense as the S² builder; instead,</span>
+<span class="sd">      it produces a barycentric-style star cover in RP² with a **witnessed** Čech nerve computed from ``U``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import circle_bundles as cb</span>
+<span class="sd">    &gt;&gt;&gt; cover = cb.make_rp2_fibonacci_star_cover(base_points, n_pairs=256)</span>
+<span class="sd">    &gt;&gt;&gt; cover.summarize(plot=False)</span>
+<span class="sd">    &gt;&gt;&gt; bundle = cb.build_bundle(total_space_data, cover, show=True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>            <span class="c1"># (N,3) hemisphere reps of RP^2 samples</span>
@@ -716,7 +823,7 @@
 
 
 <div class="viewcode-block" id="make_rp2_fibonacci_star_cover">
-<a class="viewcode-back" href="../../../api/covers.html#circle_bundles.make_rp2_fibonacci_star_cover">[docs]</a>
+<a class="viewcode-back" href="../../../api/covers.html#circle_bundles.covers.triangle_cover_builders_fibonacci.make_rp2_fibonacci_star_cover">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">make_rp2_fibonacci_star_cover</span><span class="p">(</span>
     <span class="n">base_points</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>

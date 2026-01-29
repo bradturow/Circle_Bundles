@@ -41,6 +41,7 @@
     <script src="../_static/documentation_options.js?v=27db1736"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'api/covers';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -368,27 +369,123 @@
                   
   <section id="covers">
 <h1>Covers<a class="headerlink" href="#covers" title="Link to this heading">#</a></h1>
+<section id="cover-classes">
+<h2>Cover classes<a class="headerlink" href="#cover-classes" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.base_covers.MetricBallCover">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.base_covers.</span></span><span class="sig-name descname"><span class="pre">MetricBallCover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#MetricBallCover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.MetricBallCover" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CoverBase</span></code></p>
+<p>Cover by metric balls centered at landmark points.</p>
+<p>Given base points <code class="docutils literal notranslate"><span class="pre">x_s</span></code> and landmark centers <code class="docutils literal notranslate"><span class="pre">ℓ_i</span></code>, this cover defines:</p>
+<ul class="simple">
+<li><p>membership: <code class="docutils literal notranslate"><span class="pre">U[i,s]</span> <span class="pre">=</span> <span class="pre">(d(ℓ_i,</span> <span class="pre">x_s)</span> <span class="pre">&lt;</span> <span class="pre">radius)</span></code></p></li>
+<li><p>partition of unity: a linear “hat” weight
+<code class="docutils literal notranslate"><span class="pre">w[i,s]</span> <span class="pre">=</span> <span class="pre">max(0,</span> <span class="pre">1</span> <span class="pre">-</span> <span class="pre">d(ℓ_i,</span> <span class="pre">x_s)</span> <span class="pre">/</span> <span class="pre">radius)</span></code>, normalized across sets for each sample.</p></li>
+</ul>
+<p>This is a simple, widely useful cover construction for point clouds in Euclidean
+space or in any space equipped with a vectorized metric.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>landmarks</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">dB)</span></code> giving base coordinates.</p></li>
+<li><p><strong>landmarks</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em> | </em><em>None</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">dB)</span></code> giving the cover centers.</p></li>
+<li><p><strong>radius</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Ball radius (in the units of the chosen metric).</p></li>
+<li><p><strong>metric</strong> (<em>Any</em>) – Distance model. May be:
+- a Metric-like object with <code class="docutils literal notranslate"><span class="pre">pairwise(X,</span> <span class="pre">Y=None)</span></code>, or
+- a scalar callable <code class="docutils literal notranslate"><span class="pre">metric(p,</span> <span class="pre">q)</span></code> (requires SciPy for vectorization fallback), or
+- None (defaults to <a class="reference internal" href="metrics.html#circle_bundles.metrics.EuclideanMetric" title="circle_bundles.metrics.EuclideanMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">EuclideanMetric</span></code></a>).</p></li>
 </ul>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>The cover sets are <em>open</em> balls (strict inequality).</p></li>
+<li><p>The recorded nerve is computed directly from <code class="docutils literal notranslate"><span class="pre">U</span></code> by checking whether
+intersections are nonempty (for edges, triangles, and tetrahedra).</p></li>
+<li><p>If a sample lies in no sets (possible if radius is too small), the current
+POU normalization leaves that sample with all-zero weights.</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#circle_bundles.base_covers.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></dt><dd><p>Cover induced by open stars in a triangulation.</p>
+</dd>
+</dl>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.MetricBallCover.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#MetricBallCover.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.MetricBallCover.build" title="Link to this definition">#</a></dt>
+<dd><p>Build the cover membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code> and partition of unity <code class="docutils literal notranslate"><span class="pre">pou</span></code>.</p>
+<section id="populates">
+<h3>Populates<a class="headerlink" href="#populates" title="Link to this heading">#</a></h3>
+<dl class="simple">
+<dt>U :</dt><dd><p>Boolean array of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">n_samples)</span></code> where <code class="docutils literal notranslate"><span class="pre">U[i,s]</span></code> indicates
+whether sample <code class="docutils literal notranslate"><span class="pre">s</span></code> lies in the radius-ball around landmark <code class="docutils literal notranslate"><span class="pre">i</span></code>.</p>
+</dd>
+<dt>pou :</dt><dd><p>Float array of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">n_samples)</span></code> giving normalized linear
+hat weights over the sets containing each sample.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The built cover (for chaining).</p>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#circle_bundles.base_covers.MetricBallCover" title="circle_bundles.base_covers.MetricBallCover"><em>MetricBallCover</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.MetricBallCover.nerve_edges">
+<span class="sig-name descname"><span class="pre">nerve_edges</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#MetricBallCover.nerve_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.MetricBallCover.nerve_edges" title="Link to this definition">#</a></dt>
+<dd><p>Recorded 1-simplices of the nerve.</p>
+<p>An edge (i,j) is included when the intersection <code class="docutils literal notranslate"><span class="pre">U_i</span> <span class="pre">∩</span> <span class="pre">U_j</span></code> contains
+at least one sample.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of canonical edges <code class="docutils literal notranslate"><span class="pre">(i,j)</span></code> with <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">&lt;</span> <span class="pre">j</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>edges</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.MetricBallCover.nerve_triangles">
+<span class="sig-name descname"><span class="pre">nerve_triangles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#MetricBallCover.nerve_triangles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.MetricBallCover.nerve_triangles" title="Link to this definition">#</a></dt>
+<dd><p>Recorded 2-simplices of the nerve.</p>
+<p>A triangle (i,j,k) is included when the triple intersection
+<code class="docutils literal notranslate"><span class="pre">U_i</span> <span class="pre">∩</span> <span class="pre">U_j</span> <span class="pre">∩</span> <span class="pre">U_k</span></code> is nonempty.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of canonical triangles <code class="docutils literal notranslate"><span class="pre">(i,j,k)</span></code> with <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">&lt;</span> <span class="pre">j</span> <span class="pre">&lt;</span> <span class="pre">k</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>triangles</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="circle_bundles.base_covers.MetricBallCover.nerve_tetrahedra">
 <span class="sig-name descname"><span class="pre">nerve_tetrahedra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#MetricBallCover.nerve_tetrahedra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.MetricBallCover.nerve_tetrahedra" title="Link to this definition">#</a></dt>
-<dd><p>3-simplices in the nerve: 4-way overlaps U_i ∩ U_j ∩ U_k ∩ U_l ≠ ∅.</p>
+<dd><p>Recorded 3-simplices of the nerve.</p>
+<p>A tetrahedron (i,j,k,ℓ) is included when the 4-way intersection
+<code class="docutils literal notranslate"><span class="pre">U_i</span> <span class="pre">∩</span> <span class="pre">U_j</span> <span class="pre">∩</span> <span class="pre">U_k</span> <span class="pre">∩</span> <span class="pre">U_ℓ</span></code> is nonempty.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>]]</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of canonical 4-tuples <code class="docutils literal notranslate"><span class="pre">(i,j,k,ℓ)</span></code> with <code class="docutils literal notranslate"><span class="pre">i</span> <span class="pre">&lt;</span> <span class="pre">j</span> <span class="pre">&lt;</span> <span class="pre">k</span> <span class="pre">&lt;</span> <span class="pre">ℓ</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tetrahedra</p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,28 +496,133 @@
 <dt class="sig sig-object py" id="circle_bundles.base_covers.TriangulationStarCover">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.base_covers.</span></span><span class="sig-name descname"><span class="pre">TriangulationStarCover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K_preimages</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex_coords_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#TriangulationStarCover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.TriangulationStarCover" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">CoverBase</span></code></p>
-<p>Cover by open stars of vertices in a triangulation K.
-Uses K_preimages: the location of each base point in <a href="#id1"><span class="problematic" id="id2">|K|</span></a> coordinates.</p>
-<dl class="simple">
-<dt>Expected:</dt><dd><ul class="simple">
-<li><p>K.get_simplices() yields (simplex_tuple, filtration_value) like Gudhi.</p></li>
-<li><p>vertex_coords_dict maps old_vertex_id -&gt; coords (D,)</p></li>
-</ul>
-</dd>
-</dl>
+<p>Cover by open stars of vertices in a triangulation.</p>
+<p>This cover is defined from a simplicial complex <code class="docutils literal notranslate"><span class="pre">K</span></code> that triangulates a base
+space (typically 2D for this implementation), together with “preimages”
+<code class="docutils literal notranslate"><span class="pre">K_preimages</span></code> giving each sample’s location in the geometric realization <code class="docutils literal notranslate"><span class="pre">|K|</span></code>.</p>
+<p>Each cover set corresponds to a vertex <code class="docutils literal notranslate"><span class="pre">v</span></code> of <code class="docutils literal notranslate"><span class="pre">K</span></code> and contains samples whose
+assigned triangle includes that vertex (i.e. samples lying in triangles incident
+to <code class="docutils literal notranslate"><span class="pre">v</span></code>). The partition of unity is defined using barycentric coordinates within
+the assigned triangle: the three vertices of the triangle receive the barycentric
+weights, and all other vertices receive weight 0.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>K_preimages</strong> (<em>np.ndarray</em>)</p></li>
-<li><p><strong>K</strong> (<em>Any</em>)</p></li>
-<li><p><strong>vertex_coords_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>)</p></li>
-<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
+<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">dB)</span></code>. Kept for consistency with other covers.
+(This cover uses <code class="docutils literal notranslate"><span class="pre">K_preimages</span></code> for assignment/POU.)</p></li>
+<li><p><strong>K_preimages</strong> (<em>np.ndarray</em>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">D)</span></code> giving each sample’s position in the
+coordinate system used by <code class="docutils literal notranslate"><span class="pre">vertex_coords_dict</span></code> (i.e. coordinates for
+the geometric realization of <code class="docutils literal notranslate"><span class="pre">K</span></code>).</p></li>
+<li><p><strong>K</strong> (<em>Any</em>) – Simplicial complex object with a Gudhi-like interface:
+<code class="docutils literal notranslate"><span class="pre">K.get_simplices()</span></code> yields <code class="docutils literal notranslate"><span class="pre">(simplex_tuple,</span> <span class="pre">filtration_value)</span></code>.
+This implementation expects at least 1- and 2-simplices.</p></li>
+<li><p><strong>vertex_coords_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – Mapping <code class="docutils literal notranslate"><span class="pre">old_vertex_id</span> <span class="pre">-&gt;</span> <span class="pre">coords</span></code> where <code class="docutils literal notranslate"><span class="pre">coords</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(D,)</span></code>.
+Vertex ids need not be contiguous; this cover relabels them to <code class="docutils literal notranslate"><span class="pre">0..nV-1</span></code>.</p></li>
+<li><p><strong>metric</strong> (<em>Any</em>) – Optional metric (not used for construction here), but accepted for API
+uniformity and for downstream plotting/labels.</p></li>
 </ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.TriangulationStarCover.landmarks">
+<span class="sig-name descname"><span class="pre">landmarks</span></span><a class="headerlink" href="#circle_bundles.base_covers.TriangulationStarCover.landmarks" title="Link to this definition">#</a></dt>
+<dd><p>Set to the relabeled vertex coordinates of shape <code class="docutils literal notranslate"><span class="pre">(nV,</span> <span class="pre">D)</span></code> (after build).
+These are used for nerve visualization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a> | None</p>
 </dd>
 </dl>
 </dd></dl>
 
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This implementation builds <code class="docutils literal notranslate"><span class="pre">U</span></code> and <code class="docutils literal notranslate"><span class="pre">pou</span></code> from <em>triangle membership</em>.
+It is effectively a 2-complex cover: <a class="reference internal" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_tetrahedra" title="circle_bundles.base_covers.TriangulationStarCover.nerve_tetrahedra"><code class="xref py py-meth docutils literal notranslate"><span class="pre">nerve_tetrahedra()</span></code></a> is intentionally
+not exposed (returns <code class="docutils literal notranslate"><span class="pre">[]</span></code>), even if <code class="docutils literal notranslate"><span class="pre">K</span></code> contains 3-simplices.</p></li>
+<li><p>Every sample must be assigned to some triangle. If not, <a class="reference internal" href="#circle_bundles.base_covers.TriangulationStarCover.build" title="circle_bundles.base_covers.TriangulationStarCover.build"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build()</span></code></a> raises
+an error, typically indicating inconsistent preimages or a too-strict tolerance.</p></li>
+</ul>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#circle_bundles.base_covers.MetricBallCover" title="circle_bundles.base_covers.MetricBallCover"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetricBallCover</span></code></a></dt><dd><p>A cover built from metric balls around landmark points.</p>
+</dd>
+</dl>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.TriangulationStarCover.build">
+<span class="sig-name descname"><span class="pre">build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#TriangulationStarCover.build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.TriangulationStarCover.build" title="Link to this definition">#</a></dt>
+<dd><p>Build the star cover membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code> and barycentric POU <code class="docutils literal notranslate"><span class="pre">pou</span></code>.</p>
+<p>This method:
+1) relabels vertices to contiguous ids and sets <code class="docutils literal notranslate"><span class="pre">landmarks</span></code>,
+2) extracts triangles from <code class="docutils literal notranslate"><span class="pre">K</span></code>,
+3) assigns each sample to a triangle using barycentric coordinates,
+4) builds <code class="docutils literal notranslate"><span class="pre">U</span></code> by marking membership in the three incident vertex stars,
+5) builds <code class="docutils literal notranslate"><span class="pre">pou</span></code> from barycentric weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The built cover (for chaining).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If any sample cannot be assigned to a triangle (e.g. inconsistent
+    coordinates or tolerance too strict).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.TriangulationStarCover.nerve_edges">
+<span class="sig-name descname"><span class="pre">nerve_edges</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#TriangulationStarCover.nerve_edges"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_edges" title="Link to this definition">#</a></dt>
+<dd><p>Recorded 1-simplices of the nerve (edges of the triangulation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Sorted list of canonical edges in the relabeled vertex ids.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>edges</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.TriangulationStarCover.nerve_triangles">
+<span class="sig-name descname"><span class="pre">nerve_triangles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#TriangulationStarCover.nerve_triangles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_triangles" title="Link to this definition">#</a></dt>
+<dd><p>Recorded 2-simplices of the nerve (triangles of the triangulation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of canonical triangles in relabeled vertex ids.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>triangles</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.base_covers.TriangulationStarCover.nerve_tetrahedra">
+<span class="sig-name descname"><span class="pre">nerve_tetrahedra</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/base_covers.html#TriangulationStarCover.nerve_tetrahedra"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_tetrahedra" title="Link to this definition">#</a></dt>
+<dd><p>Recorded 3-simplices of the nerve.</p>
+<p>This cover currently models a 2-complex (triangle-based stars), so we do not
+expose tetrahedra even if the underlying complex <code class="docutils literal notranslate"><span class="pre">K</span></code> contains them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Always returns <code class="docutils literal notranslate"><span class="pre">[]</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>tetrahedra</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="cover-builder-helpers">
+<h2>Cover builder helpers<a class="headerlink" href="#cover-builder-helpers" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="circle_bundles.covers.metric_ball_cover_builders.S2GeodesicMetric">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.covers.metric_ball_cover_builders.</span></span><span class="sig-name descname"><span class="pre">S2GeodesicMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/covers/metric_ball_cover_builders.html#S2GeodesicMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.covers.metric_ball_cover_builders.S2GeodesicMetric" title="Link to this definition">#</a></dt>
@@ -438,7 +640,7 @@ Uses K_preimages: the location of each base point in <a href="#id1"><span class=
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.covers.metric_ball_cover_builders.</span></span><span class="sig-name descname"><span class="pre">RP2GeodesicMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/covers/metric_ball_cover_builders.html#RP2GeodesicMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.covers.metric_ball_cover_builders.RP2GeodesicMetric" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="simple">
-<dt>Projective geodesic distance on RP^2 via S^2 reps:</dt><dd><p>d([x],[y]) = arccos(<a href="#id3"><span class="problematic" id="id4">|&lt;x,y&gt;|</span></a>), with x,y unit vectors.</p>
+<dt>Projective geodesic distance on RP^2 via S^2 reps:</dt><dd><p>d([x],[y]) = arccos(<a href="#id1"><span class="problematic" id="id2">|&lt;x,y&gt;|</span></a>), with x,y unit vectors.</p>
 </dd>
 </dl>
 <dl class="field-list simple">
@@ -451,24 +653,54 @@ Uses K_preimages: the location of each base point in <a href="#id1"><span class=
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.covers.triangle_cover_builders_fibonacci.make_s2_fibonacci_star_cover">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.covers.triangle_cover_builders_fibonacci.</span></span><span class="sig-name descname"><span class="pre">make_s2_fibonacci_star_cover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_vertices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/covers/triangle_cover_builders_fibonacci.html#make_s2_fibonacci_star_cover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.covers.triangle_cover_builders_fibonacci.make_s2_fibonacci_star_cover" title="Link to this definition">#</a></dt>
-<dd><p>S^2 star cover built from the convex-hull triangulation of Fibonacci landmarks.</p>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><p>Overlap order &lt;= 3 (each point lies in one hull face =&gt; 3 vertex stars).</p></li>
-<li><p>Fast: no “search all triangles”; we use the hit facet index.</p></li>
-</ul>
+<dd><p>Build a fast star cover of <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span> using Fibonacci landmarks and a hull triangulation.</p>
+<p>This constructs a triangulation of a set of nearly-uniform landmark points on the sphere
+(via a spherical Fibonacci lattice), then assigns each sample to <strong>the unique</strong> hull face hit
+by the ray in its direction. The resulting cover is the <strong>open star cover</strong> of the triangulation
+vertices: each sample lies in exactly the three vertex stars of its containing triangle
+(so overlap order is at most 3).</p>
+<p>The returned cover is a <a class="reference internal" href="#circle_bundles.base_covers.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a> that is
+already built (its <code class="docutils literal notranslate"><span class="pre">U</span></code> and <code class="docutils literal notranslate"><span class="pre">pou</span></code> are populated).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>n_vertices</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">3)</span></code> representing directions in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>.
+Rows are normalized internally and interpreted as points on <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span>.</p></li>
+<li><p><strong>n_vertices</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of Fibonacci landmark vertices used to build the hull triangulation.
+Larger values yield a finer cover (more sets, smaller stars). Default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Numerical stability parameter used for normalization and ray–facet intersection tests.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference internal" href="#circle_bundles.base_covers.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><em>TriangulationStarCover</em></a></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>A built <a class="reference internal" href="#circle_bundles.base_covers.TriangulationStarCover" title="circle_bundles.base_covers.TriangulationStarCover"><code class="xref py py-class docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a> representing the star cover.
+Key fields include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cover.base_points</span></code>: normalized samples on <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span> (shape <code class="docutils literal notranslate"><span class="pre">(n,3)</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cover.landmarks</span></code>: landmark vertex coordinates (shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,3)</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cover.U</span></code>: membership matrix (shape <code class="docutils literal notranslate"><span class="pre">(n_vertices,</span> <span class="pre">n_samples)</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cover.pou</span></code>: barycentric partition of unity weights (same shape as <code class="docutils literal notranslate"><span class="pre">U</span></code>)</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>cover</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p><strong>Overlap order</strong> is at most 3, since each sample is assigned to one triangle and hence
+belongs to exactly three vertex stars.</p></li>
+<li><p>This builder uses a “hit facet index” fast path (no searching over all triangles),
+so it scales well to large sample sizes.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_s2_fibonacci_star_cover</span><span class="p">(</span><span class="n">base_points</span><span class="p">,</span> <span class="n">n_vertices</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">summ</span> <span class="o">=</span> <span class="n">cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Use the cover in the main pipeline</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span><span class="n">total_space_data</span><span class="p">,</span> <span class="n">cover</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -476,7 +708,7 @@ Uses K_preimages: the location of each base point in <a href="#id1"><span class=
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.covers.triangle_cover_builders_fibonacci.</span></span><span class="sig-name descname"><span class="pre">make_rp2_fibonacci_star_cover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark_oversample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/covers/triangle_cover_builders_fibonacci.html#make_rp2_fibonacci_star_cover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.covers.triangle_cover_builders_fibonacci.make_rp2_fibonacci_star_cover" title="Link to this definition">#</a></dt>
 <dd><p>RP^2 star cover built from a symmetric hull triangulation.</p>
 <section id="pipeline">
-<h2>Pipeline<a class="headerlink" href="#pipeline" title="Link to this heading">#</a></h2>
+<h3>Pipeline<a class="headerlink" href="#pipeline" title="Link to this heading">#</a></h3>
 <ol class="arabic">
 <li><p>Canonicalize samples to hemisphere reps P_rep (RP^2 reps).</p></li>
 <li><dl class="simple">
@@ -499,20 +731,21 @@ Uses K_preimages: the location of each base point in <a href="#id1"><span class=
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>base_points</strong> (<em>np.ndarray</em>)</p></li>
 <li><p><strong>n_pairs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 <li><p><strong>landmark_oversample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>landmark_seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>landmark_seed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>)</p></li>
 <li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 <li><p><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>RP2StarCover</em></p>
+<dd class="field-even"><p>RP2StarCover</p>
 </dd>
 </dl>
 </dd></dl>
 
+</section>
 </section>
 
 
@@ -562,15 +795,31 @@ Uses K_preimages: the location of each base point in <a href="#id1"><span class=
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover"><code class="docutils literal notranslate"><span class="pre">MetricBallCover</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover.nerve_tetrahedra"><code class="docutils literal notranslate"><span class="pre">MetricBallCover.nerve_tetrahedra()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cover-classes">Cover classes</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover"><code class="docutils literal notranslate"><span class="pre">MetricBallCover</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover.build"><code class="docutils literal notranslate"><span class="pre">MetricBallCover.build()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover.nerve_edges"><code class="docutils literal notranslate"><span class="pre">MetricBallCover.nerve_edges()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover.nerve_triangles"><code class="docutils literal notranslate"><span class="pre">MetricBallCover.nerve_triangles()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.MetricBallCover.nerve_tetrahedra"><code class="docutils literal notranslate"><span class="pre">MetricBallCover.nerve_tetrahedra()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.metric_ball_cover_builders.S2GeodesicMetric"><code class="docutils literal notranslate"><span class="pre">S2GeodesicMetric</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.metric_ball_cover_builders.RP2GeodesicMetric"><code class="docutils literal notranslate"><span class="pre">RP2GeodesicMetric</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.triangle_cover_builders_fibonacci.make_s2_fibonacci_star_cover"><code class="docutils literal notranslate"><span class="pre">make_s2_fibonacci_star_cover()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.triangle_cover_builders_fibonacci.make_rp2_fibonacci_star_cover"><code class="docutils literal notranslate"><span class="pre">make_rp2_fibonacci_star_cover()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover.landmarks"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover.landmarks</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover.build"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover.build()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_edges"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover.nerve_edges()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_triangles"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover.nerve_triangles()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.base_covers.TriangulationStarCover.nerve_tetrahedra"><code class="docutils literal notranslate"><span class="pre">TriangulationStarCover.nerve_tetrahedra()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cover-builder-helpers">Cover builder helpers</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.metric_ball_cover_builders.S2GeodesicMetric"><code class="docutils literal notranslate"><span class="pre">S2GeodesicMetric</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.metric_ball_cover_builders.RP2GeodesicMetric"><code class="docutils literal notranslate"><span class="pre">RP2GeodesicMetric</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.triangle_cover_builders_fibonacci.make_s2_fibonacci_star_cover"><code class="docutils literal notranslate"><span class="pre">make_s2_fibonacci_star_cover()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#circle_bundles.covers.triangle_cover_builders_fibonacci.make_rp2_fibonacci_star_cover"><code class="docutils literal notranslate"><span class="pre">make_rp2_fibonacci_star_cover()</span></code></a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 

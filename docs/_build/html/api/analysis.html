@@ -370,29 +370,92 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.fiberwise_clustering.</span></span><span class="sig-name descname"><span class="pre">fiberwise_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sample_values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_pca_embeddings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#fiberwise_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering" title="Link to this definition">#</a></dt>
-<dd><p>Fiberwise DBSCAN clustering, then a global cluster-graph built from overlaps.</p>
+<dd><p>Cluster each fiber with DBSCAN and then merge clusters globally via an overlap graph.</p>
+<p>This is a useful diagnostic tool when you have a cover (fibers) over the dataset and
+want to see whether local cluster structure aligns across overlaps.</p>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>For each fiber r (row of <code class="docutils literal notranslate"><span class="pre">U</span></code>), run DBSCAN on the points <code class="docutils literal notranslate"><span class="pre">data[U[r]]</span></code> using
+<code class="docutils literal notranslate"><span class="pre">eps_values[r]</span></code> and <code class="docutils literal notranslate"><span class="pre">min_sample_values[r]</span></code>.</p></li>
+<li><p>Create a graph whose nodes are <em>fiber-clusters</em> <code class="docutils literal notranslate"><span class="pre">(r,</span> <span class="pre">label)</span></code> (excluding label <code class="docutils literal notranslate"><span class="pre">-1</span></code>).
+Each node stores the list of sample indices belonging to that DBSCAN cluster.</p></li>
+<li><p>Add an edge between two nodes if the corresponding fiber-clusters share at least one
+sample index that is non-noise in both fibers. Edges store <code class="docutils literal notranslate"><span class="pre">indices_shared</span></code>.</p></li>
+<li><p>Define a global component label per sample by taking connected components of the graph
+and assigning each sample that appears in any node of that connected component.</p></li>
+</ol>
+<dl class="field-list">
+<dt class="field-odd">param data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">d)</span></code> containing the ambient data vectors.</p>
+</dd>
+<dt class="field-even">param U<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean membership matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_samples)</span></code>. Row <code class="docutils literal notranslate"><span class="pre">r</span></code> indicates
+which samples lie in fiber/cover set <code class="docutils literal notranslate"><span class="pre">U_r</span></code>.</p>
+</dd>
+<dt class="field-odd">param eps_values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,)</span></code> with the DBSCAN <code class="docutils literal notranslate"><span class="pre">eps</span></code> parameter used for each fiber.</p>
+</dd>
+<dt class="field-even">param min_sample_values<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,)</span></code> with the DBSCAN <code class="docutils literal notranslate"><span class="pre">min_samples</span></code> parameter used for each fiber.</p>
+</dd>
+<dt class="field-odd">param build_pca_embeddings<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If True, compute PCA embeddings (within each fiber) for quick plotting with
+<a class="reference internal" href="#circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_pca_grid" title="circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_pca_grid"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_fiberwise_pca_grid()</span></code></a>.</p>
+</dd>
+<dt class="field-even">param pca_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of PCA components to compute per fiber (typically 2).</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><em>components</em> – Integer array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,)</span></code> giving a global component label per sample.
+Samples not belonging to any non-noise fiber-cluster remain <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p></li>
+<li><p><em>G</em> – A <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code>. Nodes are tuples <code class="docutils literal notranslate"><span class="pre">(fiber_idx,</span> <span class="pre">cluster_label)</span></code> with node attribute
+<code class="docutils literal notranslate"><span class="pre">indices</span></code> (list of sample indices). Edges indicate overlap, and store
+<code class="docutils literal notranslate"><span class="pre">indices_shared</span></code> (the supporting sample indices).</p></li>
+<li><p><em>graph_dict</em> – A simple serialization-friendly representation of the graph (nodes/links).</p></li>
+<li><p><em>cl</em> – Integer array of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_samples)</span></code> giving the DBSCAN label of each sample
+within each fiber. Label <code class="docutils literal notranslate"><span class="pre">-1</span></code> denotes noise (or not present in that fiber).</p></li>
+<li><p><em>summary</em> –</p>
+<dl class="simple">
+<dt>Dict of helpful arrays for downstream plotting, including:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fiber_component_counts</span></code>: number of DBSCAN clusters per fiber (excluding noise)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">global_component_counts</span></code>: number of graph nodes per global component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">point_counts</span></code>: number of samples assigned to each global component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pca_store</span></code>: per-fiber PCA embeddings if requested</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This routine requires optional dependencies: <code class="docutils literal notranslate"><span class="pre">networkx</span></code> and <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p></li>
+<li><p>Edge weights are not computed here. If you want a weighted filtration on the cluster graph,
+call <code class="xref py py-func docutils literal notranslate"><span class="pre">get_weights()</span></code> (internal helper) or attach your own <code class="docutils literal notranslate"><span class="pre">edge[&quot;weight&quot;]</span></code> values.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">graph_dict</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">fiberwise_clustering</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">eps_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.25</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">min_sample_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">10</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plot_fiberwise_summary_bars</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>(</em><em>n_samples</em><em>, </em><em>d</em><em>)</em>)</p></li>
-<li><p><strong>U</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_samples</em><em>) </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>eps_values</strong> (<em>(</em><em>n_fibers</em><em>,</em><em>) </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>min_sample_values</strong> (<em>(</em><em>n_fibers</em><em>,</em><em>) </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>eps_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>min_sample_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
 <li><p><strong>build_pca_embeddings</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
 <li><p><strong>pca_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 </ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><strong>components</strong> (<em>(n_samples,) int</em>) – Global component label per sample (based on connected components of the cluster-graph).
-Unassigned samples remain -1.</p></li>
-<li><p><strong>G</strong> (<em>nx.Graph</em>) – Nodes are (fiber_idx, cluster_label) with attribute ‘indices’ (sample indices).
-Edges indicate overlap; includes ‘indices_shared’.</p></li>
-<li><p><strong>graph_dict</strong> (<em>dict</em>) – Simple serialization-friendly summary.</p></li>
-<li><p><strong>cl</strong> (<em>(n_fibers, n_samples) int</em>) – DBSCAN labels within each fiber (-1 noise).</p></li>
-<li><p><strong>summary</strong> (<em>dict</em>) – Useful arrays and optional PCA embeddings for plotting.</p></li>
-</ul>
-</p>
 </dd>
 </dl>
 </dd></dl>
@@ -400,18 +463,40 @@ Edges indicate overlap; includes ‘indices_shared’.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.fiberwise_clustering.get_cluster_persistence">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.fiberwise_clustering.</span></span><span class="sig-name descname"><span class="pre">get_cluster_persistence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#get_cluster_persistence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.fiberwise_clustering.get_cluster_persistence" title="Link to this definition">#</a></dt>
-<dd><p>Track number of connected components as we remove edges by nondecreasing weight.</p>
-<p>Requires that G edges have ‘weight’ (e.g. computed by get_weights()).</p>
-<dl class="simple">
-<dt>Returns a list of dicts:</dt><dd><p>{‘weight’: w, ‘n_components’: int, ‘components’: [set(nodes), …]}</p>
-</dd>
-</dl>
+<dd><p>Track connected-component count as low-weight edges are removed.</p>
+<p>Interprets the cluster graph <code class="docutils literal notranslate"><span class="pre">G</span></code> as a weighted graph (edge attribute <code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code>),
+and forms a simple edge-threshold filtration:</p>
+<ul class="simple">
+<li><p>Start with the full graph.</p></li>
+<li><p>For each distinct weight value <code class="docutils literal notranslate"><span class="pre">w</span></code> in increasing order, remove all edges with weight
+exactly <code class="docutils literal notranslate"><span class="pre">w</span></code> (equivalently: keep only edges with weight &gt; w).</p></li>
+<li><p>Record the number of connected components after each removal step.</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>show_results</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>G</strong> – A <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code> whose edges have a numeric <code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code> attribute.
+(Use the internal helper <code class="docutils literal notranslate"><span class="pre">get_weights(G,</span> <span class="pre">method=...)</span></code> or attach weights yourself.)</p></li>
+<li><p><strong>show_results</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, plot the curve <code class="docutils literal notranslate"><span class="pre">(#</span> <span class="pre">components)</span> <span class="pre">vs</span> <span class="pre">(threshold</span> <span class="pre">weight)</span></code>.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided and <code class="docutils literal notranslate"><span class="pre">show_results=True</span></code>, save the plot to this path (PDF recommended).</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>List of dicts with keys:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code>: the threshold value (first entry uses <code class="docutils literal notranslate"><span class="pre">-np.inf</span></code> for the full graph)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;n_components&quot;</span></code>: number of connected components at that stage</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;components&quot;</span></code>: the list of node-sets returned by <code class="docutils literal notranslate"><span class="pre">nx.connected_components</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>history</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the graph has edges but none have a <code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code> attribute.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -419,30 +504,53 @@ Edges indicate overlap; includes ‘indices_shared’.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.fiberwise_clustering.get_filtered_cluster_graph">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.fiberwise_clustering.</span></span><span class="sig-name descname"><span class="pre">get_filtered_cluster_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cl</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'to_smaller_cluster'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_results</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hide_biggest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#get_filtered_cluster_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.fiberwise_clustering.get_filtered_cluster_graph" title="Link to this definition">#</a></dt>
-<dd><p>Threshold the weighted cluster graph, separate intersections for removed edges,
-and recompute global components.</p>
-<p>Requires that G edges have ‘weight’ (e.g. computed by get_weights()).</p>
+<dd><p>Threshold the weighted cluster graph and recompute global components.</p>
+<p>This is a “post-processing” step for <a class="reference internal" href="#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering" title="circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering"><code class="xref py py-func docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a> once you have
+a weighted cluster graph <code class="docutils literal notranslate"><span class="pre">G</span></code>:</p>
+<ol class="arabic simple">
+<li><p>Remove edges with <code class="docutils literal notranslate"><span class="pre">weight</span> <span class="pre">&lt;=</span> <span class="pre">thresh</span></code> (keep only edges with <code class="docutils literal notranslate"><span class="pre">weight</span> <span class="pre">&gt;</span> <span class="pre">thresh</span></code>).</p></li>
+<li><p>For each removed edge, resolve shared sample indices so that intersection samples are
+assigned to only one endpoint cluster (controlled by <code class="docutils literal notranslate"><span class="pre">rule</span></code>). This updates the node
+membership lists and also produces a cleaned label matrix <code class="docutils literal notranslate"><span class="pre">cl_clean</span></code>.</p></li>
+<li><p>Recompute connected components of the filtered graph and assign samples accordingly.</p></li>
+</ol>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>components_filtered</strong> (<em>(n_samples,) int</em>)</p></li>
-<li><p><strong>filtered_G</strong> (<em>nx.Graph</em>)</p></li>
-<li><p><strong>graph_dict_filtered</strong> (<em>dict</em>)</p></li>
-<li><p><strong>cl_clean</strong> (<em>(n_fibers, n_samples) int</em>)</p></li>
-<li><p><strong>comp_inds</strong> (<em>(n_components, n_samples) bool</em>)</p></li>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Original data array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">d)</span></code> (used here only for shape validation).</p></li>
+<li><p><strong>G</strong> – A <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code> whose edges have a numeric <code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code> attribute and whose nodes
+store an <code class="docutils literal notranslate"><span class="pre">&quot;indices&quot;</span></code> list of member sample indices.</p></li>
+<li><p><strong>cl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – The per-fiber DBSCAN label matrix returned by <a class="reference internal" href="#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering" title="circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering"><code class="xref py py-func docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a>
+(shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_samples)</span></code>).</p></li>
+<li><p><strong>thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Edge threshold. Edges with <code class="docutils literal notranslate"><span class="pre">weight</span> <span class="pre">&lt;=</span> <span class="pre">thresh</span></code> are removed.</p></li>
+<li><p><strong>rule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – <dl class="simple">
+<dt>How to resolve intersection samples on removed edges:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;to_smaller_cluster&quot;</span></code>: keep shared samples in the smaller endpoint cluster</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;to_larger_cluster&quot;</span></code>: keep shared samples in the larger endpoint cluster</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>show_results</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, plot bar charts for clusters-per-component and points-per-component.</p></li>
+<li><p><strong>hide_biggest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, drop the largest component from the points-per-component panel.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided and <code class="docutils literal notranslate"><span class="pre">show_results=True</span></code>, save a PDF with <code class="docutils literal notranslate"><span class="pre">&quot;_summary&quot;</span></code> appended.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>components_filtered</em> – Integer array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,)</span></code> giving the new global component label per sample.
+Unassigned samples remain <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p></li>
+<li><p><em>filtered_G</em> – The thresholded graph containing only edges with <code class="docutils literal notranslate"><span class="pre">weight</span> <span class="pre">&gt;</span> <span class="pre">thresh</span></code>.</p></li>
+<li><p><em>graph_dict_filtered</em> – Serialization-friendly representation of the filtered graph.</p></li>
+<li><p><em>cl_clean</em> – Cleaned copy of <code class="docutils literal notranslate"><span class="pre">cl</span></code> where samples removed from a cluster due to intersection resolution
+are set to <code class="docutils literal notranslate"><span class="pre">-1</span></code> for that fiber.</p></li>
+<li><p><em>comp_inds</em> – Boolean array of shape <code class="docutils literal notranslate"><span class="pre">(n_components,</span> <span class="pre">n_samples)</span></code> indicating membership of each
+global component.</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>cl</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>rule</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>show_results</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>hide_biggest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the graph has edges but none have a <code class="docutils literal notranslate"><span class="pre">&quot;weight&quot;</span></code> attribute.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -450,18 +558,30 @@ and recompute global components.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_pca_grid">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.fiberwise_clustering.</span></span><span class="sig-name descname"><span class="pre">plot_fiberwise_pca_grid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'viridis'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#plot_fiberwise_pca_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_pca_grid" title="Link to this definition">#</a></dt>
-<dd><p>Plot PCA scatter for selected fibers using summary[‘pca_store’].
-Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
+<dd><p>Plot per-fiber PCA scatter plots colored by DBSCAN cluster labels.</p>
+<p>This function consumes the <code class="docutils literal notranslate"><span class="pre">summary</span></code> returned by <a class="reference internal" href="#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering" title="circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering"><code class="xref py py-func docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a>
+when called with <code class="docutils literal notranslate"><span class="pre">build_pca_embeddings=True</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>)</p></li>
-<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>point_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – The <code class="docutils literal notranslate"><span class="pre">summary</span></code> dict returned by <a class="reference internal" href="#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering" title="circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering"><code class="xref py py-func docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a>.</p></li>
+<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of fiber indices to plot. If omitted, plots all fibers that
+have PCA data available.</p></li>
+<li><p><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Matplotlib colormap name used to color points by cluster label.</p></li>
+<li><p><strong>point_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Scatter marker size passed to Matplotlib.</p></li>
+<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of columns in the subplot grid.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided, save the figure to this path (PDF recommended).</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The Matplotlib figure and a flattened array of axes. Returns <code class="docutils literal notranslate"><span class="pre">(None,</span> <span class="pre">None)</span></code>
+if there is nothing to plot.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig, axes</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If PCA data is missing (i.e. <code class="docutils literal notranslate"><span class="pre">summary[&quot;pca_store&quot;]</span></code> is empty).</p>
 </dd>
 </dl>
 </dd></dl>
@@ -469,14 +589,30 @@ Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_summary_bars">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.fiberwise_clustering.</span></span><span class="sig-name descname"><span class="pre">plot_fiberwise_summary_bars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">summary</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hide_biggest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/fiberwise_clustering.html#plot_fiberwise_summary_bars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.fiberwise_clustering.plot_fiberwise_summary_bars" title="Link to this definition">#</a></dt>
-<dd><dl class="field-list simple">
+<dd><p>Plot quick bar-chart summaries of fiberwise clustering and global components.</p>
+<dl class="simple">
+<dt>Produces three panels:</dt><dd><ol class="arabic simple">
+<li><p>number of DBSCAN clusters per fiber (excluding noise)</p></li>
+<li><p>number of cluster-nodes per global connected component (sorted)</p></li>
+<li><p>number of samples per global connected component (sorted)</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>)</p></li>
-<li><p><strong>hide_biggest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>dpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a>) – The <code class="docutils literal notranslate"><span class="pre">summary</span></code> dict returned by <a class="reference internal" href="#circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering" title="circle_bundles.analysis.fiberwise_clustering.fiberwise_clustering"><code class="xref py py-func docutils literal notranslate"><span class="pre">fiberwise_clustering()</span></code></a>.</p></li>
+<li><p><strong>hide_biggest</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, drop the single largest global component in the “points per component”
+panel (useful when one component dominates the scale).</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided, saves a PDF with <code class="docutils literal notranslate"><span class="pre">&quot;_summary&quot;</span></code> appended to the filename.</p></li>
+<li><p><strong>dpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Figure DPI.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Matplotlib figure and axes array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig, axs</p>
 </dd>
 </dl>
 </dd></dl>
@@ -484,47 +620,84 @@ Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.local_analysis.get_local_pca">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.local_analysis.</span></span><span class="sig-name descname"><span class="pre">get_local_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/local_analysis.html#get_local_pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.local_analysis.get_local_pca" title="Link to this definition">#</a></dt>
-<dd><p>Local PCA on each fiber (after optional subsampling).</p>
+<dd><p>Compute PCA embeddings separately on each fiber of a cover.</p>
+<p>This is a lightweight diagnostic tool: for each fiber (row of <code class="docutils literal notranslate"><span class="pre">U</span></code>), we take the
+subset of samples belonging to that fiber, optionally subsample it, and run PCA on
+those points only. The result is a per-fiber low-dimensional embedding that can be
+visualized with <a class="reference internal" href="#circle_bundles.analysis.local_analysis.plot_local_pca" title="circle_bundles.analysis.local_analysis.plot_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_local_pca()</span></code></a>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><strong>fiber_ids</strong> (<em>list[int]</em>)</p></li>
-<li><p><strong>idx_list</strong> (<em>list[np.ndarray]          indices used in each fiber</em>)</p></li>
-<li><p><strong>proj_list</strong> (<em>list[np.ndarray | None]   PCA projections (m_i, n_components) or None</em>)</p></li>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">d)</span></code> containing the ambient data vectors.</p></li>
+<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Boolean indicator matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_points)</span></code>. Entry <code class="docutils literal notranslate"><span class="pre">U[r,</span> <span class="pre">i]</span></code>
+should be True exactly when point <code class="docutils literal notranslate"><span class="pre">i</span></code> lies in fiber/patch <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p></li>
+<li><p><strong>p_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Optional per-fiber sampling fractions in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>. If provided, must have
+length <code class="docutils literal notranslate"><span class="pre">n_fibers</span></code>. A value <code class="docutils literal notranslate"><span class="pre">p_values[r]</span> <span class="pre">=</span> <span class="pre">p</span></code> means “use approximately
+<code class="docutils literal notranslate"><span class="pre">floor(p</span> <span class="pre">*</span> <span class="pre">m_r)</span></code> points from fiber <code class="docutils literal notranslate"><span class="pre">r</span></code>”, where <code class="docutils literal notranslate"><span class="pre">m_r</span></code> is that fiber’s
+membership size. If None, uses all points in each fiber.</p></li>
+<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of fiber indices to process. If None, processes all fibers.</p></li>
+<li><p><strong>n_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of PCA components to compute per fiber.</p></li>
+<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed used for subsampling and passed to PCA (for reproducibility).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>fiber_ids</em> – The list of fiber indices actually processed (either all fibers, or <code class="docutils literal notranslate"><span class="pre">to_view</span></code>).</p></li>
+<li><p><em>idx_list</em> – List of integer index arrays, one per processed fiber. These are the point indices
+used for PCA in that fiber (after subsampling, if any).</p></li>
+<li><p><em>proj_list</em> – List of PCA projections, one per processed fiber. Entry <code class="docutils literal notranslate"><span class="pre">proj_list[k]</span></code> is an
+array of shape <code class="docutils literal notranslate"><span class="pre">(m_k,</span> <span class="pre">n_components)</span></code> for fiber <code class="docutils literal notranslate"><span class="pre">fiber_ids[k]</span></code>, or None if that
+fiber contained fewer than 2 usable points.</p></li>
 </ul>
 </p>
-</dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>p_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>n_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None]]</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This function lazily imports scikit-learn so importing this module does not require
+scikit-learn unless you call it.</p></li>
+<li><p>If you want to control the subsampling behavior directly, see
+<code class="docutils literal notranslate"><span class="pre">get_dense_fiber_indices</span></code> (currently not exported).</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.local_analysis.plot_local_pca">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.local_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_local_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fiber_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">proj_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/local_analysis.html#plot_local_pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.local_analysis.plot_local_pca" title="Link to this definition">#</a></dt>
-<dd><p>Grid of PCA scatterplots. Returns (fig, axes).</p>
+<dd><p>Plot a grid of 2D PCA scatterplots for multiple fibers.</p>
+<p>This function is typically used with the output of <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_pca" title="circle_bundles.analysis.local_analysis.get_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a>.
+Each subplot corresponds to one fiber; fibers whose PCA projection is missing
+(None or too small) are hidden.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fiber_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>)</p></li>
-<li><p><strong>proj_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em><em>]</em>)</p></li>
-<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>titles</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>font_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>point_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>fiber_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – Fiber indices (for labeling). Usually the first output of <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_pca" title="circle_bundles.analysis.local_analysis.get_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a>.</p></li>
+<li><p><strong>proj_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em><em>]</em>) – Per-fiber PCA coordinates. Usually the third output of <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_pca" title="circle_bundles.analysis.local_analysis.get_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a>.
+Each entry should be an array of shape <code class="docutils literal notranslate"><span class="pre">(m_i,</span> <span class="pre">2)</span></code> (at least 2 points),
+or None to skip that fiber.</p></li>
+<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of columns in the subplot grid.</p></li>
+<li><p><strong>titles</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – <dl class="simple">
+<dt>Title behavior:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>: uses LaTeX titles of the form <code class="docutils literal notranslate"><span class="pre">\pi^{-1}(U_j)</span></code>.</p></li>
+<li><p>None: no titles.</p></li>
+<li><p>sequence of strings: custom titles aligned with <code class="docutils literal notranslate"><span class="pre">fiber_ids</span></code>.</p></li>
 </ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>font_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Title font size.</p></li>
+<li><p><strong>point_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Scatter marker size.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided, save the figure to this path (any extension supported by matplotlib).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure and a flat array of axes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig, axes</p>
 </dd>
 </dl>
 </dd></dl>
@@ -532,45 +705,89 @@ Requires fiberwise_clustering(…, build_pca_embeddings=True).</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.local_analysis.get_local_rips">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.local_analysis.</span></span><span class="sig-name descname"><span class="pre">get_local_rips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxdim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_perm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">ripser_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/local_analysis.html#get_local_rips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.local_analysis.get_local_rips" title="Link to this definition">#</a></dt>
-<dd><p>Run Ripser on each fiber after optional subsampling.</p>
-<p class="rubric">Notes</p>
-<p>Imports ripser lazily so importing this module doesn’t require ripser.</p>
+<dd><p>Compute Ripser persistence separately on each fiber of a cover.</p>
+<p>For each fiber (row of <code class="docutils literal notranslate"><span class="pre">U</span></code>), this function extracts the corresponding points
+from <code class="docutils literal notranslate"><span class="pre">data</span></code> (optionally subsampling them), then runs <code class="docutils literal notranslate"><span class="pre">ripser</span></code> on that fiber’s
+point cloud. The resulting persistence diagrams can be plotted with
+<a class="reference internal" href="#circle_bundles.analysis.local_analysis.plot_local_rips" title="circle_bundles.analysis.local_analysis.plot_local_rips"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_local_rips()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
-<li><p><strong>p_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>maxdim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>n_perm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">d)</span></code> containing the ambient data vectors.</p></li>
+<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Boolean indicator matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_points)</span></code> indicating fiber
+membership (same convention as <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_pca" title="circle_bundles.analysis.local_analysis.get_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a>).</p></li>
+<li><p><strong>p_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Optional per-fiber sampling fractions in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> (same convention as
+<a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_pca" title="circle_bundles.analysis.local_analysis.get_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_pca()</span></code></a>).</p></li>
+<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of fiber indices to process. If None, processes all fibers.</p></li>
+<li><p><strong>maxdim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum homology dimension for Ripser. If <code class="docutils literal notranslate"><span class="pre">maxdim</span> <span class="pre">&lt;</span> <span class="pre">0</span></code>, returns None results
+for all fibers (useful as a quick “skip” switch).</p></li>
+<li><p><strong>n_perm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Upper bound on the number of points passed to ripser per fiber. For each fiber,
+we set <code class="docutils literal notranslate"><span class="pre">n_use</span> <span class="pre">=</span> <span class="pre">min(n_perm,</span> <span class="pre">m_fiber)</span></code> and pass <code class="docutils literal notranslate"><span class="pre">n_perm=n_use</span></code> to ripser.
+(This leverages ripser’s internal subsampling/permutation behavior.)</p></li>
+<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed used for the initial per-fiber subsampling (via <code class="docutils literal notranslate"><span class="pre">p_values</span></code>).</p></li>
+<li><p><strong>**ripser_kwargs</strong> – Additional keyword arguments forwarded directly to <code class="docutils literal notranslate"><span class="pre">ripser(...)</span></code>.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a> | None]]</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>fiber_ids</em> – The list of fiber indices processed.</p></li>
+<li><p><em>idx_list</em> – List of integer index arrays (points used in each fiber after subsampling).</p></li>
+<li><p><em>rips_list</em> – List of ripser result dicts, one per fiber, or None for fibers with fewer than
+2 usable points.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a> | None]]</p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This function lazily imports <code class="docutils literal notranslate"><span class="pre">ripser</span></code> so importing this module does not require
+ripser unless you call it.</p></li>
+<li><p>If you want exact control over which points go into each fiber computation, see
+<code class="docutils literal notranslate"><span class="pre">get_dense_fiber_indices</span></code> (currently not exported).</p></li>
+</ul>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.analysis.local_analysis.plot_local_rips">
 <span class="sig-prename descclassname"><span class="pre">circle_bundles.analysis.local_analysis.</span></span><span class="sig-name descname"><span class="pre">plot_local_rips</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fiber_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rips_list</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/analysis/local_analysis.html#plot_local_rips"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.analysis.local_analysis.plot_local_rips" title="Link to this definition">#</a></dt>
-<dd><p>Grid of persistence diagrams. Returns (fig, axes).</p>
-<p class="rubric">Notes</p>
-<p>Imports persim lazily so importing this module doesn’t require persim.</p>
+<dd><p>Plot a grid of persistence diagrams for multiple fibers.</p>
+<p>This function is typically used with the output of <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_rips" title="circle_bundles.analysis.local_analysis.get_local_rips"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_rips()</span></code></a>.
+Each subplot corresponds to one fiber; fibers with missing ripser output are hidden.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fiber_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>)</p></li>
-<li><p><strong>rips_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em> | </em><em>None</em><em>]</em>)</p></li>
-<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>titles</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>font_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>fiber_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em>) – Fiber indices (for labeling). Usually the first output of <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_rips" title="circle_bundles.analysis.local_analysis.get_local_rips"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_rips()</span></code></a>.</p></li>
+<li><p><strong>rips_list</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em> | </em><em>None</em><em>]</em>) – Per-fiber ripser outputs. Usually the third output of <a class="reference internal" href="#circle_bundles.analysis.local_analysis.get_local_rips" title="circle_bundles.analysis.local_analysis.get_local_rips"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_local_rips()</span></code></a>.
+Each entry should be a dict containing a <code class="docutils literal notranslate"><span class="pre">&quot;dgms&quot;</span></code> key, or None to skip.</p></li>
+<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of columns in the subplot grid.</p></li>
+<li><p><strong>titles</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – <dl class="simple">
+<dt>Title behavior:</dt><dd><ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>: uses LaTeX titles of the form <code class="docutils literal notranslate"><span class="pre">\pi^{-1}(U_j)</span></code>.</p></li>
+<li><p>None: no titles.</p></li>
+<li><p>sequence of strings: custom titles aligned with <code class="docutils literal notranslate"><span class="pre">fiber_ids</span></code>.</p></li>
 </ul>
 </dd>
 </dl>
+</p></li>
+<li><p><strong>font_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Title font size.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – If provided, save the figure to this path.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure and a flat array of axes.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>fig, axes</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This function lazily imports <code class="docutils literal notranslate"><span class="pre">persim</span></code> (for <code class="docutils literal notranslate"><span class="pre">plot_diagrams</span></code>) so importing this
+module does not require persim unless you call it.</p></li>
+</ul>
 </dd></dl>
 
 </section>
