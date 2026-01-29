@@ -1359,6 +1359,7 @@ class BundleResult:
             highlight_color=highlight_color,
         )
 
+    
     def show_max_trivial(
         self,
         *,
@@ -1407,80 +1408,87 @@ class BundleResult:
         -------
         fig:
             A Plotly figure.
-        """
-        from .viz.nerve_plotly import make_nerve_figure, embed_landmarks
+        """        
+        from .viz.nerve_plotly import nerve_with_slider
 
+        cover = self.cover
+
+        # --- pick weights for the FULL nerve (same logic as show_nerve) ---
         if prefer_edge_weight is None:
             prefer_edge_weight = self.meta.get("prefer_edge_weight", "rms")
 
-        max_triv = self.get_max_trivial_subcomplex(
+        ew_full = edge_weights
+        if ew_full is None:
+            if prefer_edge_weight == "rms":
+                ew_full = getattr(self.transitions, "rms_angle_err", None)
+            elif prefer_edge_weight == "witness":
+                ew_full = getattr(self.quality, "witness_err", None)
+            elif prefer_edge_weight == "none":
+                ew_full = None
+            else:
+                raise ValueError("prefer_edge_weight must be 'rms', 'witness', 'none', or None.")
+
+        if ew_full is None:
+            # no weights => no meaningful slider; just fall back to static highlight
+            return self.show_nerve(
+                title=title or "Max-trivial subcomplex (no edge weights available)",
+                show_labels=show_labels,
+                show_axes=show_axes,
+                tri_opacity=tri_opacity,
+                tri_color=tri_color,
+                highlight_edges=set(getattr(self.get_max_trivial_subcomplex(
+                    prefer_edge_weight=prefer_edge_weight,
+                    edge_weights=edge_weights,
+                    recompute=recompute,
+                ), "removed_edges", [])) if highlight_removed else None,
+                highlight_color=removed_color,
+            )
+
+        # --- compute the max-trivial subcomplex (depends on persistence etc.) ---
+        mt = self.get_max_trivial_subcomplex(
             prefer_edge_weight=prefer_edge_weight,
             edge_weights=edge_weights,
             recompute=recompute,
         )
 
-        cover = self.cover
-        landmarks = np.asarray(cover.landmarks)
+        kept_set = {canon_edge(*e) for e in mt.kept_edges}
+        removed_set = {canon_edge(*e) for e in mt.removed_edges}
 
-        all_edges = list(cover.nerve_edges())
-        all_tris = list(cover.nerve_triangles())
+        # --- compute the “marker” cutoff where the kept subcomplex is fully present ---
+        ew_canon = {canon_edge(*e): float(w) for e, w in ew_full.items()}
+        kept_weights = [ew_canon.get(e, np.inf) for e in kept_set]
+        w_star = float(np.max(kept_weights)) if kept_weights else float("nan")
 
-        removed_set = {canon_edge(*e) for e in max_triv.removed_edges}
-        kept_set = {canon_edge(*e) for e in max_triv.kept_edges}
-
-        if hide_removed_edges:
-            edges_to_draw = sorted(kept_set)
-            kept_pairs = set(kept_set)
-            tris_to_draw = []
-            for t in all_tris:
-                i, j, k = canon_tri(*t)
-                if (canon_edge(i, j) in kept_pairs) and (canon_edge(i, k) in kept_pairs) and (canon_edge(j, k) in kept_pairs):
-                    tris_to_draw.append((i, j, k))
-        else:
-            edges_to_draw = all_edges
-            tris_to_draw = all_tris
+        # If you want the initial view to be exactly the max-trivial complex:
+        cutoff_weight = w_star if hide_removed_edges and np.isfinite(w_star) else None
 
         if title is None:
-            title = "Max Subcomplex On Which Class Representatives Are Coboundaries"
+            title = "Nerve (slider) with max-trivial cutoff marked"
 
-        fig = make_nerve_figure(
-            landmarks=landmarks,
-            edges=edges_to_draw,
-            triangles=tris_to_draw,
+        # choose what to highlight while sliding
+        highlight_edges = None
+        highlight_color = "red"
+        if highlight_removed:
+            highlight_edges = removed_set
+            highlight_color = removed_color
+        elif highlight_kept:
+            highlight_edges = kept_set
+            highlight_color = kept_color
+
+        return nerve_with_slider(
+            cover=cover,
+            edge_weights=ew_full,
             show_labels=show_labels,
             show_axes=show_axes,
             tri_opacity=tri_opacity,
             tri_color=tri_color,
-            highlight_edges=(removed_set if highlight_removed else None),
-            highlight_color=removed_color,
             title=title,
+            highlight_edges=highlight_edges,
+            highlight_color=highlight_color,
+            mark_cutoff = cutoff_weight
         )
 
-        if highlight_kept and kept_set:
-            import plotly.graph_objects as go
-            emb = embed_landmarks(landmarks)
-            n = emb.shape[0]
-            hx, hy, hz = [], [], []
-            for (i, j) in sorted(kept_set):
-                if not (0 <= i < n and 0 <= j < n):
-                    continue
-                hx += [emb[i, 0], emb[j, 0], None]
-                hy += [emb[i, 1], emb[j, 1], None]
-                hz += [emb[i, 2], emb[j, 2], None]
-            fig.add_trace(
-                go.Scatter3d(
-                    x=hx,
-                    y=hy,
-                    z=hz,
-                    mode="lines",
-                    line=dict(width=6.0, color=kept_color),
-                    hoverinfo="none",
-                    showlegend=False,
-                )
-            )
 
-        fig.show()
-        return fig
 
     def show_circle_nerve(
         self,

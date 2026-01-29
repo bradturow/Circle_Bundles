@@ -181,19 +181,42 @@ def make_nerve_figure(
         )
     )
 
+    # filter triangles to respect current edge set
+    Eset = set(E)
+    T = _filter_tris_by_edge_set(T, Eset)
+
+    fig = go.Figure()
+
+    # ---- edges (base) ----
+    ex, ey, ez = _segments_from_edges(emb, E)
+    fig.add_trace(
+        go.Scatter3d(
+            x=ex, y=ey, z=ez,
+            mode="lines",
+            line=dict(width=float(edge_width), color="black"),
+            hoverinfo="none",
+            showlegend=False,
+        )
+    )
+
     # ---- highlighted edges ----
     if highlight_edges:
         H = _canon_edges(highlight_edges)
-        hx, hy, hz = _segments_from_edges(emb, H)
-        fig.add_trace(
-            go.Scatter3d(
-                x=hx, y=hy, z=hz,
-                mode="lines",
-                line=dict(width=float(max(2 * edge_width, edge_width + 4)), color=highlight_color),
-                hoverinfo="none",
-                showlegend=False,
+
+        # only highlight edges that are currently present after cutoff filtering
+        H = [e for e in H if e in Eset]
+
+        if H:
+            hx, hy, hz = _segments_from_edges(emb, H)
+            fig.add_trace(
+                go.Scatter3d(
+                    x=hx, y=hy, z=hz,
+                    mode="lines",
+                    line=dict(width=float(max(2 * edge_width, edge_width + 4)), color=highlight_color),
+                    hoverinfo="none",
+                    showlegend=False,
+                )
             )
-        )
 
     # ---- triangles ----
     if T:
@@ -290,7 +313,7 @@ def make_nerve_figure(
 
 
 # -----------------------------------------------------------------------------
-# Notebook slider wrapper (imports are local so the module is import-safe)
+# Notebook slider wrapper 
 # -----------------------------------------------------------------------------
 
 def nerve_with_slider(
@@ -301,71 +324,236 @@ def nerve_with_slider(
     tri_opacity: float = 0.25,
     tri_color: str = "pink",
     show_axes: bool = False,
+    highlight_edges: Optional[Set[Edge]] = None,
+    highlight_color: str = "red",
+    mark_cutoff: Optional[float] = None,   # e.g. max-trivial cutoff (a weight value)
+    title: Optional[str] = None,          
+    show_title_value: bool = True,         # if True, appends (w ≤ ...) to the title
 ):
     """
-    Notebook helper: slider over an edge weight cutoff.
+    Notebook helper: slider over an edge weight cutoff, WITHOUT resetting the camera.
 
-    Returns:
-      - If there are weights: the slider widget
-      - Else: the plotted figure
+    - Uses a persistent plotly FigureWidget and updates traces in-place.
+    - Optionally provides a button to jump to `mark_cutoff` (e.g. max-trivial weight).
     """
-    # local imports so non-notebook usage doesn't require ipywidgets
-    from ipywidgets import widgets, VBox
+    from ipywidgets import widgets, VBox, HBox
     from IPython.display import display
+    import plotly.graph_objects as go
 
     landmarks = np.asarray(cover.landmarks)
-    edges = list(cover.nerve_edges())
-    triangles = list(cover.nerve_triangles())
+    emb = embed_landmarks(landmarks)
+
+    edges_all = _canon_edges(cover.nerve_edges())
+    tris_all = _canon_tris(cover.nerve_triangles())
 
     ew = _canon_edge_weights(edge_weights)
     vals = sorted(set(float(v) for v in ew.values()))
-
     if not vals:
         fig = make_nerve_figure(
             landmarks=landmarks,
-            edges=edges,
-            triangles=triangles,
+            edges=edges_all,
+            triangles=tris_all,
             show_labels=show_labels,
             show_axes=show_axes,
             tri_opacity=tri_opacity,
             tri_color=tri_color,
-            title="Nerve",
+            highlight_edges=highlight_edges,
+            highlight_color=highlight_color,
+            title=(title or "Nerve"),
         )
         fig.show()
         return fig
 
-    # Keep your SelectionSlider behavior (stable, discrete cutoffs)
+    base_title = title or "Nerve"
+
+    # Discrete slider (filtration cutoffs)
     options = [(f"{v:.6g}", v) for v in vals]
+
+    # pick initial value
+    if mark_cutoff is not None:
+        m = float(mark_cutoff)
+        init_val = min(vals, key=lambda v: abs(v - m))  # snap to nearest available cutoff
+    else:
+        init_val = max(vals)
+
     slider = widgets.SelectionSlider(
         options=options,
-        value=max(vals),
+        value=init_val,
         description="Max w:",
         orientation="horizontal",
         layout={"width": "100%"},
         continuous_update=False,
     )
 
-    out = widgets.Output()
+    # --- Build the figure ONCE as a FigureWidget ---
+    cutoff0 = float(slider.value)
 
-    def update(_change=None):
-        out.clear_output(wait=True)
-        with out:
-            fig = make_nerve_figure(
-                landmarks=landmarks,
-                edges=edges,
-                triangles=triangles,
-                show_labels=show_labels,
-                show_axes=show_axes,
-                tri_opacity=tri_opacity,
-                tri_color=tri_color,
-                edge_weights=ew,
-                edge_cutoff=float(slider.value),
-                title=f"Nerve (w ≤ {float(slider.value):.6g})",
+    def _title_for_cutoff(cutoff: float) -> str:
+        if show_title_value:
+            return f"{base_title} (w ≤ {cutoff:.6g})"
+        return base_title
+
+    # initial filtered E,T
+    E0 = _filter_edges_by_cutoff(list(edges_all), ew, cutoff0)
+    E0set = set(E0)
+    T0 = _filter_tris_by_edge_set(list(tris_all), E0set)
+
+    fig = go.FigureWidget()
+
+    # Trace 0: edges
+    ex, ey, ez = _segments_from_edges(emb, E0)
+    fig.add_trace(go.Scatter3d(
+        x=ex, y=ey, z=ez,
+        mode="lines",
+        line=dict(width=3.0, color="black"),
+        hoverinfo="none",
+        showlegend=False,
+    ))
+
+    # Trace 1: highlighted edges overlay (only edges currently present)
+    fig.add_trace(go.Scatter3d(
+        x=[], y=[], z=[],
+        mode="lines",
+        line=dict(width=7.0, color=highlight_color),
+        hoverinfo="none",
+        showlegend=False,
+    ))
+
+    # Trace 2: triangles (or placeholder)
+    if T0:
+        tri = np.asarray(T0, dtype=int)
+        fig.add_trace(go.Mesh3d(
+            x=emb[:, 0], y=emb[:, 1], z=emb[:, 2],
+            i=tri[:, 0], j=tri[:, 1], k=tri[:, 2],
+            opacity=float(tri_opacity),
+            color=tri_color,
+            hoverinfo="skip",
+            showlegend=False,
+        ))
+    else:
+        fig.add_trace(go.Mesh3d(
+            x=[], y=[], z=[],
+            i=[], j=[], k=[],
+            opacity=0.0,
+            showlegend=False,
+        ))
+
+    # Trace 3: nodes (+labels optional)
+    n = int(emb.shape[0])
+    if show_labels:
+        fig.add_trace(go.Scatter3d(
+            x=emb[:, 0], y=emb[:, 1], z=emb[:, 2],
+            mode="markers+text",
+            text=[f"U{i}" for i in range(n)],
+            textposition="top center",
+            marker=dict(size=5, color="blue"),
+            textfont=dict(size=16, color="blue"),
+            showlegend=False,
+        ))
+    else:
+        fig.add_trace(go.Scatter3d(
+            x=emb[:, 0], y=emb[:, 1], z=emb[:, 2],
+            mode="markers",
+            marker=dict(size=5, color="blue"),
+            showlegend=False,
+        ))
+
+    fig.update_layout(
+        title=_title_for_cutoff(cutoff0),
+        margin=dict(l=0, r=0, t=40, b=0),
+        scene=dict(aspectmode="data"),
+        showlegend=False,
+    )
+    if not show_axes:
+        fig.update_layout(
+            scene=dict(
+                xaxis=dict(visible=False),
+                yaxis=dict(visible=False),
+                zaxis=dict(visible=False),
             )
-            fig.show()
+        )
+
+    # canonical highlight edges once
+    Hcanon = _canon_edges(highlight_edges or [])
+
+    def _highlight_under_cutoff(Eset: set[Edge]) -> List[Edge]:
+        # only show highlighted edges that are currently present under cutoff
+        return [e for e in Hcanon if e in Eset]
+
+    # set initial highlight
+    H0 = _highlight_under_cutoff(E0set)
+    hx, hy, hz = _segments_from_edges(emb, H0)
+    fig.data[1].x = hx
+    fig.data[1].y = hy
+    fig.data[1].z = hz
+
+    # Slider callback: update in-place (keeps camera)
+    def update(_change=None):
+        cutoff = float(slider.value)
+        E = _filter_edges_by_cutoff(list(edges_all), ew, cutoff)
+        Eset = set(E)
+        T = _filter_tris_by_edge_set(list(tris_all), Eset)
+
+        with fig.batch_update():
+            # edges trace
+            ex, ey, ez = _segments_from_edges(emb, E)
+            fig.data[0].x = ex
+            fig.data[0].y = ey
+            fig.data[0].z = ez
+
+            # highlight trace
+            H = _highlight_under_cutoff(Eset)
+            hx, hy, hz = _segments_from_edges(emb, H)
+            fig.data[1].x = hx
+            fig.data[1].y = hy
+            fig.data[1].z = hz
+
+            # triangles trace
+            if T:
+                tri = np.asarray(T, dtype=int)
+                fig.data[2].x = emb[:, 0]
+                fig.data[2].y = emb[:, 1]
+                fig.data[2].z = emb[:, 2]
+                fig.data[2].i = tri[:, 0]
+                fig.data[2].j = tri[:, 1]
+                fig.data[2].k = tri[:, 2]
+                fig.data[2].opacity = float(tri_opacity)
+                fig.data[2].color = tri_color
+            else:
+                fig.data[2].x = []
+                fig.data[2].y = []
+                fig.data[2].z = []
+                fig.data[2].i = []
+                fig.data[2].j = []
+                fig.data[2].k = []
+
+            fig.layout.title = _title_for_cutoff(cutoff)
 
     slider.observe(update, names="value")
-    display(VBox([out, slider]))
     update()
 
-    return slider
+    # --- Jump button (no extra labels) ---
+    jump_btn = widgets.Button(
+        description="Jump to max-trivial",
+        button_style="info",
+        layout={"width": "220px"},
+    )
+    jump_btn.disabled = (mark_cutoff is None)
+
+    def _jump(_btn):
+        if mark_cutoff is None:
+            return
+        m = float(mark_cutoff)
+        nearest = min(vals, key=lambda v: abs(v - m))
+
+        # If it's already at nearest, the observer won't fire, so force update.
+        if float(slider.value) != float(nearest):
+            slider.value = nearest
+        update()  # <- force redraw no matter what
+
+    jump_btn.on_click(_jump)
+
+    # Display: button + slider + figure
+    display(VBox([fig, HBox([jump_btn, slider])]))
+
+    return (jump_btn, slider, fig)
