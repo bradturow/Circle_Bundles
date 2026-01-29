@@ -42,3 +42,9 @@ This documentation is organized around:
    api/covers
    api/metrics
    api/analysis
+
+.. toctree::
+   :maxdepth: 2
+
+   tutorials/index
+   api/index

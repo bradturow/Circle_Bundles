@@ -87,3 +87,16 @@ autodoc_default_options = {
     "show-inheritance": True,
     "exclude-members": "__init__",
 }
+
+exclude_patterns = ["_build", "**/.DS_Store", "**/.ipynb_checkpoints"]
+
+extensions += ["sphinx_gallery.gen_gallery"]
+
+sphinx_gallery_conf = {
+    "examples_dirs": ["tutorials_src"],
+    "gallery_dirs": ["tutorials/auto_examples"],
+    "filename_pattern": r".*\.py$",
+    "ignore_pattern": r"(\.ipynb_checkpoints|__pycache__)",
+    "download_all_examples": False,
+    "only_warn_on_example_error": False,
+}

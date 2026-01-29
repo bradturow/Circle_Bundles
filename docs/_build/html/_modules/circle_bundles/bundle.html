@@ -30,6 +30,10 @@
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
   
   <!-- So that users can add custom icons -->
   <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
@@ -176,6 +180,13 @@
   </a>
 </li>
 
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -287,6 +298,13 @@
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../api/analysis.html">
     Analysis utilities
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
   </a>
 </li>
 
@@ -448,7 +466,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="BundleMapResult">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleMapResult">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleMapResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BundleMapResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -508,7 +526,7 @@
 
 
 <div class="viewcode-block" id="PullbackTotalSpaceResult">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.PullbackTotalSpaceResult">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.PullbackTotalSpaceResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">PullbackTotalSpaceResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -551,7 +569,7 @@
     <span class="n">meta</span><span class="p">:</span> <span class="n">PullbackMeta</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PullbackTotalSpaceResult.base_proj_map">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.PullbackTotalSpaceResult.base_proj_map">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.PullbackTotalSpaceResult.base_proj_map">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">base_proj_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Project concatenated vectors onto their base block.</span>
@@ -572,7 +590,7 @@
 
 
 <div class="viewcode-block" id="PullbackTotalSpaceResult.to_text">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.PullbackTotalSpaceResult.to_text">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.PullbackTotalSpaceResult.to_text">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a short human-readable summary.</span>
@@ -596,7 +614,7 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="BundleResult">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult">[docs]</a>
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BundleResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -684,7 +702,7 @@
     <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="BundleResult.compute_persistence">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.compute_persistence">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.compute_persistence">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_persistence</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -742,7 +760,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.get_persistence">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.get_persistence">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.get_persistence">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_persistence</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -795,7 +813,7 @@
     <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="BundleResult.compute_max_trivial_subcomplex">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.compute_max_trivial_subcomplex">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.compute_max_trivial_subcomplex">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_max_trivial_subcomplex</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -847,7 +865,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.get_max_trivial_subcomplex">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.get_max_trivial_subcomplex">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.get_max_trivial_subcomplex">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_max_trivial_subcomplex</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -895,7 +913,7 @@
     <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="BundleResult.compute_global_trivialization">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.compute_global_trivialization">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.compute_global_trivialization">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_global_trivialization</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1018,7 +1036,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.get_global_trivialization">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.get_global_trivialization">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.get_global_trivialization">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_global_trivialization</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1084,7 +1102,7 @@
     <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="BundleResult.get_frame_dataset">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.get_frame_dataset">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.get_frame_dataset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_frame_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1160,8 +1178,6 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="BundleResult.compute_bundle_map">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.compute_bundle_map">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_bundle_map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1218,13 +1234,12 @@
                 <span class="s2">&quot;compute_chart_disagreement&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">compute_chart_disagreement</span><span class="p">),</span>
                 <span class="s2">&quot;packing&quot;</span><span class="p">:</span> <span class="n">packing</span><span class="p">,</span>  <span class="c1"># keep as FramePacking for consistency</span>
             <span class="p">},</span>
-        <span class="p">)</span></div>
-
+        <span class="p">)</span>
         
   
 
 <div class="viewcode-block" id="BundleResult.get_bundle_map">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.get_bundle_map">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.get_bundle_map">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_bundle_map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1338,7 +1353,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.get_pullback_data">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.get_pullback_data">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.get_pullback_data">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_pullback_data</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1512,7 +1527,7 @@
     <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="BundleResult.bundle_app">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.bundle_app">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.bundle_app">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">bundle_app</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1604,7 +1619,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.show_bundle">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.show_bundle">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.show_bundle">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">show_bundle</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1692,7 +1707,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.show_nerve">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.show_nerve">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.show_nerve">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">show_nerve</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1771,7 +1786,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.show_max_trivial">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.show_max_trivial">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.show_max_trivial">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">show_max_trivial</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1897,7 +1912,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.show_circle_nerve">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.show_circle_nerve">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.show_circle_nerve">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">show_circle_nerve</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2040,7 +2055,7 @@
 
 
 <div class="viewcode-block" id="BundleResult.compare_trivs">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.BundleResult.compare_trivs">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.BundleResult.compare_trivs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compare_trivs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -2112,7 +2127,7 @@
 <span class="c1"># ============================================================</span>
 
 <div class="viewcode-block" id="build_bundle">
-<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.build_bundle">[docs]</a>
+<a class="viewcode-back" href="../../api/public_api.html#circle_bundles.api.build_bundle">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_bundle</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
     <span class="n">cover</span><span class="p">,</span>
