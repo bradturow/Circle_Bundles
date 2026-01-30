@@ -990,6 +990,8 @@ def summarize_edge_driven_persistence(
     top_k: int = 10,
     show: bool = True,
     mode: str = "auto",  # {"auto","text","latex","both"}
+    show_weight_hist: bool = True,
+    hist_bins: int = 40,
 ) -> Dict[str, Any]:
     """
     Persistence summary in the same style as other summaries, with:
@@ -1002,6 +1004,10 @@ def summarize_edge_driven_persistence(
     - "k" means number of edges removed (heaviest-first).
     - "r" means cutoff weight at that stage (∞ for the full complex).
     - |W_r^(d)| are the counts of d-simplices in the induced subcomplex.
+
+    If show_weight_hist=True, renders a side-by-side Matplotlib figure with:
+      - left: a table of the summary rows
+      - right: a histogram of all edge weights, with markers for key events
     """
     # ----------------------------
     # Canonicalize full complex
@@ -1201,14 +1207,85 @@ def summarize_edge_driven_persistence(
             )
         print("")
 
+    def _show_side_table_and_hist(rows_for_tbl) -> bool:
+        try:
+            import matplotlib.pyplot as plt  # type: ignore
+        except Exception:
+            return False
+
+        # weights in filtration order
+        weights = np.array([ew[e] for e in rem_order], dtype=float)
+        weights = weights[np.isfinite(weights)]
+        if weights.size == 0:
+            return False
+
+        events = [
+            ("w₁ cobirth", float(sw1_cob.cutoff_weight)),
+            ("w₁ codeath", float(sw1_cod.cutoff_weight)),
+            ("Euler cobirth", float(te_cob.cutoff_weight)),
+            ("Euler codeath", float(te_cod.cutoff_weight)),
+        ]
+
+        fig, (ax_tbl, ax_h) = plt.subplots(
+            1, 2, figsize=(14, 4.2), gridspec_kw={"width_ratios": [1.35, 1.0]}
+        )
+
+        # ---- Left: table ----
+        ax_tbl.axis("off")
+        col_labels = ["Stage", "k", "r", "|W¹|", "|W²|", "|W³|"]
+        cell_text = [
+            [stage, str(k), r_str, str(ne), str(nt), str(ntt)]
+            for (stage, k, r_str, ne, nt, ntt) in rows_for_tbl
+        ]
+        table = ax_tbl.table(
+            cellText=cell_text,
+            colLabels=col_labels,
+            loc="center",
+            cellLoc="left",
+            colLoc="left",
+        )
+        table.auto_set_font_size(False)
+        table.set_fontsize(12)
+        table.scale(1.2, 3.2)
+
+        # ---- Right: histogram ----
+        ax_h.hist(weights, bins=int(hist_bins))
+        ax_h.set_title("Edge-weight distribution")
+        ax_h.set_xlabel("Edge weight")
+        ax_h.set_ylabel("Count")
+
+        for label, w in events:
+            if np.isfinite(w):
+                ax_h.axvline(w)
+                y = ax_h.get_ylim()[1]
+                ax_h.text(w, 0.95 * y, label, rotation=90, va="top", ha="right", fontsize=8)
+
+        fig.tight_layout()
+        plt.show()
+        return True
+
+    # ----------------------------
+    # Display
+    # ----------------------------
     if show:
         core_rows = [(lab, k, r_str, ne, nt, ntt) for (lab, k, r_str, ne, nt, ntt, _top) in rows]
 
-        did_latex = False
-        if mode in {"latex", "auto", "both"}:
-            did_latex = _display_summary_latex_persistence(core_rows)
+        if show_weight_hist:
+            # Always prefer the side-by-side table+hist figure
+            ok = _show_side_table_and_hist(core_rows)
+            if not ok:
+                # Fallback: existing behavior (table + no hist)
+                did_latex = False
+                if mode in {"latex", "auto", "both"}:
+                    did_latex = _display_summary_latex_persistence(core_rows)
+                if mode == "both" or mode == "text" or (mode == "auto" and not did_latex):
+                    _print_text_table(core_rows)
+        else:
+            did_latex = False
+            if mode in {"latex", "auto", "both"}:
+                did_latex = _display_summary_latex_persistence(core_rows)
 
-        if mode == "both" or mode == "text" or (mode == "auto" and not did_latex):
-            _print_text_table(core_rows)
+            if mode == "both" or mode == "text" or (mode == "auto" and not did_latex):
+                _print_text_table(core_rows)
 
     return out

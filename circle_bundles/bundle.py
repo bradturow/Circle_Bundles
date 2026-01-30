@@ -1463,7 +1463,7 @@ class BundleResult:
         cutoff_weight = w_star if hide_removed_edges and np.isfinite(w_star) else None
 
         if title is None:
-            title = "Nerve (slider) with max-trivial cutoff marked"
+            title = "Nerve Visualization"
 
         # choose what to highlight while sliding
         highlight_edges = None

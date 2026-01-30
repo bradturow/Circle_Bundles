@@ -11,6 +11,8 @@ from ..geometry.geometry import get_bary_coords
 from ..nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
 from .triangle_covers import _require_gudhi  # lazy gudhi import helper
 
+from ..metrics import RP2UnitVectorMetric
+
 __all__ = [
     "fibonacci_sphere",
     "hemisphere_rep",
@@ -368,6 +370,8 @@ class RP2StarCover(CoverBase):
         denom[denom == 0] = 1.0
         self.U = U
         self.pou = pou / denom
+        self.metric = RP2UnitVectorMetric()
+        self.ensure_metric()
         return self
 
     def nerve_edges(self) -> List[Edge]:
