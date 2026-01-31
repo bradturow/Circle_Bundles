@@ -175,7 +175,6 @@ Notes
 # ----------------------------
 
 @dataclass
-@dataclass
 class TransitionReport:
     """
     Summary statistics and diagnostics for transition estimation.

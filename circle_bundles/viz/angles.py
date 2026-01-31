@@ -188,7 +188,7 @@ def compare_angle_pairs(
         else:
             if show_metrics:
                 val = mean_err if metric == "mean" else rms_err
-                title = f"{metric} err (circle): {val:.4g}"
+                title = f"{metric} err (circle): {val:.2g}"
             else:
                 title = ""
         ax.set_title(title, fontsize=int(titlesize))
@@ -321,7 +321,7 @@ def compare_trivs(
         tag_by_edge[best] = "BEST"
         tag_by_edge[worst] = "WORST"
         tag_by_edge[median] = "MEDIAN"
-
+        ncols = 3
     angle_arrays: List[np.ndarray] = []
     labels: List[str] = []
     titles: List[str] = []
@@ -347,9 +347,8 @@ def compare_trivs(
         tag = tag_by_edge.get((j, k), "")
         tag_str = f" [{tag}]" if tag else ""
         titles.append(
-            fr"$f_{{{j}}}$ vs $f_{{{k}}}$"
-            + tag_str
-            + fr"  ($|U_j\cap U_k|={ov}$, {metric} err={err:.4g})"
+            tag_str
+            + fr"  ($|U_{{{j}}}\cap U_{{{k}}}|={ov}$, {metric} err={err:.2g})"
         )
 
         pairs.append((2 * len(pairs), 2 * len(pairs) + 1))

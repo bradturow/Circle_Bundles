@@ -183,6 +183,7 @@ def fiberwise_clustering(
     *,
     build_pca_embeddings: bool = True,
     pca_dim: int = 2,
+    verbose: bool = True,
 ):
     """
     Cluster each fiber with DBSCAN and then merge clusters globally via an overlap graph.
@@ -254,6 +255,12 @@ def fiberwise_clustering(
     ... )
     >>> fig, _ = plot_fiberwise_summary_bars(summary)
     """
+    from ..utils.status_utils import _status, _status_clear
+
+    def _v(msg: str):
+        if verbose:
+            _status(msg)
+    
     nx = _require_networkx()
     DBSCAN, PCA = _require_sklearn()
 
@@ -278,8 +285,11 @@ def fiberwise_clustering(
     fiber_component_counts = np.zeros(n_fibers, dtype=int)
     pca_store: Dict[int, Dict[str, Any]] = {}
 
+            
     # --- Fiberwise DBSCAN + graph nodes ---
     for r in range(n_fibers):
+        _v(f"Clustering set {r+1}/{n_fibers}...")
+
         row_inds = np.where(U[r])[0]
         if row_inds.size == 0:
             continue
@@ -303,6 +313,8 @@ def fiberwise_clustering(
             pca_data = pca.fit_transform(fiber_pts)
             pca_store[r] = {"pca": pca_data, "clusters": labels, "row_inds": row_inds}
 
+    _v(f"Computing global clusters...")
+            
     # --- Overlap edges ---
     safe_add_edges(G, U, cl)
 
@@ -359,6 +371,9 @@ def fiberwise_clustering(
         "n_samples": int(n_samples),
     }
 
+    if verbose:
+        _status_clear()
+    
     return components, G, graph_dict, cl, summary
 
 

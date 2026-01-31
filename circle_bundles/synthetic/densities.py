@@ -5,13 +5,15 @@ from typing import Optional, Tuple, Union
 
 import numpy as np
 import trimesh
-from scipy.ndimage import map_coordinates
+from scipy.ndimage import map_coordinates, affine_transform
 from scipy.spatial import cKDTree
+
 
 __all__ = [
     "mesh_to_density",
     "get_density_axes",
-    "rotate_density",
+#    "rotate_density",
+    "make_rotated_density_dataset",
     "get_mesh_sample",
 ]
 
@@ -152,6 +154,107 @@ def get_density_axes(
             v = -v            
         directions[i] = v
     return (directions, ratios) if return_eigs else directions
+
+
+
+
+
+def voxel_grid_lin(grid_size: int):
+    lin = np.linspace(-1.0, 1.0, int(grid_size), dtype=np.float32)
+    return lin
+
+def make_base_density_volume(mesh: trimesh.Trimesh, *, grid_size=32, sigma=0.05, n_surface_samples=2000, eps=1e-12):
+    m = mesh.copy()
+    m.apply_translation(-m.center_mass)
+    scale = float(np.max(np.linalg.norm(m.vertices, axis=1)))
+    if scale <= eps:
+        raise ValueError("Mesh appears degenerate (near-zero scale).")
+    m.apply_scale(0.99 / scale)
+
+    surface = m.sample(int(n_surface_samples)).astype(np.float32)
+    tree = cKDTree(surface)
+
+    lin = voxel_grid_lin(grid_size)
+    X, Y, Z = np.meshgrid(lin, lin, lin, indexing="ij")
+    coords = np.stack([X, Y, Z], axis=-1).reshape(-1, 3)  # (D,3)
+
+    try:
+        dists, _ = tree.query(coords, k=1, workers=-1)
+    except TypeError:
+        dists, _ = tree.query(coords, k=1)
+
+    dists = dists.astype(np.float32)
+    inv_two_sigma2 = np.float32(1.0 / (2.0 * sigma * sigma))
+    dens = np.exp(-(dists * dists) * inv_two_sigma2).reshape(grid_size, grid_size, grid_size)
+
+    s = float(dens.sum())
+    if s > 0:
+        dens /= np.float32(s)
+    return dens.astype(np.float32)
+
+def rotate_volume_to_match_R(vol: np.ndarray, R: np.ndarray):
+    """
+    Treat vol as defined on coordinates in [-1,1]^3 (uniform grid).
+    We want vol_R(x) = vol(R^T x) (i.e. rotate the object by R).
+    scipy.affine_transform uses mapping: output[i] = input(A @ i + offset).
+    We implement in index coordinates with center handling.
+    """
+    g = vol.shape[0]
+    assert vol.shape == (g, g, g)
+
+    # center in index coords
+    c = (g - 1) / 2.0
+
+    # If we think in continuous index space, rotating about center:
+    # x_in = R^T (x_out - c) + c
+    # So A = R^T, offset = c - R^T c
+    A = R.T.astype(np.float64)
+    offset = np.array([c, c, c]) - A @ np.array([c, c, c])
+
+    out = affine_transform(
+        vol,
+        matrix=A,
+        offset=offset,
+        output_shape=vol.shape,
+        order=1,          # trilinear (fast)
+        mode="constant",
+        cval=0.0,
+        prefilter=False,  # important for speed when order=1
+    ).astype(np.float32)
+
+    s = out.sum()
+    if s > 0:
+        out /= s
+    return out
+
+def make_rotated_density_dataset(
+    mesh: trimesh.Trimesh,
+    rotations: np.ndarray,
+    *,
+    grid_size=32,
+    sigma=0.05,
+    n_surface_samples=2000,
+    batch_size=64,
+):
+    rots = np.asarray(rotations, dtype=np.float64)
+    if rots.ndim == 2 and rots.shape[1] == 9:
+        rots = rots.reshape(-1, 3, 3)
+
+    base = make_base_density_volume(
+        mesh, grid_size=grid_size, sigma=sigma, n_surface_samples=n_surface_samples
+    )
+
+    n = rots.shape[0]
+    D = grid_size**3
+    out = np.empty((n, D), dtype=np.float32)
+
+    # simple loop; you can parallelize later if needed
+    for i in range(n):
+        v = rotate_volume_to_match_R(base, rots[i])
+        out[i] = v.reshape(-1)
+
+    return out
+
 
 
 def rotate_density(

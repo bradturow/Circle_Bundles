@@ -28,6 +28,17 @@ from .bundle import (
     build_bundle,
 )
 
+# Additional dataclasses
+from .trivializations.local_triv import LocalTrivResult, DreimacCCConfig
+from .characteristic_class import ClassResult
+from .o2_cocycle import TransitionReport, O2Cocycle
+from .analysis.class_persistence import (
+    CobirthResult,
+    CodeathResult,
+    PersistenceResult
+)
+
+
 # =============================================================================
 # Covers 
 # =============================================================================
@@ -98,7 +109,16 @@ __all__ = [
     "PullbackTotalSpaceResult",
     "GlobalTrivializationResult",
     "MaxTrivialSubcomplex",
+    "DreimacCCConfig",
+    "LocalTrivResult",
+    "ClassResult",
+    "TransitionReport",
+    "O2Cocycle",
+    "CobirthResult",
+    "CodeathResult",
+    "PersistenceResult",
 
+    
     # covers
     "MetricBallCover",
     "TriangulationStarCover",
