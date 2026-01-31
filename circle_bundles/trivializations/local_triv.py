@@ -115,7 +115,7 @@ class DreimacCCConfig:
     landmarks_per_patch: int = 200
     prime: int = 41
     update_frac: float = 0.25
-    standard_range: bool = False  # feel free to delete later if you decide it's not needed
+    standard_range: bool = False  
 
 
 # ----------------------------

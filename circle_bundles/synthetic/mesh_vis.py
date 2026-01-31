@@ -264,6 +264,7 @@ def _default_pastel_gradient(n: int) -> LinearSegmentedColormap:
     )
 
 
+
 def make_star_pyramid_visualizer(
     mesh,
     *,
@@ -279,70 +280,66 @@ def make_star_pyramid_visualizer(
     """
     Visualizer for a star pyramid mesh with a smooth gradient on side faces.
 
-    Side faces are ordered by the angle of the base-edge midpoint
-    in the yz-plane to ensure a stable color assignment.
-
-    Defaults:
-    - base faces: muted slate (#94A3B8)
-    - side faces: pastel sunset gradient
+    FIX: side-face ordering is computed ONCE from the template mesh vertices,
+    so colors stay attached to the same faces under rotation.
     """
     faces = np.asarray(mesh.faces, dtype=int)
-    n_vertices = int(np.asarray(mesh.vertices).shape[0])
+    verts0 = np.asarray(mesh.vertices, dtype=float)
+    n_vertices = int(verts0.shape[0])
     apex_index = n_vertices - 1
+
+    # ----------------------------
+    # Precompute stable side-face ordering from template mesh
+    # ----------------------------
+    side_idx = np.array([i for i, f in enumerate(faces) if apex_index in f], dtype=int)
+
+    if side_idx.size > 0:
+        mids = []
+        for fi in side_idx:
+            f = faces[int(fi)]
+            base_verts = [v for v in f if int(v) != apex_index]
+            p = 0.5 * (verts0[int(base_verts[0])] + verts0[int(base_verts[1])])
+
+            # Keep your original convention (yz-plane) BUT evaluated on verts0,
+            # so it becomes a fixed ordering.
+            mids.append(np.arctan2(p[2], p[1]))
+
+        order = np.argsort(np.asarray(mids))
+        side_idx_sorted_template = side_idx[order]
+    else:
+        side_idx_sorted_template = side_idx
+
+    # Choose colormap once (length depends on number of side faces)
+    if isinstance(colormap, LinearSegmentedColormap):
+        cmap = colormap
+    elif isinstance(colormap, str):
+        cmap = plt.get_cmap(colormap)
+    else:
+        cmap = _default_pastel_gradient(len(side_idx_sorted_template))
+
+    # Precompute the face color list (again: fixed per face index)
+    face_colors_template: List[object] = [base_color] * len(faces)
+    if side_idx_sorted_template.size > 0:
+        vals = np.linspace(0.0, 1.0, side_idx_sorted_template.size, endpoint=True)
+        for t, fi in enumerate(side_idx_sorted_template):
+            face_colors_template[int(fi)] = cmap(float(vals[t]))
 
     def vis_func(flat_mesh: np.ndarray) -> Figure:
         verts = np.asarray(flat_mesh, dtype=float).reshape((n_vertices, 3))
         tris = verts[faces]
 
-        # Identify side faces (those containing the apex)
-        side_idx = np.array(
-            [i for i, f in enumerate(faces) if apex_index in f],
-            dtype=int,
-        )
-
-        # Stable angular ordering of side faces
-        if side_idx.size > 0:
-            mids = []
-            for fi in side_idx:
-                f = faces[int(fi)]
-                base_verts = [v for v in f if int(v) != apex_index]
-                p = 0.5 * (verts[int(base_verts[0])] + verts[int(base_verts[1])])
-                mids.append(np.arctan2(p[2], p[1]))  # angle in yz-plane
-
-            order = np.argsort(np.asarray(mids))
-            side_idx_sorted = side_idx[order]
-        else:
-            side_idx_sorted = side_idx
-
-        # Choose colormap
-        if isinstance(colormap, LinearSegmentedColormap):
-            cmap = colormap
-        elif isinstance(colormap, str):
-            cmap = plt.get_cmap(colormap)
-        else:
-            cmap = _default_pastel_gradient(len(side_idx_sorted))
-
-        # Assign colors
-        face_colors: List[object] = [base_color] * len(faces)
-        if side_idx_sorted.size > 0:
-            vals = np.linspace(0.0, 1.0, side_idx_sorted.size, endpoint=True)
-            for t, fi in enumerate(side_idx_sorted):
-                face_colors[int(fi)] = cmap(float(vals[t]))
-
-        # Plot
         fig = plt.figure(figsize=figsize, dpi=dpi, facecolor="none")
         ax = fig.add_subplot(111, projection="3d", facecolor="none")
         ax.set_axis_off()
 
         poly = Poly3DCollection(
             tris,
-            facecolors=face_colors,
+            facecolors=face_colors_template,  # <-- fixed mapping
             edgecolor=edge_color,
             alpha=float(alpha),
         )
         ax.add_collection3d(poly)
 
-        # Equal-ish scaling
         max_range = float(np.ptp(verts, axis=0).max() + 1e-12)
         mid = verts.mean(axis=0)
         lims = [(float(m - max_range / 2), float(m + max_range / 2)) for m in mid]

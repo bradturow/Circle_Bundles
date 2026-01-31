@@ -990,7 +990,7 @@ def summarize_edge_driven_persistence(
     top_k: int = 10,
     show: bool = True,
     mode: str = "auto",  # {"auto","text","latex","both"}
-    show_weight_hist: bool = True,
+    show_weight_hist: bool = False,
     hist_bins: int = 40,
 ) -> Dict[str, Any]:
     """
