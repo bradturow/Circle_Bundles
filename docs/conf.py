@@ -90,13 +90,23 @@ autodoc_default_options = {
 
 exclude_patterns = ["_build", "**/.DS_Store", "**/.ipynb_checkpoints"]
 
+# --- Sphinx Gallery ---------------------------------------------------------
 extensions += ["sphinx_gallery.gen_gallery"]
 
 sphinx_gallery_conf = {
-    "examples_dirs": ["tutorials_src"],
+    # folder containing your exported .py demo scripts
+    "examples_dirs": ["../notebooks/sphinx_demos"],
+    # where the rendered gallery gets written inside docs/
     "gallery_dirs": ["tutorials/auto_examples"],
+
+    # only pick up .py examples
     "filename_pattern": r".*\.py$",
     "ignore_pattern": r"(\.ipynb_checkpoints|__pycache__)",
+
+    # nice defaults
     "download_all_examples": False,
     "only_warn_on_example_error": False,
+
+    # recommended: do not reset CWD (prevents path weirdness)
+    "reset_modules": ("matplotlib",),
 }
