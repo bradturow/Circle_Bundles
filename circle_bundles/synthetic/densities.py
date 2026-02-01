@@ -351,6 +351,5 @@ def get_mesh_sample(mesh: trimesh.Trimesh, O3_data: np.ndarray) -> np.ndarray:
 
     rot_mats = O3_data.reshape(-1, 3, 3)  # (n,3,3)
 
-    # rotated[i, v, :] = verts[v, :] @ rot_mats[i].T
     rotated = np.einsum("vj,nij->nvi", verts, rot_mats)  # (n,N,3)
     return rotated.reshape(rotated.shape[0], -1)
