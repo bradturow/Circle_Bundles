@@ -1,0 +1,458 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "953e225b",
+   "metadata": {},
+   "source": [
+    "(example_01_optical_flow_torus)="
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3ce334d5",
+   "metadata": {},
+   "source": [
+    "# Optical Flow Torus"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b92ca543",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "import matplotlib.pyplot as plt\n",
+    "\n",
+    "from ripser import ripser\n",
+    "from persim import plot_diagrams\n",
+    "\n",
+    "import circle_bundles as cb"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "f343619b",
+   "metadata": {},
+   "source": [
+    "First, get a large sample of optical patches from the Sintel dataset:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "89d6386d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pickle \n",
+    "import pandas as pd\n",
+    "\n",
+    "patches_per_frame = 400\n",
+    "folder_path = \".../MPI-Sintel-complete/training/flow\"   #path to Sintel flow frames\n",
+    "\n",
+    "patch_df, file_paths = cb.get_patch_sample(\n",
+    "    folder_path,\n",
+    "    patches_per_frame = patches_per_frame,\n",
+    "    d = 3)\n",
+    "\n",
+    "print('')\n",
+    "print(f'{len(patch_df)} optical flow patches sampled')\n",
+    "\n",
+    "#Downsample if necessary\n",
+    "max_samples = 400000\n",
+    "if len(patch_df) > max_samples:\n",
+    "    patch_df = patch_df.sample(n=max_samples)\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3ab67bfc",
+   "metadata": {},
+   "source": [
+    "Next, preprocess the data -- compute contrast norms and keep only patches with contrast norm in the top 20%.  Then, use a KNN density estimator to measure the density of dataset near each datapoint:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7aa3076f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "hc_frac = 0.2\n",
+    "max_samples = 50000\n",
+    "k = [300]\n",
+    "\n",
+    "print('Preprocessing data...')\n",
+    "patch_df = cb.preprocess_flow_patches(\n",
+    "    patch_df,\n",
+    "    hc_frac = hc_frac,\n",
+    "    max_samples = max_samples,\n",
+    "    k_list = k)\n",
+    "\n",
+    "print('Preprocessing complete.')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6d803342",
+   "metadata": {},
+   "source": [
+    "Finally, keep only the top 50% of patches by density value:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ddde57ed",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "p = 0.5 \n",
+    "n_samples = int(p*len(patch_df))\n",
+    "data = np.vstack(patch_df['patch'])[:n_samples]    #Data is already sorted in decreasing order by density\n",
+    "print(f'Downsampled to {len(data)} patches')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cf707d7c",
+   "metadata": {},
+   "source": [
+    "Compute a persistence diagram from a sample of the dataset.  If the dataset is truly concentrated around the proposed torus model, we would expect to see two 1-dimensional persistent classes and a persistent class in dimension 2: "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "d480403d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "diagrams = ripser(data, maxdim = 2, n_perm = 500)['dgms']\n",
+    "plot_diagrams(diagrams, show=True)    "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e813f053",
+   "metadata": {},
+   "source": [
+    "Observe that we see a single 1-dimensional persistent class and no persistent classes in dimension 2.  "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "237053ec",
+   "metadata": {},
+   "source": [
+    "Proceed with local-to-global analysis.  Compute the predominant flow axis in $\\mathbb{RP}^{1}$ (as introduced by Adams et al.) and construct a cover of $\\mathbb{RP}^{1}$:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "30000702",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "predom_dirs, ratios = cb.get_predominant_dirs(data)    #compute directionalities for later use\n",
+    "\n",
+    "#Construct a cover of the base space\n",
+    "n_landmarks = 16\n",
+    "landmarks = np.linspace(0, np.pi, n_landmarks, endpoint= False)\n",
+    "overlap = 1.99\n",
+    "radius = overlap* np.pi/(2*n_landmarks)\n",
+    "\n",
+    "cover = cb.MetricBallCover(predom_dirs, landmarks, radius, metric = cb.RP1AngleMetric())\n",
+    "cover_data = cover.build()\n",
+    "\n",
+    "#Show a summary of the construction\n",
+    "summ = cover.summarize(plot = True)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ee9cadc6",
+   "metadata": {},
+   "source": [
+    "View a sample of the dataset arranged by predominant flow direction:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "da06605d",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "n_samples = 8\n",
+    "\n",
+    "label_func = [fr\"$\\theta = {np.round(pred/np.pi, 2)}$\" + r\"$\\pi$\" for pred in predom_dirs]\n",
+    "fig = cb.show_data_vis(\n",
+    "    data, \n",
+    "    patch_vis, \n",
+    "    label_func = label_func, \n",
+    "    angles = predom_dirs, \n",
+    "    sampling_method = 'angle', \n",
+    "    max_samples = n_samples)\n",
+    "plt.show()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "7a4a3017",
+   "metadata": {},
+   "source": [
+    "Compute a persistence diagram for the data in each set $\\pi^{-1}(U_{j})$:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "7b7834e8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fiber_ids, dense_idx_list, rips_list = cb.get_local_rips(\n",
+    "    data,\n",
+    "    cover.U,\n",
+    "    p_values=None,\n",
+    "    to_view = [0,3,8], #Choose a few diagrams to compute \n",
+    "                       #(or compute all by setting to None)\n",
+    "    maxdim=1,\n",
+    "    n_perm=500,\n",
+    "    random_state=None,\n",
+    ")\n",
+    "\n",
+    "fig, axes = cb.plot_local_rips(\n",
+    "    fiber_ids,\n",
+    "    rips_list,\n",
+    "    n_cols=3,\n",
+    "    titles='default',\n",
+    "    font_size=20,\n",
+    ")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "aca09400",
+   "metadata": {},
+   "source": [
+    "Observe that each $\\pi^{-1}(U_{j})$ has a single 1-dimensional (circular) persistent feature, supporting the hypothesis that the data has the structure of a discrete approximate circle bundle over $\\mathbb{RP}^{1}$.\n",
+    "\n",
+    "$\\textbf{Main bundle construction:}$ Construct local circular coordinates, compute approximate transition matrices and characteristic classes:\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "af1c1b27",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "bundle = cb.build_bundle(\n",
+    "    data,\n",
+    "    cover,\n",
+    "    show=True,\n",
+    ")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "a0eded27",
+   "metadata": {},
+   "source": [
+    "View the correlations between local circular coordinates on overlaps:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "95f09a3f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "fig = bundle.compare_trivs(ncols = 4)\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "df4c1a65",
+   "metadata": {},
+   "source": [
+    "Now, set up a bundle with just the high-directionality data:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "07ac5038",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "thresh = 0.8\n",
+    "high_inds = ratios > thresh\n",
+    "\n",
+    "print(f'{np.sum(high_inds)} high-directionality patches')\n",
+    "\n",
+    "high_cover = cb.MetricBallCover(predom_dirs[high_inds], landmarks, radius, metric = rp1_metric())\n",
+    "high_cover_data = high_cover.build()\n",
+    "high_bundle = build_bundle(\n",
+    "    data[high_inds],\n",
+    "    high_cover,\n",
+    "    show=True,\n",
+    ")\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "de1a6049",
+   "metadata": {},
+   "source": [
+    "Get global toroidal coordinates for the high-directionality data:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "58430a29",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "high_triv_result = high_bundle.get_global_trivialization()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "01f12879",
+   "metadata": {},
+   "source": [
+    "Show a sample of coordinatized patches:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b0af447a",
+   "metadata": {
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "per_row = 5\n",
+    "per_col = 9\n",
+    "coords = np.array([predom_dirs[high_inds], high_triv_result.F]).T\n",
+    "\n",
+    "fig = cb.lattice_vis(\n",
+    "    high_bundle.data,\n",
+    "    coords,\n",
+    "    patch_vis,\n",
+    "    per_row=per_row,\n",
+    "    per_col = per_col,\n",
+    "    figsize=19,\n",
+    "    thumb_px=350,   \n",
+    "    dpi=350, \n",
+    "    padding = 0,\n",
+    ")\n",
+    "\n",
+    "plt.show()\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9837b128",
+   "metadata": {},
+   "source": [
+    "Get a visualization of the coordinatized low-directionality data:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "59b342a8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "thresh = 0.7\n",
+    "low_inds = ratios < thresh\n",
+    "print(f'{np.sum(low_inds)} low-directionality patches')\n",
+    "low_data = data[low_inds]\n",
+    "\n",
+    "\n",
+    "per_row = 5\n",
+    "per_col = 9\n",
+    "coords = np.array([predom_dirs[low_inds], triv_result.F[low_inds]]).T\n",
+    "\n",
+    "fig = cb.lattice_vis(\n",
+    "    low_data,\n",
+    "    coords,\n",
+    "    patch_vis,\n",
+    "    per_row=per_row,\n",
+    "    per_col = per_col,\n",
+    "    figsize=19,\n",
+    "    thumb_px=350,   \n",
+    "    dpi=350,\n",
+    "    padding = 0\n",
+    ")\n",
+    "\n",
+    "plt.show()\n",
+    "\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.18"
+  },
+  "varInspector": {
+   "cols": {
+    "lenName": 16,
+    "lenType": 16,
+    "lenVar": 40
+   },
+   "kernels_config": {
+    "python": {
+     "delete_cmd_postfix": "",
+     "delete_cmd_prefix": "del ",
+     "library": "var_list.py",
+     "varRefreshCmd": "print(var_dic_list())"
+    },
+    "r": {
+     "delete_cmd_postfix": ") ",
+     "delete_cmd_prefix": "rm(",
+     "library": "var_list.r",
+     "varRefreshCmd": "cat(var_dic_list()) "
+    }
+   },
+   "types_to_exclude": [
+    "module",
+    "function",
+    "builtin_function_or_method",
+    "instance",
+    "_Feature"
+   ],
+   "window_display": false
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

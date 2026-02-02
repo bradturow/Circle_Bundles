@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Star Density Unwrapping &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Optical Flow" href="../optical_flow/index.html" />
+    <link rel="prev" title="Triangle Prism Densities" href="04_tri_prism_densities.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/index.html">Theory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core_pipeline.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.build_bundle.html">circle_bundles.build_bundle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.BundleResult.html">circle_bundles.BundleResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.DreimacCCConfig.html">circle_bundles.DreimacCCConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.LocalTrivResult.html">circle_bundles.LocalTrivResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.MetricBallCover.html">circle_bundles.MetricBallCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.TriangulationStarCover.html">circle_bundles.TriangulationStarCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.make_s2_fibonacci_star_cover.html">circle_bundles.make_s2_fibonacci_star_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.make_rp2_fibonacci_star_cover.html">circle_bundles.make_rp2_fibonacci_star_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/characteristic_classes.html">Characteristic classes and transitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.O2Cocycle.html">circle_bundles.O2Cocycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.TransitionReport.html">circle_bundles.TransitionReport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.ClassResult.html">circle_bundles.ClassResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/coordinatization.html">Coordinatization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.GlobalTrivializationResult.html">circle_bundles.GlobalTrivializationResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.BundleMapResult.html">circle_bundles.BundleMapResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.PullbackTotalSpaceResult.html">circle_bundles.PullbackTotalSpaceResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/weights_filtration.html">Weights filtration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.PersistenceResult.html">circle_bundles.PersistenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CobirthResult.html">circle_bundles.CobirthResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CodeathResult.html">circle_bundles.CodeathResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.MaxTrivialSubcomplex.html">circle_bundles.MaxTrivialSubcomplex</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cluster_persistence.html">circle_bundles.get_cluster_persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_filtered_cluster_graph.html">circle_bundles.get_filtered_cluster_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/index.html">Extras and utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/synthetic.html">Synthetic datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/viz.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/optical_flow.html">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/index.html">Quotients</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#core">Core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#optical-flow">Optical Flow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Tutorials</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Core</a></li>
+      <li class="breadcrumb-item active">Star Density Unwrapping</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/tutorials/auto_examples/core/05_star_density_unwrapping.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="star-density-unwrapping">
+<span id="example-05-star-density-unwrapping"></span><h1>Star Density Unwrapping<a class="headerlink" href="#star-density-unwrapping" title="Link to this heading"></a></h1>
+<p>This notebook demonstrates usage of <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> on a dataset endowed with a (non-Euclidean) metric.</p>
+<p>Given a vector <span class="math notranslate nohighlight">\(v\in \mathbb{S}^{2}\)</span> and an integer <span class="math notranslate nohighlight">\(p\in \mathbb{Z}\)</span>, one has a continuous, free right <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span>-action on <span class="math notranslate nohighlight">\(\mathbb{S}^{3}\)</span> defined by <span class="math notranslate nohighlight">\(q\cdot e^{i\theta} = qe^{i\frac{v}{2}}\)</span> (here we are identifying <span class="math notranslate nohighlight">\(\mathbb{S}^{3}\)</span> with the unit quaternions and <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span> with the pure imaginary unit quaternions). The hopf projection map <span class="math notranslate nohighlight">\(\pi:\mathbb{S}^{3}\to \mathbb{S}^{2}\)</span> defined by <span class="math notranslate nohighlight">\(\pi(q) = qvq^{-1}\)</span> is equivariant with respect to this action, so we obtain a new principal <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span>-bundle whose total space is the lens space <span class="math notranslate nohighlight">\(\mathbb{S}^{3}/\mathbb{Z}_{p}\)</span> (and whose projection map is defined by <span class="math notranslate nohighlight">\(\widetilde{\pi}([q]) = [\pi(q)]\)</span>).  The Euler number of this bundle is <span class="math notranslate nohighlight">\(\pm p\)</span>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
+
+<span class="c1"># Local circular coordinates</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dreimac</span><span class="w"> </span><span class="kn">import</span> <span class="n">CircularCoords</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>First, generate the dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Create the template triangle mesh</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_star_pyramid</span><span class="p">(</span><span class="n">n_points</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">R</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_so3</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1">#generate a random sample of SO(3)</span>
+
+<span class="n">mesh_data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_mesh_sample</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>  <span class="c1">#generate the mesh dataset for visualization</span>
+
+<span class="n">grid_size</span> <span class="o">=</span> <span class="mi">32</span>  <span class="c1">#density resolution</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.05</span>  
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_rotated_density_dataset</span><span class="p">(</span>
+    <span class="n">mesh</span><span class="p">,</span>
+    <span class="n">R</span><span class="p">,</span>
+    <span class="n">grid_size</span> <span class="o">=</span> <span class="n">grid_size</span><span class="p">,</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="c1">#Create visualization functions for triangle meshes and 3D densities</span>
+<span class="n">vis_mesh</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_star_pyramid_visualizer</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">vis_density</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_density_visualizer</span><span class="p">(</span><span class="n">grid_size</span><span class="o">=</span><span class="n">grid_size</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Densities are stored as vectors of length <span class="math notranslate nohighlight">\(32^{3} = 32768\)</span>.  For visualization, the original meshes are stored as vectors of length <span class="math notranslate nohighlight">\(11\times 3 = 33\)</span>.</p>
+<p>View a small sample of the data, represented by 2D projections of the 3D densities and also by the triangle meshes used to produce the densities.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_to_show</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">show_data_vis</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
+                       <span class="n">vis_density</span><span class="p">,</span> 
+                       <span class="n">max_samples</span> <span class="o">=</span> <span class="n">n_to_show</span><span class="p">,</span> 
+                       <span class="n">n_cols</span> <span class="o">=</span> <span class="n">n_to_show</span><span class="p">,</span> 
+                       <span class="n">sampling_method</span> <span class="o">=</span> <span class="s1">&#39;first&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">show_data_vis</span><span class="p">(</span><span class="n">mesh_data</span><span class="p">,</span> 
+                       <span class="n">vis_mesh</span><span class="p">,</span> 
+                       <span class="n">max_samples</span> <span class="o">=</span> <span class="n">n_to_show</span><span class="p">,</span> 
+                       <span class="n">n_cols</span> <span class="o">=</span> <span class="n">n_to_show</span><span class="p">,</span> 
+                       <span class="n">pad_frac</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> 
+                       <span class="n">sampling_method</span> <span class="o">=</span> <span class="s1">&#39;first&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note: 2D projections of the 3D densities are computed by summing intensities along the z-axis, shown here as perpendicular to the screen.  Reflecting a pyramid mesh through the z-axis produces a very different 3D density, but the 2D projections appear the same.  On the other hand, two pyramid meshes which differ by a rotation in the symmetry group yield indistinguishable 3D densities – this is a genuine symmetry of the dataset.</p>
+<p>Now, compute the base projections of the densities to <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> (represented as unit vectors in the upper hemisphere of <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span>):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_density_axes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Construct an open cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> using a collection of nearly equidistant landmark points (see reference section):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">rp2_cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_rp2_fibonacci_star_cover</span><span class="p">(</span><span class="n">base_points</span><span class="p">,</span> <span class="n">n_pairs</span> <span class="o">=</span> <span class="n">n_landmarks</span><span class="p">)</span>
+
+<span class="n">summ</span> <span class="o">=</span> <span class="n">rp2_cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Optionally run the cell below to view a Plotly visualization of the nerve of the open cover:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">rp2_cover</span><span class="o">.</span><span class="n">show_nerve</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Compute a persistence diagram for the data in each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fiber_ids</span><span class="p">,</span> <span class="n">dense_idx_list</span><span class="p">,</span> <span class="n">rips_list</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_local_rips</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">rp2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+    <span class="n">p_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">to_view</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">49</span><span class="p">],</span>
+    <span class="n">maxdim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">n_perm</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">plot_local_rips</span><span class="p">(</span>
+    <span class="n">fiber_ids</span><span class="p">,</span>
+    <span class="n">rips_list</span><span class="p">,</span>
+    <span class="n">n_cols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">titles</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+    <span class="n">font_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Observe that each set shows a pair of persistent classes in dimensions 0 and 1, suggesting the presence of a pair of local circular clusters in each set. This reflects the fact that the underlying pyramid mesh does not have additional 2-fold symmetry with respect to its rotational axis of symmetry.</p>
+<p>Optionally show a visualization of a ‘fat fiber’ of the projection map, with densities represented by both 2D projections and the underlying meshes</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">center_ind</span> <span class="o">=</span> <span class="mi">148</span>
+<span class="n">r</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">dist_mat</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">RP2UnitVectorMetric</span><span class="p">()</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">base_points</span><span class="p">)</span>
+<span class="n">nearby_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist_mat</span><span class="p">[</span><span class="n">center_ind</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">r</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="n">fiber_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">nearby_indices</span><span class="p">]</span>
+<span class="n">vis_data</span> <span class="o">=</span> <span class="n">mesh_data</span><span class="p">[</span><span class="n">nearby_indices</span><span class="p">]</span>
+
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+
+<span class="c1"># PCA labeled with meshes</span>
+<span class="n">cb</span><span class="o">.</span><span class="n">fiber_vis</span><span class="p">(</span>
+    <span class="n">fiber_data</span><span class="p">,</span>
+    <span class="n">vis_mesh</span><span class="p">,</span>
+    <span class="n">vis_data</span><span class="o">=</span><span class="n">vis_data</span><span class="p">,</span>
+    <span class="n">max_images</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">zoom</span><span class="o">=</span><span class="mf">0.08</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Fiber PCA&quot;</span><span class="p">)</span>
+
+<span class="c1"># PCA labeled with density projections</span>
+<span class="n">cb</span><span class="o">.</span><span class="n">fiber_vis</span><span class="p">(</span>
+    <span class="n">fiber_data</span><span class="p">,</span>
+    <span class="n">vis_func</span><span class="o">=</span><span class="n">vis_density</span><span class="p">,</span>
+    <span class="n">max_images</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">zoom</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Fiber PCA&quot;</span><span class="p">)</span>
+
+<span class="c1"># Base visualization</span>
+<span class="n">cb</span><span class="o">.</span><span class="n">base_vis</span><span class="p">(</span>
+    <span class="n">base_points</span><span class="p">,</span>
+    <span class="n">center_ind</span><span class="p">,</span>
+    <span class="n">r</span><span class="p">,</span>
+    <span class="n">dist_mat</span><span class="p">,</span>
+    <span class="n">use_pca</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax3</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Base neighborhood&quot;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Use fiberwise clustering to separate the data in each open set into its two components and track the global connected components</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eps_values</span> <span class="o">=</span> <span class="mf">0.0125</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rp2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">))</span>   <span class="c1">#Choose an epsilon value based on 0D persistence diagrams</span>
+<span class="n">min_sample_values</span> <span class="o">=</span> <span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rp2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">))</span>
+
+<span class="n">components</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">graph_dict</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">fiberwise_clustering</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
+                                                              <span class="n">rp2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> 
+                                                              <span class="n">eps_values</span><span class="p">,</span> 
+                                                              <span class="n">min_sample_values</span><span class="p">)</span>
+
+<span class="n">n_clusters</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">components</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Total number of global clusters: </span><span class="si">{</span><span class="n">n_clusters</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Observe that the data in each fiber was separated into two distinct clusters, but globally, the clusters organize into a single connected component.  This is expected, because the underlying model for the dataset has a single connected component.</p>
+<p>Optionally show the 1-skeleton of the nerve of the cover labeled by the <span class="math notranslate nohighlight">\(\mathbb{Z}_{2}\)</span> permutation cocycle – red edges indicate that the local +/- cluster labels are reversed on an overlap, where as blue edges indicate that the local +/- cluster labels agree.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">signs</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_cocycle_dict</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+<span class="n">signs_O1</span> <span class="o">=</span> <span class="p">{</span><span class="n">edge</span><span class="p">:(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="n">signs</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">signs</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
+
+<span class="n">dist_mat</span> <span class="o">=</span> <span class="n">rp2_cover</span><span class="o">.</span><span class="n">metric</span><span class="o">.</span><span class="n">pairwise</span><span class="p">(</span><span class="n">X</span> <span class="o">=</span> <span class="n">rp2_cover</span><span class="o">.</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">rp2_cover</span><span class="o">.</span><span class="n">base_points</span><span class="p">)</span>
+
+<span class="n">node_labels</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rp2_cover</span><span class="o">.</span><span class="n">landmarks</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">nerve_vis</span><span class="p">(</span>
+    <span class="n">rp2_cover</span><span class="p">,</span>
+    <span class="n">cochains</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="n">signs_O1</span><span class="p">},</span>
+    <span class="n">base_colors</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="s1">&#39;pink&#39;</span><span class="p">},</span>
+    <span class="n">cochain_cmaps</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">:{</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="s1">&#39;darkred&#39;</span><span class="p">}},</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">node_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+    <span class="n">line_width</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+    <span class="n">node_labels</span><span class="o">=</span><span class="n">node_labels</span><span class="p">,</span>
+    <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+    <span class="n">font_color</span><span class="o">=</span><span class="s1">&#39;lavender&#39;</span><span class="p">,</span>
+    <span class="n">title</span><span class="o">=</span><span class="s1">&#39;1-Skeleton Of The Nerve Of The Cover&#39;</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Optionally show a visualization of the local clusters. Each cluster is labeled by the pyramid mesh underlying a  representative 3D density.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">ax</span><span class="p">,</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]):</span>
+
+    <span class="n">sample_inds</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Choose a representative for each cluster with label g</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
+        <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">node</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">g</span><span class="p">:</span>
+            <span class="n">node_inds</span> <span class="o">=</span> <span class="n">cl</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">k</span>
+            <span class="n">min_idx_local</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">dist_mat</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">node_inds</span><span class="p">])</span>
+            <span class="n">min_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">node_inds</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="n">min_idx_local</span><span class="p">]</span>
+            <span class="n">sample_inds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_index</span><span class="p">)</span>
+
+    <span class="n">sample_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sample_inds</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="n">sample_mesh_data</span> <span class="o">=</span> <span class="n">mesh_data</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span>
+    <span class="n">sign</span> <span class="o">=</span> <span class="s2">&quot;+&quot;</span> <span class="k">if</span> <span class="n">g</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;-&quot;</span>
+    <span class="n">cb</span><span class="o">.</span><span class="n">nerve_vis</span><span class="p">(</span>
+        <span class="n">rp2_cover</span><span class="p">,</span>
+        <span class="n">cochains</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">signs_O1</span><span class="p">},</span>
+        <span class="n">base_colors</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;pink&quot;</span><span class="p">},</span>
+        <span class="n">cochain_cmaps</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;lightgray&quot;</span><span class="p">}},</span>
+        <span class="n">node_size</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+        <span class="n">line_width</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">node_labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+        <span class="n">font_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+        <span class="n">vis_func</span><span class="o">=</span><span class="n">vis_mesh</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">sample_mesh_data</span><span class="p">,</span>
+        <span class="n">image_zoom</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="sa">rf</span><span class="s2">&quot;$X^</span><span class="se">{{</span><span class="si">{</span><span class="n">sign</span><span class="si">}</span><span class="se">}}</span><span class="s2">$ Clusters&quot;</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>                
+        <span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>           
+    <span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Use the local cluster labels and interchange data on overlaps to lift the base map from <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> to <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lifted_base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">lift_base_points</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">base_points</span><span class="p">)</span>
+
+<span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">80</span>       <span class="c1">#Use more base points this time to compute the local circular coordinates</span>
+
+<span class="n">s2_cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_s2_fibonacci_star_cover</span><span class="p">(</span><span class="n">lifted_base_points</span><span class="p">,</span> <span class="n">n_vertices</span> <span class="o">=</span> <span class="n">n_landmarks</span><span class="p">)</span>
+<span class="n">summ</span> <span class="o">=</span> <span class="n">s2_cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Compute local trivializations, approximate transition matrices and characteristic classes</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc_alg</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">DreimacCCConfig</span><span class="p">(</span>
+    <span class="n">CircularCoords_cls</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">,</span>
+    <span class="n">landmarks_per_patch</span> <span class="o">=</span> <span class="mi">250</span><span class="p">,</span>
+    <span class="n">prime</span> <span class="o">=</span> <span class="mi">41</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="n">s2_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">s2_cover</span><span class="p">,</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">cc_alg</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">s2_bundle</span><span class="o">.</span><span class="n">compare_trivs</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, restrict the original bundle to the equator <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\subset \mathbb{S}^{2}\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eps</span> <span class="o">=</span> <span class="mf">0.15</span>  <span class="c1"># thickness of equatorial band</span>
+
+<span class="c1"># Points near the equator: last coordinate close to 0</span>
+<span class="n">eq_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">s2_cover</span><span class="o">.</span><span class="n">base_points</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">eps</span>
+
+<span class="n">eq_data</span> <span class="o">=</span> <span class="n">s2_bundle</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">eq_mask</span><span class="p">]</span>
+<span class="n">eq_mesh_data</span> <span class="o">=</span> <span class="n">mesh_data</span><span class="p">[</span><span class="n">eq_mask</span><span class="p">]</span>
+
+
+<span class="n">eq_base_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">s2_cover</span><span class="o">.</span><span class="n">base_points</span><span class="p">[</span><span class="n">eq_mask</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s2_cover</span><span class="o">.</span><span class="n">base_points</span><span class="p">[</span><span class="n">eq_mask</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Equator band: </span><span class="si">{</span><span class="n">eq_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">s2_bundle</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> samples (eps=</span><span class="si">{</span><span class="n">eps</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Constuct an open cover of <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span> by metric balls around equally-spaced landmark points:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">n_landmarks</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">overlap</span> <span class="o">=</span> <span class="mf">1.6</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="n">overlap</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">n_landmarks</span>
+
+<span class="n">eq_cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">MetricBallCover</span><span class="p">(</span><span class="n">eq_base_angles</span><span class="p">,</span> <span class="n">landmarks</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">metric</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">S1AngleMetric</span><span class="p">())</span>
+<span class="n">eq_cover_data</span> <span class="o">=</span> <span class="n">eq_cover</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+<span class="n">eq_summ</span> <span class="o">=</span> <span class="n">eq_cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Construct local circular coordinates using Dreimac, compute approximate transition matrices and characteristic classes:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc_alg</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">DreimacCCConfig</span><span class="p">(</span>
+    <span class="n">CircularCoords_cls</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">,</span>
+    <span class="n">landmarks_per_patch</span> <span class="o">=</span> <span class="mi">250</span><span class="p">,</span>
+    <span class="n">prime</span> <span class="o">=</span> <span class="mi">41</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">eq_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
+    <span class="n">eq_data</span><span class="p">,</span>
+    <span class="n">eq_cover</span><span class="p">,</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">cc_alg</span><span class="p">,</span>
+    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Observe that the restricted bundle is orientable, hence trivial, as expected. Construct a global toroidal coordinate system by synchronizing local circular coordinates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eq_triv_result</span> <span class="o">=</span> <span class="n">eq_bundle</span><span class="o">.</span><span class="n">get_global_trivialization</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, show a visualization of the coordinatized densities, represented by both the corresponding meshes and 2D projections:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Get a visualization of the data arranged by assigned coordinates using meshes</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">eq_base_angles</span><span class="p">,</span> <span class="n">eq_triv_result</span><span class="o">.</span><span class="n">F</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">lattice_vis</span><span class="p">(</span>
+    <span class="n">eq_mesh_data</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">,</span>
+    <span class="n">vis_mesh</span><span class="p">,</span> 
+    <span class="n">per_row</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>          
+    <span class="n">per_col</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>          
+    <span class="n">figsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+    <span class="n">thumb_px</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">ax1</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1">#Get a visualization of the data arranged by assigned coordinates using meshes</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">lattice_vis</span><span class="p">(</span>
+    <span class="n">eq_data</span><span class="p">,</span>
+    <span class="n">coords</span><span class="p">,</span>
+    <span class="n">vis_density</span><span class="p">,</span> 
+    <span class="n">per_row</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>          
+    <span class="n">per_col</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>          
+    <span class="n">figsize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> 
+    <span class="n">thumb_px</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">ax2</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="04_tri_prism_densities.html" class="btn btn-neutral float-left" title="Triangle Prism Densities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../optical_flow/index.html" class="btn btn-neutral float-right" title="Optical Flow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

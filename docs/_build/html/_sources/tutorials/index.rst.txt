@@ -1,14 +1,9 @@
-.. _example_tutorials_header:
+Tutorials
+=========
 
-Demos
-=====
-
-Notebook-based demos for ``circle_bundles`` showing end-to-end workflows:
-synthetic datasets, cover/nerve construction, local trivializations, cocycles,
-characteristic classes, and persistence diagnostics.
-
-
+A collection of examples demonstrating the core workflow.
 
 .. toctree::
-    :hidden:
+   :hidden:
 
+   auto_examples/index

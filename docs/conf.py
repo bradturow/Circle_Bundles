@@ -117,8 +117,15 @@ intersphinx_mapping = {
 from myst_sphinx_gallery import GalleryConfig  # noqa: E402
 
 myst_sphinx_gallery_config = GalleryConfig(
-    root_dir=Path(__file__).parent,     
-    examples_dirs="../notebooks/demos", 
-    gallery_dirs="tutorials",           
+    root_dir=Path(__file__).parent,
+    examples_dirs="../notebooks/tutorials",
+    gallery_dirs="tutorials/auto_examples",
     notebook_thumbnail_strategy="code",
 )
+
+
+myst_enable_extensions = [
+    "dollarmath",
+    "amsmath",
+    "colon_fence",
+]

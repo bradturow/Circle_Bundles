@@ -41,7 +41,7 @@ The recommended usage is:
    extras/index
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Tutorials
 
    tutorials/index
