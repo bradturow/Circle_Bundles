@@ -18,6 +18,7 @@ Tet = Tuple[int, int, int, int]
 def canon_tet(a: int, b: int, c: int, d: int) -> Tet:
     return tuple(sorted((int(a), int(b), int(c), int(d))))
 
+
 def _as_2d_points(X: np.ndarray, *, name: str = "points") -> np.ndarray:
     X = np.asarray(X)
     if X.ndim == 1:
@@ -210,6 +211,49 @@ class NerveSummary:
 
         return "\n".join(md)
 
+    def show_summary(self, *, show: bool = True, mode: str = "auto") -> str:
+        """
+        Bundle-summary-style output.
+
+        - Always returns a plain-text summary string (good for Sphinx capture).
+        - If show=True:
+            * mode="latex" or "auto" or "both": try notebook-friendly display
+            * mode="text" or fallback: print the plain text
+        """
+        text = self.to_text()
+
+        if not show:
+            return text
+
+        did_rich = False
+        if mode in {"latex", "auto", "both"}:
+            did_rich = _display_cover_summary_markdown(self)
+
+        if mode == "both" or mode == "text" or (mode == "auto" and not did_rich):
+            print("\n" + text + "\n")
+
+        return text
+
+
+def _display_cover_summary_markdown(summary: NerveSummary) -> bool:
+    """
+    Best-effort IPython Markdown display (for notebooks).
+    Returns True if it displayed, else False.
+
+    For Sphinx / sphinx-gallery, this often won't render as desired; callers will
+    print plain text as a reliable fallback.
+    """
+    try:
+        from IPython.display import display, Markdown  # type: ignore
+    except Exception:
+        return False
+
+    try:
+        display(Markdown(summary.to_markdown()))
+        return True
+    except Exception:
+        return False
+
 
 # ----------------------------
 # Internal helpers (summary)
@@ -229,18 +273,6 @@ def _cards_for_simplices(U: np.ndarray, simplices: List[Tuple[int, ...]]) -> np.
     for idx, sig in enumerate(simplices):
         out[idx] = _simplex_intersection_cardinality(U, tuple(sig))
     return out
-
-
-def _try_display_markdown(md: str) -> bool:
-    """
-    Try to display markdown in a notebook. Returns True if it displayed, else False.
-    """
-    try:
-        from IPython.display import display, Markdown  # type: ignore
-        display(Markdown(md))
-        return True
-    except Exception:
-        return False
 
 
 # ----------------------------
@@ -369,7 +401,6 @@ def plot_cover_summary_boxplot(
         high = float(np.max(np.r_[y0, y1]))
 
         # x position: whiskers are at x=1; place text slightly to the right.
-        # We'll offset in *axes-fraction* to be stable across panels.
         x_whisk = 1.0
         x_text = x_whisk + 0.03  # in data coords; OK since x-range is tiny
 
@@ -416,7 +447,6 @@ def plot_cover_summary_boxplot(
 
     plt.show()
     return fig, (axes_list[0] if n == 1 else axes_list)
-
 
 
 # ----------------------------
@@ -476,19 +506,18 @@ class CoverBase:
     U: Optional[np.ndarray] = None          # (n_sets, n_samples) bool
     pou: Optional[np.ndarray] = None        # (n_sets, n_samples) float
     landmarks: Optional[np.ndarray] = None  # (n_sets, dB) float
-    metric: Any = None                 # should be a Metric object (has .pairwise)
+    metric: Any = None                      # should be a Metric object (has .pairwise)
     full_dist_mat: Optional[np.ndarray] = None  # optional cache for viz
 
-# --- optional metadata for summaries/plots ---
+    # --- optional metadata for summaries/plots ---
     base_name: Optional[str] = None
-    base_name_latex: Optional[str] = None        
-        
-        
+    base_name_latex: Optional[str] = None
+
     def __post_init__(self):
         self.base_points = _as_2d_points(self.base_points, name="cover.base_points")
         if self.landmarks is not None:
-            self.landmarks = _as_2d_points(self.landmarks, name="cover.landmarks")        
-    
+            self.landmarks = _as_2d_points(self.landmarks, name="cover.landmarks")
+
     def normalize_shapes(self) -> None:
         self.base_points = _as_2d_points(self.base_points, name="cover.base_points")
         if self.landmarks is not None:
@@ -519,7 +548,7 @@ class CoverBase:
                 self.base_name_latex = bL.strip()
 
         return self.metric
-                
+
     def build(self) -> "CoverBase":
         raise NotImplementedError
 
@@ -792,7 +821,7 @@ class CoverBase:
 
         vert_card = edge_card = tri_card = tet_card = None
         if compute_cardinalities:
-            vert_card = U.sum(axis=1).astype(int)  
+            vert_card = U.sum(axis=1).astype(int)
             edge_card = _cards_for_simplices(U, [tuple(e) for e in edges]) if n1 > 0 else np.array([], dtype=int)
             tri_card = _cards_for_simplices(U, [tuple(t) for t in tris]) if n2 > 0 else np.array([], dtype=int)
             tet_card = _cards_for_simplices(U, [tuple(tt) for tt in tets]) if n3 > 0 else np.array([], dtype=int)
@@ -804,7 +833,7 @@ class CoverBase:
             n1=n1,
             n2=n2,
             n3=n3,
-            vert_card = vert_card,
+            vert_card=vert_card,
             edge_card=edge_card,
             tri_card=tri_card,
             tet_card=tet_card,
@@ -815,12 +844,11 @@ class CoverBase:
         )
 
         if verbose:
-            want_latex = (latex is True) or (latex == "auto")
-            did_display = False
-            if want_latex:
-                did_display = _try_display_markdown(summ.to_markdown()) if (latex != False) else False
-            if not did_display:
-                print(summ.to_text())
+            # Bundle-summary-style behavior:
+            # - attempt rich notebook display (when requested),
+            # - otherwise print plain text so Sphinx captures it reliably.
+            mode = "auto" if latex == "auto" else ("latex" if latex is True else "text")
+            summ.show_summary(show=True, mode=mode)
 
         if plot:
             if not compute_cardinalities:
@@ -1014,6 +1042,7 @@ class MetricBallCover(CoverBase):
                         if np.any(ijk & self.U[l]):
                             tets.append(canon_tet(i, j, k, l))
         return tets
+
 
 # ----------------------------
 # Triangulation star cover
