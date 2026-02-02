@@ -23,7 +23,7 @@ Applications to optical flow data.
         :link: example_01_optical_flow_torus
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-rounded-2 msg-sd-card sd-border-0
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top

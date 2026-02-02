@@ -9,7 +9,7 @@
   <title>Product Torus &mdash; circle_bundles 0+unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
 
@@ -25,7 +25,7 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Synthetic natural image patches" href="02_synthetic_natural_image_patches.html" />
+    <link rel="next" title="Synthetic Natural Image Patches" href="02_synthetic_natural_image_patches.html" />
     <link rel="prev" title="Core" href="index.html" /> 
 </head>
 
@@ -148,16 +148,28 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Tutorials</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
-<li class="toctree-l3 current"><a class="reference internal" href="index.html">Core</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../quotients/index.html">Quotients</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#core">Core</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#optical-flow">Optical Flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Core</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="04_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/01_quotients_of_s2_trivial.html">Quotients <span class="math notranslate nohighlight">\((\mathbb{S}^{2}\times\mathbb{S}^{1})/\mathbb{Z}_{2}\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/02_lens_spaces.html">Lens Spaces <span class="math notranslate nohighlight">\(L(p,1) = \mathbb{S}^{3}/\mathbb{Z}_{p}\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/03_non_orientable_over_rp2.html">Quotients <span class="math notranslate nohighlight">\(\mathbb{S}^{3}/(\mathbb{Z}_{2p}\rtimes\mathbb{Z}_{2})\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#core">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#optical-flow">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
 </ul>
 </li>
 </ul>
@@ -176,7 +188,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Tutorials</a></li>
           <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
           <li class="breadcrumb-item"><a href="index.html">Core</a></li>
       <li class="breadcrumb-item active">Product Torus</li>
@@ -231,20 +242,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Bundle viewer running at: http://127.0.0.1:58756/
-</pre></div>
-</div>
-<div class="output text_html">
-        <iframe
-            width="100%"
-            height="650"
-            src="http://127.0.0.1:58756/"
-            frameborder="0"
-            allowfullscreen
-            
-        ></iframe>
-        </div></div>
 </div>
 <p>Compute a persistence diagram from a sample of the data:</p>
 <div class="cell docutils container">
@@ -281,6 +278,10 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.211\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.067\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.033\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.010\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.211\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.000\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 = 0\ (\text{orientable})\\[3pt]\quad \text{Euler class} &amp;:\quad e = 0\ \text{(no 2-simplices)}\end{aligned}\end{split}\]</div>
+</div>
 </div>
 <p>The characteristic classes indicate that the global structure is trivial (as expected), so a global coordinate system is possible. Synchronize local circular coordinates and compute a global toroidal coordinate system:</p>
 <div class="cell docutils container">
@@ -299,6 +300,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/2c5c57354558a252b9b9aa8d384b78d3d0f0be6de0cac9cceee22e5befe5942f.png" src="../../../_images/2c5c57354558a252b9b9aa8d384b78d3d0f0be6de0cac9cceee22e5befe5942f.png" />
+</div>
 </div>
 <p>Note that the correlation is nearly perfect – the true and assigned fiber coordinates roughly differ by a global shift of about <span class="math notranslate nohighlight">\(0.5\)</span> radians.</p>
 <p>Optionally run the cell below to view an interactive visualization of the dataset colored according to assigned fiber coordinate:</p>
@@ -316,7 +320,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Core" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="02_synthetic_natural_image_patches.html" class="btn btn-neutral float-right" title="Synthetic natural image patches" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="02_synthetic_natural_image_patches.html" class="btn btn-neutral float-right" title="Synthetic Natural Image Patches" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -44,4 +44,4 @@ The recommended usage is:
    :maxdepth: 1
    :caption: Tutorials
 
-   tutorials/index
+   tutorials/auto_examples/index

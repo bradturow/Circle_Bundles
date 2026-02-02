@@ -9,7 +9,7 @@
   <title>Core &mdash; circle_bundles 0+unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
       <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
 
@@ -148,16 +148,28 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Tutorials</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Core</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../quotients/index.html">Quotients</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#core">Core</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#optical-flow">Optical Flow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="04_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/01_quotients_of_s2_trivial.html">Quotients <span class="math notranslate nohighlight">\((\mathbb{S}^{2}\times\mathbb{S}^{1})/\mathbb{Z}_{2}\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/02_lens_spaces.html">Lens Spaces <span class="math notranslate nohighlight">\(L(p,1) = \mathbb{S}^{3}/\mathbb{Z}_{p}\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../quotients/03_non_orientable_over_rp2.html">Quotients <span class="math notranslate nohighlight">\(\mathbb{S}^{3}/(\mathbb{Z}_{2p}\rtimes\mathbb{Z}_{2})\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#core">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#optical-flow">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
 </ul>
 </li>
 </ul>
@@ -176,7 +188,6 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="../../index.html">Tutorials</a></li>
           <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
       <li class="breadcrumb-item active">Core</li>
       <li class="wy-breadcrumbs-aside">
@@ -196,7 +207,7 @@
 <div class="sd-container-fluid sd-sphinx-override sd-mb-4 msg-sd-container docutils">
 <div class="sd-row msg-sd-row docutils">
 <div class="sd-col sd-d-flex-row msg-sd-card-hover docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center msg-sd-card sd-rounded-2 sd-border-0 docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center sd-rounded-2 msg-sd-card sd-border-0 docutils">
 <img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/01_product_torus.webp" />
 <div class="sd-card-body msg-sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold msg-sd-card-title docutils">
@@ -205,16 +216,16 @@
 <a class="sd-stretched-link sd-hide-link-text reference internal" href="01_product_torus.html#example-01-product-torus"><span class="std std-ref">Product Torus</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row msg-sd-card-hover docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center msg-sd-card sd-rounded-2 sd-border-0 docutils">
-<img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/no_image.webp" />
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center sd-rounded-2 msg-sd-card sd-border-0 docutils">
+<img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/02_synthetic_natural_image_patches.webp" />
 <div class="sd-card-body msg-sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold msg-sd-card-title docutils">
-<a class="reference internal" href="02_synthetic_natural_image_patches.html#example-02-synthetic-natural-image-patches"><span class="std std-ref">Synthetic natural image patches</span></a></div>
+<a class="reference internal" href="02_synthetic_natural_image_patches.html#example-02-synthetic-natural-image-patches"><span class="std std-ref">Synthetic Natural Image Patches</span></a></div>
 </div>
-<a class="sd-stretched-link sd-hide-link-text reference internal" href="02_synthetic_natural_image_patches.html#example-02-synthetic-natural-image-patches"><span class="std std-ref">Synthetic natural image patches</span></a></div>
+<a class="sd-stretched-link sd-hide-link-text reference internal" href="02_synthetic_natural_image_patches.html#example-02-synthetic-natural-image-patches"><span class="std std-ref">Synthetic Natural Image Patches</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row msg-sd-card-hover docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center msg-sd-card sd-rounded-2 sd-border-0 docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center sd-rounded-2 msg-sd-card sd-border-0 docutils">
 <img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/03_triangle_meshes.webp" />
 <div class="sd-card-body msg-sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold msg-sd-card-title docutils">
@@ -223,8 +234,8 @@
 <a class="sd-stretched-link sd-hide-link-text reference internal" href="03_triangle_meshes.html#example-03-triangle-meshes"><span class="std std-ref">Triangle Meshes</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row msg-sd-card-hover docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center msg-sd-card sd-rounded-2 sd-border-0 docutils">
-<img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/no_image.webp" />
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center sd-rounded-2 msg-sd-card sd-border-0 docutils">
+<img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/04_tri_prism_densities.webp" />
 <div class="sd-card-body msg-sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold msg-sd-card-title docutils">
 <a class="reference internal" href="04_tri_prism_densities.html#example-04-tri-prism-densities"><span class="std std-ref">Triangle Prism Densities</span></a></div>
@@ -232,7 +243,7 @@
 <a class="sd-stretched-link sd-hide-link-text reference internal" href="04_tri_prism_densities.html#example-04-tri-prism-densities"><span class="std std-ref">Triangle Prism Densities</span></a></div>
 </div>
 <div class="sd-col sd-d-flex-row msg-sd-card-hover docutils">
-<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center msg-sd-card sd-rounded-2 sd-border-0 docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-md sd-card-hover sd-text-center sd-rounded-2 msg-sd-card sd-border-0 docutils">
 <img alt="" class="sd-card-img-top msg-sd-card-img-top" src="auto_examples/myst_sphinx_gallery_thumbs/no_image.webp" />
 <div class="sd-card-body msg-sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold msg-sd-card-title docutils">
