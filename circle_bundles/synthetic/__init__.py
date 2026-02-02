@@ -27,7 +27,6 @@ from . import (
 from .densities import (
     mesh_to_density,
     get_density_axes,
-#    rotate_density,
     make_rotated_density_dataset,    
     get_mesh_sample,
 )
@@ -38,6 +37,7 @@ from .densities import (
 from .meshes import (
     make_tri_prism,
     make_star_pyramid,
+    mesh_vertex_normals
 )
 
 from .mesh_vis import (
@@ -118,6 +118,7 @@ __all__ = [
     # meshes + viz
     "make_tri_prism",
     "make_star_pyramid",
+    "mesh_vertex_normals",
     "make_density_visualizer",
     "make_tri_prism_visualizer",
     "make_star_pyramid_visualizer",

@@ -130,26 +130,26 @@ where:
 - r(ref_angle) is either the identity (if det(O)=+1) or the reflection across the line
   making angle `ref_angle` with the +x-axis (if det(O)=-1).
 
-Parameters
+    Parameters
     ----------
     O:
         A 2×2 (approximately) orthogonal matrix.
     ref_angle:
         Reflection axis angle in radians. Only affects the decomposition when det(O)=-1.
 
-Returns
+    Returns
     -------
     theta:
         Rotation angle in radians, normalized to the interval [0, 2π).
     det:
         The determinant sign of O, returned as +1 or -1.
 
-Raises
+    Raises
     ------
     ValueError
         If O is not 2×2 or is not approximately orthogonal.
 
-Notes
+    Notes
     -----
     This is a *convention choice*: many decompositions are possible for det=-1, but by
     fixing a reflection axis via `ref_angle`, the decomposition becomes deterministic and
@@ -199,7 +199,7 @@ class TransitionReport:
     missing_edges:
         List of edges (j, k) that were requested but skipped due to insufficient overlap.
     overlap_sizes:
-        Dict mapping each requested edge (j, k) to the number of overlap samples |U_j ∩ U_k|.
+        Dict mapping each requested edge (j, k) to the number of overlap samples :math:`|U_j \\cap U_k|`.
     rms_angle_err:
         Dict mapping each estimated edge (j, k) to an RMS angular error (radians) measured
         on the overlap points.
@@ -529,7 +529,7 @@ def estimate_transitions(
 
     This routine fits, for each requested edge (j,k), an orthogonal matrix Omega[(j,k)] ∈ O(2)
     that best maps unit vectors derived from chart k to unit vectors derived from chart j
-    over the overlap samples U[j] ∩ U[k].
+    over the overlap samples :math:`U[j] \\cap U[k]`.
 
     The fit is a (weighted) orthogonal Procrustes problem on S¹-embedded unit vectors:
     each angle θ is converted to v(θ) = (cos θ, sin θ), and we choose Omega minimizing

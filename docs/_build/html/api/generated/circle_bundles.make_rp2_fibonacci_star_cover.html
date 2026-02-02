@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.make_rp2_fibonacci_star_cover &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Metrics" href="../metrics.html" />
+    <link rel="prev" title="circle_bundles.make_s2_fibonacci_star_cover" href="circle_bundles.make_s2_fibonacci_star_cover.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../theory/index.html">Theory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../core_pipeline.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.build_bundle.html">circle_bundles.build_bundle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.BundleResult.html">circle_bundles.BundleResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.DreimacCCConfig.html">circle_bundles.DreimacCCConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.LocalTrivResult.html">circle_bundles.LocalTrivResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../covers.html">Covers</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.MetricBallCover.html">circle_bundles.MetricBallCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.TriangulationStarCover.html">circle_bundles.TriangulationStarCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.make_s2_fibonacci_star_cover.html">circle_bundles.make_s2_fibonacci_star_cover</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">circle_bundles.make_rp2_fibonacci_star_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../characteristic_classes.html">Characteristic classes and transitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.O2Cocycle.html">circle_bundles.O2Cocycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.TransitionReport.html">circle_bundles.TransitionReport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.ClassResult.html">circle_bundles.ClassResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coordinatization.html">Coordinatization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.GlobalTrivializationResult.html">circle_bundles.GlobalTrivializationResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.BundleMapResult.html">circle_bundles.BundleMapResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.PullbackTotalSpaceResult.html">circle_bundles.PullbackTotalSpaceResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../weights_filtration.html">Weights filtration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.PersistenceResult.html">circle_bundles.PersistenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CobirthResult.html">circle_bundles.CobirthResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CodeathResult.html">circle_bundles.CodeathResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.MaxTrivialSubcomplex.html">circle_bundles.MaxTrivialSubcomplex</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cluster_persistence.html">circle_bundles.get_cluster_persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_filtered_cluster_graph.html">circle_bundles.get_filtered_cluster_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../extras/index.html">Extras and utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/synthetic.html">Synthetic datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/viz.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/optical_flow.html">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Demos</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../covers.html">Covers</a></li>
+      <li class="breadcrumb-item active">circle_bundles.make_rp2_fibonacci_star_cover</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/generated/circle_bundles.make_rp2_fibonacci_star_cover.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="circle-bundles-make-rp2-fibonacci-star-cover">
+<h1>circle_bundles.make_rp2_fibonacci_star_cover<a class="headerlink" href="#circle-bundles-make-rp2-fibonacci-star-cover" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.make_rp2_fibonacci_star_cover">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">make_rp2_fibonacci_star_cover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_points</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark_oversample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmark_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/covers/triangle_cover_builders_fibonacci.html#make_rp2_fibonacci_star_cover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.make_rp2_fibonacci_star_cover" title="Link to this definition"></a></dt>
+<dd><p>Build a star cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span> using Fibonacci landmarks and an antipodal-symmetric hull.</p>
+<p>This constructs a cover downstairs on <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span> by working upstairs on <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span>
+and carefully pushing the result down through the antipodal quotient.</p>
+<section id="pipeline-high-level">
+<h2>Pipeline (high-level)<a class="headerlink" href="#pipeline-high-level" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Canonicalize each sample <code class="docutils literal notranslate"><span class="pre">x</span></code> to a <em>hemisphere representative</em> <code class="docutils literal notranslate"><span class="pre">x_rep</span></code> of its class <code class="docutils literal notranslate"><span class="pre">[x]</span></code>.</p></li>
+<li><p>Choose <code class="docutils literal notranslate"><span class="pre">n_pairs</span></code> well-spread landmark representatives in <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span> via:
+Fibonacci oversampling + farthest point sampling (FPS) in the chordal RP² metric.</p></li>
+<li><p>Lift landmarks to <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span> by adding antipodes, then triangulate via the convex hull.</p></li>
+<li><p>For each sample class <code class="docutils literal notranslate"><span class="pre">[x]</span></code>, compute hull-face hits and barycentric weights for both lifts
+<code class="docutils literal notranslate"><span class="pre">x_rep</span></code> and <code class="docutils literal notranslate"><span class="pre">-x_rep</span></code>.</p></li>
+<li><p>Push vertex contributions down to RP² vertex ids (pairing antipodes), sum weights, and keep the
+top-3 vertices per sample (renormalized).</p></li>
+<li><p>Build the cover membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code> and partition of unity <code class="docutils literal notranslate"><span class="pre">pou</span></code>. The nerve is “witnessed”
+from <code class="docutils literal notranslate"><span class="pre">U</span></code> (no ghost simplices).</p></li>
+</ol>
+<p>The returned object is an <code class="xref py py-class docutils literal notranslate"><span class="pre">RP2StarCover</span></code>
+that is already built (its <code class="docutils literal notranslate"><span class="pre">U</span></code> and <code class="docutils literal notranslate"><span class="pre">pou</span></code> are populated).</p>
+<dl class="field-list simple">
+<dt class="field-odd">param base_points<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">3)</span></code> representing (approximate) unit vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^3\)</span>.
+Each row represents a projective class <code class="docutils literal notranslate"><span class="pre">[x]</span></code> with the antipodal identification <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">~</span> <span class="pre">-x</span></code>.
+Rows are normalized internally.</p>
+</dd>
+<dt class="field-even">param n_pairs<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of <em>projective</em> landmark vertices (i.e. the number of antipodal pairs).
+The upstairs hull uses <code class="docutils literal notranslate"><span class="pre">2*n_pairs</span></code> vertices. Default is <code class="docutils literal notranslate"><span class="pre">256</span></code>.</p>
+</dd>
+<dt class="field-odd">param landmark_oversample<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Oversampling factor used before RP² farthest point sampling.
+Candidates are generated with <code class="docutils literal notranslate"><span class="pre">M</span> <span class="pre">=</span> <span class="pre">n_pairs</span> <span class="pre">*</span> <span class="pre">landmark_oversample</span></code> Fibonacci points.</p>
+</dd>
+<dt class="field-even">param landmark_seed<span class="colon">:</span></dt>
+<dd class="field-even"><p>Random seed used only to choose the initial FPS index. FPS is otherwise deterministic.
+Set to <code class="docutils literal notranslate"><span class="pre">None</span></code> for nondeterministic behavior.</p>
+</dd>
+<dt class="field-odd">param eps<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Numerical stability parameter used for normalization and ray–facet intersection tests.</p>
+</dd>
+<dt class="field-even">param atol<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tolerance used for deterministic hemisphere representative tie-breaking near the equator.</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A built <code class="xref py py-class docutils literal notranslate"><span class="pre">RP2StarCover</span></code>.</p>
+</dd>
+<dt class="field-even">rtype<span class="colon">:</span></dt>
+<dd class="field-even"><p>cover</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Correct handling of <span class="math notranslate nohighlight">\(\mathbb{RP}^2\)</span> requires considering <strong>both lifts</strong> of each sample
+upstairs (<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">-x</span></code>) before pushing weights down.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_rp2_fibonacci_star_cover</span><span class="p">(</span><span class="n">base_points</span><span class="p">,</span> <span class="n">n_pairs</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span><span class="n">total_space_data</span><span class="p">,</span> <span class="n">cover</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>n_pairs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>landmark_oversample</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>landmark_seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>eps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>atol</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>RP2StarCover</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="circle_bundles.make_s2_fibonacci_star_cover.html" class="btn btn-neutral float-left" title="circle_bundles.make_s2_fibonacci_star_cover" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../metrics.html" class="btn btn-neutral float-right" title="Metrics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

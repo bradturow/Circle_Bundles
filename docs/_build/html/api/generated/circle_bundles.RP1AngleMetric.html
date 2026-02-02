@@ -1,0 +1,338 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.RP1AngleMetric &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="circle_bundles.S1UnitVectorMetric" href="circle_bundles.S1UnitVectorMetric.html" />
+    <link rel="prev" title="circle_bundles.S1AngleMetric" href="circle_bundles.S1AngleMetric.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../theory/index.html">Theory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../core_pipeline.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.build_bundle.html">circle_bundles.build_bundle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.BundleResult.html">circle_bundles.BundleResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.DreimacCCConfig.html">circle_bundles.DreimacCCConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.LocalTrivResult.html">circle_bundles.LocalTrivResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.MetricBallCover.html">circle_bundles.MetricBallCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.TriangulationStarCover.html">circle_bundles.TriangulationStarCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.make_s2_fibonacci_star_cover.html">circle_bundles.make_s2_fibonacci_star_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.make_rp2_fibonacci_star_cover.html">circle_bundles.make_rp2_fibonacci_star_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../metrics.html">Metrics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../characteristic_classes.html">Characteristic classes and transitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.O2Cocycle.html">circle_bundles.O2Cocycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.TransitionReport.html">circle_bundles.TransitionReport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.ClassResult.html">circle_bundles.ClassResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coordinatization.html">Coordinatization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.GlobalTrivializationResult.html">circle_bundles.GlobalTrivializationResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.BundleMapResult.html">circle_bundles.BundleMapResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.PullbackTotalSpaceResult.html">circle_bundles.PullbackTotalSpaceResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../weights_filtration.html">Weights filtration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.PersistenceResult.html">circle_bundles.PersistenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CobirthResult.html">circle_bundles.CobirthResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CodeathResult.html">circle_bundles.CodeathResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.MaxTrivialSubcomplex.html">circle_bundles.MaxTrivialSubcomplex</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cluster_persistence.html">circle_bundles.get_cluster_persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_filtered_cluster_graph.html">circle_bundles.get_filtered_cluster_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../extras/index.html">Extras and utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/synthetic.html">Synthetic datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/viz.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/optical_flow.html">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Demos</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../metrics.html">Metrics</a></li>
+      <li class="breadcrumb-item active">circle_bundles.RP1AngleMetric</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/generated/circle_bundles.RP1AngleMetric.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="circle-bundles-rp1anglemetric">
+<h1>circle_bundles.RP1AngleMetric<a class="headerlink" href="#circle-bundles-rp1anglemetric" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">RP1AngleMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP1_angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{RP}^1'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/metrics.html#RP1AngleMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.RP1AngleMetric" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Geodesic distance on the real projective line <span class="math notranslate nohighlight">\(\mathbb{RP}^1\)</span>
+using angular coordinates.</p>
+<p>The space <span class="math notranslate nohighlight">\(\mathbb{RP}^1\)</span> can be viewed as a circle with antipodal
+points identified. Angles are therefore taken modulo <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+<p>The distance between two angles is</p>
+<div class="math notranslate nohighlight">
+\[d(\theta_1, \theta_2)
+= \min\left(|\Delta|, \pi - |\Delta|\right),
+\quad \Delta = (\theta_2 - \theta_1) \bmod \pi.\]</div>
+<p>This metric is commonly used when the base variable represents
+<em>unoriented directions</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#circle_bundles.RP1AngleMetric.name" title="Link to this definition"></a></dt>
+<dd><p>Metric identifier (default <code class="docutils literal notranslate"><span class="pre">&quot;RP1_angle&quot;</span></code>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric.base_name">
+<span class="sig-name descname"><span class="pre">base_name</span></span><a class="headerlink" href="#circle_bundles.RP1AngleMetric.base_name" title="Link to this definition"></a></dt>
+<dd><p>Short name of the base space for plots/UI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric.base_name_latex">
+<span class="sig-name descname"><span class="pre">base_name_latex</span></span><a class="headerlink" href="#circle_bundles.RP1AngleMetric.base_name_latex" title="Link to this definition"></a></dt>
+<dd><p>LaTeX symbol used in summaries and tables.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP1_angle'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'RP^1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_name_latex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\mathbb{RP}^1'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#circle_bundles.RP1AngleMetric.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>base_name_latex</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#circle_bundles.RP1AngleMetric.__init__" title="circle_bundles.RP1AngleMetric.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([name, base_name, base_name_latex])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#circle_bundles.RP1AngleMetric.pairwise" title="circle_bundles.RP1AngleMetric.pairwise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pairwise</span></code></a>(X[, Y])</p></td>
+<td><p>Compute projective geodesic distances between angle arrays.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#circle_bundles.RP1AngleMetric.base_name" title="circle_bundles.RP1AngleMetric.base_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#circle_bundles.RP1AngleMetric.base_name_latex" title="circle_bundles.RP1AngleMetric.base_name_latex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_name_latex</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#circle_bundles.RP1AngleMetric.name" title="circle_bundles.RP1AngleMetric.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.RP1AngleMetric.pairwise">
+<span class="sig-name descname"><span class="pre">pairwise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/metrics.html#RP1AngleMetric.pairwise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.RP1AngleMetric.pairwise" title="Link to this definition"></a></dt>
+<dd><p>Compute projective geodesic distances between angle arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of angles (any real values), shape <code class="docutils literal notranslate"><span class="pre">(n,)</span></code>.</p></li>
+<li><p><strong>Y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional array of angles, shape <code class="docutils literal notranslate"><span class="pre">(m,)</span></code>.
+If omitted, uses <code class="docutils literal notranslate"><span class="pre">X</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n,</span> <span class="pre">m)</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="circle_bundles.S1AngleMetric.html" class="btn btn-neutral float-left" title="circle_bundles.S1AngleMetric" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="circle_bundles.S1UnitVectorMetric.html" class="btn btn-neutral float-right" title="circle_bundles.S1UnitVectorMetric" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.build_bundle &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="circle_bundles.BundleResult" href="circle_bundles.BundleResult.html" />
+    <link rel="prev" title="Core pipeline" href="../core_pipeline.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../theory/index.html">Theory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../core_pipeline.html">Core pipeline</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">circle_bundles.build_bundle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.BundleResult.html">circle_bundles.BundleResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.DreimacCCConfig.html">circle_bundles.DreimacCCConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.LocalTrivResult.html">circle_bundles.LocalTrivResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.MetricBallCover.html">circle_bundles.MetricBallCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.TriangulationStarCover.html">circle_bundles.TriangulationStarCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.make_s2_fibonacci_star_cover.html">circle_bundles.make_s2_fibonacci_star_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.make_rp2_fibonacci_star_cover.html">circle_bundles.make_rp2_fibonacci_star_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../characteristic_classes.html">Characteristic classes and transitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.O2Cocycle.html">circle_bundles.O2Cocycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.TransitionReport.html">circle_bundles.TransitionReport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.ClassResult.html">circle_bundles.ClassResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../coordinatization.html">Coordinatization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.GlobalTrivializationResult.html">circle_bundles.GlobalTrivializationResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.BundleMapResult.html">circle_bundles.BundleMapResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.PullbackTotalSpaceResult.html">circle_bundles.PullbackTotalSpaceResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../weights_filtration.html">Weights filtration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.PersistenceResult.html">circle_bundles.PersistenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CobirthResult.html">circle_bundles.CobirthResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CodeathResult.html">circle_bundles.CodeathResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.MaxTrivialSubcomplex.html">circle_bundles.MaxTrivialSubcomplex</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cluster_persistence.html">circle_bundles.get_cluster_persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_filtered_cluster_graph.html">circle_bundles.get_filtered_cluster_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../extras/index.html">Extras and utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/synthetic.html">Synthetic datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/viz.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/optical_flow.html">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Demos</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../core_pipeline.html">Core pipeline</a></li>
+      <li class="breadcrumb-item active">circle_bundles.build_bundle</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/generated/circle_bundles.build_bundle.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="circle-bundles-build-bundle">
+<h1>circle_bundles.build_bundle<a class="headerlink" href="#circle-bundles-build-bundle" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.build_bundle">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">build_bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_min_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_witness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/bundle.html#build_bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.build_bundle" title="Link to this definition"></a></dt>
+<dd><p>Build a discrete circle bundle from data over a specified base-space cover.</p>
+<p>This is the core end-to-end pipeline:</p>
+<ol class="arabic simple">
+<li><p>ensure/build the cover (membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code> and partition of unity <code class="docutils literal notranslate"><span class="pre">pou</span></code>),</p></li>
+<li><p>compute local circle coordinates on each chart (local trivialization),</p></li>
+<li><p>estimate O(2) transition functions on overlaps,</p></li>
+<li><p>compute quality diagnostics, and</p></li>
+<li><p>compute characteristic class representatives (e.g. SW1/Euler-type data when available).</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Data array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">ambient_dim)</span></code> representing points in the total space.</p></li>
+<li><p><strong>cover</strong> – Cover object over the base space. Must provide (after <code class="docutils literal notranslate"><span class="pre">cover.build()</span></code>):
+<code class="docutils literal notranslate"><span class="pre">U</span></code> (membership matrix), <code class="docutils literal notranslate"><span class="pre">pou</span></code> (partition of unity), and nerve accessors.
+If <code class="docutils literal notranslate"><span class="pre">U</span></code>/<code class="docutils literal notranslate"><span class="pre">pou</span></code> are missing, this function calls <code class="docutils literal notranslate"><span class="pre">cover.build()</span></code>.</p></li>
+<li><p><strong>total_metric</strong> – Optional metric used by local trivialization routines (when they support it).
+If omitted, routines typically default to Euclidean behavior.</p></li>
+<li><p><strong>cc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a>) – Local circle-coordinate method/config. Common choices include:
+- <code class="docutils literal notranslate"><span class="pre">&quot;pca2&quot;</span></code> for a fast PCA-based circle coordinate method, or
+- a Dreimac configuration object, or
+- a custom callable implementing your CC interface.</p></li>
+<li><p><strong>min_patch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of points required in a chart to attempt local trivialization.
+Charts with fewer points are treated as failures.</p></li>
+<li><p><strong>weights</strong> – Optional per-sample or per-overlap weights used in transition estimation
+(implementation-defined; pass only if you know the expected format).</p></li>
+<li><p><strong>min_points_edge</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of overlap points required to fit a transition on an edge.
+Overlaps with fewer points are treated as errors.</p></li>
+<li><p><strong>ref_angle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Reference angle (in radians) used to fix reflection conventions in O(2) fitting.</p></li>
+<li><p><strong>delta_min_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of points used by certain consistency/quality checks on simplices.</p></li>
+<li><p><strong>compute_witness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, compute witness-based diagnostics (may be slower).</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, display a summary visualization after construction.</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em> | </em><em>None</em>) – If True, print status messages during construction. Defaults to <code class="docutils literal notranslate"><span class="pre">show</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A <a class="reference internal" href="circle_bundles.BundleResult.html#circle_bundles.BundleResult" title="circle_bundles.BundleResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BundleResult</span></code></a> packaging the cover, local trivialization, transitions,
+diagnostics, characteristic classes, and convenience methods.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bundle</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError:</strong> – If local trivialization fails on any chart or if required overlaps are missing.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../core_pipeline.html" class="btn btn-neutral float-left" title="Core pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="circle_bundles.BundleResult.html" class="btn btn-neutral float-right" title="circle_bundles.BundleResult" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

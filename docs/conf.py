@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import sys
 from datetime import date
+from pathlib import Path
 
 # -- Path setup --------------------------------------------------------------
 # Make the package importable for autodoc
@@ -17,6 +18,7 @@ copyright = f"{date.today().year}, {author}"
 # Prefer the package's __version__ when available
 try:
     import circle_bundles  # noqa: F401
+
     release = getattr(circle_bundles, "__version__", "0+unknown")
 except Exception:
     release = "0+unknown"
@@ -24,15 +26,23 @@ except Exception:
 # -- General configuration ---------------------------------------------------
 extensions = [
     "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",       # Google/Numpy docstrings
+    "sphinx.ext.napoleon",  # Google/Numpy docstrings
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
     "sphinx.ext.mathjax",
+    # Notebook support + notebook-native gallery
+    "myst_nb",
+    "myst_sphinx_gallery",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "**/.DS_Store"]
+exclude_patterns = [
+    "_build",
+    "**/.DS_Store",
+    "**/.ipynb_checkpoints",
+    "**/__pycache__",
+]
 
 # Autosummary: generate stub pages for autosummary directives
 autosummary_generate = True
@@ -52,6 +62,13 @@ autodoc_typehints = "description"
 autodoc_typehints_format = "short"
 autodoc_inherit_docstrings = True
 
+autodoc_default_options = {
+    "members": True,
+    "member-order": "bysource",
+    "show-inheritance": True,
+    "exclude-members": "__init__",
+}
+
 # If you have optional deps (dash/plotly/etc), don't hard fail doc builds
 autodoc_mock_imports = [
     "dash",
@@ -63,15 +80,32 @@ autodoc_mock_imports = [
     "dreimac",
 ]
 
-# -- Options for HTML output -------------------------------------------------
-html_theme = "pydata_sphinx_theme"
-html_static_path = ["_static"]
-
-html_theme_options = {
-    "navbar_start": ["navbar-logo"],
-    "navbar_end": ["navbar-icon-links"],
-    "show_nav_level": 2,
+# -- MyST-NB settings --------------------------------------------------------
+# Treat notebooks/markdown as sources (useful if you also include .ipynb pages directly in toctrees)
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "myst-nb",
+    ".myst": "myst-nb",
+    ".ipynb": "myst-nb",
 }
+
+# Recommended: don't execute notebooks during doc builds (faster + stable).
+# The saved outputs in your notebooks will be rendered.
+nb_execution_mode = "off"
+
+# -- Options for HTML output -------------------------------------------------
+# Read the Docs theme (Dreimac-style)
+html_theme = "sphinx_rtd_theme"
+
+# RTD theme options (nice defaults)
+html_theme_options = {
+    "collapse_navigation": False,
+    "navigation_depth": 3,
+    "titles_only": False,
+}
+
+# Static files 
+html_static_path = ["_static"]
 
 # -- Intersphinx -------------------------------------------------------------
 intersphinx_mapping = {
@@ -79,34 +113,12 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
 }
 
+# -- MyST Sphinx Gallery -----------------------------------------------------
+from myst_sphinx_gallery import GalleryConfig  # noqa: E402
 
-# Autodoc defaults 
-autodoc_default_options = {
-    "members": True,
-    "member-order": "bysource",
-    "show-inheritance": True,
-    "exclude-members": "__init__",
-}
-
-exclude_patterns = ["_build", "**/.DS_Store", "**/.ipynb_checkpoints"]
-
-# --- Sphinx Gallery ---------------------------------------------------------
-extensions += ["sphinx_gallery.gen_gallery"]
-
-sphinx_gallery_conf = {
-    # folder containing your exported .py demo scripts
-    "examples_dirs": ["../notebooks/sphinx_demos"],
-    # where the rendered gallery gets written inside docs/
-    "gallery_dirs": ["tutorials/auto_examples"],
-
-    # only pick up .py examples
-    "filename_pattern": r".*\.py$",
-    "ignore_pattern": r"(\.ipynb_checkpoints|__pycache__)",
-
-    # nice defaults
-    "download_all_examples": False,
-    "only_warn_on_example_error": False,
-
-    # recommended: do not reset CWD (prevents path weirdness)
-    "reset_modules": ("matplotlib",),
-}
+myst_sphinx_gallery_config = GalleryConfig(
+    root_dir=Path(__file__).parent,     
+    examples_dirs="../notebooks/demos", 
+    gallery_dirs="tutorials",           
+    notebook_thumbnail_strategy="code",
+)

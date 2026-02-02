@@ -11,6 +11,7 @@ from trimesh.creation import triangulate_polygon
 __all__ = [
     "make_tri_prism",
     "make_star_pyramid",
+    "mesh_vertex_normals"
 ]
 
 
@@ -156,3 +157,87 @@ def make_star_pyramid(
 
     faces = np.vstack([base_faces, np.asarray(side_faces, dtype=int)])
     return trimesh.Trimesh(vertices=vertices, faces=faces, process=False)
+
+
+def mesh_vertex_normals(
+    X: np.ndarray,
+    *,
+    n_vertices: int | None = None,
+    vertex_dim: int = 3,
+    idx: tuple[int, int, int] = (0, 1, 2),
+    eps: float = 1e-12,
+) -> np.ndarray:
+    """
+    Compute the oriented unit normal determined by three vertices
+    from flattened mesh-vertex data.
+
+    Raises a ValueError if any triple is colinear or degenerate.
+
+    Parameters
+    ----------
+    X:
+        Shape (D,) for one mesh or (N, D) for batch.
+    n_vertices:
+        Optional expected vertex count.
+    vertex_dim:
+        Usually 3.
+    idx:
+        (i, j, k) vertex indices used.
+        Orientation follows cross(vj-vi, vk-vi).
+    eps:
+        Tolerance for detecting degeneracy.
+
+    Returns
+    -------
+    normals:
+        Shape (3,) or (N,3) of unit normals.
+    """
+    X = np.asarray(X)
+    single = (X.ndim == 1)
+
+    if single:
+        Xb = X[None, :]
+    elif X.ndim == 2:
+        Xb = X
+    else:
+        raise ValueError(f"X must be 1D or 2D. Got shape {X.shape}.")
+
+    N, D = Xb.shape
+
+    if D % vertex_dim != 0:
+        raise ValueError(f"D={D} not divisible by vertex_dim={vertex_dim}.")
+
+    nv = D // vertex_dim
+    if n_vertices is not None and nv != int(n_vertices):
+        raise ValueError(f"Expected {n_vertices} vertices, got {nv}.")
+
+    i, j, k = map(int, idx)
+    if not (0 <= i < nv and 0 <= j < nv and 0 <= k < nv):
+        raise ValueError(f"indices {idx} out of range for nv={nv}")
+
+    V = Xb.reshape(N, nv, vertex_dim)
+
+    a = V[:, i]
+    b = V[:, j]
+    c = V[:, k]
+
+    u = b - a
+    v = c - a
+
+    n = np.cross(u, v)
+    norm = np.linalg.norm(n, axis=1)
+
+    # Strict check
+    bad = norm <= eps
+    if np.any(bad):
+        inds = np.where(bad)[0]
+        raise ValueError(
+            f"Colinear or degenerate vertex triples encountered at indices: {inds[:10]}"
+            + (" ..." if len(inds) > 10 else "")
+        )
+
+    normals = n / norm[:, None]
+
+    if single:
+        return normals[0]
+    return normals

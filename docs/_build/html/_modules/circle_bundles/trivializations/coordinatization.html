@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.trivializations.coordinatization &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#notes">Notes</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/index.html">Theory</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core_pipeline.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.build_bundle.html">circle_bundles.build_bundle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.BundleResult.html">circle_bundles.BundleResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.DreimacCCConfig.html">circle_bundles.DreimacCCConfig</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.LocalTrivResult.html">circle_bundles.LocalTrivResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.MetricBallCover.html">circle_bundles.MetricBallCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.TriangulationStarCover.html">circle_bundles.TriangulationStarCover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.make_s2_fibonacci_star_cover.html">circle_bundles.make_s2_fibonacci_star_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.make_rp2_fibonacci_star_cover.html">circle_bundles.make_rp2_fibonacci_star_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/characteristic_classes.html">Characteristic classes and transitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.O2Cocycle.html">circle_bundles.O2Cocycle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.TransitionReport.html">circle_bundles.TransitionReport</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.ClassResult.html">circle_bundles.ClassResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/coordinatization.html">Coordinatization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.GlobalTrivializationResult.html">circle_bundles.GlobalTrivializationResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.BundleMapResult.html">circle_bundles.BundleMapResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.PullbackTotalSpaceResult.html">circle_bundles.PullbackTotalSpaceResult</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/weights_filtration.html">Weights filtration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.PersistenceResult.html">circle_bundles.PersistenceResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CobirthResult.html">circle_bundles.CobirthResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CodeathResult.html">circle_bundles.CodeathResult</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.MaxTrivialSubcomplex.html">circle_bundles.MaxTrivialSubcomplex</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cluster_persistence.html">circle_bundles.get_cluster_persistence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_filtered_cluster_graph.html">circle_bundles.get_filtered_cluster_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../extras/index.html">Extras and utilities</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/synthetic.html">Synthetic datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/viz.html">Visualization Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/optical_flow.html">Optical Flow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/index.html">Demos</a><ul class="simple">
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.trivializations.coordinatization</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.trivializations.coordinatization</h1><div class="highlight"><pre>
+<span></span><span class="c1"># coordinatization.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..nerve.combinatorics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">Tri</span><span class="p">,</span> <span class="n">canon_edge</span><span class="p">,</span> <span class="n">canon_tri</span>
+
+<span class="n">Simp</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+<span class="n">Tet</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;GlobalTrivializationResult&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Canonicalization helpers</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">canon_simplex</span><span class="p">(</span><span class="n">sig</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Simp</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">:</span> <span class="n">Edge</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Edge</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">canon_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">canon_tri_tuple</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">Tri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tri</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">canon_tri</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">canon_tet_tuple</span><span class="p">(</span><span class="n">t</span><span class="p">:</span> <span class="n">Tet</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tet</span><span class="p">:</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">tt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tt</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">tt</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Persistence + max-trivial subcomplex bookkeeping</span>
+<span class="c1"># ============================================================</span>
+
+<div class="viewcode-block" id="MaxTrivialSubcomplex">
+<a class="viewcode-back" href="../../../api/public_api.html#circle_bundles.MaxTrivialSubcomplex">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MaxTrivialSubcomplex</span><span class="p">:</span>
+    <span class="n">k_removed</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">removed_edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span>
+    <span class="n">kept_edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span>
+    <span class="n">kept_triangles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]</span>
+    <span class="n">kept_tetrahedra</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">induced_triangles_from_edges</span><span class="p">(</span><span class="n">triangles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">],</span> <span class="n">kept_edges_set</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Edge</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]:</span>
+    <span class="n">kept</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
+        <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">canon_tri_tuple</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">eij</span> <span class="o">=</span> <span class="n">canon_edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+        <span class="n">eik</span> <span class="o">=</span> <span class="n">canon_edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">ejk</span> <span class="o">=</span> <span class="n">canon_edge</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">eij</span> <span class="ow">in</span> <span class="n">kept_edges_set</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">eik</span> <span class="ow">in</span> <span class="n">kept_edges_set</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">ejk</span> <span class="ow">in</span> <span class="n">kept_edges_set</span><span class="p">):</span>
+            <span class="n">kept</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">kept</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">induced_tetrahedra_from_edges</span><span class="p">(</span><span class="n">tets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">],</span> <span class="n">kept_edges_set</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Edge</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]:</span>
+    <span class="n">kept</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tt</span> <span class="ow">in</span> <span class="n">tets</span><span class="p">:</span>
+        <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">canon_tet_tuple</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span>
+        <span class="n">edges6</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">canon_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">canon_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">canon_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+            <span class="n">canon_edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">),</span> <span class="n">canon_edge</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+            <span class="n">canon_edge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">e</span> <span class="ow">in</span> <span class="n">kept_edges_set</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges6</span><span class="p">):</span>
+            <span class="n">kept</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">kept</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_max_trivial_subcomplex</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">persistence</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>   <span class="c1"># PersistenceResult from compute_bundle_persistence</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="n">triangles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tri</span><span class="p">],</span>
+    <span class="n">tets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tet</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">MaxTrivialSubcomplex</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pick the *earliest* step in the edge-removal filtration where BOTH:</span>
+<span class="sd">      - SW1 is a coboundary, and</span>
+<span class="sd">      - twisted Euler class is a coboundary.</span>
+
+<span class="sd">    Earliest simultaneous step is k = max(k_sw1_codeath, k_euler_codeath).</span>
+<span class="sd">    Returns None if either codeath is not achieved (k_removed == -1).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Backwards-compatible: if you don&#39;t pass tets, kept_tetrahedra will be [].</span>
+<span class="sd">    - We do NOT additionally require &quot;Euler cobirth&quot; (cocycle on tets) here;</span>
+<span class="sd">      this helper is purely about finding a subcomplex where the *classes trivialize*</span>
+<span class="sd">      (both are coboundaries).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sw1_cod</span> <span class="o">=</span> <span class="n">persistence</span><span class="o">.</span><span class="n">sw1</span><span class="p">[</span><span class="s2">&quot;codeath&quot;</span><span class="p">]</span>
+    <span class="n">te_cod</span> <span class="o">=</span> <span class="n">persistence</span><span class="o">.</span><span class="n">twisted_euler</span><span class="p">[</span><span class="s2">&quot;codeath&quot;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">sw1_cod</span><span class="o">.</span><span class="n">k_removed</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">te_cod</span><span class="o">.</span><span class="n">k_removed</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">removal_order</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">persistence</span><span class="o">.</span><span class="n">sw1</span><span class="p">[</span><span class="s2">&quot;removal_order&quot;</span><span class="p">])</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">sw1_cod</span><span class="o">.</span><span class="n">k_removed</span><span class="p">,</span> <span class="n">te_cod</span><span class="o">.</span><span class="n">k_removed</span><span class="p">))</span>
+    <span class="n">removed_edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">removal_order</span><span class="p">[:</span><span class="n">k</span><span class="p">]]</span>
+    <span class="n">removed_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">removed_edges</span><span class="p">)</span>
+
+    <span class="n">edges_all</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">})</span>
+    <span class="n">kept_edges_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">edges_all</span><span class="p">)</span> <span class="o">-</span> <span class="n">removed_set</span>
+    <span class="n">kept_edges</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">kept_edges_set</span><span class="p">)</span>
+
+    <span class="n">triangles_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_tri_tuple</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">]</span>
+    <span class="n">kept_triangles</span> <span class="o">=</span> <span class="n">induced_triangles_from_edges</span><span class="p">(</span><span class="n">triangles_all</span><span class="p">,</span> <span class="n">kept_edges_set</span><span class="p">)</span>
+
+    <span class="n">tets_all</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_tet_tuple</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span> <span class="k">for</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">tets</span> <span class="ow">or</span> <span class="p">[])]</span>
+    <span class="n">kept_tets</span> <span class="o">=</span> <span class="n">induced_tetrahedra_from_edges</span><span class="p">(</span><span class="n">tets_all</span><span class="p">,</span> <span class="n">kept_edges_set</span><span class="p">)</span> <span class="k">if</span> <span class="n">tets_all</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">return</span> <span class="n">MaxTrivialSubcomplex</span><span class="p">(</span>
+        <span class="n">k_removed</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+        <span class="n">removed_edges</span><span class="o">=</span><span class="n">removed_edges</span><span class="p">,</span>
+        <span class="n">kept_edges</span><span class="o">=</span><span class="n">kept_edges</span><span class="p">,</span>
+        <span class="n">kept_triangles</span><span class="o">=</span><span class="n">kept_triangles</span><span class="p">,</span>
+        <span class="n">kept_tetrahedra</span><span class="o">=</span><span class="n">kept_tets</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Global trivialization (RADIANS, single convention)</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap_angle_rad</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap radians to [0, 2π).&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">wrap_to_pi</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrap radians to (-π, π].&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">frechet_mean_circle</span><span class="p">(</span><span class="n">angles</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Weighted circular (Fréchet) mean per column.</span>
+
+<span class="sd">    angles:  (n,M) radians (any real; treated mod 2π)</span>
+<span class="sd">    weights: (n,M) nonnegative</span>
+<span class="sd">    returns: (M,) radians in [0, 2π)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sin_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">cos_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrap_angle_rad</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">sin_sum</span><span class="p">,</span> <span class="n">cos_sum</span><span class="p">))</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Orientation gauge helpers</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reflect_angles_about_axis</span><span class="p">(</span><span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply reflection r(ref_angle) to angles in radians.</span>
+
+<span class="sd">    If an angle alpha represents the unit vector (cos alpha, sin alpha), then reflecting</span>
+<span class="sd">    across the axis at angle &#39;ref_angle&#39; sends:</span>
+<span class="sd">        alpha  -&gt;  2*ref_angle - alpha    (mod 2π).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ref_angle</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrap_angle_rad</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">a</span> <span class="o">-</span> <span class="n">f</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_orientation_gauge_to_f</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>            <span class="c1"># (n,M) radians</span>
+    <span class="n">phi_pm1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>      <span class="c1"># (n,) entries ±1</span>
+    <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># (n,M) mask; if provided, re-mask after transform</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given an orienting potential phi_pm1 with entries ±1, apply the gauge that sends</span>
+<span class="sd">    charts with phi=-1 through the reflection r(ref_angle).</span>
+
+<span class="sd">    Convention:</span>
+<span class="sd">      g_j = I if phi_j=+1, and g_j = r(ref_angle) if phi_j=-1.</span>
+
+<span class="sd">    For angles f_j, this means:</span>
+<span class="sd">      f&#39;_j = f_j                 if phi_j=+1</span>
+<span class="sd">      f&#39;_j = 2*ref_angle - f_j   (mod 2π)  if phi_j=-1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">phi_pm1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">phi_pm1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;f must be 2D (n,M); got shape </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">n</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">phi_pm1</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;phi_pm1 must have shape </span><span class="si">{</span><span class="p">(</span><span class="n">n</span><span class="p">,)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">phi_pm1</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">flip</span> <span class="o">=</span> <span class="p">(</span><span class="n">phi_pm1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">flip</span><span class="p">):</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">flip</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">reflect_angles_about_axis</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">flip</span><span class="p">,</span> <span class="p">:],</span> <span class="n">ref_angle</span><span class="o">=</span><span class="n">ref_angle</span><span class="p">)</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">wrap_angle_rad</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">U</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;U must have shape </span><span class="si">{</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">M</span><span class="p">)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">*=</span> <span class="p">(</span><span class="n">U</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Theta extraction (dict -&gt; edge vector, radians)</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">theta_dict_to_edge_vector_radians</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="n">theta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    edges: list of canonical edges (j&lt;k)</span>
+<span class="sd">    theta: dict keyed by (j,k) canonical with values in radians [0,2π)</span>
+
+<span class="sd">    returns theta_edge: (E,) radians in [0,2π)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edges_c</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">theta_c</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">):</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">theta</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">edges_c</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">edges_c</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">theta_c</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing theta on edge </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">theta_c</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Gauge solvers: Singer / tree / PU (radians)</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_edge_lookup</span><span class="p">(</span><span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    edges: list of canonical undirected edges (j&lt;k)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      idx[(j,k)] = r and idx[(k,j)] = r (same row index)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">idx</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">edges</span><span class="p">):</span>
+        <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">canon_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+        <span class="n">idx</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="n">idx</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">r</span>
+    <span class="k">return</span> <span class="n">idx</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">theta_dir_from_canonical</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Directed theta_{ab} in radians such that:</span>
+
+<span class="sd">    We store canonical theta_{jk} for j&lt;k as theta_edge[r] = theta_{jk}.</span>
+<span class="sd">    Define directed theta:</span>
+<span class="sd">        theta_{jk} = +theta_{jk}  if j&lt;k</span>
+<span class="sd">        theta_{kj} = -theta_{jk}  if k&gt;j</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">b</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mu_vertices_from_singer_radians</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>          <span class="c1"># canonical edges j&lt;k</span>
+    <span class="n">theta_edge</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>     <span class="c1"># (E,) radians</span>
+    <span class="n">n_vertices</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">normalize_degree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Vertex gauge mu_v (radians) by spectral synchronization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">theta_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;theta_edge must have shape </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">build_edge_lookup</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_vertices</span><span class="p">,</span> <span class="n">n_vertices</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="n">deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+        <span class="n">th_jk</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">[</span><span class="n">idx</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]])</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">th_jk</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">th_jk</span><span class="p">)</span>  <span class="c1"># exp(i th)</span>
+        <span class="n">H</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conjugate</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>  <span class="c1"># exp(-i th)</span>
+        <span class="n">H</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">z</span>                <span class="c1"># exp(+i th)</span>
+        <span class="n">deg</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+        <span class="n">deg</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="mf">1.0</span>
+
+    <span class="k">if</span> <span class="n">normalize_degree</span><span class="p">:</span>
+        <span class="n">inv_sqrt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">deg</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">deg</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="n">inv_sqrt</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">deg</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="p">(</span><span class="n">inv_sqrt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">H</span><span class="p">)</span> <span class="o">*</span> <span class="n">inv_sqrt</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">V</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">v</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-15</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrap_angle_rad</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">angle</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mu_vertices_from_spanning_tree_radians</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="n">theta_edge</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">n_vertices</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">root</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Deterministic gauge solve on a spanning tree / DFS traversal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">theta_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;theta_edge must have shape </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">build_edge_lookup</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+
+    <span class="n">adj</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span>
+        <span class="n">th</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">[</span><span class="n">r</span><span class="p">])</span>
+        <span class="n">adj</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">th</span><span class="p">))</span>
+        <span class="n">adj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="o">-</span><span class="n">th</span><span class="p">))</span>
+
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_vertices</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">mu</span><span class="p">[</span><span class="n">root</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">root</span><span class="p">]</span>
+
+    <span class="k">while</span> <span class="n">stack</span><span class="p">:</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">delta_uv</span><span class="p">)</span> <span class="ow">in</span> <span class="n">adj</span><span class="p">[</span><span class="n">u</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mu</span><span class="p">[</span><span class="n">v</span><span class="p">]):</span>
+                <span class="n">mu</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="n">u</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta_uv</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mu</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrap_angle_rad</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">mu_from_partition_unity_radians</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="n">theta_edge</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">pou</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">beta_edge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Pointwise gauge mu[j,m] using partition of unity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">theta_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;theta_edge must have shape </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">n</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">pou</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;U must have shape </span><span class="si">{</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">M</span><span class="p">)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">beta_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">beta_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">)</span>
+    <span class="n">beta_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">beta_edge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">beta_edge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;beta_edge must have shape </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">beta_edge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">build_edge_lookup</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">idx</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">edge_index</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+
+    <span class="n">theta_eff</span> <span class="o">=</span> <span class="n">theta_edge</span> <span class="o">-</span> <span class="n">beta_edge</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">M</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">U</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">acc</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">edge_index</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">th_jk</span> <span class="o">=</span> <span class="n">theta_dir_from_canonical</span><span class="p">(</span><span class="n">theta_eff</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                <span class="n">acc</span> <span class="o">+=</span> <span class="n">pou</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">*</span> <span class="n">th_jk</span>
+            <span class="n">mu</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">acc</span>
+
+    <span class="n">mu</span> <span class="o">*=</span> <span class="p">(</span><span class="n">U</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mu</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Combine: apply gauge + Fréchet mean</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">global_from_mu</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>        <span class="c1"># (n,M) radians</span>
+    <span class="n">mu</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>       <span class="c1"># (n,M) radians</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">pou</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build global angle F[m] as weighted Fréchet mean of gauged locals:</span>
+<span class="sd">        g_j = f_j + mu_j  (mod 2π).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">wrap_angle_rad</span><span class="p">(</span><span class="n">f</span> <span class="o">+</span> <span class="n">mu</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">pou</span> <span class="o">*</span> <span class="p">(</span><span class="n">U</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">frechet_mean_circle</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_global_trivialization</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">pou</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">theta_edge</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;singer&quot;</span><span class="p">,</span>                 <span class="c1"># &quot;singer&quot; | &quot;tree&quot; | &quot;pu&quot;</span>
+    <span class="n">beta_edge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="c1"># (E,) radians optional (for &quot;pu&quot;)</span>
+    <span class="n">singer_normalize_degree</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">tree_root</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main entrypoint: returns global trivialization F (M,) radians.</span>
+
+<span class="sd">    IMPORTANT: assumes you have already oriented the cocycle if needed</span>
+<span class="sd">    (det=+1 on the edge set used), and f has been gauge-reflected accordingly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="n">pou</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;U must have shape </span><span class="si">{</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">M</span><span class="p">)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge_tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">]</span>
+    <span class="n">theta_edge</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta_edge</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;theta_edge must have shape </span><span class="si">{</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),)</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">theta_edge</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;singer&quot;</span><span class="p">:</span>
+        <span class="n">mu_v</span> <span class="o">=</span> <span class="n">mu_vertices_from_singer_radians</span><span class="p">(</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
+            <span class="n">theta_edge</span><span class="o">=</span><span class="n">theta_edge</span><span class="p">,</span>
+            <span class="n">n_vertices</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+            <span class="n">normalize_degree</span><span class="o">=</span><span class="n">singer_normalize_degree</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_v</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">pou</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">*=</span> <span class="p">(</span><span class="n">U</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">global_from_mu</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span> <span class="n">pou</span><span class="o">=</span><span class="n">pou</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;tree&quot;</span><span class="p">:</span>
+        <span class="n">mu_v</span> <span class="o">=</span> <span class="n">mu_vertices_from_spanning_tree_radians</span><span class="p">(</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
+            <span class="n">theta_edge</span><span class="o">=</span><span class="n">theta_edge</span><span class="p">,</span>
+            <span class="n">n_vertices</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+            <span class="n">root</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">tree_root</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_v</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">pou</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">*=</span> <span class="p">(</span><span class="n">U</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">global_from_mu</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span> <span class="n">pou</span><span class="o">=</span><span class="n">pou</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;pu&quot;</span><span class="p">:</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">mu_from_partition_unity_radians</span><span class="p">(</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
+            <span class="n">theta_edge</span><span class="o">=</span><span class="n">theta_edge</span><span class="p">,</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">pou</span><span class="o">=</span><span class="n">pou</span><span class="p">,</span>
+            <span class="n">beta_edge</span><span class="o">=</span><span class="n">beta_edge</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">global_from_mu</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span> <span class="n">pou</span><span class="o">=</span><span class="n">pou</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;method must be &#39;singer&#39;, &#39;tree&#39;, or &#39;pu&#39;&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Results containers</span>
+<span class="c1"># ============================================================</span>
+
+<div class="viewcode-block" id="GlobalTrivializationResult">
+<a class="viewcode-back" href="../../../api/public_api.html#circle_bundles.GlobalTrivializationResult">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GlobalTrivializationResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Result container for a computed global circle coordinate (global trivialization).</span>
+
+<span class="sd">    This object summarizes the output of a global gauge-fixing / synchronization step</span>
+<span class="sd">    that combines local circular coordinates across a cover into a single global angle</span>
+<span class="sd">    function on the dataset.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : str</span>
+<span class="sd">        Name of the method used to compute the gauge / trivialization. Typical values:</span>
+<span class="sd">        - ``&quot;singer&quot;`` : spectral synchronization on the 1-skeleton</span>
+<span class="sd">        - ``&quot;tree&quot;``   : spanning-tree / DFS propagation</span>
+<span class="sd">        - ``&quot;pu&quot;``     : partition-of-unity pointwise gauge</span>
+
+<span class="sd">    edges_used : list[Edge]</span>
+<span class="sd">        The list of edges (cover-set adjacencies) used to define the gauge constraints.</span>
+<span class="sd">        Edges are typically canonicalized (j &lt; k) unless otherwise stated by the caller.</span>
+
+<span class="sd">    F : ndarray of shape (n_samples,)</span>
+<span class="sd">        The resulting global angle in radians, wrapped to the range [0, 2π).</span>
+<span class="sd">        This is the global circle-valued coordinate defined on samples in the union</span>
+<span class="sd">        of the cover.</span>
+
+<span class="sd">    meta : dict[str, Any]</span>
+<span class="sd">        Additional method-dependent metadata (e.g. solver options, diagnostics, or</span>
+<span class="sd">        intermediate quantities used to construct ``F``).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - This result is primarily intended for inspection and downstream visualization.</span>
+<span class="sd">    - In non-oriented settings (O(2)-bundles), callers typically first apply an</span>
+<span class="sd">      orientation gauge so that the transitions used here have determinant +1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">edges_used</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span>
+    <span class="n">F</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="n">meta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
