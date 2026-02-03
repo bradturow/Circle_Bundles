@@ -19,11 +19,11 @@ Applications to optical flow data.
 
     
     .. grid-item-card:: :ref:`example_01_optical_flow_torus`
-        :img-top: /auto_examples/myst_sphinx_gallery_thumbs/no_image.webp
+        :img-top: /auto_examples/myst_sphinx_gallery_thumbs/01_optical_flow_torus.webp
         :link: example_01_optical_flow_torus
         :link-type: ref
         :shadow: md
-        :class-card: sd-rounded-2 msg-sd-card sd-border-0
+        :class-card: sd-border-0 msg-sd-card sd-rounded-2
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top

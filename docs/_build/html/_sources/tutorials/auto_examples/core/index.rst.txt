@@ -27,7 +27,7 @@ The main end-to-end workflow notebooks.
         :link: example_01_product_torus
         :link-type: ref
         :shadow: md
-        :class-card: sd-rounded-2 msg-sd-card sd-border-0
+        :class-card: sd-border-0 msg-sd-card sd-rounded-2
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -43,7 +43,7 @@ The main end-to-end workflow notebooks.
         :link: example_02_synthetic_natural_image_patches
         :link-type: ref
         :shadow: md
-        :class-card: sd-rounded-2 msg-sd-card sd-border-0
+        :class-card: sd-border-0 msg-sd-card sd-rounded-2
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -59,7 +59,7 @@ The main end-to-end workflow notebooks.
         :link: example_03_triangle_meshes
         :link-type: ref
         :shadow: md
-        :class-card: sd-rounded-2 msg-sd-card sd-border-0
+        :class-card: sd-border-0 msg-sd-card sd-rounded-2
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -75,7 +75,7 @@ The main end-to-end workflow notebooks.
         :link: example_04_tri_prism_densities
         :link-type: ref
         :shadow: md
-        :class-card: sd-rounded-2 msg-sd-card sd-border-0
+        :class-card: sd-border-0 msg-sd-card sd-rounded-2
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -87,11 +87,11 @@ The main end-to-end workflow notebooks.
 
     
     .. grid-item-card:: :ref:`example_05_star_density_unwrapping`
-        :img-top: /auto_examples/myst_sphinx_gallery_thumbs/no_image.webp
+        :img-top: /auto_examples/myst_sphinx_gallery_thumbs/05_star_density_unwrapping.webp
         :link: example_05_star_density_unwrapping
         :link-type: ref
         :shadow: md
-        :class-card: sd-rounded-2 msg-sd-card sd-border-0
+        :class-card: sd-border-0 msg-sd-card sd-rounded-2
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top

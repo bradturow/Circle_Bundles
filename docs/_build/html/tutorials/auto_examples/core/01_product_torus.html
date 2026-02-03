@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Torus &mdash; circle_bundles 0+unknown documentation</title>
+  <title>Product Torus With Varying Fiber Radius &mdash; circle_bundles 0+unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Product Torus</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="04_tri_prism_densities.html">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
@@ -190,7 +190,7 @@
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
           <li class="breadcrumb-item"><a href="index.html">Core</a></li>
-      <li class="breadcrumb-item active">Product Torus</li>
+      <li class="breadcrumb-item active">Product Torus With Varying Fiber Radius</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/tutorials/auto_examples/core/01_product_torus.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -200,16 +200,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section class="tex2jax_ignore mathjax_ignore" id="product-torus">
-<span id="example-01-product-torus"></span><h1>Product Torus<a class="headerlink" href="#product-torus" title="Link to this heading"></a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="product-torus-with-varying-fiber-radius">
+<span id="example-01-product-torus"></span><h1>Product Torus With Varying Fiber Radius<a class="headerlink" href="#product-torus-with-varying-fiber-radius" title="Link to this heading"></a></h1>
+<p>An example of how the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline can capture topological structure which is not detected with a direct persistence computation.</p>
+<p>We sample from a product torus in <span class="math notranslate nohighlight">\(\mathbb{C}^{2}\)</span> where the fiber radius continuously varies from small to large.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">ripser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ripser</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">persim</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_diagrams</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
 </pre></div>
 </div>
 </div>
@@ -217,18 +220,17 @@
 <p>First, generate a noisy sampling:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">1.5</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">1.5</span>   <span class="c1">#min and max fiber radius</span>
 <span class="n">r_func</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">small_to_big</span><span class="p">(</span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span><span class="p">)</span>
 
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5000</span>
-<span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">true_fiber_angles</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_C2_torus</span><span class="p">(</span>
+<span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">true_fiber_angles</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_C2_torus</span><span class="p">(</span>
     <span class="n">n_samples</span><span class="p">,</span>
     <span class="n">r_func</span><span class="o">=</span><span class="n">r_func</span><span class="p">,</span>
     <span class="n">sigma</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>              
     <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
-    <span class="n">return_theta</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">return_alpha</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>

@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Star Density Unwrapping" href="05_star_density_unwrapping.html" />
-    <link rel="prev" title="Triangle Meshes" href="03_triangle_meshes.html" /> 
+    <link rel="prev" title="Star Pyramid Meshes" href="03_triangle_meshes.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
@@ -202,21 +202,21 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="triangle-prism-densities">
 <span id="example-04-tri-prism-densities"></span><h1>Triangle Prism Densities<a class="headerlink" href="#triangle-prism-densities" title="Link to this heading"></a></h1>
-<p>This notebook demonstrates the application of <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> to a synthetic dataset of 3D densities constructed from …</p>
+<p>An example application of the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to a dataset where the underlying model is a non-orientable 3-manifold which admits a circle bundle structure over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> with non-trivial twisted Euler class.</p>
+<p>Also a demonstration of the bundle-coordinatization feature of <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> which produces a topologically-faithful lower-dimensional representation of the data.</p>
+<p>We generate a dataset by applying random <span class="math notranslate nohighlight">\(SO(3)\)</span> rotations to the vertices of a triangular prism embedded in the unit ball, then constructing 3D density functions on <span class="math notranslate nohighlight">\(\overline{\mathbb{B}}_{1}(0)\)</span> from the rotated prisms which are Gaussian-distributed around their boundaries.  For analysis, we define an <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span>-valued feature map which roughly captures the axis of symmetry of each density. One can show that the underlying bundle structure is non-orientable with twisted Euler number <span class="math notranslate nohighlight">\(\pm 3\)</span>.</p>
+<p>We recover the characteristic classes, which determines the topology of the total space up to homeomorphism (in particular, it is a quotient of <span class="math notranslate nohighlight">\(SO(3)\)</span>). We then restrict to a subset of the data which projects to an ‘equator’ <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\subset\mathbb{RP}^{2}\)</span> and verify that the restriction has the structure of a Klein bottle.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
-
-<span class="c1"># Local circular coordinates</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">dreimac</span><span class="w"> </span><span class="kn">import</span> <span class="n">CircularCoords</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Start by generating a synthetic dataset of 3D densities represented as vectors of length <span class="math notranslate nohighlight">\([\text{grid_size}]^{3}\)</span>. Record the corresponding triangle meshes for visualization (represented as vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^{18}\)</span>):</p>
+<p>Start by generating a synthetic dataset of 3D densities represented as vectors of length <span class="math notranslate nohighlight">\(32^{3}\)</span>. Record the corresponding triangle meshes for visualization (represented as vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^{18}\)</span>):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Create the template triangle mesh</span>
@@ -271,11 +271,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/a881213f237a914b46f172efeebb8b45647812edf42c252ab6f2a5d5c5241678.png" src="../../../_images/a881213f237a914b46f172efeebb8b45647812edf42c252ab6f2a5d5c5241678.png" />
+<img alt="../../../_images/be76c869363c3e8201da70663a509acb5a5c3cc97ae5a1e349354bbaa3cf4ae5.png" src="../../../_images/be76c869363c3e8201da70663a509acb5a5c3cc97ae5a1e349354bbaa3cf4ae5.png" />
 <img alt="../../../_images/f3fe6c9b5939e5c2efe31e7291f42641cd2a36cb0e28a91306cef779351f0d30.png" src="../../../_images/f3fe6c9b5939e5c2efe31e7291f42641cd2a36cb0e28a91306cef779351f0d30.png" />
 </div>
 </div>
-<p>Compute the base projections to <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span>:</p>
+<p><span class="math notranslate nohighlight">\(\textbf{Note:}\)</span> 2D projections of the 3D densities are computed by summing intensities along the z-axis, shown here as perpendicular to the screen.  In general, reflecting a rotated prism mesh through the z-axis may produce a very different 3D density, but the 2D projections will appear the same.  On the other hand, two prism meshes which differ by a rotation in the symmetry group of the prism yield indistinguishable 3D densities – this is a genuine symmetry of the dataset.</p>
+<p>For each 3D density, compute the principal component (up to sign in <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span>) associated with the smallest eigenvalue – for densities in the dataset, this axis is always clearly defined and coincides with the axis of rotational symmetry. Record the <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> projections as unit vectors in the upper hemisphere of <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_density_axes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -305,7 +306,7 @@
 <li><p>$#(\text{2-simplices}) = 118$</p></li>
 <li><p><em>No recorded simplices in dimensions</em> $\ge 3$</p></li>
 </ul>
-<img alt="../../../_images/b0a4298839a651cb9fc0c49ed635132c3f00f53cd64e41fdc71b64068884dfd4.png" src="../../../_images/b0a4298839a651cb9fc0c49ed635132c3f00f53cd64e41fdc71b64068884dfd4.png" />
+<img alt="../../../_images/3cfb3becae49e1858d549a470edd8551157a82cd4c9b8adc07097da0ef592e41.png" src="../../../_images/3cfb3becae49e1858d549a470edd8551157a82cd4c9b8adc07097da0ef592e41.png" />
 </div>
 </div>
 <p>Optionally run the cell below to view a Plotly visualization of the nerve of the open cover:</p>
@@ -316,7 +317,7 @@
 </div>
 </div>
 </div>
-<p>Compute a persistence diagram for the data in each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span></p>
+<p>Compute a persistence diagram for the data in each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fiber_ids</span><span class="p">,</span> <span class="n">dense_idx_list</span><span class="p">,</span> <span class="n">rips_list</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_local_rips</span><span class="p">(</span>
@@ -348,7 +349,7 @@
   warnings.warn(
 </pre></div>
 </div>
-<img alt="../../../_images/0ea882e3ba8a9e944c7197c1c12a9f5e8e27b01bb31dcd9051402c92353f93e3.png" src="../../../_images/0ea882e3ba8a9e944c7197c1c12a9f5e8e27b01bb31dcd9051402c92353f93e3.png" />
+<img alt="../../../_images/1f9049c726bfe601a443b9085bfdb6302c5e72a267f4b3477c457fb2e3e486bb.png" src="../../../_images/1f9049c726bfe601a443b9085bfdb6302c5e72a267f4b3477c457fb2e3e486bb.png" />
 </div>
 </div>
 <p>Optionally run the cell below to show a visualization of a ‘fat fiber’ of the projection map:</p>
@@ -408,23 +409,15 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/7201ce1cd5b14485085aa3c0f725b4fd3b5220498bfeec2de430d0068d7eade3.png" src="../../../_images/7201ce1cd5b14485085aa3c0f725b4fd3b5220498bfeec2de430d0068d7eade3.png" />
+<img alt="../../../_images/7353bbec60b9042ca12c2f6610b2df43d2489e4c049602d3179877fbcb48c8f5.png" src="../../../_images/7353bbec60b9042ca12c2f6610b2df43d2489e4c049602d3179877fbcb48c8f5.png" />
 </div>
 </div>
-<p>Compute local circular coordinates using Dreimac, approximate transition matrices and characteristic clases:</p>
+<p>Construct local circular coordinates, then compute approximate transition matrices and characteristic clases:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc_alg</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">DreimacCCConfig</span><span class="p">(</span>
-    <span class="n">CircularCoords_cls</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">,</span>
-    <span class="n">landmarks_per_patch</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span>
-    <span class="n">prime</span> <span class="o">=</span> <span class="mi">41</span><span class="p">,</span>
-<span class="p">)</span>
-
-
-<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">cover</span><span class="p">,</span>
-    <span class="n">cc</span> <span class="o">=</span> <span class="n">cc_alg</span><span class="p">,</span>
     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>                          
 <span class="p">)</span>
 </pre></div>
@@ -432,7 +425,7 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 1.172\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.399\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.205\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.065\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.767\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 5.039\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.428\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.048\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{(twisted) Euler number} &amp;:\quad \pm 3\end{aligned}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.494\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.159\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.098\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.031\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.787\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 2.322\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.346\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.039\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{(twisted) Euler number} &amp;:\quad \pm 3\end{aligned}\end{split}\]</div>
 </div>
 </div>
 <p>Show some correlations between local circular coordinates on overlaps</p>
@@ -444,10 +437,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/24b44e061a28d1cd1be4d220b8492bc990d3ce2ab63ab2582530a388f10b1153.png" src="../../../_images/24b44e061a28d1cd1be4d220b8492bc990d3ce2ab63ab2582530a388f10b1153.png" />
+<img alt="../../../_images/735100d46759ebc28b57a7f280a2069da2bed8aa3da01044e9db2d789adc094c.png" src="../../../_images/735100d46759ebc28b57a7f280a2069da2bed8aa3da01044e9db2d789adc094c.png" />
 </div>
 </div>
-<p>Compute class persistence on the weights filtration of the nerve</p>
+<p>Compute class persistence on the weights filtration of the nerve (see theory section for details):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pers</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_persistence</span><span class="p">(</span><span class="n">show</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -456,11 +449,11 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{array}{lrrrrr}\textbf{Stage} &amp; k &amp; r &amp; |W_r^{(1)}| &amp; |W_r^{(2)}| &amp; |W_r^{(3)}| \\ \hline \text{Full nerve} &amp; 0 &amp; \infty &amp; 177 &amp; 118 &amp; 0 \\ \text{w₁ cobirth} &amp; 0 &amp; \infty &amp; 177 &amp; 118 &amp; 0 \\ \text{w₁ codeath} &amp; 121 &amp; 0.193 &amp; 56 &amp; 12 &amp; 0 \\ \text{Euler cobirth} &amp; 0 &amp; \infty &amp; 177 &amp; 118 &amp; 0 \\ \text{Euler codeath} &amp; 1 &amp; 0.658 &amp; 176 &amp; 116 &amp; 0\end{array}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{array}{lrrrrr}\textbf{Stage} &amp; k &amp; r &amp; |W_r^{(1)}| &amp; |W_r^{(2)}| &amp; |W_r^{(3)}| \\ \hline \text{Full nerve} &amp; 0 &amp; \infty &amp; 177 &amp; 118 &amp; 0 \\ \text{w₁ cobirth} &amp; 0 &amp; \infty &amp; 177 &amp; 118 &amp; 0 \\ \text{w₁ codeath} &amp; 122 &amp; 0.096 &amp; 55 &amp; 10 &amp; 0 \\ \text{Euler cobirth} &amp; 0 &amp; \infty &amp; 177 &amp; 118 &amp; 0 \\ \text{Euler codeath} &amp; 1 &amp; 0.231 &amp; 176 &amp; 116 &amp; 0\end{array}\end{split}\]</div>
 </div>
 </div>
-<p>Observe that the twisted Euler class becomes trivial as soon as a single edge is removed.  This is to be expected, since the resulting subcomplex is deformation retracts onto its 1-skeleton.  On the other hand, the orientation class does not become trivial until many edges are removed. This is also reasonable, since one can show that the restriction of a non-orientable bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> to an ‘equator’ <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> is still non-orientable (hence non-trivial) – see below. In any case, the variation in weight across this large collection of edges is relatively small.</p>
-<p>Now, to construct a lower-dimensional representation of the high-dimensional dataset, compute a classifying map to <span class="math notranslate nohighlight">\(Gr(2)\)</span> representing the underlying circle bundle and compute the pullback of the canonical circle bundle <span class="math notranslate nohighlight">\(V(2)\times_{O(2)}\mathbb{S}^{1}\)</span> (see reference for details).</p>
+<p>Observe that the twisted Euler class becomes trivial as soon as a single edge is removed.  This is to be expected, since the resulting subcomplex deformation retracts onto its 1-skeleton.  On the other hand, the orientation class does not become trivial until many edges are removed. This is also reasonable, since one can show that the restriction of a non-orientable bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> to an ‘equator’ <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> is still non-orientable (hence non-trivial) – see below. In any case, observe that the variation in weight across this large collection of edges is relatively small, suggesting that our model is likely reliable across the entire nerve.</p>
+<p>Now, to construct a lower-dimensional representation of the high-dimensional dataset, compute a classifying map to <span class="math notranslate nohighlight">\(Gr(2)\)</span> representing the underlying circle bundle and compute the pullback of the canonical circle bundle <span class="math notranslate nohighlight">\(V(2)\times_{O(2)}\mathbb{S}^{1}\)</span> (see theory section for details):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pullback_results</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_pullback_data</span><span class="p">(</span>
@@ -475,7 +468,7 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Coordinatization} &amp; \\[6pt]\quad \text{Cocycle projection dist.} &amp;:\quad d_{\infty}(\Omega,\Pi(\Omega)):=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ \|\Omega_{jk}-\Pi(\Omega)_{jk}(b)\|_{F} = 0.396\\[3pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\mathrm{triv}}:=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ d_{\mathbb{C}}\!\left(f_j(x),\ \Pi(\Omega)_{jk}(b)f_k(x)\right) = 1.041\ \ (\varepsilon_{\mathrm{triv}}^{\mathrm{geo}} = 0.348\pi)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\mathrm{triv}} = 0.198\ \ (\bar{\varepsilon}_{\mathrm{triv}}^{\mathrm{geo}} = 0.063\pi)\\[3pt]\quad \text{Grassmann proj. dist.} &amp;:\quad d_{\mathrm{Gr}}:=\sup_{b\in \cup_{U_j\in\mathcal{U}}U_j}\ \left\|\operatorname{sym}(C(b))-\Pi_{\mathrm{Gr}}(C(b))\right\|_F = 0.011\\[3pt]\quad \text{Stiefel proj. dist.} &amp;:\quad d_{\mathrm{St}}:=\sup_{U_j\in\mathcal{U}}\sup_{b\in U_j}\ \left\|\Pi_{\mathrm{St}}\!\big(\Phi_j(b)\big)-\Phi_j(b)\right\|_F = 0.209\\[3pt]\quad \text{Chart disagreement} &amp;:\quad \Delta:=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ \|F_j(b)-F_k(b)\|_2 = 0.000\\[3pt]\quad \text{Frame packing} &amp;:\quad \texttt{coloring2}\quad (K=12)\\[3pt]\quad \text{Ambient space} &amp;:\quad \widetilde{E}\subset \mathbb{RP}^2\times\mathbb{R}^{24}\end{aligned}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Coordinatization} &amp; \\[6pt]\quad \text{Cocycle projection dist.} &amp;:\quad d_{\infty}(\Omega,\Pi(\Omega)):=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ \|\Omega_{jk}-\Pi(\Omega)_{jk}(b)\|_{F} = 0.313\\[3pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\mathrm{triv}}:=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ d_{\mathbb{C}}\!\left(f_j(x),\ \Pi(\Omega)_{jk}(b)f_k(x)\right) = 0.401\ \ (\varepsilon_{\mathrm{triv}}^{\mathrm{geo}} = 0.128\pi)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\mathrm{triv}} = 0.082\ \ (\bar{\varepsilon}_{\mathrm{triv}}^{\mathrm{geo}} = 0.026\pi)\\[3pt]\quad \text{Grassmann proj. dist.} &amp;:\quad d_{\mathrm{Gr}}:=\sup_{b\in \cup_{U_j\in\mathcal{U}}U_j}\ \left\|\operatorname{sym}(C(b))-\Pi_{\mathrm{Gr}}(C(b))\right\|_F = 0.008\\[3pt]\quad \text{Stiefel proj. dist.} &amp;:\quad d_{\mathrm{St}}:=\sup_{U_j\in\mathcal{U}}\sup_{b\in U_j}\ \left\|\Pi_{\mathrm{St}}\!\big(\Phi_j(b)\big)-\Phi_j(b)\right\|_F = 0.168\\[3pt]\quad \text{Chart disagreement} &amp;:\quad \Delta:=\sup_{(jk)\in\mathcal{N}(\mathcal{U})}\sup_{b\in U_j\cap U_k}\ \|F_j(b)-F_k(b)\|_2 = 0.000\\[3pt]\quad \text{Frame packing} &amp;:\quad \texttt{coloring2}\quad (K=12)\\[3pt]\quad \text{Ambient space} &amp;:\quad \widetilde{E}\subset \mathbb{RP}^2\times\mathbb{R}^{24}\end{aligned}\end{split}\]</div>
 </div>
 </div>
 <p>Notice that the pullback data lives in the ambient space <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\times\mathbb{R}^{24}\)</span>.  Check that the base projections of the pullback data coincide with the projections of the original densities:</p>
@@ -496,7 +489,7 @@
 </div>
 </div>
 </div>
-<p>Construct the pullback bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> and verify it has the same classification as the original dataset (this time we can use the default PCA2 algorithm for local circular coordinates):</p>
+<p>Construct the pullback bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> and verify it has the same classification as the original dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pb_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
@@ -510,7 +503,7 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.943\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.313\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.117\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.037\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.878\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 7.739\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.415\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.047\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{(twisted) Euler number} &amp;:\quad \pm 3\end{aligned}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.438\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.140\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.069\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.022\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.807\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 2.269\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.407\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.046\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{(twisted) Euler number} &amp;:\quad \pm 3\end{aligned}\end{split}\]</div>
 </div>
 </div>
 <p>Now, restrict the original bundle to the ‘equator’ <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\subset \mathbb{RP}^{2}\)</span>:</p>
@@ -532,12 +525,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Equator band: 688 / 5000 samples (eps=0.15).
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Equator band: 692 / 5000 samples (eps=0.15).
 </pre></div>
 </div>
 </div>
 </div>
-<p>Constuct an open cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> by metric balls around equally-spaced landmark points:</p>
+<p>Constuct an open cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> by metric balls around equally-spaced landmark points, then construct the restricted bundle object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">12</span>
@@ -554,29 +547,7 @@
 <span class="p">)</span>
 <span class="n">eq_cover_data</span> <span class="o">=</span> <span class="n">eq_cover</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 
-<span class="c1">#Show a summary of the construction</span>
-<span class="n">eq_summ</span> <span class="o">=</span> <span class="n">eq_cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<p class="rubric" id="id1">Cover And Nerve Summary</p>
-<ul class="simple">
-<li><p>$n_\text{sets} = 12$, $n_\text{samples} = 688$</p></li>
-</ul>
-<p><strong>Recorded Simplex Counts:</strong></p>
-<ul class="simple">
-<li><p>$#(\text{0-simplices}) = 12$</p></li>
-<li><p>$#(\text{1-simplices}) = 12$</p></li>
-<li><p><em>No recorded simplices in dimensions</em> $\ge 2$</p></li>
-</ul>
-<img alt="../../../_images/57f7188f40262fd006171bc7887aef0d6bfd0db9dfa71f8891f78d6e1dc765b4.png" src="../../../_images/57f7188f40262fd006171bc7887aef0d6bfd0db9dfa71f8891f78d6e1dc765b4.png" />
-</div>
-</div>
-<p>Compute characteristic classes for the restricted bundle:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eq_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
+<span class="n">eq_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
     <span class="n">eq_data</span><span class="p">,</span>
     <span class="n">eq_cover</span><span class="p">,</span>
     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -586,10 +557,11 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.453\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.145\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.105\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.034\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.453\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.000\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{Euler class} &amp;:\quad e = 0\ \text{(no 2-simplices)}\end{aligned}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.488\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.157\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.111\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.035\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.488\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.000\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{Euler class} &amp;:\quad e = 0\ \text{(no 2-simplices)}\end{aligned}\end{split}\]</div>
 </div>
 </div>
-<p>Compute a global ‘coordinate system’ for the restricted dataset after dropping the heaviest edge from the nerve of the cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span></p>
+<p>The characteristic classes confirm that the restricted dataset has the topology of a Klein bottle embedded in <span class="math notranslate nohighlight">\(\mathbb{R}^{32^{3}}\)</span>.</p>
+<p>Compute a global ‘coordinate system’ for the restricted dataset after dropping the heaviest edge from the nerve of the cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eq_triv_result</span> <span class="o">=</span> <span class="n">eq_bundle</span><span class="o">.</span><span class="n">get_global_trivialization</span><span class="p">()</span>
@@ -614,7 +586,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/490976d483db8b888bf384ee5b2ceebc04ba6ab4fb72b4fc1ca8d137ffffb6e8.png" src="../../../_images/490976d483db8b888bf384ee5b2ceebc04ba6ab4fb72b4fc1ca8d137ffffb6e8.png" />
+<img alt="../../../_images/51c387ad0ecb1d177ac5bf5e1b98dbc5b08bcfa69ee4f3f64398f76db64ee8c2.png" src="../../../_images/51c387ad0ecb1d177ac5bf5e1b98dbc5b08bcfa69ee4f3f64398f76db64ee8c2.png" />
 </div>
 </div>
 <p>The value of the orientation cocycle on each edge is shown in blue, and the removed edge is clearly indicated.  A potential for the cocycle after restriction is shown in red.</p>
@@ -653,7 +625,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/9dfac8fb515a19569e4464414a6111ea8d38c7b68f33c7a37b85d6381f1f0d60.png" src="../../../_images/9dfac8fb515a19569e4464414a6111ea8d38c7b68f33c7a37b85d6381f1f0d60.png" />
+<img alt="../../../_images/cb797633626b7828dceaba7c7b2f7050c27f8f5631f55156ebd8c182e5462262.png" src="../../../_images/cb797633626b7828dceaba7c7b2f7050c27f8f5631f55156ebd8c182e5462262.png" />
 </div>
 </div>
 <p>Notice that base projection roughly corresponds to axis of symmetry, as expected.  Upon carefuly inspection, one can see that coordinatized densities in each column approximately traverse a 1/3 rotation about the axis of symmetry, but the direction of rotation abruptly changes from counter-clockwise to clockwise between columns 1 and 2. This reflects the fundamental non-orientability of the underlying circle bundle structure over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> (in particular, the underlying manifold is a Klein bottle).</p>
@@ -663,7 +635,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="03_triangle_meshes.html" class="btn btn-neutral float-left" title="Triangle Meshes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="03_triangle_meshes.html" class="btn btn-neutral float-left" title="Star Pyramid Meshes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="05_star_density_unwrapping.html" class="btn btn-neutral float-right" title="Star Density Unwrapping" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

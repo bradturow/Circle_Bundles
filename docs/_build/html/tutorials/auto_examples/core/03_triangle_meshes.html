@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Triangle Meshes &mdash; circle_bundles 0+unknown documentation</title>
+  <title>Star Pyramid Meshes &mdash; circle_bundles 0+unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Triangle Meshes</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="04_tri_prism_densities.html">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
@@ -190,7 +190,7 @@
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
           <li class="breadcrumb-item"><a href="index.html">Core</a></li>
-      <li class="breadcrumb-item active">Triangle Meshes</li>
+      <li class="breadcrumb-item active">Star Pyramid Meshes</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/tutorials/auto_examples/core/03_triangle_meshes.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -200,9 +200,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section class="tex2jax_ignore mathjax_ignore" id="triangle-meshes">
-<span id="example-03-triangle-meshes"></span><h1>Triangle Meshes<a class="headerlink" href="#triangle-meshes" title="Link to this heading"></a></h1>
-<p>This notebook demonstrates the application of <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> to a synthetic dataset of 3D densities constructed from …</p>
+  <section class="tex2jax_ignore mathjax_ignore" id="star-pyramid-meshes">
+<span id="example-03-triangle-meshes"></span><h1>Star Pyramid Meshes<a class="headerlink" href="#star-pyramid-meshes" title="Link to this heading"></a></h1>
+<p>An example of an application of the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to a dataset where the underlying model is a 3-manifold with non-trivial Euler class. Persistence computations in dimension higher than 2 are intractible, so a local-to-global analysis is needed to capture the topology.</p>
+<p>We generate a synthetic dataset by applying random <span class="math notranslate nohighlight">\(SO(3)\)</span> rotations to the vertices of a triangle mesh and storing the results as vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^{3n}\)</span>; one can show that the <span class="math notranslate nohighlight">\(SO(3)\)</span>-orbit of the original mesh vertices under this action is a 3-manifold homeomorphic to <span class="math notranslate nohighlight">\(SO(3)\)</span> itself. We choose an <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span>-valued feature map for analysis and model the dataset as a discrete aproximate circle bundle. We then compute characteristic classes to confirm the global topology.</p>
+<p>Finally, we consider a subset of the data which projects to a neighborhood of the equator <span class="math notranslate nohighlight">\(z = 0\)</span> in <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span> and compute a toroidal coordinate system for this data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -249,6 +251,10 @@
 <img alt="../../../_images/2accb8a100cc5fef4f4971c6e3b33b96e92edce773aa1910d202d161fe293ad5.png" src="../../../_images/2accb8a100cc5fef4f4971c6e3b33b96e92edce773aa1910d202d161fe293ad5.png" />
 </div>
 </div>
+<p>Define a feature map as follows: given a mesh whose first three vertices are <span class="math notranslate nohighlight">\(v_{1},v_{2},v_{3}\in \mathbb{R}^{3}\)</span>, compute the oriented unit normal defined by</p>
+<div class="math notranslate nohighlight">
+\[\frac{(v_{2}-v_{1})\times (v_{3} - v_{1})}{|(v_{2} - v_{1})\times (v_{3} - v_{1})|}\]</div>
+<p>Note that for meshes in the dataset, the first three vertices are never colinear, so this map is well-defined. Moreover, it happens to be the case that the oriented unit normal vector coincides with the axis of rotational symmetry.  While this is not strictly needed (and does not affect the isomorphism type of the underlying bundle structure), it is convenient for visualization and interpretation.</p>
 <p>Compute the base projections to <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -282,7 +288,7 @@
 <img alt="../../../_images/b352d3c767aa6d99467c2a2fb52942c9c304113efdb88a85d9744c76d71617b1.png" src="../../../_images/b352d3c767aa6d99467c2a2fb52942c9c304113efdb88a85d9744c76d71617b1.png" />
 </div>
 </div>
-<p>Optionally run the cell below to view a Plotly visualization of the nerve of the open cover:</p>
+<p>Observe that the nerve of the (good) cover has Euler characteristic <span class="math notranslate nohighlight">\(\chi = 60 - 174 + 116 = 2\)</span>, as expected for <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span>. Optionally run the cell below to view a Plotly visualization of the nerve:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">cover</span><span class="o">.</span><span class="n">show_nerve</span><span class="p">()</span>
@@ -317,6 +323,7 @@
 <img alt="../../../_images/a831b89381ce2754ad708417a4f6e729f47d0673596f7c607d8d1e6df4d77a18.png" src="../../../_images/a831b89381ce2754ad708417a4f6e729f47d0673596f7c607d8d1e6df4d77a18.png" />
 </div>
 </div>
+<p>The diagrams above confirm the presence of a single 1-dimensional persistent feature in each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span>.</p>
 <p>Optionally run the cell below to show a visualization of an interactive visualization of the projection map:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -325,7 +332,7 @@
 </div>
 </div>
 </div>
-<p>Compute local circular coordinates, approximate transition matrices and characteristic clases</p>
+<p>Compute local circular coordinates, approximate transition matrices and characteristic clases:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
@@ -341,6 +348,7 @@
 \[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.245\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.078\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.054\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.017\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.706\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.834\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.227\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.026\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 = 0\ (\text{orientable})\\[3pt]\quad \text{Euler number} &amp;:\quad \pm 2\ (\text{spin})\end{aligned}\end{split}\]</div>
 </div>
 </div>
+<p>Observe that the computed isomorphism type (as recorded by the characteristic classes) coincides with that of the underlying model. From this computation, we can infer that the data is concentrated around a 3-manifold with the topology of <span class="math notranslate nohighlight">\(SO(3)\)</span>.</p>
 <p>Now, restrict the bundle to the equator <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\subset \mathbb{S}^{2}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -364,7 +372,7 @@
 </div>
 </div>
 </div>
-<p>Constuct an open cover of <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span> by metric balls around equally-spaced landmark points:</p>
+<p>Constuct an open cover of <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span> by metric balls around equally-spaced landmark points, then construct the restricted bundle object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">12</span>
@@ -381,29 +389,8 @@
 <span class="p">)</span>
 <span class="n">eq_cover_data</span> <span class="o">=</span> <span class="n">eq_cover</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 
-<span class="c1">#Show a summary of the construction</span>
-<span class="n">eq_summ</span> <span class="o">=</span> <span class="n">eq_cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<p class="rubric" id="id1">Cover And Nerve Summary</p>
-<ul class="simple">
-<li><p>$n_\text{sets} = 12$, $n_\text{samples} = 698$</p></li>
-</ul>
-<p><strong>Recorded Simplex Counts:</strong></p>
-<ul class="simple">
-<li><p>$#(\text{0-simplices}) = 12$</p></li>
-<li><p>$#(\text{1-simplices}) = 12$</p></li>
-<li><p><em>No recorded simplices in dimensions</em> $\ge 2$</p></li>
-</ul>
-<img alt="../../../_images/143c86c8e91ee5909701602a303dbe83677aef30fe095e83faaa5b7d5e718840.png" src="../../../_images/143c86c8e91ee5909701602a303dbe83677aef30fe095e83faaa5b7d5e718840.png" />
-</div>
-</div>
-<p>Compute characteristic classes for the restricted bundle:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">eq_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
+
+<span class="n">eq_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
     <span class="n">eq_data</span><span class="p">,</span>
     <span class="n">eq_cover</span><span class="p">,</span>
     <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>

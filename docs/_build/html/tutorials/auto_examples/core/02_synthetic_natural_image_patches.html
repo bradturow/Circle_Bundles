@@ -25,8 +25,8 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Triangle Meshes" href="03_triangle_meshes.html" />
-    <link rel="prev" title="Product Torus" href="01_product_torus.html" /> 
+    <link rel="next" title="Star Pyramid Meshes" href="03_triangle_meshes.html" />
+    <link rel="prev" title="Product Torus With Varying Fiber Radius" href="01_product_torus.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="03_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="04_tri_prism_densities.html">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
@@ -202,8 +202,8 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="synthetic-natural-image-patches">
 <span id="example-02-synthetic-natural-image-patches"></span><h1>Synthetic Natural Image Patches<a class="headerlink" href="#synthetic-natural-image-patches" title="Link to this heading"></a></h1>
-<p>This notebook demonstrates the application of <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> to a synthetic dataset of high-contrast <span class="math notranslate nohighlight">\(n\times n\)</span> optical image patches sampled from a known model with the topology of a Klein bottle embedded in <span class="math notranslate nohighlight">\(\mathbb{R}^{n^{2}}\)</span> (see –).</p>
-<p>We choose an <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>-valued feature map and model the dataset as a discrete approximate circle bundle.  We compute characteristic classes to confirm the non-orientable global topology of the underlying model, then construct a coordinate system which reflects the inherent non-orientability.</p>
+<p>A example application of the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to a dataset with the topology of a Klein bottle.</p>
+<p>We generate a synthetic sample of high-contrast <span class="math notranslate nohighlight">\(n\times n\)</span> optical image patches from a known model (see – for details) and choose an <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>-valued feature map for analysis.  We compute characteristic classes to confirm the non-orientable global topology of the underlying model, then construct a coordinate system which reflects the inherent non-orientability.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -232,7 +232,7 @@
 </div>
 </div>
 </div>
-<p>Compute the predominant gradient direction of each patch</p>
+<p>We define a projection map which returns the ‘predominant gradient direction’ of a high-contrast patch.  Compute the predominant gradient direction of each patch:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grad_dirs</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_gradient_dirs</span><span class="p">(</span><span class="n">img_data</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>   
@@ -240,7 +240,7 @@
 </div>
 </div>
 </div>
-<p>View a small random sample of the dataset arranged by gradient direction</p>
+<p>View a small random sample of the dataset arranged by gradient direction:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">30</span>
@@ -298,24 +298,8 @@
                                <span class="n">metric</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">RP1AngleMetric</span><span class="p">())</span>
 
 <span class="n">img_cover_data</span> <span class="o">=</span> <span class="n">img_cover</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-
-<span class="n">img_summ</span> <span class="o">=</span> <span class="n">img_cover</span><span class="o">.</span><span class="n">summarize</span><span class="p">(</span><span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<p class="rubric" id="cover-and-nerve-summary">Cover And Nerve Summary</p>
-<ul class="simple">
-<li><p>$n_\text{sets} = 12$, $n_\text{samples} = 5000$</p></li>
-</ul>
-<p><strong>Recorded Simplex Counts:</strong></p>
-<ul class="simple">
-<li><p>$#(\text{0-simplices}) = 12$</p></li>
-<li><p>$#(\text{1-simplices}) = 12$</p></li>
-<li><p><em>No recorded simplices in dimensions</em> $\ge 2$</p></li>
-</ul>
-<img alt="../../../_images/c9a22628de28bc3c671b2b8ee21445828842ab98b4bbef73fa0b159382711039.png" src="../../../_images/c9a22628de28bc3c671b2b8ee21445828842ab98b4bbef73fa0b159382711039.png" />
 </div>
 </div>
 <p>Compute a persistence diagram for the data in each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span></p>
@@ -343,10 +327,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/2fabc0148487d48f55ff28667650e29025c510ff07ae3196e19df6c113bafd7b.png" src="../../../_images/2fabc0148487d48f55ff28667650e29025c510ff07ae3196e19df6c113bafd7b.png" />
+<img alt="../../../_images/ffd7cab4d5080b2fbdaadb615ebb1ca226eb2c1d540e62cbf42b7ef07f7b7747.png" src="../../../_images/ffd7cab4d5080b2fbdaadb615ebb1ca226eb2c1d540e62cbf42b7ef07f7b7747.png" />
 </div>
 </div>
-<p>Observe that each <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span> has a single 1-dimensional (circular) persistent feature, supporting the hypothesis that the data has the structure of a discrete approximate circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>. Up to isomorphism, the only circle bundles over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\cong\mathbb{S}^{1}\)</span> are the torus (trivial) and the Klein bottle (non-orientable). These two possibilities are distinguished by their orientation class <span class="math notranslate nohighlight">\(w_{1}\)</span>.</p>
+<p>Observe that each <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span> has a single 1-dimensional (circular) persistent feature, supporting the hypothesis that the data has the structure of a discrete approximate circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>. Up to isomorphism, the only circle bundles over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\cong\mathbb{S}^{1}\)</span> are the torus (trivial) and the Klein bottle (non-orientable). These two possibilities are distinguished by the orientation class <span class="math notranslate nohighlight">\(w_{1}\)</span>.</p>
 <p>Construct a bundle object to compute local circular coordinates, approximate transition matrices and characteristic classes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -410,15 +394,15 @@
 <img alt="../../../_images/aa31135824c39ebf2dd02892e87e7876c64f9e6ee55f184133667e6f13689aa9.png" src="../../../_images/aa31135824c39ebf2dd02892e87e7876c64f9e6ee55f184133667e6f13689aa9.png" />
 </div>
 </div>
-<p>Notice the abrupt reflection in the coordinates between columns 2 and 3 in the diagram above.</p>
+<p>Notice the abrupt reflection in the coordinates between columns 2 and 3 in the diagram above. Everywhere else, the coordinate system varies continuously, and the edges of the diagram roughly coincide.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="01_product_torus.html" class="btn btn-neutral float-left" title="Product Torus" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="03_triangle_meshes.html" class="btn btn-neutral float-right" title="Triangle Meshes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="01_product_torus.html" class="btn btn-neutral float-left" title="Product Torus With Varying Fiber Radius" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="03_triangle_meshes.html" class="btn btn-neutral float-right" title="Star Pyramid Meshes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

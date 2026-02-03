@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Optical Flow Torus &mdash; circle_bundles 0+unknown documentation</title>
+  <title>Extended Torus Model &mdash; circle_bundles 0+unknown documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../core/03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/03_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/04_tri_prism_densities.html">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Optical Flow</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Optical Flow Torus</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../quotients/index.html">Quotients</a><ul>
@@ -190,7 +190,7 @@
       <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
           <li class="breadcrumb-item"><a href="index.html">Optical Flow</a></li>
-      <li class="breadcrumb-item active">Optical Flow Torus</li>
+      <li class="breadcrumb-item active">Extended Torus Model</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../../_sources/tutorials/auto_examples/optical_flow/01_optical_flow_torus.ipynb.txt" rel="nofollow"> View page source</a>
       </li>
@@ -200,8 +200,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section class="tex2jax_ignore mathjax_ignore" id="optical-flow-torus">
-<span id="example-01-optical-flow-torus"></span><h1>Optical Flow Torus<a class="headerlink" href="#optical-flow-torus" title="Link to this heading"></a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="extended-torus-model">
+<span id="example-01-optical-flow-torus"></span><h1>Extended Torus Model<a class="headerlink" href="#extended-torus-model" title="Link to this heading"></a></h1>
+<p>In this tutorial, we apply the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to confirm a 3-manifold model proposed in [] for high-contrast optical flow patches sampled from the Sintel dataset []. The model is homotopy equivalent to a torus, but the topology cannot be satsfactorally detected from a direct persistence computation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -239,6 +240,14 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Collecting samples from scene 23, frame 49
+Finalizing dataframe... Done
+
+416400 optical flow patches sampled
+</pre></div>
+</div>
+</div>
 </div>
 <p>Next, preprocess the data – compute contrast norms and keep only patches with contrast norm in the top 20%.  Then, use a KNN density estimator to measure the density of dataset near each datapoint:</p>
 <div class="cell docutils container">
@@ -247,14 +256,11 @@
 <span class="n">max_samples</span> <span class="o">=</span> <span class="mi">50000</span>
 <span class="n">k</span> <span class="o">=</span> <span class="p">[</span><span class="mi">300</span><span class="p">]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Preprocessing data...&#39;</span><span class="p">)</span>
 <span class="n">patch_df</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">preprocess_flow_patches</span><span class="p">(</span>
     <span class="n">patch_df</span><span class="p">,</span>
     <span class="n">hc_frac</span> <span class="o">=</span> <span class="n">hc_frac</span><span class="p">,</span>
     <span class="n">max_samples</span> <span class="o">=</span> <span class="n">max_samples</span><span class="p">,</span>
     <span class="n">k_list</span> <span class="o">=</span> <span class="n">k</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Preprocessing complete.&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -269,6 +275,11 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Downsampled to 25000 patches
+</pre></div>
+</div>
+</div>
 </div>
 <p>Compute a persistence diagram from a sample of the dataset.  If the dataset is truly concentrated around the proposed torus model, we would expect to see two 1-dimensional persistent classes and a persistent class in dimension 2:</p>
 <div class="cell docutils container">
@@ -278,12 +289,15 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/7d0bb1dc9f11438f00a98b628bc83cebc547845518000ee56678e346d2c1e69c.png" src="../../../_images/7d0bb1dc9f11438f00a98b628bc83cebc547845518000ee56678e346d2c1e69c.png" />
+</div>
 </div>
 <p>Observe that we see a single 1-dimensional persistent class and no persistent classes in dimension 2.</p>
-<p>Proceed with local-to-global analysis.  Compute the predominant flow axis in <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> (as introduced by Adams et al.) and construct a cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>:</p>
+<p>Proceed with local-to-global analysis.  Compute the predominant flow axis in <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span> (as introduced by Adams et al.) and directionality (as introduced in —) for each patch, and construct a cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predom_dirs</span><span class="p">,</span> <span class="n">ratios</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_predominant_dirs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>    <span class="c1">#compute directionalities for later use</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predom_dirs</span><span class="p">,</span> <span class="n">ratios</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_predominant_dirs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  
 
 <span class="c1">#Construct a cover of the base space</span>
 <span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">16</span>
@@ -299,11 +313,26 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<p class="rubric" id="cover-and-nerve-summary">Cover And Nerve Summary</p>
+<ul class="simple">
+<li><p>$n_\text{sets} = 16$, $n_\text{samples} = 25000$</p></li>
+</ul>
+<p><strong>Recorded Simplex Counts:</strong></p>
+<ul class="simple">
+<li><p>$#(\text{0-simplices}) = 16$</p></li>
+<li><p>$#(\text{1-simplices}) = 16$</p></li>
+<li><p><em>No recorded simplices in dimensions</em> $\ge 2$</p></li>
+</ul>
+<img alt="../../../_images/a518d75a2da1bed02a54f9f37a67368e1b83dda8e2011794d50d18e23e93d0ec.png" src="../../../_images/a518d75a2da1bed02a54f9f37a67368e1b83dda8e2011794d50d18e23e93d0ec.png" />
+</div>
 </div>
 <p>View a sample of the dataset arranged by predominant flow direction:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">8</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">patch_vis</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_patch_visualizer</span><span class="p">()</span>
+
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">8</span>
 
 <span class="n">label_func</span> <span class="o">=</span> <span class="p">[</span><span class="sa">fr</span><span class="s2">&quot;$\theta = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">pred</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">$&quot;</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;$\pi$&quot;</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">predom_dirs</span><span class="p">]</span>
 <span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">show_data_vis</span><span class="p">(</span>
@@ -316,6 +345,9 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/c202710ae2142e7cf56321819994032ba886e5fbb504465361a5818b0f8cc1bd.png" src="../../../_images/c202710ae2142e7cf56321819994032ba886e5fbb504465361a5818b0f8cc1bd.png" />
 </div>
 </div>
 <p>Compute a persistence diagram for the data in each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span>:</p>
@@ -342,9 +374,12 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/9958accf47e14f25b05471f8de72d71b619f0ee360466e153b6f633e22565fda.png" src="../../../_images/9958accf47e14f25b05471f8de72d71b619f0ee360466e153b6f633e22565fda.png" />
 </div>
-<p>Observe that each <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span> has a single 1-dimensional (circular) persistent feature, supporting the hypothesis that the data has the structure of a discrete approximate circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>.</p>
-<p><span class="math notranslate nohighlight">\(\textbf{Main bundle construction:}\)</span> Construct local circular coordinates, compute approximate transition matrices and characteristic classes:</p>
+</div>
+<p>Observe that each <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span> has a single 1-dimensional (circular) persistent feature, supporting the hypothesis that the data has the structure of a discrete approximate circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>. Up to isormorphism, there are two possible global structures for a circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\cong\mathbb{S}^{1}\)</span>, namely the torus (trivial) and the Klein bottle (non-orientable). These two possibilities are distinguished by the orientation class <span class="math notranslate nohighlight">\(w_{1}\)</span>.</p>
+<p>Now, construct local circular coordinates, compute approximate transition matrices and characteristic classes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
@@ -355,6 +390,10 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.246\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.079\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.050\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.016\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.246\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.000\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 = 0\ (\text{orientable})\\[3pt]\quad \text{Euler class} &amp;:\quad e = 0\ \text{(no 2-simplices)}\end{aligned}\end{split}\]</div>
+</div>
 </div>
 <p>View the correlations between local circular coordinates on overlaps:</p>
 <div class="cell docutils container">
@@ -364,59 +403,55 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/b739c07461ca254aa564617d3d6dd06d485fa0e84088e7e837feacdfa5e19877.png" src="../../../_images/b739c07461ca254aa564617d3d6dd06d485fa0e84088e7e837feacdfa5e19877.png" />
 </div>
-<p>Now, set up a bundle with just the high-directionality data:</p>
+</div>
+<p>Since the global structure is trivial, synchronize local circular coordinates to construct a toroidal coordinate system for the dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">global_triv_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_global_trivialization</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, view a sample of high-directionality patches arranged by toroidal coordinates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thresh</span> <span class="o">=</span> <span class="mf">0.8</span>
 <span class="n">high_inds</span> <span class="o">=</span> <span class="n">ratios</span> <span class="o">&gt;</span> <span class="n">thresh</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">high_inds</span><span class="p">)</span><span class="si">}</span><span class="s1"> high-directionality patches&#39;</span><span class="p">)</span>
+<span class="n">high_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">high_inds</span><span class="p">]</span>
 
-<span class="n">high_cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">MetricBallCover</span><span class="p">(</span><span class="n">predom_dirs</span><span class="p">[</span><span class="n">high_inds</span><span class="p">],</span> <span class="n">landmarks</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">metric</span> <span class="o">=</span> <span class="n">rp1_metric</span><span class="p">())</span>
-<span class="n">high_cover_data</span> <span class="o">=</span> <span class="n">high_cover</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="n">high_bundle</span> <span class="o">=</span> <span class="n">build_bundle</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">[</span><span class="n">high_inds</span><span class="p">],</span>
-    <span class="n">high_cover</span><span class="p">,</span>
-    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Get global toroidal coordinates for the high-directionality data:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">high_triv_result</span> <span class="o">=</span> <span class="n">high_bundle</span><span class="o">.</span><span class="n">get_global_trivialization</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Show a sample of coordinatized patches:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">per_row</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">per_row</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">per_col</span> <span class="o">=</span> <span class="mi">9</span>
-<span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">predom_dirs</span><span class="p">[</span><span class="n">high_inds</span><span class="p">],</span> <span class="n">high_triv_result</span><span class="o">.</span><span class="n">F</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">predom_dirs</span><span class="p">[</span><span class="n">high_inds</span><span class="p">],</span> <span class="n">global_triv_result</span><span class="o">.</span><span class="n">F</span><span class="p">[</span><span class="n">high_inds</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">lattice_vis</span><span class="p">(</span>
-    <span class="n">high_bundle</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+    <span class="n">high_data</span><span class="p">,</span>
     <span class="n">coords</span><span class="p">,</span>
     <span class="n">patch_vis</span><span class="p">,</span>
     <span class="n">per_row</span><span class="o">=</span><span class="n">per_row</span><span class="p">,</span>
     <span class="n">per_col</span> <span class="o">=</span> <span class="n">per_col</span><span class="p">,</span>
     <span class="n">figsize</span><span class="o">=</span><span class="mi">19</span><span class="p">,</span>
     <span class="n">thumb_px</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>   
-    <span class="n">dpi</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span> 
-    <span class="n">padding</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">dpi</span><span class="o">=</span><span class="mi">350</span><span class="p">,</span>
+    <span class="n">padding</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>16021 high-directionality patches
+</pre></div>
 </div>
-<p>Get a visualization of the coordinatized low-directionality data:</p>
+<img alt="../../../_images/b5b8b32a986abf2a425cae1cd0a6d8b92e78aa8c3f12b35931294152d40f4e87.png" src="../../../_images/b5b8b32a986abf2a425cae1cd0a6d8b92e78aa8c3f12b35931294152d40f4e87.png" />
+</div>
+</div>
+<p>View a sample of low-directionality patches arranged by toroidal coordinates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">thresh</span> <span class="o">=</span> <span class="mf">0.7</span>
@@ -427,7 +462,7 @@
 
 <span class="n">per_row</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="n">per_col</span> <span class="o">=</span> <span class="mi">9</span>
-<span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">predom_dirs</span><span class="p">[</span><span class="n">low_inds</span><span class="p">],</span> <span class="n">triv_result</span><span class="o">.</span><span class="n">F</span><span class="p">[</span><span class="n">low_inds</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+<span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">predom_dirs</span><span class="p">[</span><span class="n">low_inds</span><span class="p">],</span> <span class="n">global_triv_result</span><span class="o">.</span><span class="n">F</span><span class="p">[</span><span class="n">low_inds</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
 
 <span class="n">fig</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">lattice_vis</span><span class="p">(</span>
     <span class="n">low_data</span><span class="p">,</span>
@@ -445,7 +480,14 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5355 low-directionality patches
+</pre></div>
 </div>
+<img alt="../../../_images/8da6de12fdad831d3a2f3aa07c156b46ad6af75ebc68989e160ca6fa82823b1f.png" src="../../../_images/8da6de12fdad831d3a2f3aa07c156b46ad6af75ebc68989e160ca6fa82823b1f.png" />
+</div>
+</div>
+<p>Observe that every column is nearly identical: this reflects the fact that the low-directionality data is concentrated near a single circle at the center of the thickened torus structure.</p>
 </section>
 
 

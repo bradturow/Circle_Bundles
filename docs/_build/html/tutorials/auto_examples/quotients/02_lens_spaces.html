@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../core/03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/03_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/04_tri_prism_densities.html">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Quotients</a><ul class="current">
@@ -202,7 +202,6 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="lens-spaces-l-p-1-mathbb-s-3-mathbb-z-p-as-circle-bundles-over-mathbb-s-2">
 <span id="example-02-lens-spaces"></span><h1>Lens Spaces <span class="math notranslate nohighlight">\(L(p,1) = \mathbb{S}^{3}/\mathbb{Z}_{p}\)</span> As Circle Bundles Over <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span><a class="headerlink" href="#lens-spaces-l-p-1-mathbb-s-3-mathbb-z-p-as-circle-bundles-over-mathbb-s-2" title="Link to this heading"></a></h1>
-<p>This notebook demonstrates usage of <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> on a dataset endowed with a (non-Euclidean) metric.</p>
 <p>Given a vector <span class="math notranslate nohighlight">\(v\in \mathbb{S}^{2}\)</span> and an integer <span class="math notranslate nohighlight">\(p\in \mathbb{Z}\)</span>, one has a continuous, free right <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span>-action on <span class="math notranslate nohighlight">\(\mathbb{S}^{3}\)</span> defined by <span class="math notranslate nohighlight">\(q\cdot e^{i\theta} = qe^{i\frac{v}{2}}\)</span> (here we are identifying <span class="math notranslate nohighlight">\(\mathbb{S}^{3}\)</span> with the unit quaternions and <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span> with the pure imaginary unit quaternions). The hopf projection map <span class="math notranslate nohighlight">\(\pi:\mathbb{S}^{3}\to \mathbb{S}^{2}\)</span> defined by <span class="math notranslate nohighlight">\(\pi(q) = qvq^{-1}\)</span> is equivariant with respect to this action, so we obtain a new principal <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span>-bundle whose total space is the lens space <span class="math notranslate nohighlight">\(\mathbb{S}^{3}/\mathbb{Z}_{p}\)</span> (and whose projection map is defined by <span class="math notranslate nohighlight">\(\widetilde{\pi}([q]) = [\pi(q)]\)</span>).  The Euler number of this bundle is <span class="math notranslate nohighlight">\(\pm p\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -215,13 +214,8 @@
 <p>First, generate a sample of the 3-sphere:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10000</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5000</span>
 <span class="n">s3_data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>10000 samples from S3 generated.
 </pre></div>
 </div>
 </div>
@@ -229,8 +223,7 @@
 <p>Compute base projections to <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\)</span> using the Hopf projection map</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span> 
-<span class="n">base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">hopf_projection</span><span class="p">(</span><span class="n">s3_data</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">hopf_projection</span><span class="p">(</span><span class="n">s3_data</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -247,7 +240,7 @@
 <div class="cell_output docutils container">
 <p class="rubric" id="cover-and-nerve-summary">Cover And Nerve Summary</p>
 <ul class="simple">
-<li><p>$n_\text{sets} = 80$, $n_\text{samples} = 10000$</p></li>
+<li><p>$n_\text{sets} = 80$, $n_\text{samples} = 5000$</p></li>
 </ul>
 <p><strong>Recorded Simplex Counts:</strong></p>
 <ul class="simple">
@@ -256,7 +249,7 @@
 <li><p>$#(\text{2-simplices}) = 156$</p></li>
 <li><p><em>No recorded simplices in dimensions</em> $\ge 3$</p></li>
 </ul>
-<img alt="../../../_images/dfe8f3d9534c9fbdb5c7efdbf639f922dd691204691786950a6325a57d707d95.png" src="../../../_images/dfe8f3d9534c9fbdb5c7efdbf639f922dd691204691786950a6325a57d707d95.png" />
+<img alt="../../../_images/4ed910c353b128d6d5dea42e1782165ce8dbf1140537083ee9bc3e8f3420c5e4.png" src="../../../_images/4ed910c353b128d6d5dea42e1782165ce8dbf1140537083ee9bc3e8f3420c5e4.png" />
 </div>
 </div>
 <p><span class="math notranslate nohighlight">\(\textbf{Main bundle computation}\)</span>: Compute local trivializations and characteristic classes using a quotient metric on <span class="math notranslate nohighlight">\(\mathbb{S}^{3}\)</span>.</p>
@@ -264,7 +257,7 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">p</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1">#CHOOSE: a p-value for the quotient metric</span>
 
-<span class="n">total_metric</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">S3QuotientMetric</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">v_axis</span> <span class="o">=</span> <span class="n">v</span><span class="p">,</span> <span class="n">antipodal</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>    
+<span class="n">total_metric</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">S3QuotientMetric</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">,</span> <span class="n">antipodal</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>    
 
 <span class="n">lens_bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
     <span class="n">s3_data</span><span class="p">,</span>
@@ -277,7 +270,7 @@
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.294\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.094\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.063\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.020\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.433\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.519\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.310\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.035\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 = 0\ (\text{orientable})\\[3pt]\quad \text{Euler number} &amp;:\quad \pm 4\ (\text{spin})\end{aligned}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.378\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.121\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.071\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.023\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.810\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 1.989\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.346\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.039\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 = 0\ (\text{orientable})\\[3pt]\quad \text{Euler number} &amp;:\quad \pm 4\ (\text{spin})\end{aligned}\end{split}\]</div>
 </div>
 </div>
 </section>

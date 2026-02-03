@@ -150,15 +150,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../core/03_triangle_meshes.html">Triangle Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/03_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/04_tri_prism_densities.html">Triangle Prism Densities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Optical Flow Torus</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../optical_flow/01_optical_flow_torus.html">Extended Torus Model</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Quotients</a><ul class="current">
@@ -219,7 +219,7 @@
 <p>First, generate a sample of the product <span class="math notranslate nohighlight">\(\mathbb{S}^{2}\times\mathbb{S}^{1}\)</span> as vectors in <span class="math notranslate nohighlight">\(\mathbb{R}^{5}\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">10000</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5000</span>
 <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.05</span>  <span class="c1">#noise level</span>
 
 <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">angles</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_s2_trivial</span><span class="p">(</span>
@@ -240,6 +240,20 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<p class="rubric" id="cover-and-nerve-summary">Cover And Nerve Summary</p>
+<ul class="simple">
+<li><p>$n_\text{sets} = 80$, $n_\text{samples} = 5000$</p></li>
+</ul>
+<p><strong>Recorded Simplex Counts:</strong></p>
+<ul class="simple">
+<li><p>$#(\text{0-simplices}) = 80$</p></li>
+<li><p>$#(\text{1-simplices}) = 237$</p></li>
+<li><p>$#(\text{2-simplices}) = 158$</p></li>
+<li><p><em>No recorded simplices in dimensions</em> $\ge 3$</p></li>
+</ul>
+<img alt="../../../_images/b1082bc90f817e6d0240546c3e5acab615e2cbf3913120b09660d53f2eb75cb7.png" src="../../../_images/b1082bc90f817e6d0240546c3e5acab615e2cbf3913120b09660d53f2eb75cb7.png" />
+</div>
 </div>
 <p>Observe that the Euler characteristic of the nerve of our (good) open cover is <span class="math notranslate nohighlight">\(\chi = 80 - 237 + 158 = 1\)</span>, as expected for <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span>.</p>
 <p>Now, choose a quotient metric for the dataset and construct a bundle</p>
@@ -248,7 +262,7 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">total_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">cb</span><span class="o">.</span><span class="n">RP2_TrivialMetric</span><span class="p">(),</span> <span class="n">cb</span><span class="o">.</span><span class="n">RP2_TwistMetric</span><span class="p">(),</span> <span class="n">cb</span><span class="o">.</span><span class="n">RP2_FlipMetric</span><span class="p">()]</span>  
 
 
-<span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>   <span class="c1">#CHOOSE: a metric on the total space</span>
+<span class="n">j</span> <span class="o">=</span> <span class="mi">2</span>   <span class="c1">#CHOOSE: a metric on the total space</span>
 <span class="n">total_metric</span> <span class="o">=</span> <span class="n">total_metrics</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
 
 
@@ -261,6 +275,10 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Diagnostics} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.229\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.073\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.043\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.014\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.989\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 20.227\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.052\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta,\tilde{e}) = 0.006\\[14pt]\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{(twisted) Euler class} &amp;:\quad \tilde{e} = 0\end{aligned}\end{split}\]</div>
+</div>
 </div>
 <p>Below we compute the persistence of each characteristic class representative with respect to the weights filtration of the nerve of our open cover of <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> (see theory section for details).  We expect an orientable cocycle to become a coboundary after a single edge is removed from the nerve, but a non-orientable cocycle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> may have a much longer ‘lifetime.’ The restriction of the total space of a non-orientable bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{2}\)</span> to any ‘equator’ <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\subset\mathbb{RP}^{2}\)</span> is still non-trivial, so the maximal subcomplex of the nerve on which a representative cocycle restricts to a coboundary cannot have any non-trivial cycles.</p>
 <div class="cell docutils container">
@@ -268,6 +286,10 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pers</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_persistence</span><span class="p">(</span><span class="n">show</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split}\displaystyle \begin{array}{lrrrrr}\textbf{Stage} &amp; k &amp; r &amp; |W_r^{(1)}| &amp; |W_r^{(2)}| &amp; |W_r^{(3)}| \\ \hline \text{Full nerve} &amp; 0 &amp; \infty &amp; 237 &amp; 158 &amp; 0 \\ \text{w₁ cobirth} &amp; 0 &amp; \infty &amp; 237 &amp; 158 &amp; 0 \\ \text{w₁ codeath} &amp; 170 &amp; 0.032 &amp; 67 &amp; 7 &amp; 0 \\ \text{Euler cobirth} &amp; 0 &amp; \infty &amp; 237 &amp; 158 &amp; 0 \\ \text{Euler codeath} &amp; 0 &amp; \infty &amp; 237 &amp; 158 &amp; 0\end{array}\end{split}\]</div>
 </div>
 </div>
 <p>Optionally run the cell below to see an interactive visualization of the weights filtration on the nerve of the cover.  Use the slider to see different stages of weights filtration.  Edges shown in red are removed to reach a subcomplex on which both characterstic class representatives become coboundaries.</p>
