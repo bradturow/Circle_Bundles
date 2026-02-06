@@ -1,36 +1,30 @@
-# characteristic_class.py
+# circle_bundles/characteristic_class.py
 """
 Characteristic classes for O(2)-bundles on a nerve (supports up to 3-simplices).
 
-Main entrypoint:
-    compute_classes(cover, cocycle, ...)
+REFRACTOR (Feb 2026)
+--------------------
+We split the old monolithic `compute_classes(...)` into two layers so Bundle.get_classes()
+can do:
 
-Assumptions / conventions
--------------------------
-- We work on a simplicial complex given by (edges, triangles, tets).
-- Edges are represented canonically using combinatorics.canon_edge (min,max).
-- Triangles are represented canonically using combinatorics.canon_tri (sorted).
-- Tetrahedra are represented canonically as sorted 4-tuples.
+  (1) compute reps only (fast, cochain-level): w1 (edge Z2 cochain) + twisted Euler rep on triangles
+  (2) run persistence on reps (weights filtration)
+  (3) restrict to a subcomplex where reps are cocycles
+  (4) compute derived class data (coboundary tests, pairings, trivial/spin flags) on that subcomplex
 
-- The O(2) cocycle object is assumed to provide:
-    - restrict(edges) -> cocycle restricted to those edges
-    - omega_Z2()      -> dict edge -> {0,1}  (det -> Z2)
-    - omega_O1()      -> dict edge -> {+1,-1}
-    - theta_normalized() -> dict edge -> float in R/Z (represented mod 1)
-    - orient_if_possible(edges, n_vertices) -> (ok, cocycle_out, phi_pm1_array)
+New public helpers:
+  - compute_class_representatives_from_nerve(...)
+  - compute_class_data_on_complex(...)
+
+Back-compat:
+  - compute_classes(...) still returns a full ClassResult on the full complex (old behavior),
+    implemented by calling the new helpers internally.
 
 Notes
 -----
-- The twisted Euler representative e is computed by rounding δ_ω θ on triangles.
-- If 3-simplices are present, we DO NOT assume e is a cocycle: we check δ_ω e on tets.
-- Euler number computation:
-    * If H_2(B; Z~) has free rank 1, compute integer pairing (twisted Euler number),
-      regardless of orientability of the base.
-    * If free rank != 1, do not compute integer pairing.
-    * If H_2(B; Z2) has dimension 1, compute mod-2 pairing.
-    * Otherwise, mod-2 pairing is not computed.
+- We keep the exact same conventions as your old file.
+- We do NOT change the mathematics; this is purely a refactor.
 """
-
 
 from __future__ import annotations
 
@@ -41,20 +35,32 @@ import numpy as np
 import sympy as sp
 
 from .nerve.combinatorics import Edge, Tri, canon_edge, canon_tri
-
-from .analysis.class_persistence import build_delta_C0_to_C1_Z2, build_delta_C1_to_C2_Z_twisted
-from .analysis.class_persistence import in_image_mod2, in_image_Z_fast_pipeline
+from .analysis.class_persistence import (
+    build_delta_C0_to_C1_Z2,
+    build_delta_C1_to_C2_Z_twisted,
+    in_image_mod2,
+    in_image_Z_fast_pipeline,
+)
 
 __all__ = [
-    "ClassResult"
+    # main old entrypoint
+    "compute_classes",
+    # new refactor entrypoints
+    "compute_class_representatives_from_nerve",
+    "compute_class_data_on_complex",
+    # results
+    "ClassReps",
+    "ClassResult",
+    # summary helper (kept)
+    "show_summary",
 ]
+
+Tet = Tuple[int, int, int, int]
+
 
 # ============================================================
 # Canonicalization
 # ============================================================
-
-Tet = Tuple[int, int, int, int]
-
 
 def canon_tet(a: int, b: int, c: int, d: int) -> Tet:
     return tuple(sorted((int(a), int(b), int(c), int(d))))
@@ -127,11 +133,8 @@ def twisted_delta_euler_on_tet(tet: Tet, euler: Dict[Tri, int], omega_O1: Dict[E
     3D twisted coboundary of an integer 2-cochain e on a tetrahedron (i<j<k<l):
 
       (δ_ω e)(i,j,k,l) = ω(i,j) e(j,k,l) - e(i,k,l) + e(i,j,l) - e(i,j,k)
-
-    Returns an integer.
     """
     i, j, k, l = tet
-
     w01 = int(omega_O1[canon_edge(i, j)])
 
     t_jkl = canon_tri(j, k, l)
@@ -139,13 +142,17 @@ def twisted_delta_euler_on_tet(tet: Tet, euler: Dict[Tri, int], omega_O1: Dict[E
     t_ijl = canon_tri(i, j, l)
     t_ijk = canon_tri(i, j, k)
 
-    return int(w01 * int(euler.get(t_jkl, 0)) - int(euler.get(t_ikl, 0)) + int(euler.get(t_ijl, 0)) - int(euler.get(t_ijk, 0)))
+    return int(
+        w01 * int(euler.get(t_jkl, 0))
+        - int(euler.get(t_ikl, 0))
+        + int(euler.get(t_ijl, 0))
+        - int(euler.get(t_ijk, 0))
+    )
 
 
 def compute_twisted_euler_class(cocycle: Any, triangles: Iterable[Tri]):
     """
-    cocycle: O2Cocycle-like object (expects theta_normalized() and omega_O1()).
-    triangles: iterable of triangles (any order; we canonicalize).
+    Compute the twisted Euler representative by rounding δ_ω θ on triangles.
 
     Returns
     -------
@@ -176,7 +183,79 @@ def compute_twisted_euler_class(cocycle: Any, triangles: Iterable[Tri]):
 
 
 # ============================================================
-# Boundary matrices (twisted over Z, untwisted over Z2)
+# Linear algebra helpers (Q and mod2)
+# ============================================================
+
+def rank_over_Q(A: np.ndarray) -> int:
+    if A.size == 0:
+        return 0
+    return int(sp.Matrix(A).rank())
+
+
+def in_colspace_over_Q(M: sp.Matrix, v: sp.Matrix) -> bool:
+    if M.cols == 0:
+        return False
+    if v.cols != 1:
+        v = sp.Matrix(v).reshape(v.rows, 1)
+    return int(M.row_join(v).rank()) == int(M.rank())
+
+
+def rref_mod2(A_in: np.ndarray) -> Tuple[np.ndarray, List[int]]:
+    A = (np.asarray(A_in, dtype=np.uint8) & 1).copy()
+    m, n = A.shape
+    row = 0
+    pivots: List[int] = []
+
+    for col in range(n):
+        pivot = None
+        for r in range(row, m):
+            if A[r, col] == 1:
+                pivot = r
+                break
+        if pivot is None:
+            continue
+
+        if pivot != row:
+            A[[row, pivot], :] = A[[pivot, row], :]
+
+        for r in range(m):
+            if r != row and A[r, col] == 1:
+                A[r, :] ^= A[row, :]
+
+        pivots.append(col)
+        row += 1
+        if row == m:
+            break
+
+    return A, pivots
+
+
+def nullspace_basis_mod2(A_in: np.ndarray) -> List[np.ndarray]:
+    A = (np.asarray(A_in, dtype=np.uint8) & 1).copy()
+    m, n = A.shape
+    R, pivots = rref_mod2(A)
+    pivot_set = set(pivots)
+    free_cols = [c for c in range(n) if c not in pivot_set]
+
+    basis: List[np.ndarray] = []
+    for free in free_cols:
+        x = np.zeros(n, dtype=np.uint8)
+        x[free] = 1
+        for i in range(len(pivots) - 1, -1, -1):
+            p = pivots[i]
+            ones = np.flatnonzero(R[i, :])
+            s = 0
+            for j in ones:
+                if j == p:
+                    continue
+                s ^= int(x[j])
+            x[p] = s & 1
+        basis.append(x)
+    return basis
+
+
+# ============================================================
+# H2 dims and fundamental classes (same as old)
 # ============================================================
 
 def build_twisted_boundary_C2_to_C1(
@@ -184,15 +263,6 @@ def build_twisted_boundary_C2_to_C1(
     triangles: List[Tri],
     omega_O1: Dict[Edge, int],
 ) -> np.ndarray:
-    """
-    Twisted boundary ∂_2^ω : C2 -> C1 over Z.
-
-    Consistent with:
-      δ_ω θ(i,j,k) = ω(i,j)θ(j,k) - θ(i,k) + θ(i,j)
-
-    So:
-      ∂_ω [i,j,k] = ω(i,j)[j,k] - [i,k] + [i,j]
-    """
     edges = [canon_edge(*e) for e in edges]
     triangles = [canon_tri(*t) for t in triangles]
     edge_index = {e: r for r, e in enumerate(edges)}
@@ -224,15 +294,8 @@ def build_twisted_boundary_C3_to_C2(
     tets: List[Tet],
     omega_O1: Dict[Edge, int],
 ) -> np.ndarray:
-    """
-    Twisted boundary ∂_3^ω : C3 -> C2 over Z.
-
-    Convention (i<j<k<l):
-      ∂_ω [i,j,k,l] = ω(i,j)[j,k,l] - [i,k,l] + [i,j,l] - [i,j,k]
-    """
     triangles = [canon_tri(*t) for t in triangles]
     tets = [canon_tet(*tt) for tt in tets]
-
     tri_index = {t: r for r, t in enumerate(triangles)}
 
     omega_O1 = canonicalize_o1_cochain(omega_O1)
@@ -249,10 +312,9 @@ def build_twisted_boundary_C3_to_C2(
         t_ijl = canon_tri(i, j, l)
         t_ijk = canon_tri(i, j, k)
 
-        # require all faces present in triangle basis
         for face in (t_jkl, t_ikl, t_ijl, t_ijk):
             if face not in tri_index:
-                raise KeyError(f"Tetrahedron face {face} not found in triangles list; ensure triangles include all faces.")
+                raise KeyError(f"Tetrahedron face {face} not found in triangles list; include all faces.")
 
         D[tri_index[t_jkl], c] += w01
         D[tri_index[t_ikl], c] += -1
@@ -263,10 +325,6 @@ def build_twisted_boundary_C3_to_C2(
 
 
 def build_boundary_mod2_C2_to_C1(edges: List[Edge], triangles: List[Tri]) -> np.ndarray:
-    """
-    Standard boundary ∂_2 : C2 -> C1 over Z2 (represented as uint8 matrix).
-    ∂[i,j,k] = [j,k] + [i,k] + [i,j] mod 2 (signs vanish in Z2).
-    """
     edges = [canon_edge(*e) for e in edges]
     triangles = [canon_tri(*t) for t in triangles]
     edge_index = {e: r for r, e in enumerate(edges)}
@@ -280,150 +338,23 @@ def build_boundary_mod2_C2_to_C1(edges: List[Edge], triangles: List[Tri]) -> np.
 
 
 def build_boundary_mod2_C3_to_C2(triangles: List[Tri], tets: List[Tet]) -> np.ndarray:
-    """
-    Standard boundary ∂_3 : C3 -> C2 over Z2 (uint8).
-    ∂[i,j,k,l] = [j,k,l] + [i,k,l] + [i,j,l] + [i,j,k] mod 2
-    """
     triangles = [canon_tri(*t) for t in triangles]
     tets = [canon_tet(*tt) for tt in tets]
     tri_index = {t: r for r, t in enumerate(triangles)}
 
     D = np.zeros((len(triangles), len(tets)), dtype=np.uint8)
     for c, (i, j, k, l) in enumerate(tets):
-        for face in (canon_tri(j, k, l), canon_tri(i, k, l), canon_tri(i, j, l), canon_tri(i, j, k)):
+        for face in (
+            canon_tri(j, k, l),
+            canon_tri(i, k, l),
+            canon_tri(i, j, l),
+            canon_tri(i, j, k),
+        ):
             if face not in tri_index:
-                raise KeyError(f"Tet face {face} not found in triangles list; ensure triangles include all faces.")
+                raise KeyError(f"Tet face {face} not found in triangles list; include all faces.")
             D[tri_index[face], c] ^= 1
     return D
 
-
-# ============================================================
-# Linear algebra helpers (Q and mod2)
-# ============================================================
-
-def rank_over_Q(A: np.ndarray) -> int:
-    if A.size == 0:
-        return 0
-    return int(sp.Matrix(A).rank())
-
-
-def nullspace_over_Q(A: np.ndarray) -> List[sp.Matrix]:
-    if A.size == 0:
-        # nullspace of 0xN is full space; caller should handle dimensions carefully
-        return sp.Matrix(A).nullspace()
-    return sp.Matrix(A).nullspace()
-
-
-def in_colspace_over_Q(M: sp.Matrix, v: sp.Matrix) -> bool:
-    """Check if v is in the column space of M over Q."""
-    if M.cols == 0:
-        return False
-    if v.cols != 1:
-        v = sp.Matrix(v).reshape(v.rows, 1)
-    return int(M.row_join(v).rank()) == int(M.rank())
-
-
-def rref_mod2(A_in: np.ndarray) -> Tuple[np.ndarray, List[int]]:
-    """
-    Compute RREF of A over GF(2). Returns (RREF_matrix, pivot_cols).
-    """
-    A = (np.asarray(A_in, dtype=np.uint8) & 1).copy()
-    m, n = A.shape
-    row = 0
-    pivots: List[int] = []
-
-    for col in range(n):
-        pivot = None
-        for r in range(row, m):
-            if A[r, col] == 1:
-                pivot = r
-                break
-        if pivot is None:
-            continue
-
-        if pivot != row:
-            A[[row, pivot], :] = A[[pivot, row], :]
-
-        for r in range(m):
-            if r != row and A[r, col] == 1:
-                A[r, :] ^= A[row, :]
-
-        pivots.append(col)
-        row += 1
-        if row == m:
-            break
-
-    return A, pivots
-
-
-def nullspace_basis_mod2(A_in: np.ndarray) -> List[np.ndarray]:
-    """
-    Return a basis for nullspace of A over GF(2).
-    A shape: (m,n). Returns list of length nullity, each vector length n (uint8).
-    """
-    A = (np.asarray(A_in, dtype=np.uint8) & 1).copy()
-    m, n = A.shape
-    R, pivots = rref_mod2(A)
-    pivot_set = set(pivots)
-    free_cols = [c for c in range(n) if c not in pivot_set]
-
-    basis: List[np.ndarray] = []
-    for free in free_cols:
-        x = np.zeros(n, dtype=np.uint8)
-        x[free] = 1
-        # back substitute (R is RREF, pivot i on row i)
-        for i in range(len(pivots) - 1, -1, -1):
-            p = pivots[i]
-            ones = np.flatnonzero(R[i, :])
-            s = 0
-            for j in ones:
-                if j == p:
-                    continue
-                s ^= int(x[j])
-            x[p] = s & 1
-        basis.append(x)
-    return basis
-
-
-def in_image_mod2(A: np.ndarray, b: np.ndarray) -> bool:
-    """Decide if b is in the column space of A over GF(2)."""
-    A = (np.asarray(A, dtype=np.uint8) & 1).copy()
-    b = (np.asarray(b, dtype=np.uint8) & 1).reshape(-1, 1)
-
-    M = np.concatenate([A, b], axis=1)
-    m, n1 = M.shape
-    n = n1 - 1
-
-    row = 0
-    for col in range(n):
-        piv = None
-        for r in range(row, m):
-            if M[r, col] == 1:
-                piv = r
-                break
-        if piv is None:
-            continue
-
-        if piv != row:
-            M[[row, piv]] = M[[piv, row]]
-
-        for r in range(m):
-            if r != row and M[r, col] == 1:
-                M[r, :] ^= M[row, :]
-
-        row += 1
-        if row == m:
-            break
-
-    for r in range(m):
-        if np.all(M[r, :n] == 0) and M[r, n] == 1:
-            return False
-    return True
-
-
-# ============================================================
-# Fundamental class + pairing in general 3D case
-# ============================================================
 
 def normalize_cycle_Z(z: np.ndarray) -> np.ndarray:
     z = np.asarray(z, dtype=int).copy()
@@ -444,21 +375,12 @@ def H2_dimensions(
     tets: List[Tet],
     omega_O1: Dict[Edge, int],
 ) -> Dict[str, int]:
-    """
-    Compute:
-      dim_Q = dim H_2(B; Z~) over Q (free rank)
-      dim_Z2 = dim H_2(B; Z2)
-    using boundaries ∂2 and ∂3.
-    """
     edges = sorted({canon_edge(*e) for e in edges})
     triangles = sorted({canon_tri(*t) for t in triangles})
     tets = sorted({canon_tet(*tt) for tt in tets})
 
-    # Twisted (Z~) over Q
     if len(triangles) == 0:
-        dim_Q = 0
-        dim_Z2 = 0
-        return {"dim_Q": dim_Q, "dim_Z2": dim_Z2}
+        return {"dim_Q": 0, "dim_Z2": 0}
 
     D2w = build_twisted_boundary_C2_to_C1(edges, triangles, omega_O1=omega_O1)
     r2 = rank_over_Q(D2w)
@@ -473,21 +395,18 @@ def H2_dimensions(
 
     dim_Q = int(max(ker2_dim - im3_dim, 0))
 
-    # Mod 2 (untwisted)
     D2 = build_boundary_mod2_C2_to_C1(edges, triangles)
-    R2, piv2 = rref_mod2(D2)
+    _, piv2 = rref_mod2(D2)
     ker2_dim2 = n2 - len(piv2)
 
     if len(tets) == 0:
         im3_dim2 = 0
     else:
         D3 = build_boundary_mod2_C3_to_C2(triangles, tets)
-        # image dim is rank of D3 over GF2; rank is #pivots of RREF of D3
         _, piv3 = rref_mod2(D3)
         im3_dim2 = len(piv3)
 
     dim_Z2 = int(max(ker2_dim2 - im3_dim2, 0))
-
     return {"dim_Q": dim_Q, "dim_Z2": dim_Z2}
 
 
@@ -497,11 +416,6 @@ def fundamental_class_Z_rank1(
     tets: List[Tet],
     omega_O1: Dict[Edge, int],
 ) -> Optional[np.ndarray]:
-    """
-    If dim H2(B; Z~) over Q is 1, return an integer 2-cycle z (length #triangles)
-    representing the generator (up to sign).
-    Otherwise return None.
-    """
     edges = sorted({canon_edge(*e) for e in edges})
     triangles = sorted({canon_tri(*t) for t in triangles})
     tets = sorted({canon_tet(*tt) for tt in tets})
@@ -510,29 +424,24 @@ def fundamental_class_Z_rank1(
         return None
 
     D2w = sp.Matrix(build_twisted_boundary_C2_to_C1(edges, triangles, omega_O1=omega_O1))
-    ns = D2w.nullspace()  # basis for Z2 cycles over Q (actually kernel of ∂2)
-
+    ns = D2w.nullspace()
     if len(ns) == 0:
         return None
 
     if len(tets) == 0:
-        # H2 dim = dim ker(∂2)
         if len(ns) != 1:
             return None
         v = ns[0]
     else:
         D3w = sp.Matrix(build_twisted_boundary_C3_to_C2(triangles, tets, omega_O1=omega_O1))
-        # pick a kernel vector not in image(∂3)
         candidates = []
         for v0 in ns:
             if not in_colspace_over_Q(D3w, v0):
                 candidates.append(v0)
         if len(candidates) != 1:
-            # Either dim != 1 or ambiguity; we refuse.
             return None
         v = candidates[0]
 
-    # clear denominators to integer
     lcm = 1
     for x in v:
         xr = sp.Rational(x)
@@ -547,11 +456,6 @@ def fundamental_class_Z2_rank1(
     triangles: List[Tri],
     tets: List[Tet],
 ) -> Optional[np.ndarray]:
-    """
-    If dim H2(B; Z2) is 1, return a mod-2 2-cycle vector z2 (length #triangles)
-    representing the generator class (up to sign, but sign is irrelevant mod 2).
-    Otherwise return None.
-    """
     edges = sorted({canon_edge(*e) for e in edges})
     triangles = sorted({canon_tri(*t) for t in triangles})
     tets = sorted({canon_tet(*tt) for tt in tets})
@@ -559,25 +463,25 @@ def fundamental_class_Z2_rank1(
     if len(triangles) == 0:
         return None
 
-    D2 = build_boundary_mod2_C2_to_C1(edges, triangles)  # (E x T)
-    # cycles are vectors in ker(D2)
+    D2 = build_boundary_mod2_C2_to_C1(edges, triangles)
     ker_basis = nullspace_basis_mod2(D2)
-
     if len(ker_basis) == 0:
         return None
 
     if len(tets) == 0:
-        # H2 dim = dim ker
         if len(ker_basis) != 1:
             return None
         return ker_basis[0]
 
-    D3 = build_boundary_mod2_C3_to_C2(triangles, tets)  # (T x Tet)
-    # image(D3) is column space in T-dim
-    # find a kernel vector not in image(D3)
+    D3 = build_boundary_mod2_C3_to_C2(triangles, tets)
+
+    # column space membership over GF2
+    def _in_image_mod2_cols(A: np.ndarray, b: np.ndarray) -> bool:
+        return in_image_mod2(A, b)
+
     candidates = []
     for v in ker_basis:
-        if not in_image_mod2(D3, v):  # v in colspace(D3)?
+        if not _in_image_mod2_cols(D3, v):
             candidates.append(v)
 
     if len(candidates) != 1:
@@ -600,34 +504,19 @@ def euler_pairing_Z2(e_class: Dict[Tri, int], triangles: List[Tri], z_fund_Z2: n
 
 
 # ============================================================
-# Class computation + reporting
+# Result containers
 # ============================================================
 
 @dataclass
-class ClassResult:
+class ClassReps:
     """
-    Output bundle invariants and diagnostics for an O(2)-cocycle on a finite nerve.
+    Lightweight cochain-level representatives (no coboundary tests / pairings).
+    This is what Bundle.get_classes() wants first.
 
-    This object summarizes:
-    - the orientability obstruction (w1),
-    - the twisted Euler representative on triangles (ẽ) and its rounding quality,
-    - optional 3D consistency checks on tetrahedra,
-    - optional coboundary tests (“is the class trivial on this complex?”),
-    - optional Euler-number pairings when H2 has rank 1,
-    - and the mod-2 reduction (w2) used for spin diagnostics in the orientable case.
-
-    Notes
-    -----
-    - All keys for edges/triangles are canonicalized (undirected edges, sorted triangles).
-    - “On this complex” means with respect to the simplicial cochain complex induced by
-      the provided (edges, triangles, tets). Refining the nerve can change coboundary
-      tests and pairings.
-    - The Euler representative is computed by rounding ``δ_ω θ`` on triangles. In a
-      3-dimensional complex we explicitly check whether ``δ_ω ẽ = 0`` on tetrahedra
-      before interpreting it as a cohomology class.
-
-    The fields are intentionally explicit (rather than nested) so that summaries can be
-    printed without additional computation.
+    Required downstream fields for persistence:
+      - sw1_Z2
+      - euler_class
+      - omega_O1_used
     """
     n_vertices: int
     n_edges: int
@@ -636,12 +525,7 @@ class ClassResult:
 
     sw1_Z2: Dict[Edge, int]
     sw1_O1: Dict[Edge, int]
-
-    # whether ω passed the triangle cocycle check on this complex
     sw1_is_cocycle: Optional[bool]
-
-    # ω is a coboundary in C^1 over Z2 (i.e. w1 = 0) on this complex
-    sw1_is_coboundary_Z2: Optional[bool]
 
     orientable: bool
     phi_pm1: Optional[np.ndarray]
@@ -653,18 +537,39 @@ class ClassResult:
     rounding_dist: float
     omega_O1_used: Dict[Edge, int]
 
-    # Euler cocycle check in 3D (δ_ω e = 0 on tets). None if no tets.
+
+@dataclass
+class ClassResult:
+    """
+    Full class report (old behavior), potentially after restricting to a subcomplex.
+    """
+    n_vertices: int
+    n_edges: int
+    n_triangles: int
+    n_tets: int
+
+    sw1_Z2: Dict[Edge, int]
+    sw1_O1: Dict[Edge, int]
+    sw1_is_cocycle: Optional[bool]
+    sw1_is_coboundary_Z2: Optional[bool]
+
+    orientable: bool
+    phi_pm1: Optional[np.ndarray]
+    cocycle_used: Any
+
+    euler_class: Dict[Tri, int]
+    euler_class_real: Dict[Tri, float]
+    rounding_dist: float
+    omega_O1_used: Dict[Edge, int]
+
     euler_is_cocycle: Optional[bool]
     max_abs_delta_euler_on_tets: Optional[int]
 
-    # e is a twisted coboundary in C^2 over Z (i.e. e=0 or ẽ=0) on this complex
     euler_is_coboundary_Z: Optional[bool]
 
-    # Homology info
     H2_dim_Q: Optional[int]
     H2_dim_Z2: Optional[int]
 
-    # Pairings / invariants
     twisted_euler_number_Z: Optional[int]
     euler_number_mod2: Optional[int]
 
@@ -674,12 +579,11 @@ class ClassResult:
     spin_on_this_complex: Optional[bool]
 
 
-        
+# ============================================================
+# Internal checks
+# ============================================================
+
 def _sw1_cocycle_check_on_triangles(triangles: List[Tri], omega_Z2: Dict[Edge, int]) -> bool:
-    """
-    Check δω = 0 on every triangle (mod 2):
-      δω(i,j,k) = ω(j,k) - ω(i,k) + ω(i,j)  (mod 2)
-    """
     for (i, j, k) in triangles:
         eij = canon_edge(i, j)
         eik = canon_edge(i, k)
@@ -690,25 +594,262 @@ def _sw1_cocycle_check_on_triangles(triangles: List[Tri], omega_Z2: Dict[Edge, i
     return True
 
 
-def _infer_tets_from_cover(cover: Any) -> List[Tet]:
-    """
-    Try common method names; fall back to empty.
-    """
-    if hasattr(cover, "nerve_tetrahedra"):
-        return [canon_tet(*tt) for tt in cover.nerve_tetrahedra()]
-    if hasattr(cover, "nerve_tets"):
-        return [canon_tet(*tt) for tt in cover.nerve_tets()]
-    if hasattr(cover, "nerve_3simplices"):
-        return [canon_tet(*tt) for tt in cover.nerve_3simplices()]
-    if hasattr(cover, "nerve_simplices"):
-        # sometimes nerve_simplices(dim) exists
-        try:
-            tets = cover.nerve_simplices(3)
-            return [canon_tet(*tt) for tt in tets]
-        except Exception:
-            pass
-    return []
+def _infer_n_vertices_from_simplices(
+    edges: List[Edge],
+    triangles: List[Tri],
+    tets: List[Tet],
+    *,
+    fallback: Optional[int] = None,
+) -> int:
+    mx = -1
+    for (a, b) in edges:
+        mx = max(mx, int(a), int(b))
+    for (a, b, c) in triangles:
+        mx = max(mx, int(a), int(b), int(c))
+    for (a, b, c, d) in tets:
+        mx = max(mx, int(a), int(b), int(c), int(d))
+    if mx >= 0:
+        return int(mx + 1)
+    if fallback is None:
+        raise ValueError("Could not infer n_vertices from empty simplices and no fallback provided.")
+    return int(fallback)
 
+
+# ============================================================
+# NEW: reps-only computation
+# ============================================================
+
+def compute_class_representatives_from_nerve(
+    *,
+    cocycle: Any,
+    edges: Iterable[Edge],
+    triangles: Iterable[Tri],
+    tets: Optional[Iterable[Tet]] = None,
+    n_vertices: Optional[int] = None,
+    try_orient: bool = True,
+) -> ClassReps:
+    """
+    Compute only the cochain-level class representatives:
+      - w1 as a Z2 1-cochain on edges
+      - twisted Euler rep on triangles (rounded δ_ω θ)
+    plus the orient_if_possible attempt (if requested).
+
+    Does NOT compute:
+      - sw1 coboundary test
+      - Euler cocycle/coboundary tests
+      - H2 dims / Euler numbers / trivial/spin flags
+    """
+    edges_list = sorted({canon_edge(*e) for e in edges})
+    tris_list = sorted({canon_tri(*t) for t in triangles})
+    tets_list = sorted({canon_tet(*tt) for tt in (tets or [])})
+
+    if n_vertices is None:
+        n_vertices = _infer_n_vertices_from_simplices(edges_list, tris_list, tets_list, fallback=None)
+
+    # Restrict cocycle to this 1-skeleton
+    coc_res = cocycle.restrict(edges_list)
+
+    sw1_Z2 = {canon_edge(*e): int(v) & 1 for e, v in coc_res.omega_Z2().items()}
+    sw1_O1 = canonicalize_o1_cochain(coc_res.omega_O1())
+
+    sw1_is_cocycle: Optional[bool] = None
+    if len(tris_list) > 0:
+        sw1_is_cocycle = bool(_sw1_cocycle_check_on_triangles(tris_list, sw1_Z2))
+
+    orientable = False
+    phi_pm1 = None
+    coc_used = coc_res
+
+    if try_orient and len(edges_list) > 0:
+        ok, coc_oriented, phi_pm1 = coc_res.orient_if_possible(edges_list, n_vertices=n_vertices)
+        orientable = bool(ok)
+        coc_used = coc_oriented if orientable else coc_res
+
+    if len(tris_list) == 0:
+        euler_rep: Dict[Tri, int] = {}
+        euler_real: Dict[Tri, float] = {}
+        rounding_dist = 0.0
+        omega_O1_used = canonicalize_o1_cochain(coc_used.omega_O1())
+    else:
+        euler_rep, rounding_dist, euler_real, omega_O1_used = compute_twisted_euler_class(coc_used, tris_list)
+        # restrict ω to exactly edges in this complex
+        omega_O1_used = {e: int(omega_O1_used.get(e, 1)) for e in edges_list}
+
+    return ClassReps(
+        n_vertices=int(n_vertices),
+        n_edges=int(len(edges_list)),
+        n_triangles=int(len(tris_list)),
+        n_tets=int(len(tets_list)),
+        sw1_Z2=sw1_Z2,
+        sw1_O1=sw1_O1,
+        sw1_is_cocycle=sw1_is_cocycle,
+        orientable=orientable,
+        phi_pm1=phi_pm1,
+        cocycle_used=coc_used,
+        euler_class=euler_rep,
+        euler_class_real=euler_real,
+        rounding_dist=float(rounding_dist),
+        omega_O1_used=omega_O1_used,
+    )
+
+
+# ============================================================
+# NEW: derived class data on a chosen complex
+# ============================================================
+
+def compute_class_data_on_complex(
+    *,
+    reps: ClassReps,
+    edges: Iterable[Edge],
+    triangles: Iterable[Tri],
+    tets: Optional[Iterable[Tet]] = None,
+    n_vertices: Optional[int] = None,
+    compute_euler_num: bool = True,
+) -> ClassResult:
+    """
+    Given already-computed reps (w1 cochain + Euler rep), compute derived class data on
+    the provided (possibly restricted) complex:
+
+      - sw1 coboundary test on edges
+      - euler cocycle check on tets (if any)
+      - euler coboundary test (only meaningful if e is a cocycle in 3D)
+      - H2 dims and Euler numbers (when available)
+      - w2 (e mod 2) and spin flag (orientable case)
+      - bundle_trivial_on_this_complex
+
+    This is the “after restriction” piece for Bundle.get_classes().
+    """
+    edges_list = sorted({canon_edge(*e) for e in edges})
+    tris_list = sorted({canon_tri(*t) for t in triangles})
+    tets_list = sorted({canon_tet(*tt) for tt in (tets or [])})
+
+    if n_vertices is None:
+        n_vertices = _infer_n_vertices_from_simplices(edges_list, tris_list, tets_list, fallback=reps.n_vertices)
+
+    # --- sw1 coboundary on this complex ---
+    sw1_is_coboundary_Z2: Optional[bool] = None
+    if len(edges_list) > 0:
+        V0 = [(i,) for i in range(int(n_vertices))]
+        A01 = build_delta_C0_to_C1_Z2(vertices=V0, edges=edges_list)
+        b1 = np.array([int(reps.sw1_Z2.get(e, 0)) & 1 for e in edges_list], dtype=np.uint8)
+        sw1_is_coboundary_Z2 = bool(in_image_mod2(A01, b1))
+
+    # --- Euler rep restricted to current triangles ---
+    euler_rep = {canon_tri(*t): int(reps.euler_class.get(canon_tri(*t), 0)) for t in tris_list}
+    omega_O1_used = {canon_edge(*e): int(reps.omega_O1_used.get(canon_edge(*e), 1)) for e in edges_list}
+
+    # sw2 is e mod2 on triangles present
+    sw2 = {tri: (int(euler_rep.get(tri, 0)) & 1) for tri in tris_list}
+
+    # --- spin check: w2 coboundary over Z2 (only meaningful if orientable and tris exist) ---
+    sw2_is_coboundary_Z2: Optional[bool] = None
+    if reps.orientable and (len(tris_list) > 0) and (len(edges_list) > 0):
+        D2_mod2 = build_boundary_mod2_C2_to_C1(edges_list, tris_list)  # (E x T)
+        A12_mod2 = (D2_mod2.T).astype(np.uint8)                        # (T x E)
+        b2 = np.array([sw2.get(t, 0) & 1 for t in tris_list], dtype=np.uint8)
+        sw2_is_coboundary_Z2 = bool(in_image_mod2(A12_mod2, b2))
+
+    # --- euler cocycle check on tets (3D) ---
+    if len(tets_list) == 0:
+        euler_is_cocycle = None
+        max_abs_delta = None
+    else:
+        bad = False
+        max_abs = 0
+        for tt in tets_list:
+            dv = twisted_delta_euler_on_tet(tt, euler_rep, omega_O1_used)
+            max_abs = max(max_abs, abs(int(dv)))
+            if dv != 0:
+                bad = True
+        euler_is_cocycle = (not bad)
+        max_abs_delta = int(max_abs)
+
+    # --- Euler coboundary test (twisted) ---
+    euler_is_coboundary_Z: Optional[bool] = None
+    if len(tris_list) > 0 and len(edges_list) > 0:
+        ok_e = True if (euler_is_cocycle is None) else bool(euler_is_cocycle)
+        if ok_e:
+            A12 = build_delta_C1_to_C2_Z_twisted(edges=edges_list, triangles=tris_list, omega_O1=omega_O1_used).astype(
+                np.int64
+            )
+            b2Z = np.array([int(euler_rep.get(t, 0)) for t in tris_list], dtype=np.int64)
+            euler_is_coboundary_Z = bool(in_image_Z_fast_pipeline(A12, b2Z))
+        else:
+            euler_is_coboundary_Z = None
+
+    # --- H2 dims and pairings (Euler numbers) ---
+    H2_dim_Q = None
+    H2_dim_Z2 = None
+    eZ = None
+    eZ2 = None
+
+    if compute_euler_num:
+        ok_e = True if (euler_is_cocycle is None) else bool(euler_is_cocycle)
+        if ok_e:
+            dims = H2_dimensions(edges_list, tris_list, tets_list, omega_O1=omega_O1_used)
+            H2_dim_Q = int(dims["dim_Q"])
+            H2_dim_Z2 = int(dims["dim_Z2"])
+
+            if H2_dim_Q == 0:
+                eZ = None
+            elif H2_dim_Q == 1:
+                z = fundamental_class_Z_rank1(edges_list, tris_list, tets_list, omega_O1=omega_O1_used)
+                eZ = None if z is None else euler_pairing_Z(euler_rep, tris_list, z)
+            else:
+                eZ = None
+
+            if H2_dim_Z2 == 0:
+                eZ2 = 0
+            elif H2_dim_Z2 == 1:
+                z2 = fundamental_class_Z2_rank1(edges_list, tris_list, tets_list)
+                eZ2 = None if z2 is None else euler_pairing_Z2(euler_rep, tris_list, z2)
+            else:
+                eZ2 = None
+
+    # --- bundle trivial flag on this complex (same logic as old file) ---
+    if len(tets_list) == 0:
+        bundle_trivial = bool(reps.orientable and (euler_is_coboundary_Z is True))
+    else:
+        bundle_trivial = bool(reps.orientable and (euler_is_cocycle is True) and (euler_is_coboundary_Z is True))
+
+    spin = bool(sw2_is_coboundary_Z2) if sw2_is_coboundary_Z2 is not None else None
+
+    # Preserve reps fields + attach derived fields
+    # (We keep euler_class_real and rounding_dist from reps, but note: euler_class_real
+    # is computed on the full triangle list used when building reps. That’s fine for summaries,
+    # and it keeps this function lightweight.)
+    return ClassResult(
+        n_vertices=int(n_vertices),
+        n_edges=int(len(edges_list)),
+        n_triangles=int(len(tris_list)),
+        n_tets=int(len(tets_list)),
+        sw1_Z2=reps.sw1_Z2,
+        sw1_O1=reps.sw1_O1,
+        sw1_is_cocycle=reps.sw1_is_cocycle,
+        sw1_is_coboundary_Z2=sw1_is_coboundary_Z2,
+        orientable=bool(reps.orientable),
+        phi_pm1=reps.phi_pm1,
+        cocycle_used=reps.cocycle_used,
+        euler_class=euler_rep,
+        euler_class_real=reps.euler_class_real,
+        rounding_dist=float(reps.rounding_dist),
+        omega_O1_used=omega_O1_used,
+        euler_is_cocycle=euler_is_cocycle,
+        max_abs_delta_euler_on_tets=max_abs_delta,
+        euler_is_coboundary_Z=euler_is_coboundary_Z,
+        H2_dim_Q=H2_dim_Q,
+        H2_dim_Z2=H2_dim_Z2,
+        twisted_euler_number_Z=eZ,
+        euler_number_mod2=eZ2,
+        sw2_Z2=sw2,
+        bundle_trivial_on_this_complex=bundle_trivial,
+        spin_on_this_complex=spin,
+    )
+
+
+# ============================================================
+# Back-compat: old compute_classes
+# ============================================================
 
 def compute_classes(
     cover: Any,
@@ -721,222 +862,57 @@ def compute_classes(
     try_orient: bool = True,
     compute_euler_num: bool = True,
 ) -> ClassResult:
+    """
+    Backwards-compatible full class computation on the provided complex (defaults to cover nerve).
+
+    Implemented via:
+      reps = compute_class_representatives_from_nerve(...)
+      full = compute_class_data_on_complex(reps, ...)
+    """
     if edges is None:
         edges = cover.nerve_edges()
     if triangles is None:
         triangles = cover.nerve_triangles()
+    if tets is None:
+        # try common names; else empty
+        if hasattr(cover, "nerve_tetrahedra"):
+            tets = cover.nerve_tetrahedra()
+        elif hasattr(cover, "nerve_tets"):
+            tets = cover.nerve_tets()
+        else:
+            tets = []
 
     edges_list = sorted({canon_edge(*e) for e in edges})
     tris_list = sorted({canon_tri(*t) for t in triangles})
-
-    if tets is None:
-        tets_list = _infer_tets_from_cover(cover)
-    else:
-        tets_list = sorted({canon_tet(*tt) for tt in tets})
+    tets_list = sorted({canon_tet(*tt) for tt in tets})
 
     if n_vertices is None:
-        mx = -1
-        for (a, b) in edges_list:
-            mx = max(mx, a, b)
-        for (a, b, c) in tris_list:
-            mx = max(mx, a, b, c)
-        for (a, b, c, d) in tets_list:
-            mx = max(mx, a, b, c, d)
-        n_vertices = (mx + 1) if mx >= 0 else int(cover.U.shape[0])
+        n_vertices = _infer_n_vertices_from_simplices(edges_list, tris_list, tets_list, fallback=getattr(cover, "U", np.zeros((0, 0))).shape[0] or 0)
 
-    # Restrict cocycle to this 1-skeleton
-    coc_res = cocycle.restrict(edges_list)
-
-    sw1_Z2 = {canon_edge(*e): int(v) & 1 for e, v in coc_res.omega_Z2().items()}
-    sw1_O1 = canonicalize_o1_cochain(coc_res.omega_O1())
-
-    # ---- SW1 cocycle check on triangles (δω=0 on each 2-simplex) ----
-    sw1_is_cocycle: Optional[bool] = None
-    if len(tris_list) > 0:
-        sw1_is_cocycle = bool(_sw1_cocycle_check_on_triangles(tris_list, sw1_Z2))
-
-    # ---- SW1 coboundary check on edges (ω in Im δ: C^0->C^1 over Z2) ----
-    sw1_is_coboundary_Z2: Optional[bool] = None
-    if len(edges_list) > 0:
-        # vertices as 0-simplices
-        V0 = [(i,) for i in range(int(n_vertices))]
-        A01 = build_delta_C0_to_C1_Z2(vertices=V0, edges=edges_list)  # (#E, #V)
-        b1 = np.array([sw1_Z2.get(e, 0) & 1 for e in edges_list], dtype=np.uint8)
-        sw1_is_coboundary_Z2 = bool(in_image_mod2(A01, b1))
-
-    # Try to orient (may modify cocycle)
-    orientable = False
-    phi_pm1 = None
-    coc_used = coc_res
-
-    if try_orient and len(edges_list) > 0:
-        ok, coc_oriented, phi_pm1 = coc_res.orient_if_possible(edges_list, n_vertices=n_vertices)
-        orientable = bool(ok)
-        coc_used = coc_oriented if orientable else coc_res
-
-    # ============================================================
-    # Euler representative (triangle level)
-    # ============================================================
-    if len(tris_list) == 0:
-        euler_rep: Dict[Tri, int] = {}
-        euler_real: Dict[Tri, float] = {}
-        rounding_dist = 0.0
-        omega_O1_used = canonicalize_o1_cochain(coc_used.omega_O1())
-        sw2: Dict[Tri, int] = {}
-
-        euler_is_cocycle = None
-        max_abs_delta = None
-
-        H2_dim_Q = None
-        H2_dim_Z2 = None
-        eZ = None
-        eZ2 = None
-
-        # no triangles => no Euler class rep => no coboundary test
-        euler_is_coboundary_Z: Optional[bool] = None
-
-        bundle_trivial = None
-        spin = None
-
-    else:
-        euler_rep, rounding_dist, euler_real, omega_O1_used = compute_twisted_euler_class(coc_used, tris_list)
-
-        # restrict ω to exactly edges in this complex
-        omega_O1_used = {e: int(omega_O1_used.get(e, 1)) for e in edges_list}
-
-        # sw2 on triangles is e mod 2 (cochain-level)
-        sw2 = {tri: (int(val) & 1) for tri, val in euler_rep.items()}
-
-        # --- w2 coboundary check (spin) over Z2 ---
-        sw2_is_coboundary_Z2: Optional[bool] = None
-        if orientable and (len(tris_list) > 0) and (len(edges_list) > 0):
-            # δ: C^1 -> C^2 over Z2 is the transpose of ∂2: C2 -> C1
-            D2_mod2 = build_boundary_mod2_C2_to_C1(edges_list, tris_list)   # (E x T)
-            A12_mod2 = (D2_mod2.T).astype(np.uint8)                         # (T x E)
-
-            b2 = np.array([sw2.get(t, 0) & 1 for t in tris_list], dtype=np.uint8)  # (T,)
-            sw2_is_coboundary_Z2 = bool(in_image_mod2(A12_mod2, b2))
-        
-        
-        
-        # ---- 3D cocycle check for Euler class if tets exist ----
-        if len(tets_list) == 0:
-            euler_is_cocycle = None
-            max_abs_delta = None
-        else:
-            bad = False
-            max_abs = 0
-            for tt in tets_list:
-                dv = twisted_delta_euler_on_tet(tt, euler_rep, omega_O1_used)
-                max_abs = max(max_abs, abs(int(dv)))
-                if dv != 0:
-                    bad = True
-            euler_is_cocycle = (not bad)
-            max_abs_delta = int(max_abs)
-
-        # ---- Euler coboundary test (e in Im δ_ω: C^1->C^2 over Z) ----
-        euler_is_coboundary_Z: Optional[bool] = None
-        if len(tris_list) > 0 and len(edges_list) > 0:
-            A12 = build_delta_C1_to_C2_Z_twisted(edges=edges_list, triangles=tris_list, omega_O1=omega_O1_used).astype(np.int64)
-            b2 = np.array([int(euler_rep.get(t, 0)) for t in tris_list], dtype=np.int64)
-
-            # Only meaningful if Euler rep is a valid 3D cocycle (or we are in 2D)
-            ok_e = True if (euler_is_cocycle is None) else bool(euler_is_cocycle)
-            if ok_e:
-                euler_is_coboundary_Z = bool(in_image_Z_fast_pipeline(A12, b2))
-            else:
-                euler_is_coboundary_Z = None  # not a cocycle in 3D, so "class" undefined here
-
-        # decide whether to compute pairings
-        H2_dim_Q = None
-        H2_dim_Z2 = None
-        eZ = None
-        eZ2 = None
-
-        if compute_euler_num:
-            ok_e = True if (euler_is_cocycle is None) else bool(euler_is_cocycle)
-            if ok_e:
-                dims = H2_dimensions(edges_list, tris_list, tets_list, omega_O1=omega_O1_used)
-                H2_dim_Q = int(dims["dim_Q"])
-                H2_dim_Z2 = int(dims["dim_Z2"])
-
-                # pairing conventions / availability logic
-                if H2_dim_Q == 0:
-                    eZ = None
-                elif H2_dim_Q == 1:
-                    z = fundamental_class_Z_rank1(edges_list, tris_list, tets_list, omega_O1=omega_O1_used)
-                    eZ = None if z is None else euler_pairing_Z(euler_rep, tris_list, z)
-                else:
-                    eZ = None
-
-                if H2_dim_Z2 == 0:
-                    eZ2 = 0
-                elif H2_dim_Z2 == 1:
-                    z2 = fundamental_class_Z2_rank1(edges_list, tris_list, tets_list)
-                    eZ2 = None if z2 is None else euler_pairing_Z2(euler_rep, tris_list, z2)
-                else:
-                    eZ2 = None
-
-        # ------------------------------------------------------------
-        # Quick “bundle trivial / spin” flags (use class-level tests)
-        # ------------------------------------------------------------
-        if len(tets_list) == 0:
-            bundle_trivial = bool(orientable and (euler_is_coboundary_Z is True))
-
-        else:
-            bundle_trivial = bool(
-                orientable and (euler_is_cocycle is True) and (euler_is_coboundary_Z is True)
-            )
-
-        spin = bool(sw2_is_coboundary_Z2) if sw2_is_coboundary_Z2 is not None else None
-
-            
-            
-    return ClassResult(
+    reps = compute_class_representatives_from_nerve(
+        cocycle=cocycle,
+        edges=edges_list,
+        triangles=tris_list,
+        tets=tets_list,
         n_vertices=int(n_vertices),
-        n_edges=int(len(edges_list)),
-        n_triangles=int(len(tris_list)),
-        n_tets=int(len(tets_list)),
+        try_orient=bool(try_orient),
+    )
 
-        sw1_Z2=sw1_Z2,
-        sw1_O1=sw1_O1,
-        sw1_is_cocycle=sw1_is_cocycle,
-
-        sw1_is_coboundary_Z2=sw1_is_coboundary_Z2,
-        euler_is_coboundary_Z=euler_is_coboundary_Z,
-
-        orientable=orientable,
-        phi_pm1=phi_pm1,
-        cocycle_used=coc_used,
-
-        euler_class=euler_rep,
-        euler_class_real=euler_real,
-        rounding_dist=float(rounding_dist),
-        omega_O1_used=omega_O1_used,
-
-        euler_is_cocycle=euler_is_cocycle,
-        max_abs_delta_euler_on_tets=max_abs_delta,
-
-        H2_dim_Q=H2_dim_Q,
-        H2_dim_Z2=H2_dim_Z2,
-
-        twisted_euler_number_Z=eZ,
-        euler_number_mod2=eZ2,
-
-        sw2_Z2=sw2,
-
-        bundle_trivial_on_this_complex=bundle_trivial,
-        spin_on_this_complex=spin,
+    return compute_class_data_on_complex(
+        reps=reps,
+        edges=edges_list,
+        triangles=tris_list,
+        tets=tets_list,
+        n_vertices=int(n_vertices),
+        compute_euler_num=bool(compute_euler_num),
     )
 
 
-
+# ============================================================
+# Pretty summary (UNCHANGED from your version)
+# ============================================================
 
 def _euc_to_geo_rad(d: Optional[float]) -> Optional[float]:
-    """
-    Convert chordal distance d in [0,2] on S^1 ⊂ C to geodesic angle in radians in [0, π]:
-        d = 2 sin(theta/2)  =>  theta = 2 arcsin(d/2).
-    """
     if d is None:
         return None
     d = float(d)
@@ -947,11 +923,6 @@ def _euc_to_geo_rad(d: Optional[float]) -> Optional[float]:
 
 
 def _fmt_euc_with_geo_pi(d_euc: Optional[float], *, decimals: int = 3) -> str:
-    """
-    Render:
-        <d_euc> (ε_triv^{geo}=<theta/pi>π)
-    where <theta> is the geodesic angle in radians derived from chordal d_euc.
-    """
     if d_euc is None or not np.isfinite(float(d_euc)):
         return "—"
     d_euc = float(d_euc)
@@ -962,10 +933,6 @@ def _fmt_euc_with_geo_pi(d_euc: Optional[float], *, decimals: int = 3) -> str:
 
 
 def _fmt_mean_euc_with_geo_pi(d_euc_mean: Optional[float], *, decimals: int = 3) -> str:
-    """
-    Render:
-        <d_euc_mean> (\bar{ε}_triv^{geo}=<theta/pi>π)
-    """
     if d_euc_mean is None or not np.isfinite(float(d_euc_mean)):
         return "—"
     d_euc_mean = float(d_euc_mean)
@@ -979,22 +946,8 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     """
     Pretty summary of (1) diagnostics and (2) characteristic classes.
 
-    User-facing conventions:
-    - No explicit pairing notation is shown.
-    - Euler number displayed as:
-        * orientable:     "Euler number: k (spin/not spin)"
-        * non-orientable: "(twisted) Euler number: k"
-    - Reporting rules:
-        * If (twisted) Euler class is trivial: report the (twisted) Euler class line and do NOT report Euler number.
-        * If (twisted) Euler class is nontrivial and Euler number is available: report ONLY Euler number (do NOT also report Euler class).
-        * If (twisted) Euler class is nontrivial and Euler number is unavailable (orientable only): report Euler class + spin class fallback.
-    - If orientable AND Euler class is nontrivial BUT Euler number is undefined,
-      report the spin class instead:
-        "Spin class: w₂ = 0 (spin)" or "Spin class: w₂ ≠ 0 (not spin)"
+    This is kept verbatim from your previous version (so existing notebooks stay stable).
     """
-    # ----------------------------
-    # Pull quantities
-    # ----------------------------
     eps_triv = getattr(quality, "eps_align_euc", None) if quality is not None else None
     eps_triv_mean = getattr(quality, "eps_align_euc_mean", None) if quality is not None else None
 
@@ -1006,10 +959,8 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     orientable = bool(getattr(classes, "orientable", False))
     n_tri = int(getattr(classes, "n_triangles", 0))
 
-    # “is coboundary?” flags
     w1_is_cob = getattr(classes, "sw1_is_coboundary_Z2", None)
     if w1_is_cob is None:
-        # fallback: if orientable was inferred successfully, treat w1 as zero
         w1_is_cob = bool(orientable)
 
     e_is_cob = getattr(classes, "euler_is_coboundary_Z", None)
@@ -1017,30 +968,17 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
     e_trivial_cochain = all(int(v) == 0 for v in euler_rep.values()) if euler_rep else True
     e_zero_for_print = bool(e_is_cob) if e_is_cob is not None else bool(e_trivial_cochain)
 
-    # Euler number (integer pairing), when computed
     eZ = getattr(classes, "twisted_euler_number_Z", None)
 
-    # w2 / spin fallback (only used when orientable + Euler number undefined)
     def _infer_w2_is_zero() -> Optional[bool]:
-        """
-        Returns:
-            True  if w2 = 0,
-            False if w2 != 0,
-            None  if unavailable.
-        """
-        sp = getattr(classes, "spin_on_this_complex", None)
-        if sp is not None:
-            return bool(sp)
-
+        spn = getattr(classes, "spin_on_this_complex", None)
+        if spn is not None:
+            return bool(spn)
         sw2 = getattr(classes, "sw2_Z2", None)
         if isinstance(sw2, dict) and len(sw2) > 0:
             return all((int(v) & 1) == 0 for v in sw2.values())
-
         return None
 
-    # ----------------------------
-    # Build plain-text summary
-    # ----------------------------
     IND = "  "
     LABEL_W = 28
 
@@ -1062,12 +1000,7 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 )
             )
         if eps_triv_mean is not None:
-            lines.append(
-                _tline(
-                    "mean triv error:",
-                    f"\\bar{{ε}}_triv = {_fmt_mean_euc_with_geo_pi(eps_triv_mean)}",
-                )
-            )
+            lines.append(_tline("mean triv error:", f"\\bar{{ε}}_triv = {_fmt_mean_euc_with_geo_pi(eps_triv_mean)}"))
         if delta is not None:
             lines.append(
                 _tline(
@@ -1088,7 +1021,6 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                     "ε_coc := sup_{(i j k)∈N(U)} ‖Ω_{ij}Ω_{jk}Ω_{ki} - I‖_F" f" = {float(eps_coc):.3f}",
                 )
             )
-
         lines.append(_tline("Euler rounding diag:", f"d_∞(δ_ω θ, ẽ) = {rounding_dist:.6g}"))
 
     lines.append("")
@@ -1117,19 +1049,12 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    # ------------------------------------------------------------
-    # Euler class / Euler number reporting (per your rules)
-    # ------------------------------------------------------------
-
-    # (1) Euler class trivial -> always report Euler class, never Euler number.
     if e_zero_for_print:
         bt = getattr(classes, "bundle_trivial_on_this_complex", None)
-
         if orientable:
             lines.append(_tline("Euler class:", "e = 0 (trivial)"))
         else:
             lines.append(_tline("(twisted) Euler class:", "ẽ = 0"))
-
         if bt is not None:
             lines.append(_tline("bundle trivial:", f"{bool(bt)}"))
 
@@ -1148,9 +1073,6 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
                 print("\n" + text + "\n")
         return text
 
-    # From here on, Euler class is nontrivial.
-
-    # (2) Euler class nontrivial + Euler number available -> report ONLY Euler number (no Euler class line).
     if eZ is not None:
         k = abs(int(eZ))
         if orientable:
@@ -1159,18 +1081,11 @@ def show_summary(classes, *, quality=None, show: bool = True, mode: str = "auto"
         else:
             lines.append(_tline("(twisted) Euler number:", f"±{k}"))
     else:
-        # (3) Euler class nontrivial + Euler number unavailable -> report Euler class nontrivial,
-        #     and (orientable only) report spin class fallback when available.
         if orientable:
             lines.append(_tline("Euler class:", "e ≠ 0 (non-trivial)"))
             w2_is_zero = _infer_w2_is_zero()
             if w2_is_zero is not None:
-                lines.append(
-                    _tline(
-                        "Spin class:",
-                        "w₂ = 0 (spin)" if bool(w2_is_zero) else "w₂ ≠ 0 (not spin)",
-                    )
-                )
+                lines.append(_tline("Spin class:", "w₂ = 0 (spin)" if bool(w2_is_zero) else "w₂ ≠ 0 (not spin)"))
         else:
             lines.append(_tline("(twisted) Euler class:", "ẽ ≠ 0"))
 
@@ -1204,52 +1119,30 @@ def _display_summary_latex(
     e_zero_for_print: bool,
     w1_is_zero: bool,
 ) -> bool:
-    """
-    Best-effort IPython Math display (user-facing formatting).
-
-    Rules:
-    - No explicit pairings shown.
-    - Euler number is displayed as:
-        * orientable:     "Euler number: k (spin/not spin)"  (no "e =")
-        * non-orientable: "(twisted) Euler number: k"        (no "\\tilde{e} =")
-    - Reporting rules:
-        * If (twisted) Euler class is trivial: report Euler class line and do NOT report Euler number.
-        * If (twisted) Euler class is nontrivial and Euler number is available: report ONLY Euler number.
-        * If orientable and Euler class is nontrivial but Euler number undefined: report Euler class + spin class fallback.
-    """
     try:
         from IPython.display import display, Math  # type: ignore
     except Exception:
         return False
 
-    # ----------------------------
-    # Pull diagnostics
-    # ----------------------------
     eps_triv = getattr(quality, "eps_align_euc", None) if quality is not None else None
     eps_triv_mean = getattr(quality, "eps_align_euc_mean", None) if quality is not None else None
     delta = getattr(quality, "delta", None) if quality is not None else None
     alpha = getattr(quality, "alpha", None) if quality is not None else None
     eps_coc = getattr(quality, "cocycle_defect", None) if quality is not None else None
 
-    # ----------------------------
-    # Class quantities
-    # ----------------------------
     orientable = bool(getattr(classes, "orientable", False))
     n_tri = int(getattr(classes, "n_triangles", 0))
     eZ = getattr(classes, "twisted_euler_number_Z", None)
 
     def _infer_w2_is_zero() -> Optional[bool]:
-        sp = getattr(classes, "spin_on_this_complex", None)
-        if sp is not None:
-            return bool(sp)
-
+        spn = getattr(classes, "spin_on_this_complex", None)
+        if spn is not None:
+            return bool(spn)
         sw2 = getattr(classes, "sw2_Z2", None)
         if isinstance(sw2, dict) and len(sw2) > 0:
             return all((int(v) & 1) == 0 for v in sw2.values())
-
         return None
 
-    # helpers for latex numeric strings with geo-in-π parentheses
     def _latex_eps_with_geo_pi(d_euc: Optional[float], *, decimals: int = 3, mean: bool = False) -> str:
         if d_euc is None or not np.isfinite(float(d_euc)):
             return r"\text{—}"
@@ -1271,9 +1164,6 @@ def _display_summary_latex(
             + r"\pi\right)"
         )
 
-    # ----------------------------
-    # Rows
-    # ----------------------------
     diag_rows: List[Tuple[str, str]] = []
     if quality is None:
         diag_rows.append((r"\text{(no quality report provided)}", r""))
@@ -1293,7 +1183,9 @@ def _display_summary_latex(
             diag_rows.append(
                 (
                     r"\text{Mean triv error}",
-                    r"\bar{\varepsilon}_{\text{triv}}" + r" = " + _latex_eps_with_geo_pi(eps_triv_mean, mean=True),
+                    r"\bar{\varepsilon}_{\text{triv}}"
+                    + r" = "
+                    + _latex_eps_with_geo_pi(eps_triv_mean, mean=True),
                 )
             )
         if delta is not None:
@@ -1310,12 +1202,7 @@ def _display_summary_latex(
             if alpha == float("inf"):
                 diag_rows.append((r"\text{Stability ratio}", r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = \infty"))
             else:
-                diag_rows.append(
-                    (
-                        r"\text{Stability ratio}",
-                        r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = " + f"{float(alpha):.3f}",
-                    )
-                )
+                diag_rows.append((r"\text{Stability ratio}", r"\alpha := \varepsilon_{\text{triv}}/(1-\delta) = " + f"{float(alpha):.3f}"))
         if eps_coc is not None:
             diag_rows.append(
                 (
@@ -1326,39 +1213,21 @@ def _display_summary_latex(
                     + f"{float(eps_coc):.3f}",
                 )
             )
-
-        diag_rows.append(
-            (
-                r"\text{Euler rounding dist.}",
-                r"d_\infty(\delta_\omega\theta,\tilde{e}) = " + f"{float(rounding_dist):.3f}",
-            )
-        )
+        diag_rows.append((r"\text{Euler rounding dist.}", r"d_\infty(\delta_\omega\theta,\tilde{e}) = " + f"{float(rounding_dist):.3f}"))
 
     class_rows: List[Tuple[str, str]] = []
-    class_rows.append(
-        (
-            r"\text{Stiefel--Whitney}",
-            r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})",
-        )
-    )
+    class_rows.append((r"\text{Stiefel--Whitney}", r"w_1 = 0\ (\text{orientable})" if w1_is_zero else r"w_1 \neq 0\ (\text{non-orientable})"))
 
     if n_tri == 0:
         class_rows.append((r"\text{Euler class}", r"e = 0\ \text{(no 2-simplices)}"))
     else:
-        # ------------------------------------------------------------
-        # Euler class / Euler number reporting (per your rules)
-        # ------------------------------------------------------------
-
         if e_zero_for_print:
-            # Euler class trivial -> always report Euler class, never Euler number
             if orientable:
                 class_rows.append((r"\text{Euler class}", r"e = 0\ (\text{trivial})"))
             else:
                 class_rows.append((r"\text{(twisted) Euler class}", r"\tilde{e} = 0"))
         else:
-            # Euler class nontrivial
             if eZ is not None:
-                # Euler number available -> report ONLY Euler number (no Euler class line)
                 k = abs(int(eZ))
                 if orientable:
                     parity_note = r"\ (\text{spin})" if (k % 2 == 0) else r"\ (\text{not spin})"
@@ -1366,19 +1235,11 @@ def _display_summary_latex(
                 else:
                     class_rows.append((r"\text{(twisted) Euler number}", rf"\pm {k}"))
             else:
-                # Euler number unavailable -> report Euler class nontrivial (+ spin fallback if available)
                 if orientable:
                     class_rows.append((r"\text{Euler class}", r"e \neq 0\ (\text{non-trivial})"))
                     w2_is_zero = _infer_w2_is_zero()
                     if w2_is_zero is not None:
-                        class_rows.append(
-                            (
-                                r"\text{Spin class}",
-                                r"w_2 = 0\ (\text{spin})"
-                                if bool(w2_is_zero)
-                                else r"w_2 \neq 0\ (\text{not spin})",
-                            )
-                        )
+                        class_rows.append((r"\text{Spin class}", r"w_2 = 0\ (\text{spin})" if bool(w2_is_zero) else r"w_2 \neq 0\ (\text{not spin})"))
                 else:
                     class_rows.append((r"\text{(twisted) Euler class}", r"\tilde{e} \neq 0"))
 

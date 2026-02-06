@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Literal, Optional, Tuple, List
+from typing import Dict, Iterable, Literal, Optional, Tuple, List, Any
 
 import numpy as np
 
@@ -14,6 +14,23 @@ from .analysis.quality import BundleQualityReport, compute_bundle_quality_from_U
 from .summaries.nerve_summary import summarize_nerve_from_U, NerveSummary
 from .summaries.local_triv_summary import summarize_local_trivs
 
+# NEW: classes + persistence
+from .analysis.class_persistence import (
+    compute_bundle_persistence,
+    _edges_for_subcomplex_from_persistence,
+    build_edge_weights_from_transition_report,
+)
+
+# NEW: class summary (classes-only + rounding diag) + persistence block together
+from .summaries.class_summary import summarize_classes_and_persistence
+
+# NEW: class reps + restricted-class report (refactor of your existing characteristic_class.py)
+from .characteristic_class import (
+    # lightweight reps only (no coboundary tests / pairings)
+    compute_class_representatives_from_nerve,
+    # derived class info on a given complex (coboundaries / euler num logic / trivial/spin flags)
+    compute_class_data_on_complex,
+)
 
 # ----------------------------
 # Return type for get_local_trivs
@@ -26,6 +43,18 @@ class LocalTrivAndCocycle:
     report: TransitionReport
     quality: BundleQualityReport
     nerve: NerveSummary
+
+
+# ----------------------------
+# Return type for get_classes
+# ----------------------------
+
+@dataclass
+class ClassesAndPersistence:
+    reps: Any                 # class representatives object (lightweight)
+    persistence: Any          # PersistenceResult
+    restricted: Any           # derived class report on chosen subcomplex
+    summary_text: str         # plain-text class summary (always returned)
 
 
 # ----------------------------
@@ -42,8 +71,9 @@ class Bundle:
         up to max_simp_dim (requested).
       - We do NOT print O(2)-estimation stats in summaries (per preference).
       - Summaries are:
-          (1) NerveSummary (old cover-summary style, auto-plots when shown)
-          (2) LocalTrivSummary (characteristic-class style diagnostics only)
+          (1) NerveSummary (old cover-summary style, now auto-plots when shown)
+          (2) LocalTrivSummary (characteristic-class style diagnostics)
+      - Classes are computed via get_classes() (after get_local_trivs()).
     """
 
     _REF_ANGLE: float = 0.0
@@ -76,12 +106,19 @@ class Bundle:
             self._tets_from_U(min_points=1) if self.max_simp_dim >= 3 else []
         )
 
-        # caches
+        # caches (trivs)
         self._local_triv: Optional[LocalTrivResult] = None
         self._cocycle: Optional[O2Cocycle] = None
         self._transition_report: Optional[TransitionReport] = None
         self._quality: Optional[BundleQualityReport] = None
+
+        # caches (summaries)
         self._nerve_summary: Optional[NerveSummary] = None
+
+        # caches (classes/persistence)
+        self._class_reps: Optional[Any] = None
+        self._class_persistence: Optional[Any] = None
+        self._class_restricted: Optional[Any] = None
 
     # ----------------------------
     # validation / properties
@@ -195,12 +232,7 @@ class Bundle:
         save_path: Optional[str] = None,
     ) -> NerveSummary:
         """
-        Nerve summary driven by U.
-
-        Notes:
-          - This function computes the nerve summary (cheap, cover-only).
-          - Display is controlled by show/verbose.
-          - NerveSummary.show_summary auto-plots if cardinalities exist, unless plot=False.
+        Always works (no need to compute local trivs first).
         """
         summ = summarize_nerve_from_U(
             self.U,
@@ -208,7 +240,7 @@ class Bundle:
             min_points_simplex=1,
             force_compute_from_U=True,
             compute_cardinalities=True,
-            plot=False,  # let show_summary control display
+            plot=False,  # show_summary handles plotting
             show_tets_plot=show_tets_plot,
             dpi=dpi,
             figsize=figsize,
@@ -242,24 +274,13 @@ class Bundle:
         *,
         show: bool = True,
         mode: str = "auto",
-        compute_missing: bool = False,
     ):
         """
-        Characteristic-class style diagnostics summary (no O(2) estimation block).
-
-        Default behavior is cache-only:
-          - If local triv / quality have not been computed, this prints a small note and returns None.
-          - Set compute_missing=True to compute them via get_local_trivs(show_summary=False).
+        Show local-triv summary only if already computed.
+        Never computes anything.
         """
         if self._local_triv is None or self._quality is None:
-            if compute_missing:
-                self.get_local_trivs(show_summary=False)
-            else:
-                if show:
-                    print("\n(Local trivializations not computed yet — run get_local_trivs() first.)\n")
-                return None
-
-        assert self._local_triv is not None and self._quality is not None
+            return None
 
         summ = summarize_local_trivs(
             self._local_triv,
@@ -271,33 +292,84 @@ class Bundle:
             summ.show_summary(show=True, mode=mode)
         return summ
 
+    
+    def summarize_classes(
+        self,
+        *,
+        show: bool = True,
+        mode: str = "auto",
+        top_k: int = 10,
+        show_weight_hist: bool = True,
+        hist_bins: int = 40,
+    ):
+        """
+        Show class+persistence summary *only if already computed*.
+        Never computes anything.
+        """
+        if self._class_reps is None or self._class_persistence is None or self._class_restricted is None:
+            return None
+
+        # NOTE: constructor only takes the core objects
+        summ = summarize_classes_and_persistence(
+            reps=self._class_reps,
+            restricted=self._class_restricted,
+            persistence=self._class_persistence,
+        )
+
+        if show:
+            # knobs belong here
+            summ.show_summary(
+                show=True,
+                mode=str(mode),
+                top_k=int(top_k),
+                show_weight_hist=bool(show_weight_hist),
+                hist_bins=int(hist_bins),
+            )
+        return summ
+
+    
+    
     def summary(
         self,
-        modes: Optional[Iterable[Literal["nerve", "local_triv"]]] = None,
+        modes: Optional[Iterable[Literal["nerve", "local_triv", "classes"]]] = None,
         *,
         show: bool = True,
         mode: str = "auto",
         latex: str | bool = "auto",
-        compute_missing: bool = False,
+        # pass-through knobs for classes summary (ignored if classes not present)
+        top_k: int = 10,
+        show_weight_hist: bool = False,
+        hist_bins: int = 40,
     ) -> Dict[str, object]:
         """
-        Unified summary entry point.
+        Show only summaries that are already available.
 
-        Default behavior:
-          - Always show the cover/nerve summary (it is cover-only and cheap).
-          - Only show local_triv summary if cached (unless compute_missing=True).
+        Default (modes=None):
+          - always show nerve
+          - show local_triv if computed
+          - show classes if computed
+
+        If modes is provided, we *attempt* those, but do not compute missing pieces:
+          - missing summaries just return None in the output dict.
         """
         if modes is None:
-            modes_list = ["nerve", "local_triv"]
+            # “show what we have”
+            modes_list: List[str] = ["nerve"]
+            if self._local_triv is not None and self._quality is not None:
+                modes_list.append("local_triv")
+            if (
+                self._class_reps is not None
+                and self._class_persistence is not None
+                and self._class_restricted is not None
+            ):
+                modes_list.append("classes")
         else:
             modes_list = list(modes)
 
         out: Dict[str, object] = {}
-        showed_any = False
 
         for m in modes_list:
             if m == "nerve":
-                # NEW behavior: summary() always shows nerve by default, even if not cached yet.
                 out["nerve"] = self.summarize_nerve(
                     show=show,
                     mode=mode,
@@ -305,19 +377,21 @@ class Bundle:
                     latex=latex,
                     plot=True,
                 )
-                showed_any = True
 
             elif m == "local_triv":
-                summ = self.summarize_local_trivs(show=show, mode=mode, compute_missing=compute_missing)
-                if summ is not None:
-                    out["local_triv"] = summ
-                    showed_any = True
+                out["local_triv"] = self.summarize_local_trivs(show=show, mode=mode)
+
+            elif m == "classes":
+                out["classes"] = self.summarize_classes(
+                    show=show,
+                    mode=mode,
+                    top_k=int(top_k),
+                    show_weight_hist=bool(show_weight_hist),
+                    hist_bins=int(hist_bins),
+                )
 
             else:
                 raise ValueError(f"Unknown summary mode {m!r}.")
-
-        if show and not showed_any:
-            print("\n(No summaries available.)\n")
 
         return out
 
@@ -336,15 +410,6 @@ class Bundle:
         latex: str | bool = "auto",
         verbose: bool = True,
     ) -> LocalTrivAndCocycle:
-        """
-        Compute:
-          1) local trivializations (angles)
-          2) O(2) cocycle transitions (needed for quality + downstream)
-          3) quality report
-
-        Display policy:
-          - If show_summary=True, we show ONLY the local trivialization diagnostics summary.
-        """
         # 1) local triv
         if self.distance_matrix:
             lt = compute_local_triv(
@@ -367,7 +432,7 @@ class Bundle:
                 fail_fast=True,
             )
 
-        # 2) transitions (for cocycle): edges with overlap >= min_points_edge
+        # 2) transitions (edges with overlap >= min_points_edge)
         edges_est = self._edges_from_U(min_points=int(min_points_edge))
         cocycle, report = estimate_transitions(
             U=self.U,
@@ -379,7 +444,7 @@ class Bundle:
             fail_fast_missing=True,
         )
 
-        # 3) quality (cover-free)
+        # 3) quality
         qual = compute_bundle_quality_from_U(
             U=self.U,
             pou=self.pou,
@@ -401,11 +466,16 @@ class Bundle:
         self._transition_report = report
         self._quality = qual
 
-        # Ensure nerve cache exists for downstream, but do not display during compute
+        # invalidate downstream caches
+        self._class_reps = None
+        self._class_persistence = None
+        self._class_restricted = None
+
+        # cache nerve summary (computed from U); do not show during compute
         nerve = self.summarize_nerve(show=False, verbose=False, latex=latex)
 
         if show_summary:
-            self.summarize_local_trivs(show=True, mode=mode, compute_missing=False)
+            self.summary(modes=["local_triv"], show=True, mode=mode, latex=latex)
 
         return LocalTrivAndCocycle(
             local_triv=lt,
@@ -413,6 +483,146 @@ class Bundle:
             report=report,
             quality=qual,
             nerve=nerve,
+        )
+
+    # ----------------------------
+    # classes + persistence
+    # ----------------------------
+
+    def get_classes(
+        self,
+        *,
+        edge_weights: Optional[Dict[Tuple[int, int], float]] = None,
+        prefer_edge_weight: str = "rms",
+        show_summary: bool = True,
+        mode: str = "auto",
+        top_k: int = 10,
+        show_weight_hist: bool = False,
+        hist_bins: int = 40,
+        # which persistence-derived subcomplex to use for “derived class data”
+        restriction_mode: Literal["cocycle", "max_trivial"] = "cocycle",
+    ) -> ClassesAndPersistence:
+        """
+        Compute characteristic class reps + persistence.
+
+        Pipeline:
+          1) reps only (w1 + twisted Euler representative)
+          2) edge-driven persistence on weights filtration
+          3) compute “derived class data” only after restricting to a
+             persistence-determined subcomplex (so reps are cocycles there)
+
+        NOTE:
+          - requires get_local_trivs() has been run (or we run it silently).
+        """
+        # IMPORTANT: we only silently compute *local trivs* if missing.
+        if self._cocycle is None or self._transition_report is None:
+            self.get_local_trivs(show_summary=False)
+
+        assert self._cocycle is not None and self._transition_report is not None
+
+        # ---- 1) reps only (no coboundary tests / no Euler pairing yet) ----
+        reps = compute_class_representatives_from_nerve(
+            cocycle=self._cocycle,
+            edges=self._edges_U,
+            triangles=self._tris_U,
+            tets=self._tets_U,
+            n_vertices=self.n_sets,
+            try_orient=True,
+        )
+        self._class_reps = reps
+
+        # ---- 2) persistence ----
+        if edge_weights is None:
+            # best-effort use transition report weights if present
+            rms = getattr(self._transition_report, "rms_angle_err", None)
+            wit = getattr(self._transition_report, "witness_err", None)
+            ew = build_edge_weights_from_transition_report(
+                self._edges_U,
+                rms_angle_err=rms,
+                witness_err=wit,
+                prefer=str(prefer_edge_weight),
+            )
+        else:
+            ew = {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in edge_weights.items()}
+
+        p = compute_bundle_persistence(
+            cover=self,  # only used for simplex extraction when edges/tris/tets omitted
+            classes=reps,
+            edges=self._edges_U,
+            triangles=self._tris_U,
+            tets=self._tets_U,
+            edge_weights=ew,
+            prefer_edge_weight=str(prefer_edge_weight),
+        )
+        self._class_persistence = p
+
+        # ---- 3) restrict to a persistence stage subcomplex, then compute derived class data ----
+        kept_edges = _edges_for_subcomplex_from_persistence(p, restriction_mode)
+        kept_edges_set = {tuple(e) for e in kept_edges}
+
+        def _induced_tris(tris):
+            out = []
+            for (i, j, k) in tris:
+                eij = tuple(sorted((i, j)))
+                eik = tuple(sorted((i, k)))
+                ejk = tuple(sorted((j, k)))
+                if eij in kept_edges_set and eik in kept_edges_set and ejk in kept_edges_set:
+                    out.append((i, j, k))
+            return out
+
+        def _induced_tets(tets):
+            out = []
+            for (a, b, c, d) in tets:
+                edges6 = [
+                    tuple(sorted((a, b))),
+                    tuple(sorted((a, c))),
+                    tuple(sorted((a, d))),
+                    tuple(sorted((b, c))),
+                    tuple(sorted((b, d))),
+                    tuple(sorted((c, d))),
+                ]
+                if all(e in kept_edges_set for e in edges6):
+                    out.append((a, b, c, d))
+            return out
+
+        tris_sub = _induced_tris(self._tris_U)
+        tets_sub = _induced_tets(self._tets_U)
+
+        restricted = compute_class_data_on_complex(
+            reps=reps,
+            edges=kept_edges,
+            triangles=tris_sub,
+            tets=tets_sub,
+            n_vertices=self.n_sets,
+            compute_euler_num=True,
+        )
+        self._class_restricted = restricted
+
+        # ---- Combined class + persistence summary (polished, consistent) ----
+        # NOTE: this summary object owns the pretty printing logic (latex/text + title blocks).
+        summ = summarize_classes_and_persistence(
+            reps=reps,
+            restricted=restricted,
+            persistence=p,
+        )
+
+        # Keep plain-text class block available for programmatic/log use
+        summary_text = str(summ.summary_text)
+
+        if show_summary:
+            summ.show_summary(
+                show=True,
+                mode=str(mode),
+                top_k=int(top_k),
+                show_weight_hist=bool(show_weight_hist),
+                hist_bins=int(hist_bins),
+            )
+
+        return ClassesAndPersistence(
+            reps=reps,
+            persistence=p,
+            restricted=restricted,
+            summary_text=summary_text,
         )
 
     # ----------------------------
