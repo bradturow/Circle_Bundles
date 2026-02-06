@@ -1,4 +1,4 @@
-# quality.py
+# analysis/quality.py
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -447,3 +447,136 @@ def compute_bundle_quality(
     )
 
 
+
+def compute_bundle_quality_from_U(
+    U: np.ndarray,
+    *,
+    pou: Optional[np.ndarray],
+    local_triv,
+    cocycle,
+    transitions_report,
+    edges: Iterable[Edge],
+    triangles: Iterable[Tri],
+    # delta settings (paper delta)
+    delta_min_points: int = 5,
+    delta_use_euclidean: bool = True,
+    delta_fail_fast: bool = True,
+    # cocycle defect settings
+    cocycle_matrix_norm: str = "fro",
+    # epsilon settings
+    eps_min_points: int = 1,
+    compute_witness: bool = False,
+) -> BundleQualityReport:
+    """
+    Cover-free version of compute_bundle_quality.
+
+    You supply:
+      - U (n_sets, n_samples) boolean matrix
+      - pou (optional, for witness diagnostics)
+      - local_triv.f (angles per patch per sample)
+      - cocycle + transitions_report
+      - explicit edges, triangles (as lists/iterables)
+    """
+    U = np.asarray(U, dtype=bool)
+    edges_list = list(edges)
+    triangles_list = list(triangles)
+
+    # paper delta
+    delta = compute_delta_from_triples(
+        U,
+        local_triv.f,
+        triangles_list,
+        min_points=delta_min_points,
+        use_euclidean=delta_use_euclidean,
+        fail_fast=delta_fail_fast,
+    )
+
+    # cocycle triangle defect
+    cocycle_defect = compute_O2_cocycle_defect(
+        cocycle,
+        triangles_list,
+        matrix_norm=cocycle_matrix_norm,
+    )
+
+    # edge RMS summaries (from transitions_report)
+    max_edge_rms = float(getattr(transitions_report, "max_rms_angle_err", 0.0))
+    mean_edge_rms = float(getattr(transitions_report, "mean_rms_angle_err", 0.0))
+
+    # epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)
+    eps_geo, eps_geo_mean, eps_euc, eps_euc_mean = compute_eps_alignment_stats(
+        U,
+        local_triv.f,
+        cocycle,
+        edges_list,
+        min_points=eps_min_points,
+    )
+
+    # alpha computed using Euclidean epsilon
+    alpha = compute_alpha_from_eps_delta_euc(eps_euc, float(delta))
+
+    n_edges_requested = int(getattr(transitions_report, "n_edges_requested", len(edges_list)))
+    n_edges_estimated = int(getattr(transitions_report, "n_edges_estimated", len(getattr(cocycle, "Omega", {}))))
+
+    # Optional witness diagnostics
+    witness_err = None
+    witness_err_geo = None
+    witness_err_mean = None
+    witness_err_geo_mean = None
+    cocycle_proj_dist = None
+
+    if compute_witness:
+        from ..trivializations.bundle_map import (
+            build_true_frames,
+            witness_error_stats,
+            cocycle_projection_distance,
+        )
+
+        Omega = getattr(cocycle, "Omega", None)
+        if Omega is None:
+            raise AttributeError("cocycle.Omega is missing; cannot compute witness diagnostics.")
+
+        tf = build_true_frames(
+            U=U,
+            pou=pou,
+            Omega=Omega,
+            edges=edges_list,
+        )
+
+        w_geo, w_geo_mean, w_c, w_c_mean = witness_error_stats(
+            U=U,
+            f=local_triv.f,
+            Omega_true=tf.Omega_true,
+            edges=edges_list,
+        )
+
+        witness_err_geo = w_geo
+        witness_err_geo_mean = w_geo_mean
+        witness_err = w_c
+        witness_err_mean = w_c_mean
+
+        cocycle_proj_dist = cocycle_projection_distance(
+            U=U,
+            Omega_simplicial=Omega,
+            Omega_true=tf.Omega_true,
+            edges=edges_list,
+        )
+
+    return BundleQualityReport(
+        delta=float(delta),
+        cocycle_defect=float(cocycle_defect),
+        max_edge_rms=max_edge_rms,
+        mean_edge_rms=mean_edge_rms,
+        eps_align_geo=eps_geo,
+        eps_align_euc=eps_euc,
+        eps_align_geo_mean=eps_geo_mean,
+        eps_align_euc_mean=eps_euc_mean,
+        alpha=alpha,
+        n_edges_estimated=n_edges_estimated,
+        n_edges_requested=n_edges_requested,
+        n_triangles=int(len(triangles_list)),
+        witness_err=witness_err,
+        witness_err_geo=witness_err_geo,
+        witness_err_mean=witness_err_mean,
+        witness_err_geo_mean=witness_err_geo_mean,
+        cocycle_proj_dist=cocycle_proj_dist,
+    )

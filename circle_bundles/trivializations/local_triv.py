@@ -333,6 +333,10 @@ def compute_local_triv(
     """
     Compute local circle coordinates f[j, s] on each cover set U[j].
 
+    Supports two data modes:
+    - Point cloud: data shape (n_samples, D)
+    - Full distance matrix: data shape (n_samples, n_samples)
+
     Conventions (UNCHANGED):
     - U has shape (n_sets, n_samples) bool
     - f has shape (n_sets, n_samples) radians
@@ -340,13 +344,15 @@ def compute_local_triv(
 
     Circular coordinates method (cc):
     - "pca2" (default): compute_circular_coords_pca2
-      * if total_metric is provided, uses MDS from patch distance matrices
-    - DreimacCCConfig(...): use Dreimac on points or distance matrices
+      * uses PCA2 on points, or MDS2 if a dist_mat is provided
+    - DreimacCCConfig(...): uses Dreimac on points or distance matrices
     - callable: advanced hook; we call cc(Xj, dist_mat=Dj) if possible, else cc(Xj)
 
     Notes
     -----
     - For a callable cc, returning angles in radians is expected; we wrap to [0,2pi).
+    - If `data` is a distance matrix, we pass per-patch submatrices as `dist_mat`.
+      In that case, `Xj` is a dummy placeholder (unless the callable ignores dist_mat).
     """
     data = np.asarray(data)
     U = np.asarray(U, dtype=bool)
@@ -355,8 +361,24 @@ def compute_local_triv(
         raise ValueError(f"U must be 2D (n_sets, n_samples). Got shape {U.shape}.")
 
     n_sets, n_samples = U.shape
-    if data.shape[0] != n_samples:
-        raise ValueError(f"data has n={data.shape[0]} samples but U has n_samples={n_samples}.")
+
+    # Determine whether data is a full distance matrix
+    data_is_dist = (data.ndim == 2 and data.shape[0] == data.shape[1])
+
+    if data_is_dist:
+        if data.shape[0] != n_samples:
+            raise ValueError(
+                f"Distance matrix has n={data.shape[0]} but U has n_samples={n_samples}."
+            )
+    else:
+        # point cloud mode
+        if data.ndim != 2:
+            raise ValueError(
+                f"data must be either a point cloud (n_samples, D) or a distance matrix (n_samples, n_samples). "
+                f"Got shape {data.shape}."
+            )
+        if data.shape[0] != n_samples:
+            raise ValueError(f"data has n={data.shape[0]} samples but U has n_samples={n_samples}.")
 
     cc_is_pca2 = (isinstance(cc, str) and str(cc).lower() == "pca2")
     cc_is_dreimac = isinstance(cc, DreimacCCConfig)
@@ -390,10 +412,18 @@ def compute_local_triv(
             errors[j] = msg
             continue
 
-        Xj = data[mask]
-
         try:
-            Dj = _pairwise_dist_or_none(total_metric, Xj)
+            # Build per-patch data
+            if data_is_dist:
+                idx = np.where(mask)[0]
+                Dj = np.asarray(data[np.ix_(idx, idx)], dtype=float)
+                if Dj.shape != (m, m):
+                    raise ValueError(f"Patch dist submatrix has shape {Dj.shape}, expected ({m},{m}).")
+                # Dummy placeholder for callables that insist on Xj
+                Xj = np.zeros((m, 1), dtype=float)
+            else:
+                Xj = np.asarray(data[mask], dtype=float)
+                Dj = _pairwise_dist_or_none(total_metric, Xj)
 
             # 1) Custom callable wins
             if cc_is_callable:
@@ -401,16 +431,21 @@ def compute_local_triv(
                     ang = cc(Xj, dist_mat=Dj)  # type: ignore[misc]
                 except TypeError:
                     ang = cc(Xj)  # type: ignore[misc]
+
                 ang = np.asarray(ang, dtype=float).reshape(-1)
                 if ang.shape != (m,):
                     raise ValueError(f"cc callable returned shape {ang.shape}, expected ({m},).")
+
                 f[j, mask] = np.mod(ang, 2.0 * np.pi)
                 valid[j] = True
                 continue
 
-            # 2) PCA2
+            # 2) PCA2 (PCA2 on points, or MDS2 if Dj is provided)
             if cc_is_pca2:
-                ang = compute_circular_coords_pca2(Xj, dist_mat=Dj)
+                if data_is_dist:
+                    ang = compute_circular_coords_pca2(X=None, dist_mat=Dj)
+                else:
+                    ang = compute_circular_coords_pca2(Xj, dist_mat=Dj)
                 f[j, mask] = ang
                 valid[j] = True
                 continue
@@ -419,7 +454,7 @@ def compute_local_triv(
             assert cc_is_dreimac
             ang, retries, n_lmks = compute_circular_coords_dreimac(
                 Xj,
-                dist_mat=Dj,
+                dist_mat=Dj,  # if Dj is not None, dreimac uses distance_matrix=True internally
                 n_landmarks_init=cc.landmarks_per_patch,
                 prime=cc.prime,
                 update_frac=cc.update_frac,
