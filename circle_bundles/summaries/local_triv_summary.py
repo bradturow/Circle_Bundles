@@ -264,7 +264,7 @@ def _display_summary_latex(summary: LocalTrivSummary) -> bool:
 
     latex = (
         r"\begin{aligned}"
-        r"\textbf{Diagnostics} & \\[6pt]"
+        r"\textbf{Local Trivialization Summary} & \\[6pt]"
         + _rows_to_aligned(diag_rows)
         + r"\end{aligned}"
     )

@@ -39,12 +39,11 @@ from .trivializations.global_trivialization import (
     apply_orientation_gauge_to_f,
 )
 
-# bundle-map + frames
 from .trivializations.bundle_map import (
     FramePacking,
     get_frame_dataset as _get_frame_dataset,
-    get_bundle_map as _get_bundle_map,
     show_bundle_map_summary,
+    get_bundle_map_v2,   
 )
 
 
@@ -477,7 +476,33 @@ class Bundle:
 
         out: Dict[str, object] = {}
 
+        # Add vertical space *between* summaries when displaying multiple blocks.
+        # (We keep it simple: print a blank line before every summary after the first.)
+        first_shown = True
+
         for m in modes_list:
+            # Determine whether this summary will actually display something.
+            # We only print spacing when show=True and this mode is available.
+            will_show = False
+            if show:
+                if m == "nerve":
+                    will_show = True  # always available
+                elif m == "local_triv":
+                    will_show = self._local_triv is not None and self._quality is not None
+                elif m == "classes":
+                    will_show = (
+                        self._class_reps is not None
+                        and self._class_persistence is not None
+                        and self._class_restricted is not None
+                    )
+                elif m == "bundle_map":
+                    will_show = self._bundle_map_summary is not None
+
+            if will_show and not first_shown:
+                print("")  # vertical space between summary blocks
+            if will_show:
+                first_shown = False
+
             if m == "nerve":
                 out["nerve"] = self.summarize_nerve(
                     show=show,
@@ -510,6 +535,7 @@ class Bundle:
                 raise ValueError(f"Unknown summary mode {m!r}.")
 
         return out
+
 
     # ----------------------------
     # core: local triv + transitions + quality
@@ -876,108 +902,182 @@ class Bundle:
     def get_frame_dataset(
         self,
         *,
-        stage: str = "post_projection",
-        reducer=None,
-        max_frames: Optional[int] = None,
-        rng_seed: Optional[int] = None,
-        edges: Optional[Iterable[Edge]] = None,
-        subcomplex: Literal["full", "cocycle", "max_trivial"] = "full",
-        persistence=None,
-        packing: FramePacking = "coloring",
         pou: Optional[np.ndarray] = None,
+        weight: Optional[float] = None,
     ):
         """
-        Build a frame dataset used by the bundle-map solver.
+        Build the *pre-projection* frame dataset used by the bundle-map solver.
 
-        Requires
-        --------
-        - get_local_trivs()   (for f and Omega)
-        - a partition of unity (self.pou or pou= override)
+        Requires (must already be computed)
+        -----------------------------------
+        - get_local_trivs()   (for Omega)
+        - get_classes()       (for persistence + certified "cocycle" subcomplex)
+        - partition of unity  (self.pou or pou= override)
+
+        Parameters
+        ----------
+        pou:
+            Optional partition-of-unity override for this call (does not overwrite self.pou).
+        weight:
+            Optional edge-weight threshold. If provided, it must be <= the cocycle-certification
+            threshold (largest weight at which class reps are cocycles). Otherwise an error is raised.
+
+            If weight is None, we use the full cocycle-certified subcomplex.
 
         Notes
         -----
-        - This is a *debug/inspection* helper; most users call get_bundle_map().
-        - No auto-running of prerequisites.
+        - Unlike get_global_trivialization(), we do NOT require coboundaries / max-trivial.
+          We only require that the class representatives are cocycles.
+        - Always returns frames *before projection* (stage="pre_projection").
+        - This is intended for inspection/debugging; most users call get_bundle_map().
         """
+        # prerequisites (NO auto-running)
         self._require_local_trivs()
-        assert self._cocycle is not None
+        self._require_classes()
+        assert self._cocycle is not None and self._transition_report is not None
 
+        # partition of unity (required)
         P = self._require_pou(pou)
 
-        edges_used = edges
-        if edges_used is None and subcomplex != "full":
-            p = persistence if persistence is not None else getattr(self, "_class_persistence", None)
-            if p is None:
-                raise RuntimeError(
-                    "subcomplex != 'full' requires persistence.\n"
-                    "Run bundle.get_classes(...) first, or pass persistence=..."
-                )
-            edges_used = _edges_for_subcomplex_from_persistence(p, str(subcomplex))
+        # persistence must exist by _require_classes()
+        p = self._class_persistence
+        assert p is not None
 
+        # edge weights: prefer what's stored on persistence, else rebuild
+        ew = getattr(p, "edge_weights", None)
+        if ew is None:
+            rms = getattr(self._transition_report, "rms_angle_err", None)
+            wit = getattr(self._transition_report, "witness_err", None)
+            ew = build_edge_weights_from_transition_report(
+                self._edges_U,
+                rms_angle_err=rms,
+                witness_err=wit,
+                prefer="rms",
+            )
+
+        # cocycle-certified subcomplex
+        cocycle_edges = _edges_for_subcomplex_from_persistence(p, "cocycle")
+        cocycle_set = {tuple(sorted((int(a), int(b)))) for (a, b) in cocycle_edges}
+        if not cocycle_set:
+            raise ValueError("Cocycle subcomplex has no edges; cannot build frame dataset.")
+
+        # cocycle threshold: maximum weight among cocycle edges
+        # (use only edges that appear in ew; missing weights are treated as +inf below)
+        w_cocycle = max(float(ew[e]) for e in cocycle_set if e in ew)
+
+        # optional thresholding, but weight cannot exceed cocycle threshold
+        if weight is None:
+            edges_used = sorted(cocycle_set)
+        else:
+            w = float(weight)
+            if w > w_cocycle + 1e-12:
+                raise ValueError(
+                    f"weight={w:g} exceeds the cocycle-certification threshold {w_cocycle:g}. "
+                    "Choose weight <= cocycle threshold."
+                )
+            edges_used = sorted(e for e in cocycle_set if float(ew.get(e, np.inf)) <= w)
+            if not edges_used:
+                raise ValueError("No edges remain at this weight within the cocycle subcomplex.")
+
+        # Always pre-projection frames; remove other knobs from the public API
         return _get_frame_dataset(
             U=self.U,
             pou=P,
             Omega=self._cocycle.Omega,
             edges=edges_used,
-            reducer=reducer,
-            stage=stage,
-            max_frames=max_frames,
-            rng_seed=rng_seed,
-            packing=packing,
+            reducer=None,
+            stage="pre_projection",
+            max_frames=None,
+            rng_seed=None,
+            packing="coloring",  
         )
 
     def get_bundle_map(
         self,
         *,
-        edges: Optional[Iterable[Edge]] = None,
-        subcomplex: Literal["full", "cocycle", "max_trivial"] = "full",
-        persistence=None,
-        strict_semicircle: bool = True,
-        semicircle_tol: float = 1e-8,
-        reducer=None,
-        packing: FramePacking = "coloring2",
-        compute_chart_disagreement: bool = True,
-        show_summary: bool = True,
-        summary_mode: str = "auto",
-        rounding: int = 3,
         pou: Optional[np.ndarray] = None,
+        weight: Optional[float] = None,
+        reducer: Optional[object] = None,
+        packing: FramePacking = "coloring2",
+        strict_semicircle: bool = True,
+        show_summary: bool = True,
         recompute: bool = False,
     ) -> BundleMapResult:
         """
-        Run (or fetch cached) bundle-map solver.
+        Compute (or fetch cached) bundle-map coordinatization using the v2 pipeline.
 
-        Returns
-        -------
-        BundleMapResult with:
-          - F: (n_samples, D_used) "total space" coordinates (fiber in ambient frame coords)
-          - plus diagnostics objects used by the solver
+        Fixed policy (by design)
+        ------------------------
+        - Summary mode is always "auto".
+        - Semicircle tolerance is fixed at 1e-8.
+        - Summary rounding is fixed at 3.
+        - Chart disagreement diagnostic is always computed.
+
+        Requires (must already be computed)
+        -----------------------------------
+        - get_local_trivs()
+        - get_classes()
+        - partition of unity (self.pou or pou= override)
         """
+        # fixed knobs
+        SEMICIRCLE_TOL = 1e-8
+        ROUNDING = 3
+        COMPUTE_CD = True
+
+        # prerequisites (NO auto-running)
         self._require_local_trivs()
+        self._require_classes()
         assert self._cocycle is not None and self._local_triv is not None
 
+        # partition of unity (required)
         P = self._require_pou(pou)
 
-        edges_used = edges
-        subcomplex_key = None
-        if edges_used is None:
-            subcomplex = str(subcomplex)
-            if subcomplex not in {"full", "cocycle", "max_trivial"}:
-                raise ValueError(f"subcomplex must be one of 'full','cocycle','max_trivial'. Got {subcomplex!r}")
-            subcomplex_key = subcomplex
+        # persistence exists by _require_classes()
+        p = self._class_persistence
+        assert p is not None
 
-            if subcomplex != "full":
-                p = persistence if persistence is not None else getattr(self, "_class_persistence", None)
-                if p is None:
-                    raise RuntimeError(
-                        "subcomplex != 'full' requires persistence.\n"
-                        "Run bundle.get_classes(...) first, or pass persistence=..."
-                    )
-                edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
+        # edge weights: prefer what's stored on persistence, else rebuild
+        ew = getattr(p, "edge_weights", None)
+        if ew is None:
+            assert self._transition_report is not None
+            rms = getattr(self._transition_report, "rms_angle_err", None)
+            wit = getattr(self._transition_report, "witness_err", None)
+            ew = build_edge_weights_from_transition_report(
+                self._edges_U,
+                rms_angle_err=rms,
+                witness_err=wit,
+                prefer="rms",
+            )
 
-        edges_key = None
-        if edges_used is not None:
-            edges_key = tuple(sorted({canon_edge(*e) for e in edges_used if e[0] != e[1]}))
+        # cocycle-certified subcomplex
+        cocycle_edges = _edges_for_subcomplex_from_persistence(p, "cocycle")
+        cocycle_set = {tuple(sorted((int(a), int(b)))) for (a, b) in cocycle_edges}
+        if not cocycle_set:
+            raise ValueError("Cocycle subcomplex has no edges; cannot compute bundle map.")
 
+        # cocycle threshold: maximum weight among cocycle edges (ignoring missing weights)
+        w_cocycle = max(float(ew[e]) for e in cocycle_set if e in ew)
+
+        # optional thresholding, but weight cannot exceed cocycle threshold
+        if weight is None:
+            edges_used = sorted(cocycle_set)
+            weight_used = None
+        else:
+            w = float(weight)
+            if w > w_cocycle + 1e-12:
+                raise ValueError(
+                    f"weight={w:g} exceeds the cocycle-certification threshold {w_cocycle:g}. "
+                    "Choose weight <= cocycle threshold."
+                )
+            edges_used = sorted(e for e in cocycle_set if float(ew.get(e, np.inf)) <= w)
+            if not edges_used:
+                raise ValueError("No edges remain at this weight within the cocycle subcomplex.")
+            weight_used = w
+
+        # canonicalize edges for caching / downstream
+        edges_key = tuple(sorted({canon_edge(*e) for e in edges_used if e[0] != e[1]}))
+
+        # reducer participates in caching via a lightweight key
         red_key = None
         if reducer is not None:
             red_key = (
@@ -989,36 +1089,48 @@ class Bundle:
                 getattr(reducer, "psc_verbosity", None),
             )
 
-        # pou override participates in caching without hashing the full matrix.
+        # pou override participates in caching without hashing the full matrix
         pou_key = id(pou) if pou is not None else None
 
         key = (
-            "bundle_map",
+            "bundle_map_v2",
             edges_key,
-            subcomplex_key,
+            weight_used,
             str(packing),
             bool(strict_semicircle),
-            float(semicircle_tol),
+            float(SEMICIRCLE_TOL),
             red_key,
-            bool(compute_chart_disagreement),
+            bool(COMPUTE_CD),
             pou_key,
         )
 
         if recompute or key not in self._bundle_map_cache:
-            F, pre_F, Omega_used, Phi_used, report = _get_bundle_map(
+            
+            # cocycle-certified subcomplex edges (list of Edge tuples)
+            cocycle_edges_list = list(_edges_for_subcomplex_from_persistence(p, "cocycle"))
+
+            F, pre_F, Omega_used, Phi_used, report = get_bundle_map_v2(
                 U=self.U,
                 pou=P,
                 f=self._local_triv.f,
                 Omega=self._cocycle.Omega,
-                edges=edges_used,
-                strict_semicircle=bool(strict_semicircle),
-                semicircle_tol=float(semicircle_tol),
-                reducer=reducer,
-                show_summary=False,  # we handle summary here
-                compute_chart_disagreement=bool(compute_chart_disagreement),
-                packing=packing,
-            )
 
+                # IMPORTANT: let v2 own the restriction logic
+                edges=None,
+                weight=weight_used,
+
+                reducer=reducer,
+                packing=packing,
+                strict_semicircle=bool(strict_semicircle),
+
+                show_summary=False,  # wrapper controls summary
+                compute_chart_disagreement=bool(COMPUTE_CD),
+
+                # REQUIRED when weight is None (and still useful when weight is not None)
+                persistence=p,
+                cocycle_subcomplex_edges=cocycle_edges_list,
+            )
+            
             reducer_meta = None
             if reducer is not None:
                 reducer_meta = {
@@ -1030,6 +1142,8 @@ class Bundle:
                     "psc_verbosity": getattr(reducer, "psc_verbosity", None),
                 }
 
+            ambient_dim = int(np.asarray(F).shape[1])  # output dimension
+                
             self._bundle_map_cache[key] = BundleMapResult(
                 F=np.asarray(F),
                 pre_F=np.asarray(pre_F),
@@ -1037,20 +1151,21 @@ class Bundle:
                 Phi_used=np.asarray(Phi_used),
                 report=report,
                 meta={
+                    "weight": weight_used,
                     "strict_semicircle": bool(strict_semicircle),
-                    "semicircle_tol": float(semicircle_tol),
+                    "semicircle_tol": float(SEMICIRCLE_TOL),
                     "reducer": reducer_meta,
-                    "compute_chart_disagreement": bool(compute_chart_disagreement),
+                    "compute_chart_disagreement": bool(COMPUTE_CD),
                     "packing": packing,
-                    "subcomplex": subcomplex_key if edges is None else "explicit",
+                    "subcomplex": "cocycle",
+                    "ambient_dim": ambient_dim,
                 },
             )
 
         bm = self._bundle_map_cache[key]
         self._bundle_map_last = bm
-        
 
-        # Build cached standardized summary object so bundle.summary() can show it later
+        # standardized summary object for bundle.summary()
         try:
             self._bundle_map_summary = summarize_bundle_map(
                 bm.report,
@@ -1063,15 +1178,15 @@ class Bundle:
             if self._bundle_map_summary is not None:
                 self._bundle_map_summary.show_summary(
                     show=True,
-                    mode=str(summary_mode),
-                    rounding=int(rounding),
+                    mode="auto",
+                    rounding=int(ROUNDING),
                 )
             else:
                 show_bundle_map_summary(
                     bm.report,
                     show=True,
-                    mode="auto" if summary_mode is None else str(summary_mode),
-                    rounding=int(rounding),
+                    mode="auto",
+                    rounding=int(ROUNDING),
                     extra_rows=None,
                 )
 

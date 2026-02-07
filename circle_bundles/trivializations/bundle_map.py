@@ -60,6 +60,7 @@ __all__ = [
     "FrameDataset",
     "get_frame_dataset",
     "show_bundle_map_summary",
+    "get_bundle_map_v2",
 ]
 
 
@@ -1536,7 +1537,7 @@ def _display_bundle_map_summary_latex(
 
     latex = (
         r"\begin{aligned}"
-        r"\textbf{Coordinatization} & \\[6pt]"
+        r"\textbf{Bundle Map} & \\[6pt]"
         + _rows_to_aligned(coord_rows)
     )
 
@@ -1740,6 +1741,270 @@ def get_bundle_map(
     )
 
     if show_summary:
+        show_bundle_map_summary(report, show=True, mode="auto", rounding=3)
+
+    return F, pre_F, Omega_used, Phi_used, report
+
+
+
+
+
+
+def get_bundle_map_v2(
+    *,
+    U: np.ndarray,
+    pou: np.ndarray,
+    f: np.ndarray,
+    Omega: Dict[Edge, Mat2],
+    edges: Optional[Iterable[Edge]] = None,
+    # --- new persistence interface ---
+    weight: Optional[float] = None,
+    # --- reduction / packing ---
+    reducer: Optional[FrameReducerConfig] = None,
+    packing: FramePacking = "none",
+    # --- UX / diagnostics ---
+    show_summary: bool = True,
+    compute_chart_disagreement: bool = True,
+    strict_semicircle: bool = True,  
+    # --- REQUIRED: info from get_classes() ---
+    # These are expected to be precomputed & stored by get_classes().
+    # Your Bundle.method wrapper will supply them.
+    persistence: Optional[PersistenceResult] = None,
+    cocycle_subcomplex_edges: Optional[List[Edge]] = None,
+) -> Tuple[np.ndarray, np.ndarray, Dict[Edge, np.ndarray], np.ndarray, BundleMapReport]:
+    """
+    End-to-end coordinatization with simplified persistence controls.
+
+    Persistence / restriction
+    -------------------------
+    The only persistence-related knob is `weight`.
+
+    - If weight is None:
+        Restrict to the maximal subcomplex on which the characteristic-class
+        representatives are *cocycles*. This restriction must already be known
+        from `get_classes()` and passed in via `cocycle_subcomplex_edges`.
+
+    - If weight is not None:
+        Restrict to edges with persistence weight <= weight.
+        This is only allowed if the characteristic-class representatives are
+        still cocycles on that subcomplex; otherwise, raise ValueError.
+
+    Notes
+    -----
+    - We *recompute always* (no caching).
+    - Rounding is fixed to 3 in summaries.
+    - Semicircle tolerance is fixed internally.
+    - Frame reduction (if any) is applied in the existing pipeline options.
+    """
+
+    # ----------------------------
+    # Basic validation
+    # ----------------------------
+    U = np.asarray(U, dtype=bool)
+    pou = np.asarray(pou, dtype=float)
+    f = np.asarray(f, dtype=float)
+
+    n_sets, n_samples = U.shape
+    if pou.shape != (n_sets, n_samples):
+        raise ValueError("pou shape mismatch with U.")
+    if f.shape != (n_sets, n_samples):
+        raise ValueError("f shape mismatch with U.")
+
+    if edges is None:
+        edges = infer_edges_from_U(U)
+    edges_list = sorted({canon_edge(a, b) for (a, b) in edges if a != b})
+
+    # ----------------------------
+    # Decide subcomplex restriction (edges)
+    # ----------------------------
+    # We restrict *both*:
+    #   - which edges are used for cocycle projection / diagnostics / gluing
+    #   - which vertices/frames participate (by restricting U/pou/f to induced vertices if you want)
+    #
+    # For now we keep U/pou/f unchanged and only restrict the *nerve edges* used in
+    # computations. (This is consistent with how your persistence helpers work.)
+    #
+    # `cocycle_subcomplex_edges` is the maximal-edge set where classes are cocycles.
+    if cocycle_subcomplex_edges is None:
+        if weight is None:
+            raise ValueError(
+                "cocycle_subcomplex_edges must be provided when weight=None "
+                "(expected to come from get_classes())."
+            )
+        # If user passes a weight, we *can* derive edges from persistence,
+        # but we still need the cocycle threshold check below.
+    cocycle_edges_max = None if cocycle_subcomplex_edges is None else sorted(
+        {canon_edge(a, b) for (a, b) in cocycle_subcomplex_edges if a != b}
+    )
+
+    if weight is None:
+        # default: maximal cocycle subcomplex
+        edges_used = cocycle_edges_max
+        assert edges_used is not None
+    else:
+        if persistence is None:
+            raise ValueError("persistence must be provided when weight is not None.")
+
+        # edges under weight threshold
+        w = float(weight)
+        edges_under_w = _edges_for_subcomplex_from_persistence(
+            persistence,
+            subcomplex="edge_weight",   # you may implement/alias this mode; see note below
+            weight=w,
+        )
+
+        # ---- cocycle check: weight must not exceed cocycle-valid threshold ----
+        # simplest: require edges_under_w to be subset of cocycle_edges_max
+        # (equivalently: w <= cocycle_threshold)
+        if cocycle_edges_max is None:
+            raise ValueError("cocycle_subcomplex_edges must be provided to validate weight.")
+        cocycle_set = set(cocycle_edges_max)
+        for e in edges_under_w:
+            if canon_edge(*e) not in cocycle_set:
+                raise ValueError(
+                    "Invalid weight: at this threshold the characteristic classes are not cocycles "
+                    "(requested subcomplex exceeds cocycle-valid subcomplex)."
+                )
+
+        edges_used = sorted({canon_edge(a, b) for (a, b) in edges_under_w if a != b})
+
+    # Sanity: edges_used must be subset of inferred edges_list if you expect that
+    # (not strictly necessary, but usually true)
+    edges_used = sorted({e for e in edges_used if e in set(edges_list)})
+
+    # ----------------------------
+    # Step 2: build raw frames (packing happens here)
+    # ----------------------------
+    tf = build_true_frames(U=U, pou=pou, Omega=Omega, edges=edges_list, packing=packing)
+
+    packing_used = str(tf.packing) if tf.packing is not None else None
+    n_colors_used = tf.n_colors
+
+    # ----------------------------
+    # Reduction stage logic (keep as-is, but simpler defaults)
+    # ----------------------------
+    reduction_report: Optional[FrameReductionReport] = None
+
+    reducer_stage = "pre_classifying"
+    if reducer is not None:
+        reducer_stage = str(getattr(reducer, "stage", "pre_classifying"))
+        if getattr(reducer, "method", "none") == "none":
+            reducer = None
+
+    # Fixed semicircle tolerance
+    _SEMICIRCLE_TOL = 1e-8
+
+    # ----------------------------
+    # Steps 3–4 (projection)
+    # Use *edges_used* consistently for cocycle projection & overlap diagnostics.
+    # ----------------------------
+    if reducer is not None and reducer_stage == "pre_classifying":
+        # reduce raw frames BEFORE classifying map / Stiefel projection
+        Phi_red, reduction_report = apply_frame_reduction(Phi_true=tf.Phi, U=U, reducer=reducer)
+        proj = cocycle_project_from_raw_frames(U=U, pou=pou, Phi=Phi_red, edges=edges_used)
+        Phi_used = proj.Phi_true
+        Omega_used = proj.Omega_true
+        cl_proj_dist = float(proj.cl_proj_dist)
+        frame_proj_dist = float(proj.frame_proj_dist)
+
+    else:
+        # project in ambient D
+        proj = cocycle_project_from_raw_frames(U=U, pou=pou, Phi=tf.Phi, edges=edges_used)
+        Phi_used = proj.Phi_true
+        Omega_used = proj.Omega_true
+        cl_proj_dist = float(proj.cl_proj_dist)
+        frame_proj_dist = float(proj.frame_proj_dist)
+
+        # optional post-stiefel reduction (legacy/experimental)
+        if reducer is not None and reducer_stage == "post_stiefel":
+            Phi_used, reduction_report = apply_frame_reduction(Phi_true=Phi_used, U=U, reducer=reducer)
+            Omega_used = cocycle_from_frames(Phi_true=Phi_used, edges=edges_used)
+
+    # ----------------------------
+    # Diagnostics using edges_used
+    # ----------------------------
+    cocycle_proj_dist = cocycle_projection_distance(
+        U=U, Omega_simplicial=Omega, Omega_true=Omega_used, edges=edges_used
+    )
+
+    eps_geo_sup, eps_geo_mean, eps_c_sup, eps_c_mean = witness_error_stats(
+        U=U, f=f, Omega_true=Omega_used, edges=edges_used
+    )
+
+    # ----------------------------
+    # Step 5: gluing (NO averaging across charts; pick one chart value)
+    # Your build_bundle_map already picks first active chart for F[s].
+    # ----------------------------
+    F, pre_F = build_bundle_map(
+        U=U,
+        pou=pou,
+        f=f,
+        Phi_true=Phi_used,
+        Omega_true=Omega_used,
+        edges=edges_used,
+        strict_semicircle=bool(strict_semicircle),
+        semicircle_tol=_SEMICIRCLE_TOL,
+    )
+
+    cd_val: Optional[float] = None
+    if compute_chart_disagreement:
+        cd_val = float(chart_disagreement_stats(U=U, pre_F=pre_F).max)
+
+    # ----------------------------
+    # Reduction summary
+    # ----------------------------
+    red_method: Optional[str] = None
+    red_D_in: Optional[int] = None
+    red_d: Optional[int] = None
+    eps_red: Optional[float] = None
+    eps_red_mean: Optional[float] = None
+
+    if reduction_report is not None:
+        red_method = getattr(reduction_report, "method", None) or getattr(reduction_report, "name", None)
+        red_method = None if red_method is None else str(red_method)
+
+        red_D_in = getattr(reduction_report, "D_in", None)
+        red_D_in = None if red_D_in is None else int(red_D_in)
+
+        red_d = getattr(reduction_report, "d_out", None)
+        if red_d is None:
+            red_d = getattr(reduction_report, "d", None)
+        red_d = None if red_d is None else int(red_d)
+
+        eps_red_mean = getattr(reduction_report, "mean_proj_err", None)
+        if eps_red_mean is None:
+            eps_red_mean = getattr(reduction_report, "mean_projection_error", None)
+        eps_red_mean = None if eps_red_mean is None else float(eps_red_mean)
+
+        eps_red = getattr(reduction_report, "sup_proj_err", None)
+        if eps_red is None:
+            eps_red = getattr(reduction_report, "sup_projection_error", None)
+        eps_red = None if eps_red is None else float(eps_red)
+
+    report = BundleMapReport(
+        cl_proj_dist=float(cl_proj_dist),
+        frame_proj_dist=float(frame_proj_dist),
+        cocycle_proj_dist=float(cocycle_proj_dist),
+
+        eps_triv=eps_c_sup,
+        eps_triv_geo=eps_geo_sup,
+        eps_triv_mean=eps_c_mean,
+        eps_triv_geo_mean=eps_geo_mean,
+
+        chart_disagreement=cd_val,
+
+        reduction_method=red_method,
+        reduction_D_in=red_D_in,
+        reduction_d_out=red_d,
+        eps_red=eps_red,
+        eps_red_mean=eps_red_mean,
+
+        packing=packing_used,
+        n_colors=n_colors_used,
+    )
+
+    if show_summary:
+        # fixed auto + fixed rounding=3
         show_bundle_map_summary(report, show=True, mode="auto", rounding=3)
 
     return F, pre_F, Omega_used, Phi_used, report

@@ -10,7 +10,7 @@ class BundleMapSummary:
     """
     Summary wrapper for the bundle-map solver output.
 
-    This mirrors the style of the other summary objects:
+    Mirrors the style of the other summary objects:
       - always carries a plain-text summary
       - can render a polished table/visual summary via show_summary()
     """
@@ -18,37 +18,65 @@ class BundleMapSummary:
     meta: Dict[str, Any] = field(default_factory=dict)
     summary_text: str = ""
 
+    def _ambient_dim_row(self) -> Optional[Tuple[str, str]]:
+        """
+        Try to infer an ambient dimension display row from meta.
+        Expected meta keys (prefer earlier):
+          - "ambient_dim"  (recommended)
+          - "D_used"
+          - "D"
+        """
+        for key in ("ambient_dim", "D_used", "D"):
+            if key in self.meta and self.meta[key] is not None:
+                try:
+                    D = int(self.meta[key])
+                    return (
+                        r"\text{Ambient dimension}",
+                        rf"{D}",
+                    )
+                except Exception:
+                    return (
+                        r"\text{Ambient dimension}",
+                        rf"\text{{{self.meta[key]}}}",
+                    )
+        return None
+
     def show_summary(
         self,
         *,
         show: bool = True,
+        # Keep these parameters only for backwards compatibility;
+        # we intentionally force the uniform "auto" behavior now.
         mode: str = "auto",
         rounding: int = 3,
         extra_rows: Optional[List[Tuple[str, str]]] = None,
     ):
         """
-        Render the bundle-map summary using the existing pretty renderer.
+        Render the bundle-map summary via the shared pretty renderer.
 
-        Parameters
-        ----------
-        show:
-            Whether to display the summary.
-        mode:
-            "auto", "latex", or "text" (passed through to the renderer).
-        rounding:
-            Numeric rounding in the renderer.
-        extra_rows:
-            Optional extra (label, value) rows to append to the summary table.
+        Notes
+        -----
+        - We intentionally enforce the uniform behavior used elsewhere:
+            mode="auto" and rounding=3.
+        - We automatically append an "Ambient dimension" row when available in meta.
         """
         # Import lazily to avoid any import cycles / optional deps
         from ..trivializations.bundle_map import show_bundle_map_summary
 
+        rows: List[Tuple[str, str]] = []
+        if extra_rows:
+            rows.extend(list(extra_rows))
+
+        amb = self._ambient_dim_row()
+        if amb is not None:
+            rows.append(amb)
+
         return show_bundle_map_summary(
             self.report,
             show=bool(show),
-            mode=str(mode),
-            rounding=int(rounding),
-            extra_rows=extra_rows,
+            mode="auto",      # force
+            rounding=3,       # force
+            extra_rows=(rows if rows else None),
         )
 
 
@@ -60,11 +88,10 @@ def summarize_bundle_map(
     """
     Create a BundleMapSummary object from a solver report + meta.
     """
-    # Try to derive a stable plain-text snippet (never required to be perfect)
     text = ""
     try:
-        # common patterns: report may have to_text(), summary_text, or __str__
         if hasattr(report, "to_text") and callable(getattr(report, "to_text")):
+            # Use default formatting; we keep this as a stable snippet
             text = str(report.to_text())
         elif hasattr(report, "summary_text"):
             text = str(getattr(report, "summary_text"))
