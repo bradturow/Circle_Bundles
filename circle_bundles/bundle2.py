@@ -14,23 +14,28 @@ from .analysis.quality import BundleQualityReport, compute_bundle_quality_from_U
 from .summaries.nerve_summary import summarize_nerve_from_U, NerveSummary
 from .summaries.local_triv_summary import summarize_local_trivs
 
-# NEW: classes + persistence
+# classes + persistence
 from .analysis.class_persistence import (
     compute_bundle_persistence,
     _edges_for_subcomplex_from_persistence,
     build_edge_weights_from_transition_report,
 )
 
-# NEW: class summary (classes-only + rounding diag) + persistence block together
+# class summary (classes-only + rounding diag) + persistence block together
 from .summaries.class_summary import summarize_classes_and_persistence
 
-# NEW: class reps + restricted-class report (refactor of your existing characteristic_class.py)
+# class reps + restricted-class report
 from .characteristic_class import (
-    # lightweight reps only (no coboundary tests / pairings)
     compute_class_representatives_from_nerve,
-    # derived class info on a given complex (coboundaries / euler num logic / trivial/spin flags)
     compute_class_data_on_complex,
 )
+
+# global trivialization (Singer only) + orientation gauge helper
+from .trivializations.global_trivialization import (
+    build_global_trivialization_singer,
+    apply_orientation_gauge_to_f,
+)
+
 
 # ----------------------------
 # Return type for get_local_trivs
@@ -73,7 +78,8 @@ class Bundle:
       - Summaries are:
           (1) NerveSummary (old cover-summary style, now auto-plots when shown)
           (2) LocalTrivSummary (characteristic-class style diagnostics)
-      - Classes are computed via get_classes() (after get_local_trivs()).
+          (3) ClassSummary (Characteristic Classes + Persistence; no triv diagnostics)
+      - Computation is explicit: methods NEVER auto-run prerequisites.
     """
 
     _REF_ANGLE: float = 0.0
@@ -119,6 +125,35 @@ class Bundle:
         self._class_reps: Optional[Any] = None
         self._class_persistence: Optional[Any] = None
         self._class_restricted: Optional[Any] = None
+
+        # caches (global trivialization)
+        self._global_F: Optional[np.ndarray] = None
+        self._global_meta: Optional[Dict[str, Any]] = None
+
+    # ----------------------------
+    # requirement helpers (NO auto-running)
+    # ----------------------------
+
+    def _require_local_trivs(self) -> None:
+        if self._local_triv is None or self._cocycle is None or self._transition_report is None or self._quality is None:
+            raise RuntimeError(
+                "Local trivializations/cocycle/quality not computed.\n"
+                "Run: bundle.get_local_trivs(...) first."
+            )
+
+    def _require_classes(self) -> None:
+        if self._class_reps is None or self._class_persistence is None or self._class_restricted is None:
+            raise RuntimeError(
+                "Classes/persistence not computed.\n"
+                "Run: bundle.get_classes(...) first."
+            )
+
+    def _require_pou(self) -> None:
+        if self.pou is None:
+            raise RuntimeError(
+                "This method requires a partition of unity `pou`.\n"
+                "Provide `pou=...` when constructing Bundle(...)."
+            )
 
     # ----------------------------
     # validation / properties
@@ -292,7 +327,6 @@ class Bundle:
             summ.show_summary(show=True, mode=mode)
         return summ
 
-    
     def summarize_classes(
         self,
         *,
@@ -303,13 +337,12 @@ class Bundle:
         hist_bins: int = 40,
     ):
         """
-        Show class+persistence summary *only if already computed*.
+        Show class+persistence summary only if already computed.
         Never computes anything.
         """
         if self._class_reps is None or self._class_persistence is None or self._class_restricted is None:
             return None
 
-        # NOTE: constructor only takes the core objects
         summ = summarize_classes_and_persistence(
             reps=self._class_reps,
             restricted=self._class_restricted,
@@ -317,7 +350,6 @@ class Bundle:
         )
 
         if show:
-            # knobs belong here
             summ.show_summary(
                 show=True,
                 mode=str(mode),
@@ -327,8 +359,6 @@ class Bundle:
             )
         return summ
 
-    
-    
     def summary(
         self,
         modes: Optional[Iterable[Literal["nerve", "local_triv", "classes"]]] = None,
@@ -353,7 +383,6 @@ class Bundle:
           - missing summaries just return None in the output dict.
         """
         if modes is None:
-            # “show what we have”
             modes_list: List[str] = ["nerve"]
             if self._local_triv is not None and self._quality is not None:
                 modes_list.append("local_triv")
@@ -470,11 +499,14 @@ class Bundle:
         self._class_reps = None
         self._class_persistence = None
         self._class_restricted = None
+        self._global_F = None
+        self._global_meta = None
 
         # cache nerve summary (computed from U); do not show during compute
         nerve = self.summarize_nerve(show=False, verbose=False, latex=latex)
 
         if show_summary:
+            # show only the triv summary (nerve is always available separately)
             self.summary(modes=["local_triv"], show=True, mode=mode, latex=latex)
 
         return LocalTrivAndCocycle(
@@ -499,7 +531,6 @@ class Bundle:
         top_k: int = 10,
         show_weight_hist: bool = False,
         hist_bins: int = 40,
-        # which persistence-derived subcomplex to use for “derived class data”
         restriction_mode: Literal["cocycle", "max_trivial"] = "cocycle",
     ) -> ClassesAndPersistence:
         """
@@ -511,16 +542,14 @@ class Bundle:
           3) compute “derived class data” only after restricting to a
              persistence-determined subcomplex (so reps are cocycles there)
 
-        NOTE:
-          - requires get_local_trivs() has been run (or we run it silently).
+        IMPORTANT:
+          - This does NOT auto-run get_local_trivs().
+            You must run get_local_trivs(...) first.
         """
-        # IMPORTANT: we only silently compute *local trivs* if missing.
-        if self._cocycle is None or self._transition_report is None:
-            self.get_local_trivs(show_summary=False)
-
+        self._require_local_trivs()
         assert self._cocycle is not None and self._transition_report is not None
 
-        # ---- 1) reps only (no coboundary tests / no Euler pairing yet) ----
+        # ---- 1) reps only ----
         reps = compute_class_representatives_from_nerve(
             cocycle=self._cocycle,
             edges=self._edges_U,
@@ -533,7 +562,6 @@ class Bundle:
 
         # ---- 2) persistence ----
         if edge_weights is None:
-            # best-effort use transition report weights if present
             rms = getattr(self._transition_report, "rms_angle_err", None)
             wit = getattr(self._transition_report, "witness_err", None)
             ew = build_edge_weights_from_transition_report(
@@ -554,9 +582,15 @@ class Bundle:
             edge_weights=ew,
             prefer_edge_weight=str(prefer_edge_weight),
         )
+        # Recommended: store weights on result for downstream gating/debugging
+        try:
+            setattr(p, "edge_weights", dict(ew))
+        except Exception:
+            pass
+
         self._class_persistence = p
 
-        # ---- 3) restrict to a persistence stage subcomplex, then compute derived class data ----
+        # ---- 3) restrict + derived class data ----
         kept_edges = _edges_for_subcomplex_from_persistence(p, restriction_mode)
         kept_edges_set = {tuple(e) for e in kept_edges}
 
@@ -598,15 +632,13 @@ class Bundle:
         )
         self._class_restricted = restricted
 
-        # ---- Combined class + persistence summary (polished, consistent) ----
-        # NOTE: this summary object owns the pretty printing logic (latex/text + title blocks).
+        # ---- Combined class + persistence summary ----
         summ = summarize_classes_and_persistence(
             reps=reps,
             restricted=restricted,
             persistence=p,
         )
 
-        # Keep plain-text class block available for programmatic/log use
         summary_text = str(summ.summary_text)
 
         if show_summary:
@@ -618,6 +650,10 @@ class Bundle:
                 hist_bins=int(hist_bins),
             )
 
+        # invalidate global trivialization cache (depends on classes threshold)
+        self._global_F = None
+        self._global_meta = None
+
         return ClassesAndPersistence(
             reps=reps,
             persistence=p,
@@ -626,23 +662,156 @@ class Bundle:
         )
 
     # ----------------------------
-    # Accessors
+    # global trivialization (Singer only)
+    # ----------------------------
+
+    def get_global_trivialization(
+        self,
+        weight: Optional[float] = None,
+        *,
+        pou: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
+        """
+        Singer-only global trivialization (degree-normalized ALWAYS).
+
+        Parameters
+        ----------
+        weight:
+            Edge-weight threshold (rms-angle error etc.) for selecting edges *within* the
+            max-trivial subcomplex. If None, uses the maximal-trivial threshold automatically.
+            In all cases we forbid weights above the max-trivial threshold.
+        pou:
+            Optional partition of unity override (shape (n_sets, n_samples)).
+            If provided, it is used instead of self.pou (but does not overwrite it).
+
+        Requires (must already be computed)
+        -----------------------------------
+        - get_local_trivs()  -> provides self._local_triv, self._cocycle, self._transition_report
+        - get_classes()      -> provides self._class_persistence (for max-trivial stage)
+
+        Returns
+        -------
+        F : ndarray, shape (n_samples,)
+            Global angles in radians in [0, 2π).
+        """
+        # ---- prerequisites (NO auto-running) ----
+        if self._local_triv is None or self._cocycle is None or self._transition_report is None:
+            raise RuntimeError("Run bundle.get_local_trivs(...) before get_global_trivialization().")
+
+        if self._class_persistence is None:
+            raise RuntimeError("Run bundle.get_classes(...) before get_global_trivialization().")
+
+        # ---- partition of unity (required) ----
+        P = np.asarray(pou, dtype=float) if pou is not None else None
+        if P is None:
+            if self.pou is None:
+                raise ValueError(
+                    "get_global_trivialization requires a partition of unity `pou` "
+                    "(shape (n_sets, n_samples)). Pass pou=... here or provide it in Bundle(..., pou=...)."
+                )
+            P = np.asarray(self.pou, dtype=float)
+
+        if P.shape != (self.n_sets, self.n_samples):
+            raise ValueError(f"pou must have shape {(self.n_sets, self.n_samples)}; got {P.shape}.")
+
+        # ---- build edge weights same as get_classes() ----
+        rms = getattr(self._transition_report, "rms_angle_err", None)
+        wit = getattr(self._transition_report, "witness_err", None)
+        ew = build_edge_weights_from_transition_report(
+            self._edges_U,
+            rms_angle_err=rms,
+            witness_err=wit,
+            prefer="rms",
+        )
+
+        # ---- max-trivial edges from persistence ----
+        kept_edges_max = _edges_for_subcomplex_from_persistence(self._class_persistence, "max_trivial")
+        kept_set = {tuple(sorted((int(a), int(b)))) for (a, b) in kept_edges_max}
+
+        if not kept_set:
+            raise ValueError("Max-trivial subcomplex has no edges; cannot build global trivialization.")
+
+        # Max allowed weight among edges in max-trivial subcomplex
+        max_allowed_weight = max(
+            float(ew[tuple(sorted(e))]) for e in kept_set if tuple(sorted(e)) in ew
+        )
+
+        # Default weight = maximal-trivial threshold
+        if weight is None:
+            w = float(max_allowed_weight)
+        else:
+            w = float(weight)
+            if w > max_allowed_weight + 1e-12:
+                raise ValueError(
+                    f"weight={w:g} exceeds the maximal-trivial threshold {max_allowed_weight:g}. "
+                    "Choose weight <= max-trivial threshold."
+                )
+
+        # ---- choose edges at this stage, but never beyond max-trivial ----
+        edges_stage: List[Tuple[int, int]] = []
+        for (a, b) in self._edges_U:
+            e = tuple(sorted((int(a), int(b))))
+            if e not in kept_set:
+                continue
+            if float(ew.get(e, np.inf)) <= w:
+                edges_stage.append(e)
+
+        edges_stage = sorted(set(edges_stage))
+        if not edges_stage:
+            raise ValueError("No edges remain at this weight within the max-trivial subcomplex.")
+
+        # ---- orient the cocycle on the chosen 1-skeleton (THIS FIXES ALIGNMENT) ----
+        ok, coc_oriented, phi_pm1 = self._cocycle.orient_if_possible(
+            edges_stage,
+            n_vertices=self.n_sets,
+            require_all_edges_present=False,
+        )
+        if not ok:
+            raise ValueError(
+                "Cannot build a global S¹ coordinate: the cocycle is non-orientable "
+                "on the selected subcomplex (w₁ does not trivialize there)."
+            )
+
+        # ---- apply the SAME vertex gauge to local angles ----
+        f = np.asarray(self._local_triv.f, dtype=float)
+        U = np.asarray(self.U, dtype=bool)
+
+        f = apply_orientation_gauge_to_f(
+            f=f,
+            phi_pm1=np.asarray(phi_pm1, dtype=int),
+            ref_angle=float(self._REF_ANGLE),
+            U=U,
+        )
+
+        # ---- Singer using oriented theta (now compatible with gauged f) ----
+        theta_use = coc_oriented.theta  # canonical edges (j<k) included
+        F = build_global_trivialization_singer(
+            edges=edges_stage,
+            U=U,
+            pou=P,
+            f=f,
+            theta=theta_use,
+            n_vertices=self.n_sets,
+        )
+
+        return np.asarray(F, dtype=float)
+
+
+    # ----------------------------
+    # Accessors (NO auto-running)
     # ----------------------------
 
     def get_quality(self) -> BundleQualityReport:
         if self._quality is None:
-            self.get_local_trivs(show_summary=False)
-        assert self._quality is not None
+            raise RuntimeError("Quality not computed. Run: bundle.get_local_trivs(...) first.")
         return self._quality
 
     def get_cocycle(self) -> O2Cocycle:
         if self._cocycle is None:
-            self.get_local_trivs(show_summary=False)
-        assert self._cocycle is not None
+            raise RuntimeError("Cocycle not computed. Run: bundle.get_local_trivs(...) first.")
         return self._cocycle
 
     def get_local_triv_result(self) -> LocalTrivResult:
         if self._local_triv is None:
-            self.get_local_trivs(show_summary=False)
-        assert self._local_triv is not None
+            raise RuntimeError("Local trivializations not computed. Run: bundle.get_local_trivs(...) first.")
         return self._local_triv
