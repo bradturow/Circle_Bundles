@@ -1366,6 +1366,190 @@ class Bundle:
         )
 
     
+    def show_circle_nerve(
+        self,
+        *,
+        use_max_trivial: bool = True,
+        # weights source (not user-provided dict)
+        weights: str = "rms",  # "rms" | "witness" | "none"
+        # optional explicit overrides that still make sense
+        omega: Optional[Dict[Tuple[int, int], int]] = None,
+        phi: Optional[Dict[int, int]] = None,
+        compute_phi: bool = True,
+        fail_if_not_cycle: bool = True,
+        title: Optional[str] = None,
+        save_path: Optional[str] = None,
+        # embedding (matplotlib-native contract)
+        ax=None,
+        figsize: tuple[float, float] = (5.0, 5.0),
+        dpi: Optional[int] = None,
+        # styling passthrough (explicit only)
+        r: float = 1.0,
+        node_size: float = 600,
+        node_facecolor: str = "lightblue",
+        node_edgecolor: str = "k",
+        node_label_color: str = "k",
+        removed_edge_color: str = "lightgray",
+        removed_edge_lw: float = 1.5,
+        kept_edge_color: str = "black",
+        kept_edge_lw: float = 4.0,
+        omega_color: str = "blue",
+        phi_color: str = "red",
+        weights_color: str = "black",
+        fontsize_node: int = 12,
+        fontsize_omega: int = 12,
+        fontsize_phi: int = 12,
+        fontsize_weights: int = 9,
+        omega_offset: float = 0.09,
+        weights_offset: float = 0.09,
+        phi_offset: float = 0.14,
+    ):
+        """
+        Circle-layout nerve visualization for single-cycle graphs (cover-free).
+
+        Policy (fixed)
+        --------------
+        - Always reorders the cycle to a canonical cyclic order for clean layout.
+        - User cannot pass custom edge weights dict; `weights` selects the source:
+            * "rms"     -> transition_report.rms_angle_err (or persistence edge_weights if present)
+            * "witness" -> quality.witness_err (or persistence edge_weights if present)
+            * "none"    -> suppress weight labels
+        - Omega behavior:
+            * if omega=... provided -> use it
+            * else (always) try reps.omega_O1_used if available
+        - Does not call plt.show(); caller controls display.
+        - If ax is None: creates new (fig, ax) inside viz; otherwise draws into provided ax.
+        """
+        from .viz.nerve_circle import (
+            show_circle_nerve as _show_circle_nerve,
+            is_single_cycle_graph,
+            cycle_order_from_edges,
+            reindex_edges,
+            reindex_vertex_dict,
+            reindex_edge_dict,
+        )
+
+        n = int(self.n_sets)
+        edges = [tuple(sorted((int(a), int(b)))) for (a, b) in list(getattr(self, "_edges_U", []))]
+        if not edges:
+            raise RuntimeError("No nerve edges available on this Bundle (missing _edges_U).")
+
+        ok, msg = is_single_cycle_graph(n, edges)
+        if (not ok) and fail_if_not_cycle:
+            raise ValueError(f"Nerve is not a single cycle graph: {msg}")
+
+        # ---- kept edges (max-trivial) from persistence ----
+        kept_edges: Optional[list[tuple[int, int]]] = None
+        if use_max_trivial:
+            p = getattr(self, "_class_persistence", None)
+            if p is not None:
+                try:
+                    kept = _edges_for_subcomplex_from_persistence(p, "max_trivial")
+                    kept_edges = [tuple(sorted((int(a), int(b)))) for (a, b) in kept]
+                except Exception:
+                    kept_edges = None  # fail soft
+
+        # ---- weights source (no user dict allowed) ----
+        weights = str(weights).lower().strip()
+        if weights not in ("rms", "witness", "none"):
+            raise ValueError("weights must be one of {'rms','witness','none'}.")
+
+        if weights == "none":
+            ew = None
+        else:
+            # Reuse your central policy:
+            # - prefers persistence edge_weights when available
+            # - else uses local-triv report / quality depending on prefer
+            ew = self._latest_edge_weights(None, prefer=weights)
+
+        # ---- omega: explicit override OR auto from reps (always-on) ----
+        omega_use: Optional[Dict[Tuple[int, int], int]] = None
+        if omega is not None:
+            omega_use = {tuple(sorted((int(a), int(b)))): int(v) for (a, b), v in omega.items()}
+        else:
+            reps = getattr(self, "_class_reps", None)
+            cand = getattr(reps, "omega_O1_used", None) if reps is not None else None
+            if cand is not None:
+                omega_use = {tuple(sorted((int(a), int(b)))): int(v) for (a, b), v in cand.items()}
+
+        # ---- phi ----
+        phi_use: Optional[Dict[int, int]] = None
+        if phi is not None:
+            phi_use = {int(i): int(v) for i, v in phi.items()}
+        elif compute_phi:
+            coc = getattr(self, "_cocycle", None)
+            if coc is None:
+                raise RuntimeError(
+                    "Cannot compute phi: cocycle not computed. Run bundle.get_local_trivs(...) first, "
+                    "or pass phi=... explicitly."
+                )
+            edge_set_for_phi = kept_edges if (kept_edges is not None and len(kept_edges) > 0) else edges
+            ok_or, _coc_oriented, phi_pm1 = coc.orient_if_possible(
+                edge_set_for_phi,
+                n_vertices=n,
+                require_all_edges_present=False,
+            )
+            if ok_or:
+                vec = np.asarray(phi_pm1, dtype=int).reshape(-1)
+                phi_use = {i: int(vec[i]) for i in range(n)}
+            else:
+                phi_use = None
+
+        # ---- ALWAYS reorder around the cycle for clean layout ----
+        # (Even if ok=False, cycle_order_from_edges may raise; but ok=False is only allowed if fail_if_not_cycle=False.)
+        if ok:
+            order = cycle_order_from_edges(n, edges, start=0)
+            old_to_new = {old: new for new, old in enumerate(order)}
+
+            edges_r = reindex_edges(edges, old_to_new)
+            kept_r = reindex_edges(kept_edges, old_to_new) if kept_edges is not None else None
+            omega_r = reindex_edge_dict(omega_use, old_to_new) if omega_use is not None else None
+            w_r = reindex_edge_dict(ew, old_to_new) if ew is not None else None
+            phi_r = reindex_vertex_dict(phi_use, old_to_new) if phi_use is not None else None
+        else:
+            # not a cycle, but user asked not to fail; show "as-is"
+            edges_r, kept_r, omega_r, w_r, phi_r = edges, kept_edges, omega_use, ew, phi_use
+
+        if title is None:
+            title = "Nerve Visualization"
+
+        fig, _ax = _show_circle_nerve(
+            n_vertices=n,
+            edges=edges_r,
+            kept_edges=kept_r,
+            omega=omega_r,
+            weights=w_r,
+            phi=phi_r,
+            title=title,
+            ax=ax,
+            figsize=figsize,
+            dpi=dpi,
+            r=r,
+            node_size=node_size,
+            node_facecolor=node_facecolor,
+            node_edgecolor=node_edgecolor,
+            node_label_color=node_label_color,
+            removed_edge_color=removed_edge_color,
+            removed_edge_lw=removed_edge_lw,
+            kept_edge_color=kept_edge_color,
+            kept_edge_lw=kept_edge_lw,
+            omega_color=omega_color,
+            phi_color=phi_color,
+            weights_color=weights_color,
+            fontsize_node=fontsize_node,
+            fontsize_omega=fontsize_omega,
+            fontsize_phi=fontsize_phi,
+            fontsize_weights=fontsize_weights,
+            omega_offset=omega_offset,
+            weights_offset=weights_offset,
+            phi_offset=phi_offset,
+            save_path=save_path,
+        )
+
+        return fig
+
+
+    
     # ----------------------------
     # Accessors (NO auto-running)
     # ----------------------------

@@ -1,3 +1,4 @@
+# circle_bundles/viz/nerve_circle.py
 from __future__ import annotations
 
 from typing import Any, Optional
@@ -17,6 +18,7 @@ __all__ = [
 ]
 
 
+
 def show_circle_nerve(
     *,
     n_vertices: int,
@@ -25,6 +27,13 @@ def show_circle_nerve(
     omega: dict[tuple[int, int], int] | None = None,
     weights: dict[tuple[int, int], float] | None = None,
     phi: dict[int, int] | None = None,
+    title: str | None = None,
+
+    # layout / display
+    ax=None,
+    figsize: tuple[float, float] = (8.0, 8.0),
+    dpi: Optional[int] = None,
+
     # styling
     r: float = 1.0,
     node_size: float = 600,
@@ -42,157 +51,113 @@ def show_circle_nerve(
     fontsize_omega: int = 12,
     fontsize_phi: int = 12,
     fontsize_weights: int = 9,
-    # label offsets (relative to radius)
     omega_offset: float = 0.09,
     weights_offset: float = 0.09,
     phi_offset: float = 0.14,
-    title: str | None = None,
-    ax=None,
     save_path: str | None = None,
-    show: bool = True,
 ):
     """
     Circle-layout nerve plot.
 
-    Notes
-    -----
-    - Canonicalizes edge keys via canon_edge(a,b).
-    - Supports omega/weights dicts keyed by either orientation.
+    Contract
+    --------
+    - If ax is None: creates a brand-new figure/axes (fig.add_axes).
+    - If ax is provided: draws into that axes only.
+    - Never calls plt.show() or display().
     """
-    if int(n_vertices) <= 0:
-        raise ValueError("n_vertices must be positive.")
-    n_vertices = int(n_vertices)
 
-    # canonicalize edge lists
-    E_all = sorted({canon_edge(int(i), int(j)) for (i, j) in edges if int(i) != int(j)})
+    n_vertices = int(n_vertices)
+    if n_vertices <= 0:
+        raise ValueError("n_vertices must be positive.")
+
+    # ---- canonicalize edges ----
+    E_all = sorted({canon_edge(int(i), int(j)) for (i, j) in edges if i != j})
     if kept_edges is None:
         E_keep = set(E_all)
     else:
-        E_keep = {canon_edge(int(i), int(j)) for (i, j) in kept_edges if int(i) != int(j)}
+        E_keep = {canon_edge(int(i), int(j)) for (i, j) in kept_edges if i != j}
     E_rem = [e for e in E_all if e not in E_keep]
 
-    def _canon_edge_dict(d):
+    def canon_dict(d):
         if d is None:
             return None
-        out = {}
-        for (i, j), v in d.items():
-            ii, jj = int(i), int(j)
-            if ii == jj:
-                continue
-            out[canon_edge(ii, jj)] = v
-        return out
+        return {canon_edge(int(i), int(j)): v for (i, j), v in d.items() if i != j}
 
-    omega = _canon_edge_dict(omega)
-    weights = _canon_edge_dict(weights)
+    omega = canon_dict(omega)
+    weights = canon_dict(weights)
 
-    # node positions on circle
-    ang = np.linspace(0, 2 * np.pi, n_vertices, endpoint=False)
-    P = np.c_[float(r) * np.cos(ang), float(r) * np.sin(ang)]
-
-    # set up axes
+    # ---- create figure/axes safely ----
+    created_fig = False
     if ax is None:
-        fig, ax = plt.subplots(figsize=(8, 8))
+        fig = plt.figure(figsize=figsize, dpi=dpi)
+        ax = fig.add_axes([0, 0, 1, 1])  # 🔒 isolated axes
+        created_fig = True
     else:
         fig = ax.figure
 
-    # edges
-    def draw_edges(edgelist, *, color, lw, zorder):
-        for (i, j) in edgelist:
-            if not (0 <= i < n_vertices and 0 <= j < n_vertices):
-                continue
-            ax.plot([P[i, 0], P[j, 0]], [P[i, 1], P[j, 1]], color=color, linewidth=lw, zorder=zorder)
+    # ---- geometry ----
+    ang = np.linspace(0, 2 * np.pi, n_vertices, endpoint=False)
+    P = np.c_[r * np.cos(ang), r * np.sin(ang)]
 
-    draw_edges(E_rem, color=removed_edge_color, lw=float(removed_edge_lw), zorder=1)
-    draw_edges(sorted(E_keep), color=kept_edge_color, lw=float(kept_edge_lw), zorder=2)
+    def draw_edges(edgelist, *, color, lw, z):
+        for i, j in edgelist:
+            ax.plot([P[i, 0], P[j, 0]], [P[i, 1], P[j, 1]],
+                    color=color, linewidth=lw, zorder=z)
 
-    # nodes
+    draw_edges(E_rem, color=removed_edge_color, lw=removed_edge_lw, z=1)
+    draw_edges(E_keep, color=kept_edge_color, lw=kept_edge_lw, z=2)
+
     ax.scatter(
         P[:, 0], P[:, 1],
-        s=float(node_size),
+        s=node_size,
         c=node_facecolor,
         edgecolors=node_edgecolor,
         zorder=3,
     )
 
-    # node labels U_i
     for i in range(n_vertices):
         ax.text(
-            P[i, 0], P[i, 1],
-            f"$U_{{{i+1}}}$",
+            P[i, 0], P[i, 1], f"$U_{{{i+1}}}$",
             ha="center", va="center",
-            fontsize=int(fontsize_node),
+            fontsize=fontsize_node,
             color=node_label_color,
             fontweight="bold",
             zorder=4,
         )
 
-    # omega labels (outside midpoints)
-    if omega is not None:
-        for (i, j) in E_all:
-            if (i, j) not in omega:
-                continue
+    if omega:
+        for (i, j), val in omega.items():
             mid = 0.5 * (P[i] + P[j])
-            norm = float(np.linalg.norm(mid))
-            if norm <= 1e-15:
-                continue
-            u = mid / norm
-            pos = mid + (float(omega_offset) * float(r)) * u
-            ax.text(
-                pos[0], pos[1],
-                str(int(omega[(i, j)])),
-                ha="center", va="center",
-                fontsize=int(fontsize_omega),
-                color=omega_color,
-                zorder=5,
-            )
+            u = mid / (np.linalg.norm(mid) + 1e-12)
+            pos = mid + omega_offset * r * u
+            ax.text(*pos, str(int(val)),
+                    fontsize=fontsize_omega, color=omega_color,
+                    ha="center", va="center", zorder=5)
 
-    # phi labels (outside nodes)
-    if phi is not None:
+    if weights:
+        for (i, j), w in weights.items():
+            mid = 0.5 * (P[i] + P[j])
+            u = -mid / (np.linalg.norm(mid) + 1e-12)
+            pos = mid + weights_offset * r * u
+            ax.text(*pos, f"{float(w):.3g}",
+                    fontsize=fontsize_weights, color=weights_color,
+                    ha="center", va="center", zorder=5)
+
+    if phi:
         for v, val in phi.items():
-            v = int(v)
-            if not (0 <= v < n_vertices):
-                continue
-            u = P[v] / (float(np.linalg.norm(P[v])) + 1e-12)
-            pos = P[v] + (float(phi_offset) * float(r)) * u
-            ax.text(
-                pos[0], pos[1],
-                str(int(val)),
-                ha="center", va="center",
-                fontsize=int(fontsize_phi),
-                color=phi_color,
-                zorder=6,
-            )
-
-    # weights labels (inside midpoints)
-    if weights is not None:
-        for (i, j) in E_all:
-            if (i, j) not in weights:
-                continue
-            mid = 0.5 * (P[i] + P[j])
-            norm = float(np.linalg.norm(mid))
-            if norm <= 1e-15:
-                continue
-            u_in = -mid / norm
-            pos = mid + (float(weights_offset) * float(r)) * u_in
-            ax.text(
-                pos[0], pos[1],
-                f"{float(weights[(i, j)]):.3g}",
-                ha="center", va="center",
-                fontsize=int(fontsize_weights),
-                color=weights_color,
-                zorder=5,
-            )
+            u = P[v] / (np.linalg.norm(P[v]) + 1e-12)
+            pos = P[v] + phi_offset * r * u
+            ax.text(*pos, str(int(val)),
+                    fontsize=fontsize_phi, color=phi_color,
+                    ha="center", va="center", zorder=6)
 
     ax.set_aspect("equal")
     ax.axis("off")
-    if title is not None:
-        ax.set_title(title, pad=18, y=1.03)
+    if title:
+        ax.set_title(title, pad=18)
 
-    if save_path is not None:
+    if save_path and created_fig:
         fig.savefig(save_path, bbox_inches="tight")
-
-    if show:
-        plt.show()
 
     return fig, ax
 
