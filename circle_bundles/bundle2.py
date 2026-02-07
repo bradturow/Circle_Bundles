@@ -548,7 +548,7 @@ class Bundle:
         min_patch_size: int = 10,
         min_points_edge: int = 5,
         pou: Optional[np.ndarray] = None,
-        show_summary: bool = True,
+        show_summary: bool = False,
         mode: str = "auto",
         latex: str | bool = "auto",
         verbose: bool = True,
@@ -661,7 +661,7 @@ class Bundle:
         *,
         edge_weights: Optional[Dict[Tuple[int, int], float]] = None,
         prefer_edge_weight: str = "rms",
-        show_summary: bool = True,
+        show_summary: bool = False,
         mode: str = "auto",
         top_k: int = 10,
         show_weight_hist: bool = False,
@@ -1001,7 +1001,7 @@ class Bundle:
         reducer: Optional[object] = None,
         packing: FramePacking = "coloring2",
         strict_semicircle: bool = True,
-        show_summary: bool = True,
+        show_summary: bool = False,
         recompute: bool = False,
     ) -> BundleMapResult:
         """
@@ -1278,6 +1278,94 @@ class Bundle:
             return_selected=bool(return_selected),
         )
     
+
+    def show_nerve(
+        self,
+        *,
+        landmarks: np.ndarray,
+        title: Optional[str] = None,
+        show_labels: bool = True,
+        show_axes: bool = False,
+        tri_opacity: float = 0.25,
+        tri_color: str = "pink",
+        cochains: Optional[List[Dict[Tuple[int, ...], object]]] = None,
+        weights: Optional[Dict[Tuple[int, int], float]] = None,
+        edge_cutoff: Optional[float] = None,
+        highlight_edges: Optional[Set[Tuple[int, int]]] = None,
+        highlight_color: str = "red",
+        prefer_local_weights: str = "rms",
+        use_slider: bool = True,
+        mark_cutoff: Optional[float] = None,  # optional override
+        show_title_value: bool = True,
+    ):
+        """
+        Visualize the nerve (Plotly), cover-free.
+
+        - If no weights are available (and none provided), renders static (no slider).
+        - If weights are available, renders slider.
+        - Shows a jump button ONLY if classes/persistence exist and we can compute a max-trivial cutoff.
+        """
+        from .viz.nerve_plotly import make_nerve_figure, nerve_with_slider_from_U
+
+        L = np.asarray(landmarks)
+        edges = list(getattr(self, "_edges_U", []))
+        tris = list(getattr(self, "_tris_U", []))
+        if not edges:
+            raise RuntimeError("No nerve edges available on this Bundle (missing _edges_U).")
+
+        # your existing policy for choosing weights
+        ew = self._latest_edge_weights(weights, prefer=str(prefer_local_weights))
+
+        # --- static case ---
+        if ew is None or not use_slider:
+            fig = make_nerve_figure(
+                landmarks=L,
+                edges=edges,
+                triangles=tris,
+                title=(title or "Nerve Visualization"),
+                show_labels=bool(show_labels),
+                show_axes=bool(show_axes),
+                tri_opacity=float(tri_opacity),
+                tri_color=str(tri_color),
+                cochains=cochains,
+                edge_weights=ew,
+                edge_cutoff=edge_cutoff,
+                highlight_edges=set(highlight_edges) if highlight_edges else None,
+                highlight_color=str(highlight_color),
+            )
+            # (optional) makes "something happen" in notebooks
+            fig.show()
+            return fig
+
+        # --- compute a working jump cutoff ---
+        # user override wins
+        if mark_cutoff is not None:
+            jump_cutoff = float(mark_cutoff)
+        else:
+            jump_cutoff = self._try_max_trivial_cutoff(ew)
+
+        show_jump = bool(jump_cutoff is not None)
+
+        return nerve_with_slider_from_U(
+            U=np.asarray(self.U, dtype=bool),
+            landmarks=L,
+            edges=edges,
+            triangles=tris,
+            edge_weights=ew,
+            show_labels=bool(show_labels),
+            tri_opacity=float(tri_opacity),
+            tri_color=str(tri_color),
+            show_axes=bool(show_axes),
+            highlight_edges=set(highlight_edges) if highlight_edges else None,
+            highlight_color=str(highlight_color),
+            mark_cutoff=jump_cutoff,            # None => no button
+            title=(title or "Nerve Visualization"),
+            show_title_value=bool(show_title_value),
+            show_jump=show_jump,                # relies on your updated nerve_plotly
+            jump_label="Jump to max-trivial",
+        )
+
+    
     # ----------------------------
     # Accessors (NO auto-running)
     # ----------------------------
@@ -1296,3 +1384,85 @@ class Bundle:
         if self._local_triv is None:
             raise RuntimeError("Local trivializations not computed. Run: bundle.get_local_trivs(...) first.")
         return self._local_triv
+
+    def _try_max_trivial_cutoff(self, edge_weights: Dict[Tuple[int, int], float]) -> Optional[float]:
+        """
+        Best-effort: return the weight cutoff for the max-trivial subcomplex, or None.
+
+        This uses PersistenceResult + _edges_for_subcomplex_from_persistence(p, "max_trivial").
+        It never raises.
+        """
+        p = getattr(self, "_class_persistence", None)
+        if p is None:
+            return None
+
+        try:
+            kept = _edges_for_subcomplex_from_persistence(p, "max_trivial")
+        except Exception:
+            return None
+
+        if not kept:
+            return None
+
+        # canonicalize weights dict (keys are (i,j))
+        ew = {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in edge_weights.items()}
+
+        ws = [ew.get(tuple(sorted((int(a), int(b)))), np.inf) for (a, b) in kept]
+        ws = [w for w in ws if np.isfinite(w)]
+        if not ws:
+            return None
+
+        # In your filtration, kept edges are exactly those with weight <= cutoff,
+        # so cutoff = max weight among kept edges.
+        return float(max(ws))
+
+
+    def _latest_edge_weights(
+        self,
+        weights: Optional[Dict[Tuple[int, int], float]],
+        *,
+        prefer: str = "rms",
+    ) -> Optional[Dict[Tuple[int, int], float]]:
+        """
+        Weight policy (single knob `weights`):
+          - if `weights` provided: use it
+          - else if classes exist and persistence has `edge_weights`: use those
+          - else if local trivs exist: use transition_report weights (prefer 'rms' by default)
+          - else: None
+        """
+        # 0) explicit override always wins
+        if weights is not None:
+            return {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in weights.items()}
+
+        # 1) classes/persistence weights (if available)
+        p = getattr(self, "_class_persistence", None)
+        if p is not None:
+            ew = getattr(p, "edge_weights", None)
+            if ew is not None:
+                # accept either canonical (i,j) tuples or whatever mapping keys, but normalize
+                return {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in dict(ew).items()}
+
+        # 2) local-triv transition weights (if available)
+        tr = getattr(self, "_transition_report", None)
+        if tr is None:
+            return None  # no local trivs computed
+
+        prefer = str(prefer)
+        if prefer not in ("rms", "witness", "none"):
+            raise ValueError("prefer must be 'rms', 'witness', or 'none'.")
+
+        if prefer == "none":
+            return None
+
+        if prefer == "rms":
+            ew = getattr(tr, "rms_angle_err", None)
+        else:  # "witness"
+            # witness lives on quality in your code, but not always present
+            q = getattr(self, "_quality", None)
+            ew = getattr(q, "witness_err", None) if q is not None else None
+
+        if ew is None:
+            return None
+
+        return {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in dict(ew).items()}
+

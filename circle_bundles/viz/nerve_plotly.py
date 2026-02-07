@@ -12,6 +12,15 @@ from ..nerve.combinatorics import canon_edge, canon_tri
 Edge = Tuple[int, int]
 Tri = Tuple[int, int, int]
 
+__all__ = [
+    "embed_landmarks",
+    "make_nerve_figure",
+    "nerve_plotly_from_U",
+    "nerve_with_slider_from_U",
+    # backwards compat
+    "nerve_with_slider",
+]
+
 
 # -----------------------------------------------------------------------------
 # Embedding
@@ -98,13 +107,18 @@ def _filter_tris_by_edge_set(T: List[Tri], Eset: Set[Edge]) -> List[Tri]:
     return keep
 
 
-def _segments_from_edges(emb: np.ndarray, edges: Sequence[Edge]) -> Tuple[List[Optional[float]], List[Optional[float]], List[Optional[float]]]:
+def _segments_from_edges(
+    emb: np.ndarray,
+    edges: Sequence[Edge],
+) -> Tuple[List[Optional[float]], List[Optional[float]], List[Optional[float]]]:
     ex: List[Optional[float]] = []
     ey: List[Optional[float]] = []
     ez: List[Optional[float]] = []
-    n = emb.shape[0]
+    n = int(emb.shape[0])
 
     for (i, j) in edges:
+        i = int(i)
+        j = int(j)
         if not (0 <= i < n and 0 <= j < n):
             continue
         ex += [float(emb[i, 0]), float(emb[j, 0]), None]
@@ -133,7 +147,7 @@ def make_nerve_figure(
     highlight_edges: Optional[Set[Edge]] = None,
     highlight_color: str = "red",
     # cochains: list of dicts mapping simplex->value
-    # expected simplex keys as tuple-like (i,), (i,j), (i,j,k) OR ints for vertices
+    # expected simplex keys as tuple-like (i,), (i,j), (i,j,k)
     cochains: Optional[List[Dict[Tuple[int, ...], object]]] = None,
     fontsize: int = 16,
     title: Optional[str] = None,
@@ -181,24 +195,6 @@ def make_nerve_figure(
         )
     )
 
-    # filter triangles to respect current edge set
-    Eset = set(E)
-    T = _filter_tris_by_edge_set(T, Eset)
-
-    fig = go.Figure()
-
-    # ---- edges (base) ----
-    ex, ey, ez = _segments_from_edges(emb, E)
-    fig.add_trace(
-        go.Scatter3d(
-            x=ex, y=ey, z=ez,
-            mode="lines",
-            line=dict(width=float(edge_width), color="black"),
-            hoverinfo="none",
-            showlegend=False,
-        )
-    )
-
     # ---- highlighted edges ----
     if highlight_edges:
         H = _canon_edges(highlight_edges)
@@ -212,7 +208,7 @@ def make_nerve_figure(
                 go.Scatter3d(
                     x=hx, y=hy, z=hz,
                     mode="lines",
-                    line=dict(width=float(max(2 * edge_width, edge_width + 4)), color=highlight_color),
+                    line=dict(width=float(max(2 * edge_width, edge_width + 4)), color=str(highlight_color)),
                     hoverinfo="none",
                     showlegend=False,
                 )
@@ -226,7 +222,7 @@ def make_nerve_figure(
                 x=emb[:, 0], y=emb[:, 1], z=emb[:, 2],
                 i=tri[:, 0], j=tri[:, 1], k=tri[:, 2],
                 opacity=float(tri_opacity),
-                color=tri_color,
+                color=str(tri_color),
                 hoverinfo="skip",
                 showlegend=False,
             )
@@ -313,12 +309,56 @@ def make_nerve_figure(
 
 
 # -----------------------------------------------------------------------------
-# Notebook slider wrapper 
+# Cover-free entry points (Bundle should use these)
 # -----------------------------------------------------------------------------
 
-def nerve_with_slider(
+def nerve_plotly_from_U(
     *,
-    cover,
+    U: np.ndarray,
+    landmarks: np.ndarray,
+    edges: Sequence[Edge],
+    triangles: Optional[Sequence[Tri]] = None,
+    title: Optional[str] = None,
+    show_labels: bool = True,
+    show_axes: bool = False,
+    tri_opacity: float = 0.25,
+    tri_color: str = "pink",
+    cochains: Optional[List[Dict[Tuple[int, ...], object]]] = None,
+    edge_weights: Optional[Mapping[Edge, float]] = None,
+    edge_cutoff: Optional[float] = None,
+    highlight_edges: Optional[Set[Edge]] = None,
+    highlight_color: str = "red",
+) -> go.Figure:
+    """
+    Static nerve plot that does NOT require a cover object.
+    """
+    _U = np.asarray(U, dtype=bool)
+    if _U.ndim != 2:
+        raise ValueError(f"U must be 2D (n_sets, n_samples). Got {_U.shape}.")
+
+    return make_nerve_figure(
+        landmarks=np.asarray(landmarks),
+        edges=list(edges),
+        triangles=list(triangles or []),
+        show_labels=bool(show_labels),
+        show_axes=bool(show_axes),
+        tri_opacity=float(tri_opacity),
+        tri_color=str(tri_color),
+        edge_weights=edge_weights,
+        edge_cutoff=edge_cutoff,
+        highlight_edges=highlight_edges,
+        highlight_color=str(highlight_color),
+        cochains=cochains,
+        title=title,
+    )
+
+
+def nerve_with_slider_from_U(
+    *,
+    U: np.ndarray,
+    landmarks: np.ndarray,
+    edges: Sequence[Edge],
+    triangles: Sequence[Tri] | None = None,
     edge_weights: Mapping[Edge, float],
     show_labels: bool = True,
     tri_opacity: float = 0.25,
@@ -327,24 +367,33 @@ def nerve_with_slider(
     highlight_edges: Optional[Set[Edge]] = None,
     highlight_color: str = "red",
     mark_cutoff: Optional[float] = None,   # e.g. max-trivial cutoff (a weight value)
-    title: Optional[str] = None,          
-    show_title_value: bool = True,         # if True, appends (w ≤ ...) to the title
+    title: Optional[str] = None,
+    show_title_value: bool = True,
+    initial: Union[str, float] = "max",     # "max" | "min" | float (snap)
+    show_jump: bool = True,                # if False, never show jump button
+    jump_label: str = "Jump to max-trivial",
 ):
     """
     Notebook helper: slider over an edge weight cutoff, WITHOUT resetting the camera.
+    Cover-free version used by Bundle.
 
-    - Uses a persistent plotly FigureWidget and updates traces in-place.
-    - Optionally provides a button to jump to `mark_cutoff` (e.g. max-trivial weight).
+    Returns:
+      - if jump is shown: (jump_btn, slider, fig_widget)
+      - else:            (slider, fig_widget)
     """
     from ipywidgets import widgets, VBox, HBox
     from IPython.display import display
     import plotly.graph_objects as go
 
-    landmarks = np.asarray(cover.landmarks)
+    _U = np.asarray(U, dtype=bool)
+    if _U.ndim != 2:
+        raise ValueError(f"U must be 2D (n_sets, n_samples). Got {_U.shape}.")
+
+    landmarks = np.asarray(landmarks)
     emb = embed_landmarks(landmarks)
 
-    edges_all = _canon_edges(cover.nerve_edges())
-    tris_all = _canon_tris(cover.nerve_triangles())
+    edges_all = _canon_edges(edges)
+    tris_all = _canon_tris(triangles or [])
 
     ew = _canon_edge_weights(edge_weights)
     vals = sorted(set(float(v) for v in ew.values()))
@@ -369,12 +418,23 @@ def nerve_with_slider(
     # Discrete slider (filtration cutoffs)
     options = [(f"{v:.6g}", v) for v in vals]
 
+    def _snap_to_nearest(x: float) -> float:
+        return min(vals, key=lambda v: abs(v - float(x)))
+
     # pick initial value
-    if mark_cutoff is not None:
-        m = float(mark_cutoff)
-        init_val = min(vals, key=lambda v: abs(v - m))  # snap to nearest available cutoff
+    if isinstance(initial, str):
+        if initial == "min":
+            init_val = min(vals)
+        elif initial == "max":
+            init_val = max(vals)
+        else:
+            raise ValueError("initial must be 'min', 'max', or a float.")
     else:
-        init_val = max(vals)
+        init_val = _snap_to_nearest(float(initial))
+
+    # if mark_cutoff is provided, it takes precedence for initial snap
+    if mark_cutoff is not None:
+        init_val = _snap_to_nearest(float(mark_cutoff))
 
     slider = widgets.SelectionSlider(
         options=options,
@@ -410,11 +470,11 @@ def nerve_with_slider(
         showlegend=False,
     ))
 
-    # Trace 1: highlighted edges overlay (only edges currently present)
+    # Trace 1: highlighted edges overlay
     fig.add_trace(go.Scatter3d(
         x=[], y=[], z=[],
         mode="lines",
-        line=dict(width=7.0, color=highlight_color),
+        line=dict(width=7.0, color=str(highlight_color)),
         hoverinfo="none",
         showlegend=False,
     ))
@@ -426,7 +486,7 @@ def nerve_with_slider(
             x=emb[:, 0], y=emb[:, 1], z=emb[:, 2],
             i=tri[:, 0], j=tri[:, 1], k=tri[:, 2],
             opacity=float(tri_opacity),
-            color=tri_color,
+            color=str(tri_color),
             hoverinfo="skip",
             showlegend=False,
         ))
@@ -476,8 +536,7 @@ def nerve_with_slider(
     # canonical highlight edges once
     Hcanon = _canon_edges(highlight_edges or [])
 
-    def _highlight_under_cutoff(Eset: set[Edge]) -> List[Edge]:
-        # only show highlighted edges that are currently present under cutoff
+    def _highlight_under_cutoff(Eset: Set[Edge]) -> List[Edge]:
         return [e for e in Hcanon if e in Eset]
 
     # set initial highlight
@@ -518,7 +577,7 @@ def nerve_with_slider(
                 fig.data[2].j = tri[:, 1]
                 fig.data[2].k = tri[:, 2]
                 fig.data[2].opacity = float(tri_opacity)
-                fig.data[2].color = tri_color
+                fig.data[2].color = str(tri_color)
             else:
                 fig.data[2].x = []
                 fig.data[2].y = []
@@ -532,28 +591,84 @@ def nerve_with_slider(
     slider.observe(update, names="value")
     update()
 
-    # --- Jump button (no extra labels) ---
-    jump_btn = widgets.Button(
-        description="Jump to max-trivial",
-        button_style="info",
-        layout={"width": "220px"},
-    )
-    jump_btn.disabled = (mark_cutoff is None)
+    # --- Jump button: ONLY create it if mark_cutoff is provided ---
+    controls = [slider]
 
-    def _jump(_btn):
-        if mark_cutoff is None:
-            return
-        m = float(mark_cutoff)
-        nearest = min(vals, key=lambda v: abs(v - m))
+    if mark_cutoff is not None:
+        jump_btn = widgets.Button(
+            description="Jump to max-trivial",
+            button_style="info",
+            layout={"width": "220px"},
+        )
 
-        # If it's already at nearest, the observer won't fire, so force update.
-        if float(slider.value) != float(nearest):
+        def _jump(_btn):
+            m = float(mark_cutoff)
+            nearest = min(vals, key=lambda v: abs(v - m))
+
+            # If it's already at nearest, the observer might not fire; force update.
             slider.value = nearest
-        update()  # <- force redraw no matter what
+            update()
 
-    jump_btn.on_click(_jump)
+        jump_btn.on_click(_jump)
+        controls = [jump_btn, slider]
 
-    # Display: button + slider + figure
-    display(VBox([fig, HBox([jump_btn, slider])]))
+    # Display: figure + controls
+    display(VBox([fig, HBox(controls)]))
 
+    # Return shape: if no jump button, return (None, slider, fig)
+    if mark_cutoff is None:
+        return (None, slider, fig)
     return (jump_btn, slider, fig)
+
+
+
+# -----------------------------------------------------------------------------
+# Backwards-compatible cover wrapper (optional)
+# -----------------------------------------------------------------------------
+
+def nerve_with_slider(
+    *,
+    cover: Any,
+    edge_weights: Mapping[Edge, float],
+    show_labels: bool = True,
+    tri_opacity: float = 0.25,
+    tri_color: str = "pink",
+    show_axes: bool = False,
+    highlight_edges: Optional[Set[Edge]] = None,
+    highlight_color: str = "red",
+    mark_cutoff: Optional[float] = None,
+    title: Optional[str] = None,
+    show_title_value: bool = True,
+    initial: Union[str, float] = "max",
+    show_jump: bool = True,
+    jump_label: str = "Jump to max-trivial",
+):
+    """
+    Backwards compatible wrapper for older cover-based notebooks.
+
+    Internally calls the cover-free `nerve_with_slider_from_U`.
+    """
+    U = np.asarray(cover.U, dtype=bool)
+    landmarks = np.asarray(getattr(cover, "landmarks"))
+    edges = list(cover.nerve_edges())
+    tris = list(cover.nerve_triangles())
+
+    return nerve_with_slider_from_U(
+        U=U,
+        landmarks=landmarks,
+        edges=edges,
+        triangles=tris,
+        edge_weights=edge_weights,
+        show_labels=show_labels,
+        tri_opacity=tri_opacity,
+        tri_color=tri_color,
+        show_axes=show_axes,
+        highlight_edges=highlight_edges,
+        highlight_color=highlight_color,
+        mark_cutoff=mark_cutoff,
+        title=title,
+        show_title_value=show_title_value,
+        initial=initial,
+        show_jump=show_jump,
+        jump_label=jump_label,
+    )
