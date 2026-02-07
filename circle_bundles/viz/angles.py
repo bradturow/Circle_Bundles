@@ -262,9 +262,8 @@ def _select_edges_by_error(
 
     return selected, err_by_edge, ov_by_edge
 
-
-def compare_trivs(
-    cover,
+def compare_trivs_from_U(
+    U: np.ndarray,
     f: np.ndarray,
     *,
     edges: Optional[List[Tuple[int, int]]] = None,
@@ -279,7 +278,7 @@ def compare_trivs(
     return_selected: bool = False,
 ):
     """
-    Compare local trivializations on overlaps for each nerve edge (j,k).
+    Compare local trivializations on overlaps for each nerve edge (j,k), using cover-free inputs.
 
     New behavior:
       - If number of nonempty overlaps <= max_pairs: plot all.
@@ -287,17 +286,27 @@ def compare_trivs(
     """
     import matplotlib.pyplot as plt
 
-    U = np.asarray(cover.U, dtype=bool)
+    U = np.asarray(U, dtype=bool)
     if U.ndim != 2:
-        raise ValueError("cover.U must be 2D (n_sets, n_samples).")
+        raise ValueError("U must be 2D (n_sets, n_samples).")
 
     n_sets, n_samples = U.shape
     f = np.asarray(f)
     if f.shape != (n_sets, n_samples):
         raise ValueError(f"f must have shape {(n_sets, n_samples)}, got {f.shape}")
 
+    # If edges not provided: infer all nonempty overlaps (same policy as cover.nerve_edges())
     if edges is None:
-        edges = list(cover.nerve_edges())
+        edges = []
+        for j in range(n_sets):
+            Uj = U[j]
+            for k in range(j + 1, n_sets):
+                if np.any(Uj & U[k]):
+                    edges.append((j, k))
+
+    # normalize / cast
+    edges = [(int(a), int(b)) for (a, b) in edges if int(a) != int(b)]
+    edges = [(min(a, b), max(a, b)) for (a, b) in edges]
 
     selected_edges, err_by_edge, ov_by_edge = _select_edges_by_error(
         U,
@@ -310,7 +319,9 @@ def compare_trivs(
     if not selected_edges:
         raise ValueError("No nonempty overlaps found on the provided edges.")
 
-    subsampled = (len(selected_edges) < len([e for e in edges if (int(e[0]), int(e[1])) in err_by_edge]))
+    # were we subsampled?
+    n_nonempty = len([e for e in edges if (int(e[0]), int(e[1])) in err_by_edge])
+    subsampled = (len(selected_edges) < n_nonempty)
 
     tag_by_edge: Dict[Tuple[int, int], str] = {}
     if subsampled and len(selected_edges) >= 2:
@@ -322,6 +333,7 @@ def compare_trivs(
         tag_by_edge[worst] = "WORST"
         tag_by_edge[median] = "MEDIAN"
         ncols = 3
+
     angle_arrays: List[np.ndarray] = []
     labels: List[str] = []
     titles: List[str] = []
@@ -371,8 +383,53 @@ def compare_trivs(
 
     if show:
         plt.show()
+    else:
+        plt.close(fig)
 
     if return_selected:
         return fig, selected_edges, err_by_edge
 
     return fig
+
+
+def compare_trivs(
+    cover,
+    f: np.ndarray,
+    *,
+    edges: Optional[List[Tuple[int, int]]] = None,
+    ncols: int | str = "auto",
+    title_size: int = 14,
+    align: bool = False,
+    s: float = 1.0,
+    save_path: Optional[str] = None,
+    show: bool = True,
+    max_pairs: int = 25,
+    metric: str = "mean",
+    return_selected: bool = False,
+):
+    """
+    Backwards-compatible wrapper: accepts `cover` and calls compare_trivs_from_U(U=cover.U,...).
+    """
+    U = np.asarray(cover.U, dtype=bool)
+
+    if edges is None:
+        # preserve old behavior if cover provides nerve_edges()
+        if hasattr(cover, "nerve_edges") and callable(getattr(cover, "nerve_edges")):
+            edges = list(cover.nerve_edges())
+        else:
+            edges = None  # let compare_trivs_from_U infer
+
+    return compare_trivs_from_U(
+        U=U,
+        f=f,
+        edges=edges,
+        ncols=ncols,
+        title_size=title_size,
+        align=align,
+        s=s,
+        save_path=save_path,
+        show=show,
+        max_pairs=max_pairs,
+        metric=metric,
+        return_selected=return_selected,
+    )

@@ -1537,7 +1537,7 @@ def _display_bundle_map_summary_latex(
 
     latex = (
         r"\begin{aligned}"
-        r"\textbf{Bundle Map} & \\[6pt]"
+        r"\textbf{Bundle Map Summary} & \\[6pt]"
         + _rows_to_aligned(coord_rows)
     )
 

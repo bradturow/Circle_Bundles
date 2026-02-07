@@ -904,6 +904,7 @@ class Bundle:
         *,
         pou: Optional[np.ndarray] = None,
         weight: Optional[float] = None,
+        packing: FramePacking = "coloring2",
     ):
         """
         Build the *pre-projection* frame dataset used by the bundle-map solver.
@@ -989,7 +990,7 @@ class Bundle:
             stage="pre_projection",
             max_frames=None,
             rng_seed=None,
-            packing="coloring",  
+            packing=packing,  
         )
 
     def get_bundle_map(
@@ -1190,8 +1191,93 @@ class Bundle:
                     extra_rows=None,
                 )
 
-        return bm
+        return bm    
+    
+    # --------------
+    # Visualization
+    # --------------
+    
+    def compare_trivs(
+        self,
+        *,
+        ncols: int | str = "auto",
+        title_size: int = 14,
+        align: bool = False,
+        s: float = 1.0,
+        save_path: Optional[str] = None,
+        max_pairs: int = 25,
+        metric: str = "mean",
+        show: bool = True,
+        return_selected: bool = False,
+        # Bundle-style edge selection (so we don't depend on a Cover object)
+        min_points_edge: int = 1,
+        edges: Optional[List[Tuple[int, int]]] = None,
+    ):
+        """
+        Compare local trivializations on overlaps (static diagnostic plot).
 
+        This is a cover-free wrapper around ``circle_bundles.viz.angles.compare_trivs_from_U``.
+        It can be called once local trivializations have been computed.
+
+        Parameters
+        ----------
+        ncols:
+            Number of columns in the comparison grid (or ``"auto"``).
+        title_size:
+            Font size for subplot titles.
+        align:
+            If True, align the second trivialization to the first on each overlap using an O(2) fit.
+        s:
+            Marker size scaling (visualization parameter).
+        save_path:
+            If provided, save the figure to this path.
+        max_pairs:
+            Maximum number of overlap pairs to display.
+            If more overlaps exist, the visualizer shows WORST / MEDIAN / BEST by the chosen metric.
+        metric:
+            Overlap scoring method: ``"mean"`` or ``"rms"`` (circle-fit error).
+        show:
+            If True, display the plot (matplotlib).
+        return_selected:
+            If True, also return (selected_edges, err_by_edge) in addition to the figure.
+        min_points_edge:
+            If `edges` is not provided, we infer edges from U by requiring
+            |U_j ∩ U_k| >= min_points_edge.
+        edges:
+            Optional explicit list of (j,k) edges to consider. If provided, overrides min_points_edge.
+
+        Returns
+        -------
+        fig  (or (fig, selected_edges, err_by_edge) if return_selected=True)
+        """
+        # prerequisites (NO auto-running)
+        self._require_local_trivs()
+        assert self._local_triv is not None
+
+        # Lazy import so bundle import doesn't pull matplotlib
+        from .viz.angles import compare_trivs_from_U
+
+        # Choose edges
+        if edges is None:
+            edges_used = self._edges_from_U(min_points=int(min_points_edge))
+        else:
+            edges_used = [(int(a), int(b)) for (a, b) in edges]
+
+        return compare_trivs_from_U(
+            U=self.U,
+            f=self._local_triv.f,
+            edges=edges_used,
+            ncols=ncols,
+            title_size=int(title_size),
+            align=bool(align),
+            s=float(s),
+            save_path=save_path,
+            show=bool(show),
+            max_pairs=int(max_pairs),
+            metric=str(metric),
+            return_selected=bool(return_selected),
+        )
+    
     # ----------------------------
     # Accessors (NO auto-running)
     # ----------------------------
