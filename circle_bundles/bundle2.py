@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Literal, Optional, Tuple, List, Any
+from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple
 
 import numpy as np
+
+from .nerve.combinatorics import Edge, canon_edge
 
 from .o2_cocycle import O2Cocycle, TransitionReport, estimate_transitions
 from .trivializations.local_triv import LocalTrivResult, compute_local_triv
@@ -13,6 +15,10 @@ from .analysis.quality import BundleQualityReport, compute_bundle_quality_from_U
 # Summaries (polished + uniform)
 from .summaries.nerve_summary import summarize_nerve_from_U, NerveSummary
 from .summaries.local_triv_summary import summarize_local_trivs
+from .summaries.class_summary import summarize_classes_and_persistence
+
+from .summaries.bundle_map_summary import summarize_bundle_map, BundleMapSummary
+
 
 # classes + persistence
 from .analysis.class_persistence import (
@@ -20,9 +26,6 @@ from .analysis.class_persistence import (
     _edges_for_subcomplex_from_persistence,
     build_edge_weights_from_transition_report,
 )
-
-# class summary (classes-only + rounding diag) + persistence block together
-from .summaries.class_summary import summarize_classes_and_persistence
 
 # class reps + restricted-class report
 from .characteristic_class import (
@@ -34,6 +37,14 @@ from .characteristic_class import (
 from .trivializations.global_trivialization import (
     build_global_trivialization_singer,
     apply_orientation_gauge_to_f,
+)
+
+# bundle-map + frames
+from .trivializations.bundle_map import (
+    FramePacking,
+    get_frame_dataset as _get_frame_dataset,
+    get_bundle_map as _get_bundle_map,
+    show_bundle_map_summary,
 )
 
 
@@ -63,6 +74,27 @@ class ClassesAndPersistence:
 
 
 # ----------------------------
+# Return type for get_bundle_map
+# ----------------------------
+
+@dataclass
+class BundleMapResult:
+    """
+    Minimal, user-facing bundle-map output.
+
+    F:
+      Global fiber coordinates in the solver's ambient frame space.
+      Shape is (n_samples, D_used).
+    """
+    F: np.ndarray
+    pre_F: np.ndarray
+    Omega_used: Dict[Edge, np.ndarray]
+    Phi_used: np.ndarray
+    report: Any
+    meta: Dict[str, Any]
+
+
+# ----------------------------
 # Bundle
 # ----------------------------
 
@@ -74,12 +106,16 @@ class Bundle:
       - U is the only "cover structure" input.
       - We ALWAYS compute edges/triangles/tetrahedra from U automatically (min_points=1),
         up to max_simp_dim (requested).
-      - We do NOT print O(2)-estimation stats in summaries (per preference).
       - Summaries are:
-          (1) NerveSummary (old cover-summary style, now auto-plots when shown)
-          (2) LocalTrivSummary (characteristic-class style diagnostics)
-          (3) ClassSummary (Characteristic Classes + Persistence; no triv diagnostics)
+          (1) NerveSummary
+          (2) LocalTrivSummary
+          (3) ClassSummary (Characteristic Classes + Persistence)
+          (4) BundleMapSummary (solver summary; only shows if bundle-map has been computed)
       - Computation is explicit: methods NEVER auto-run prerequisites.
+      - Bundle-map is exposed as:
+          - get_frame_dataset(...)
+          - get_bundle_map(...)
+        and returns ONLY the fiber/total-space coordinates (no concatenation, no product metric).
     """
 
     _REF_ANGLE: float = 0.0
@@ -130,12 +166,24 @@ class Bundle:
         self._global_F: Optional[np.ndarray] = None
         self._global_meta: Optional[Dict[str, Any]] = None
 
+        # caches (bundle map)
+        self._bundle_map_cache: Dict[Any, BundleMapResult] = {}
+        self._bundle_map_last: Optional[BundleMapResult] = None
+
+        # caches (bundle-map summary)
+        self._bundle_map_summary: Optional[BundleMapSummary] = None
+
     # ----------------------------
     # requirement helpers (NO auto-running)
     # ----------------------------
 
     def _require_local_trivs(self) -> None:
-        if self._local_triv is None or self._cocycle is None or self._transition_report is None or self._quality is None:
+        if (
+            self._local_triv is None
+            or self._cocycle is None
+            or self._transition_report is None
+            or self._quality is None
+        ):
             raise RuntimeError(
                 "Local trivializations/cocycle/quality not computed.\n"
                 "Run: bundle.get_local_trivs(...) first."
@@ -148,12 +196,22 @@ class Bundle:
                 "Run: bundle.get_classes(...) first."
             )
 
-    def _require_pou(self) -> None:
-        if self.pou is None:
-            raise RuntimeError(
-                "This method requires a partition of unity `pou`.\n"
-                "Provide `pou=...` when constructing Bundle(...)."
-            )
+    def _require_pou(self, pou_override: Optional[np.ndarray]) -> np.ndarray:
+        """
+        Return a validated partition of unity, preferring the override if provided.
+        """
+        P = np.asarray(pou_override, dtype=float) if pou_override is not None else None
+        if P is None:
+            if self.pou is None:
+                raise RuntimeError(
+                    "This method requires a partition of unity `pou`.\n"
+                    "Provide `pou=...` when constructing Bundle(...), or pass pou=... to this method."
+                )
+            P = np.asarray(self.pou, dtype=float)
+
+        if P.shape != (self.n_sets, self.n_samples):
+            raise ValueError(f"pou must have shape {(self.n_sets, self.n_samples)}; got {P.shape}.")
+        return P
 
     # ----------------------------
     # validation / properties
@@ -359,17 +417,39 @@ class Bundle:
             )
         return summ
 
+    def summarize_bundle_map(
+        self,
+        *,
+        show: bool = True,
+        mode: str = "auto",
+        rounding: int = 3,
+    ):
+        """
+        Show bundle-map summary only if a bundle-map has already been computed.
+        Never computes anything.
+        """
+        if self._bundle_map_summary is None:
+            return None
+
+        if show:
+            self._bundle_map_summary.show_summary(
+                show=True,
+                mode=str(mode),
+                rounding=int(rounding),
+            )
+        return self._bundle_map_summary
+
     def summary(
         self,
-        modes: Optional[Iterable[Literal["nerve", "local_triv", "classes"]]] = None,
+        modes: Optional[Iterable[Literal["nerve", "local_triv", "classes", "bundle_map"]]] = None,
         *,
         show: bool = True,
         mode: str = "auto",
         latex: str | bool = "auto",
-        # pass-through knobs for classes summary (ignored if classes not present)
         top_k: int = 10,
         show_weight_hist: bool = False,
         hist_bins: int = 40,
+        bm_rounding: int = 3,
     ) -> Dict[str, object]:
         """
         Show only summaries that are already available.
@@ -378,9 +458,7 @@ class Bundle:
           - always show nerve
           - show local_triv if computed
           - show classes if computed
-
-        If modes is provided, we *attempt* those, but do not compute missing pieces:
-          - missing summaries just return None in the output dict.
+          - show bundle_map if computed
         """
         if modes is None:
             modes_list: List[str] = ["nerve"]
@@ -392,6 +470,8 @@ class Bundle:
                 and self._class_restricted is not None
             ):
                 modes_list.append("classes")
+            if self._bundle_map_summary is not None:
+                modes_list.append("bundle_map")
         else:
             modes_list = list(modes)
 
@@ -419,6 +499,13 @@ class Bundle:
                     hist_bins=int(hist_bins),
                 )
 
+            elif m == "bundle_map":
+                out["bundle_map"] = self.summarize_bundle_map(
+                    show=show,
+                    mode=mode,
+                    rounding=int(bm_rounding),
+                )
+
             else:
                 raise ValueError(f"Unknown summary mode {m!r}.")
 
@@ -434,11 +521,23 @@ class Bundle:
         cc: object = "pca2",
         min_patch_size: int = 10,
         min_points_edge: int = 5,
+        pou: Optional[np.ndarray] = None,
         show_summary: bool = True,
         mode: str = "auto",
         latex: str | bool = "auto",
         verbose: bool = True,
     ) -> LocalTrivAndCocycle:
+        """
+        Compute local trivializations + cocycle + quality.
+
+        Notes
+        -----
+        - `pou` is OPTIONAL here: it is only used for quality diagnostics.
+          If omitted, we use `self.pou` (if present). If neither exists, we still compute
+          local_triv + cocycle, and quality is computed with pou=None (if your quality
+          routine supports it).
+        - Passing `pou=...` here does NOT overwrite self.pou.
+        """
         # 1) local triv
         if self.distance_matrix:
             lt = compute_local_triv(
@@ -473,10 +572,18 @@ class Bundle:
             fail_fast_missing=True,
         )
 
-        # 3) quality
+        # 3) quality (allow pou override, but do not require it)
+        P = None
+        if pou is not None:
+            P = np.asarray(pou, dtype=float)
+            if P.shape != (self.n_sets, self.n_samples):
+                raise ValueError(f"pou must have shape {(self.n_sets, self.n_samples)}; got {P.shape}.")
+        elif self.pou is not None:
+            P = np.asarray(self.pou, dtype=float)
+
         qual = compute_bundle_quality_from_U(
             U=self.U,
-            pou=self.pou,
+            pou=P,
             local_triv=lt,
             cocycle=cocycle,
             transitions_report=report,
@@ -501,12 +608,14 @@ class Bundle:
         self._class_restricted = None
         self._global_F = None
         self._global_meta = None
+        self._bundle_map_cache.clear()
+        self._bundle_map_last = None
+        self._bundle_map_summary = None
 
         # cache nerve summary (computed from U); do not show during compute
         nerve = self.summarize_nerve(show=False, verbose=False, latex=latex)
 
         if show_summary:
-            # show only the triv summary (nerve is always available separately)
             self.summary(modes=["local_triv"], show=True, mode=mode, latex=latex)
 
         return LocalTrivAndCocycle(
@@ -535,12 +644,6 @@ class Bundle:
     ) -> ClassesAndPersistence:
         """
         Compute characteristic class reps + persistence.
-
-        Pipeline:
-          1) reps only (w1 + twisted Euler representative)
-          2) edge-driven persistence on weights filtration
-          3) compute “derived class data” only after restricting to a
-             persistence-determined subcomplex (so reps are cocycles there)
 
         IMPORTANT:
           - This does NOT auto-run get_local_trivs().
@@ -574,7 +677,7 @@ class Bundle:
             ew = {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in edge_weights.items()}
 
         p = compute_bundle_persistence(
-            cover=self,  # only used for simplex extraction when edges/tris/tets omitted
+            cover=self,
             classes=reps,
             edges=self._edges_U,
             triangles=self._tris_U,
@@ -582,7 +685,6 @@ class Bundle:
             edge_weights=ew,
             prefer_edge_weight=str(prefer_edge_weight),
         )
-        # Recommended: store weights on result for downstream gating/debugging
         try:
             setattr(p, "edge_weights", dict(ew))
         except Exception:
@@ -632,7 +734,6 @@ class Bundle:
         )
         self._class_restricted = restricted
 
-        # ---- Combined class + persistence summary ----
         summ = summarize_classes_and_persistence(
             reps=reps,
             restricted=restricted,
@@ -650,9 +751,12 @@ class Bundle:
                 hist_bins=int(hist_bins),
             )
 
-        # invalidate global trivialization cache (depends on classes threshold)
+        # invalidate downstream caches
         self._global_F = None
         self._global_meta = None
+        self._bundle_map_cache.clear()
+        self._bundle_map_last = None
+        self._bundle_map_summary = None
 
         return ClassesAndPersistence(
             reps=reps,
@@ -674,47 +778,25 @@ class Bundle:
         """
         Singer-only global trivialization (degree-normalized ALWAYS).
 
-        Parameters
-        ----------
-        weight:
-            Edge-weight threshold (rms-angle error etc.) for selecting edges *within* the
-            max-trivial subcomplex. If None, uses the maximal-trivial threshold automatically.
-            In all cases we forbid weights above the max-trivial threshold.
-        pou:
-            Optional partition of unity override (shape (n_sets, n_samples)).
-            If provided, it is used instead of self.pou (but does not overwrite it).
-
         Requires (must already be computed)
         -----------------------------------
-        - get_local_trivs()  -> provides self._local_triv, self._cocycle, self._transition_report
-        - get_classes()      -> provides self._class_persistence (for max-trivial stage)
+        - get_local_trivs()
+        - get_classes()
 
-        Returns
-        -------
-        F : ndarray, shape (n_samples,)
-            Global angles in radians in [0, 2π).
+        pou override
+        ------------
+        If `pou` is provided, it overrides self.pou for this call only (no overwrite).
         """
-        # ---- prerequisites (NO auto-running) ----
-        if self._local_triv is None or self._cocycle is None or self._transition_report is None:
-            raise RuntimeError("Run bundle.get_local_trivs(...) before get_global_trivialization().")
-
+        # prerequisites (NO auto-running)
+        self._require_local_trivs()
         if self._class_persistence is None:
             raise RuntimeError("Run bundle.get_classes(...) before get_global_trivialization().")
+        assert self._cocycle is not None and self._transition_report is not None and self._local_triv is not None
 
-        # ---- partition of unity (required) ----
-        P = np.asarray(pou, dtype=float) if pou is not None else None
-        if P is None:
-            if self.pou is None:
-                raise ValueError(
-                    "get_global_trivialization requires a partition of unity `pou` "
-                    "(shape (n_sets, n_samples)). Pass pou=... here or provide it in Bundle(..., pou=...)."
-                )
-            P = np.asarray(self.pou, dtype=float)
+        # partition of unity (required here)
+        P = self._require_pou(pou)
 
-        if P.shape != (self.n_sets, self.n_samples):
-            raise ValueError(f"pou must have shape {(self.n_sets, self.n_samples)}; got {P.shape}.")
-
-        # ---- build edge weights same as get_classes() ----
+        # build edge weights
         rms = getattr(self._transition_report, "rms_angle_err", None)
         wit = getattr(self._transition_report, "witness_err", None)
         ew = build_edge_weights_from_transition_report(
@@ -724,19 +806,14 @@ class Bundle:
             prefer="rms",
         )
 
-        # ---- max-trivial edges from persistence ----
+        # max-trivial edges from persistence
         kept_edges_max = _edges_for_subcomplex_from_persistence(self._class_persistence, "max_trivial")
         kept_set = {tuple(sorted((int(a), int(b)))) for (a, b) in kept_edges_max}
-
         if not kept_set:
             raise ValueError("Max-trivial subcomplex has no edges; cannot build global trivialization.")
 
-        # Max allowed weight among edges in max-trivial subcomplex
-        max_allowed_weight = max(
-            float(ew[tuple(sorted(e))]) for e in kept_set if tuple(sorted(e)) in ew
-        )
+        max_allowed_weight = max(float(ew[tuple(sorted(e))]) for e in kept_set if tuple(sorted(e)) in ew)
 
-        # Default weight = maximal-trivial threshold
         if weight is None:
             w = float(max_allowed_weight)
         else:
@@ -747,7 +824,6 @@ class Bundle:
                     "Choose weight <= max-trivial threshold."
                 )
 
-        # ---- choose edges at this stage, but never beyond max-trivial ----
         edges_stage: List[Tuple[int, int]] = []
         for (a, b) in self._edges_U:
             e = tuple(sorted((int(a), int(b))))
@@ -755,12 +831,11 @@ class Bundle:
                 continue
             if float(ew.get(e, np.inf)) <= w:
                 edges_stage.append(e)
-
         edges_stage = sorted(set(edges_stage))
         if not edges_stage:
             raise ValueError("No edges remain at this weight within the max-trivial subcomplex.")
 
-        # ---- orient the cocycle on the chosen 1-skeleton (THIS FIXES ALIGNMENT) ----
+        # orient the cocycle on the chosen 1-skeleton (fixes alignment)
         ok, coc_oriented, phi_pm1 = self._cocycle.orient_if_possible(
             edges_stage,
             n_vertices=self.n_sets,
@@ -772,10 +847,9 @@ class Bundle:
                 "on the selected subcomplex (w₁ does not trivialize there)."
             )
 
-        # ---- apply the SAME vertex gauge to local angles ----
+        # apply the SAME vertex gauge to local angles
         f = np.asarray(self._local_triv.f, dtype=float)
         U = np.asarray(self.U, dtype=bool)
-
         f = apply_orientation_gauge_to_f(
             f=f,
             phi_pm1=np.asarray(phi_pm1, dtype=int),
@@ -783,8 +857,8 @@ class Bundle:
             U=U,
         )
 
-        # ---- Singer using oriented theta (now compatible with gauged f) ----
-        theta_use = coc_oriented.theta  # canonical edges (j<k) included
+        # Singer using oriented theta (compatible with gauged f)
+        theta_use = coc_oriented.theta
         F = build_global_trivialization_singer(
             edges=edges_stage,
             U=U,
@@ -793,9 +867,215 @@ class Bundle:
             theta=theta_use,
             n_vertices=self.n_sets,
         )
-
         return np.asarray(F, dtype=float)
 
+    # ----------------------------
+    # bundle-map: frames + coordinates (NO pullback object)
+    # ----------------------------
+
+    def get_frame_dataset(
+        self,
+        *,
+        stage: str = "post_projection",
+        reducer=None,
+        max_frames: Optional[int] = None,
+        rng_seed: Optional[int] = None,
+        edges: Optional[Iterable[Edge]] = None,
+        subcomplex: Literal["full", "cocycle", "max_trivial"] = "full",
+        persistence=None,
+        packing: FramePacking = "coloring",
+        pou: Optional[np.ndarray] = None,
+    ):
+        """
+        Build a frame dataset used by the bundle-map solver.
+
+        Requires
+        --------
+        - get_local_trivs()   (for f and Omega)
+        - a partition of unity (self.pou or pou= override)
+
+        Notes
+        -----
+        - This is a *debug/inspection* helper; most users call get_bundle_map().
+        - No auto-running of prerequisites.
+        """
+        self._require_local_trivs()
+        assert self._cocycle is not None
+
+        P = self._require_pou(pou)
+
+        edges_used = edges
+        if edges_used is None and subcomplex != "full":
+            p = persistence if persistence is not None else getattr(self, "_class_persistence", None)
+            if p is None:
+                raise RuntimeError(
+                    "subcomplex != 'full' requires persistence.\n"
+                    "Run bundle.get_classes(...) first, or pass persistence=..."
+                )
+            edges_used = _edges_for_subcomplex_from_persistence(p, str(subcomplex))
+
+        return _get_frame_dataset(
+            U=self.U,
+            pou=P,
+            Omega=self._cocycle.Omega,
+            edges=edges_used,
+            reducer=reducer,
+            stage=stage,
+            max_frames=max_frames,
+            rng_seed=rng_seed,
+            packing=packing,
+        )
+
+    def get_bundle_map(
+        self,
+        *,
+        edges: Optional[Iterable[Edge]] = None,
+        subcomplex: Literal["full", "cocycle", "max_trivial"] = "full",
+        persistence=None,
+        strict_semicircle: bool = True,
+        semicircle_tol: float = 1e-8,
+        reducer=None,
+        packing: FramePacking = "coloring2",
+        compute_chart_disagreement: bool = True,
+        show_summary: bool = True,
+        summary_mode: str = "auto",
+        rounding: int = 3,
+        pou: Optional[np.ndarray] = None,
+        recompute: bool = False,
+    ) -> BundleMapResult:
+        """
+        Run (or fetch cached) bundle-map solver.
+
+        Returns
+        -------
+        BundleMapResult with:
+          - F: (n_samples, D_used) "total space" coordinates (fiber in ambient frame coords)
+          - plus diagnostics objects used by the solver
+        """
+        self._require_local_trivs()
+        assert self._cocycle is not None and self._local_triv is not None
+
+        P = self._require_pou(pou)
+
+        edges_used = edges
+        subcomplex_key = None
+        if edges_used is None:
+            subcomplex = str(subcomplex)
+            if subcomplex not in {"full", "cocycle", "max_trivial"}:
+                raise ValueError(f"subcomplex must be one of 'full','cocycle','max_trivial'. Got {subcomplex!r}")
+            subcomplex_key = subcomplex
+
+            if subcomplex != "full":
+                p = persistence if persistence is not None else getattr(self, "_class_persistence", None)
+                if p is None:
+                    raise RuntimeError(
+                        "subcomplex != 'full' requires persistence.\n"
+                        "Run bundle.get_classes(...) first, or pass persistence=..."
+                    )
+                edges_used = _edges_for_subcomplex_from_persistence(p, subcomplex)
+
+        edges_key = None
+        if edges_used is not None:
+            edges_key = tuple(sorted({canon_edge(*e) for e in edges_used if e[0] != e[1]}))
+
+        red_key = None
+        if reducer is not None:
+            red_key = (
+                getattr(reducer, "method", None),
+                getattr(reducer, "stage", None),
+                getattr(reducer, "d", None),
+                getattr(reducer, "max_frames", None),
+                getattr(reducer, "rng_seed", None),
+                getattr(reducer, "psc_verbosity", None),
+            )
+
+        # pou override participates in caching without hashing the full matrix.
+        pou_key = id(pou) if pou is not None else None
+
+        key = (
+            "bundle_map",
+            edges_key,
+            subcomplex_key,
+            str(packing),
+            bool(strict_semicircle),
+            float(semicircle_tol),
+            red_key,
+            bool(compute_chart_disagreement),
+            pou_key,
+        )
+
+        if recompute or key not in self._bundle_map_cache:
+            F, pre_F, Omega_used, Phi_used, report = _get_bundle_map(
+                U=self.U,
+                pou=P,
+                f=self._local_triv.f,
+                Omega=self._cocycle.Omega,
+                edges=edges_used,
+                strict_semicircle=bool(strict_semicircle),
+                semicircle_tol=float(semicircle_tol),
+                reducer=reducer,
+                show_summary=False,  # we handle summary here
+                compute_chart_disagreement=bool(compute_chart_disagreement),
+                packing=packing,
+            )
+
+            reducer_meta = None
+            if reducer is not None:
+                reducer_meta = {
+                    "method": getattr(reducer, "method", None),
+                    "stage": getattr(reducer, "stage", None),
+                    "d": getattr(reducer, "d", None),
+                    "max_frames": getattr(reducer, "max_frames", None),
+                    "rng_seed": getattr(reducer, "rng_seed", None),
+                    "psc_verbosity": getattr(reducer, "psc_verbosity", None),
+                }
+
+            self._bundle_map_cache[key] = BundleMapResult(
+                F=np.asarray(F),
+                pre_F=np.asarray(pre_F),
+                Omega_used=Omega_used,
+                Phi_used=np.asarray(Phi_used),
+                report=report,
+                meta={
+                    "strict_semicircle": bool(strict_semicircle),
+                    "semicircle_tol": float(semicircle_tol),
+                    "reducer": reducer_meta,
+                    "compute_chart_disagreement": bool(compute_chart_disagreement),
+                    "packing": packing,
+                    "subcomplex": subcomplex_key if edges is None else "explicit",
+                },
+            )
+
+        bm = self._bundle_map_cache[key]
+        self._bundle_map_last = bm
+        
+
+        # Build cached standardized summary object so bundle.summary() can show it later
+        try:
+            self._bundle_map_summary = summarize_bundle_map(
+                bm.report,
+                meta=dict(bm.meta or {}),
+            )
+        except Exception:
+            self._bundle_map_summary = None
+
+        if show_summary:
+            if self._bundle_map_summary is not None:
+                self._bundle_map_summary.show_summary(
+                    show=True,
+                    mode=str(summary_mode),
+                    rounding=int(rounding),
+                )
+            else:
+                show_bundle_map_summary(
+                    bm.report,
+                    show=True,
+                    mode="auto" if summary_mode is None else str(summary_mode),
+                    rounding=int(rounding),
+                    extra_rows=None,
+                )
+
+        return bm
 
     # ----------------------------
     # Accessors (NO auto-running)
