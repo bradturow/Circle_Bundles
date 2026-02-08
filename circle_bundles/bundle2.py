@@ -251,6 +251,7 @@ class Bundle:
         landmarks: Optional[np.ndarray] = None,
         total_metric: Optional[object] = None,
         max_simp_dim: int = 3,
+        show_summary = False,
     ):
         # --- accept either cover or U ---
         if cover is None and U is None:
@@ -318,6 +319,9 @@ class Bundle:
         # caches (bundle-map summary)
         self._bundle_map_summary: Optional[BundleMapSummary] = None
 
+        if show_summary:
+            fig = self.summary()
+            
     # ----------------------------
     # requirement helpers (NO auto-running)
     # ----------------------------
@@ -488,8 +492,6 @@ class Bundle:
             cache, and return the summary without display.
         plot:
             If True, include plots in the displayed summary (if applicable).
-        show_tets_plot:
-            If True and tetrahedra are available, include the tetrahedra diagnostic plot.
         dpi:
             DPI for matplotlib figures produced by the summary.
         figsize:
@@ -675,7 +677,6 @@ class Bundle:
         modes: Optional[Iterable[Literal["nerve", "local_triv", "classes", "bundle_map"]]] = None,
         *,
         show: bool = True,
-        top_k: int = 10,
         show_weight_hist: bool = False,
         hist_bins: int = 40,
     ) -> Dict[str, object]:
@@ -699,8 +700,6 @@ class Bundle:
             Iterable selecting which summaries to consider. If None, uses the default policy above.
         show:
             If True, display summaries in the active frontend.
-        top_k:
-            Number of top classes/features to show in the class summary.
         show_weight_hist:
             Whether to show the edge-weight histogram in the class summary.
         hist_bins:
@@ -761,7 +760,7 @@ class Bundle:
             elif m == "classes":
                 out["classes"] = self.summarize_classes(
                     show=show,
-                    top_k=int(top_k),
+                    top_k=10,
                     show_weight_hist=bool(show_weight_hist),
                     hist_bins=int(hist_bins),
                 )
@@ -1755,7 +1754,7 @@ class Bundle:
     def show_nerve(
         self,
         *,
-        landmarks: np.ndarray,
+        landmarks: Optional[np.ndarray] = None,
         title: Optional[str] = None,
         show_labels: bool = True,
         show_axes: bool = False,
@@ -1774,74 +1773,45 @@ class Bundle:
         """
         Visualize the nerve as an interactive Plotly figure.
 
-        This is a cover-free nerve visualization: edges/triangles come from the cached
-        simplices computed from ``U`` (e.g. ``self._edges_U`` and ``self._tris_U``).
-
-        Weight / slider policy
-        ----------------------
-        - If edge weights are available (either provided via ``weights`` or discoverable
-          from cached results), the visualization uses a slider controlling an edge-weight
-          cutoff in the filtration.
-        - If no weights are available (or ``use_slider=False``), the visualization is static.
-        - A "jump" button is shown only when a max-trivial cutoff can be inferred from
-          class/persistence results, or when explicitly provided via ``mark_cutoff``.
-
-        Parameters
-        ----------
-        landmarks:
-            Landmark coordinates used to embed the nerve vertices in 2D/3D for visualization.
-            Shape is typically ``(n_sets, 2)`` or ``(n_sets, 3)``.
-        title:
-            Optional plot title. Defaults to ``"Nerve Visualization"``.
-        show_labels:
-            If True, show vertex labels.
-        show_axes:
-            If True, show Plotly axes.
-        tri_opacity:
-            Opacity for triangle faces (if triangles are present).
-        tri_color:
-            Color used for triangle faces.
-        cochains:
-            Optional list of cochains to display (e.g., edge or triangle values). Each cochain is a
-            dict mapping simplices (tuples of vertex indices) to a displayable value.
-        weights:
-            Optional explicit edge-weight dictionary mapping ``(i, j)`` to a nonnegative weight.
-            If omitted, weights are inferred from cached persistence or local-trivialization diagnostics.
-        edge_cutoff:
-            Optional fixed cutoff used in the static case (no slider), showing only edges with
-            weight <= cutoff.
-        highlight_edges:
-            Optional set of edges to highlight regardless of cutoff.
-        highlight_color:
-            Color used for highlighted edges.
-        prefer_local_weights:
-            If ``weights`` is not provided and persistence weights are unavailable, choose which
-            locally-computed diagnostic to use. Typically ``"rms"`` or ``"witness"``.
-        use_slider:
-            If True and weights are available, use an interactive slider.
-        mark_cutoff:
-            Optional override for the jump/marker cutoff value. If None, the method attempts to
-            infer a max-trivial cutoff from persistence results.
-        show_title_value:
-            If True, display the current cutoff value in the title when using the slider.
-
-        Returns
-        -------
-        plotly.graph_objects.Figure
-            The Plotly figure. In the static case the method calls ``fig.show()`` as a convenience.
-
-        Raises
-        ------
-        RuntimeError
-            If the Bundle has no cached nerve edges (e.g., ``self._edges_U`` missing/empty).
+        If `landmarks` is not provided, this method tries to use stored landmarks from:
+          1) self.cover.landmarks (if present)
+          2) self.landmarks (if present)
         """
         from .viz.nerve_plotly import make_nerve_figure, nerve_with_slider_from_U
 
-        L = np.asarray(landmarks)
+        # ------------------------------------------------------------
+        # Landmarks resolution (explicit arg wins; else stored)
+        # ------------------------------------------------------------
+        if landmarks is None:
+            L = None
+
+            # (A) If Bundle stores a cover object
+            cover = getattr(self, "cover", None)
+            if cover is not None:
+                L = getattr(cover, "landmarks", None)
+
+            # (B) If Bundle stores landmarks directly
+            if L is None:
+                L = getattr(self, "landmarks", None)
+
+            if L is None:
+                raise RuntimeError(
+                    "No landmarks available for nerve visualization. "
+                    "Pass `landmarks=...` explicitly, or construct the Bundle with a cover "
+                    "that provides landmarks, or store `self.landmarks`."
+                )
+
+            landmarks = L
+
+        L = np.asarray(landmarks, dtype=float)
+
+        # ------------------------------------------------------------
+        # Cached simplices from U
+        # ------------------------------------------------------------
         edges = list(getattr(self, "_edges_U", []))
         tris = list(getattr(self, "_tris_U", []))
         if not edges:
-            raise RuntimeError("No nerve edges available on this Bundle (missing _edges_U).")
+            raise RuntimeError("No nerve edges available on this Bundle (missing/empty _edges_U).")
 
         # your existing policy for choosing weights
         ew = self._latest_edge_weights(weights, prefer=str(prefer_local_weights))
@@ -1863,12 +1833,10 @@ class Bundle:
                 highlight_edges=set(highlight_edges) if highlight_edges else None,
                 highlight_color=str(highlight_color),
             )
-            # (optional) makes "something happen" in notebooks
             fig.show()
             return fig
 
         # --- compute a working jump cutoff ---
-        # user override wins
         if mark_cutoff is not None:
             jump_cutoff = float(mark_cutoff)
         else:
@@ -1888,10 +1856,10 @@ class Bundle:
             show_axes=bool(show_axes),
             highlight_edges=set(highlight_edges) if highlight_edges else None,
             highlight_color=str(highlight_color),
-            mark_cutoff=jump_cutoff,            # None => no button
+            mark_cutoff=jump_cutoff,             # None => no button
             title=(title or "Nerve Visualization"),
             show_title_value=bool(show_title_value),
-            show_jump=show_jump,                # relies on your updated nerve_plotly
+            show_jump=show_jump,
             jump_label="Jump to max-trivial",
         )
 

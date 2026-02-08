@@ -1,65 +1,47 @@
+# circle_bundles/api.py
+"""
+Public API for circle_bundles.
+
+This module re-exports the *stable* user-facing surface of the package.
+The objects listed in __all__ are considered part of the supported API.
+"""
+
 from __future__ import annotations
 
-"""
-Public API for circle_bundles (curated).
-
-Design
-------
-The primary entry point is :func:`build_bundle`, which returns a :class:`BundleResult`.
-Downstream computations are exposed as cached methods on :class:`BundleResult`
-(e.g. ``get_persistence()``, ``get_global_trivialization()``, ``get_bundle_map()``,
-``get_pullback_data()``).
-
-This module also exposes common *on-ramps* (covers + metrics) so typical users can
-start workflows without deep imports.
-
-Everything else remains accessible via submodules (covers, metrics, viz, synthetic, optical_flow).
-"""
-
 # =============================================================================
-# Core bundle construction + main result objects
+# Core workflow (recommended entry points)
 # =============================================================================
-from .bundle import (
-    BundleResult,
+
+from .bundle2 import (
+    Bundle,
+    LocalTrivAndCocycle,
+    ClassesAndPersistence,
     BundleMapResult,
-    PullbackTotalSpaceResult,
-    GlobalTrivializationResult,
-    MaxTrivialSubcomplex,
-    build_bundle,
 )
 
-# Additional dataclasses
+# =============================================================================
+# Result + config types 
+# =============================================================================
+
 from .trivializations.local_triv import LocalTrivResult, DreimacCCConfig
+from .o2_cocycle import O2Cocycle, TransitionReport
+from .analysis.quality import BundleQualityReport
+from .analysis.class_persistence import CobirthResult, CodeathResult, PersistenceResult
 from .characteristic_class import ClassResult
-from .o2_cocycle import TransitionReport, O2Cocycle
-from .analysis.class_persistence import (
-    CobirthResult,
-    CodeathResult,
-    PersistenceResult
-)
-
+from .trivializations.bundle_map import FramePacking
+from .summaries.nerve_summary import NerveSummary
 
 # =============================================================================
-# Covers 
+# Covers (construction utilities)
 # =============================================================================
-from .base_covers import (
-    MetricBallCover,
-    TriangulationStarCover,
-)
 
-from .covers.metric_ball_cover_builders import (
-    S2GeodesicMetric,
-    RP2GeodesicMetric,
-)
-
-from .covers.triangle_cover_builders_fibonacci import (
-    make_s2_fibonacci_star_cover,
-    make_rp2_fibonacci_star_cover,
-)
+from .covers.covers import CoverData, get_metric_ball_cover
+from .covers.fibonacci_covers import get_s2_fibonacci_cover, get_rp2_fibonacci_cover
 
 # =============================================================================
-# Metrics 
+# Metrics
 # =============================================================================
+
 from .metrics import (
     EuclideanMetric,
     S1AngleMetric,
@@ -69,17 +51,17 @@ from .metrics import (
     RP2UnitVectorMetric,
     T2FlatMetric,
     Torus_DiagQuotientMetric_R4,
-    Torus_KleinQuotientMetric_R4,    
+    Torus_KleinQuotientMetric_R4,
     RP2_TrivialMetric,
     RP2_TwistMetric,
     RP2_FlipMetric,
     S3QuotientMetric,
 )
 
+# =============================================================================
+# Fiberwise analysis and clustering
+# =============================================================================
 
-# ----------------------------
-# Fiberwise analysis utilities
-# ----------------------------
 from .analysis.fiberwise_clustering import (
     fiberwise_clustering,
     get_cluster_persistence,
@@ -95,39 +77,39 @@ from .analysis.local_analysis import (
     plot_local_rips,
 )
 
-from .geometry.geometric_unwrapping import (
-    get_cocycle_dict,
-    lift_base_points,
-)
+from .geometry.geometric_unwrapping import get_cocycle_dict, lift_base_points
 
+# =============================================================================
+# Public export list
+# =============================================================================
 
 __all__ = [
-    # core
-    "build_bundle",
-    "BundleResult",
+    # Core workflow
+    "Bundle",
+    "LocalTrivAndCocycle",
+    "ClassesAndPersistence",
     "BundleMapResult",
-    "PullbackTotalSpaceResult",
-    "GlobalTrivializationResult",
-    "MaxTrivialSubcomplex",
-    "DreimacCCConfig",
+
+    # Result + config types
     "LocalTrivResult",
-    "ClassResult",
-    "TransitionReport",
+    "DreimacCCConfig",
     "O2Cocycle",
+    "TransitionReport",
+    "BundleQualityReport",
     "CobirthResult",
     "CodeathResult",
     "PersistenceResult",
+    "ClassResult",
+    "FramePacking",
+    "NerveSummary",
 
-    
-    # covers
-    "MetricBallCover",
-    "TriangulationStarCover",
-    "S2GeodesicMetric",
-    "RP2GeodesicMetric",
-    "make_s2_fibonacci_star_cover",
-    "make_rp2_fibonacci_star_cover",
+    # Covers
+    "CoverData",
+    "get_metric_ball_cover",
+    "get_s2_fibonacci_cover",
+    "get_rp2_fibonacci_cover",
 
-    # metrics
+    # Metrics
     "EuclideanMetric",
     "S1AngleMetric",
     "RP1AngleMetric",
@@ -142,7 +124,7 @@ __all__ = [
     "RP2_FlipMetric",
     "S3QuotientMetric",
 
-    # fiberwise analysis utilities
+    # Advanced utilities
     "fiberwise_clustering",
     "get_cluster_persistence",
     "get_filtered_cluster_graph",
@@ -153,7 +135,5 @@ __all__ = [
     "get_local_rips",
     "plot_local_rips",
     "get_cocycle_dict",
-    "lift_base_points",   
+    "lift_base_points",
 ]
-
-
