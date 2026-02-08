@@ -46,6 +46,8 @@ from .trivializations.bundle_map import (
     get_bundle_map_v2,   
 )
 
+# covers
+from .covers.covers import CoverData
 
 # ----------------------------
 # Return type for get_local_trivs
@@ -170,8 +172,13 @@ class Bundle:
     """
     Cover-free bundle reconstruction driver.
 
-    This class takes a *membership matrix* ``U`` (the only cover-like structure)
-    and raw data ``X`` (either a point cloud or a distance matrix). It then:
+    This class takes either
+
+    - a minimal :class:`~circle_bundles.covers.Cover` object (holding ``U``, optional ``pou``,
+      and optional ``landmarks``), **or**
+    - a raw membership matrix ``U``,
+
+    together with total-space data ``X`` (either a point cloud or a distance matrix). It then:
 
     1. Builds the nerve simplices (edges/triangles/tetrahedra) **directly from** ``U``.
     2. Computes local trivializations and an O(2) cocycle on overlaps.
@@ -180,10 +187,10 @@ class Bundle:
 
     Design principles
     -----------------
-    - ``U`` is the only "cover structure" input. We do not accept a separate Cover object.
-    - Nerve simplices are always computed from ``U`` (with ``min_points=1``) up to
-      ``max_simp_dim``.
-    - Computation is explicit: methods **never auto-run prerequisites**.
+    - The only required cover-like structure is the membership matrix ``U``.
+      A ``Cover`` object is accepted purely as a convenience wrapper.
+    - Nerve simplices are computed from ``U`` (with ``min_points=1``) up to ``max_simp_dim``.
+    - Computation is explicit: public methods **never auto-run prerequisites**.
     - Summaries are standardized into a small set of uniform summary objects:
         1) :class:`~circle_bundles.summaries.nerve_summary.NerveSummary`
         2) Local trivialization summary
@@ -192,28 +199,36 @@ class Bundle:
 
     Parameters
     ----------
-    U:
-        Boolean membership matrix of shape ``(n_sets, n_samples)``. Entry ``U[j, i]``
-        indicates whether sample ``i`` belongs to chart/set ``j``.
-    X:
+    X :
         Either a point cloud of shape ``(n_samples, D)`` (if ``distance_matrix=False``),
         or a distance matrix of shape ``(n_samples, n_samples)`` (if ``distance_matrix=True``).
-    distance_matrix:
+    U :
+        Boolean membership matrix of shape ``(n_sets, n_samples)``. Entry ``U[j, i]``
+        indicates whether sample ``i`` belongs to chart/set ``j``.
+        Provide exactly one of ``U`` or ``cover``.
+    cover :
+        Optional :class:`~circle_bundles.covers.Cover` object holding ``U`` and (optionally)
+        ``pou`` and ``landmarks``. If provided, its fields are used as defaults.
+        Provide exactly one of ``U`` or ``cover``.
+    distance_matrix :
         If True, interpret ``X`` as a distance matrix. If False, interpret ``X`` as a point cloud.
-    pou:
-        Optional partition of unity of shape ``(n_sets, n_samples)``.
-        Some methods require it (e.g., global trivialization / bundle-map), but many do not.
-    total_metric:
+    pou :
+        Optional partition of unity of shape ``(n_sets, n_samples)``. If ``cover`` is provided,
+        this overrides ``cover.pou`` for this Bundle (and does not mutate the cover).
+    landmarks :
+        Optional landmark coordinates of shape ``(n_sets, dB)`` used by visualization helpers.
+        If ``cover`` is provided, this overrides ``cover.landmarks`` for this Bundle.
+    total_metric :
         Optional metric object passed through to local-trivialization computations.
         Only used when ``distance_matrix=False``.
-    max_simp_dim:
+    max_simp_dim :
         Maximum simplex dimension to precompute from ``U``. Common values are 1, 2, or 3.
 
     Attributes
     ----------
-    U, X, distance_matrix, pou, total_metric, max_simp_dim:
+    U, X, distance_matrix, pou, landmarks, total_metric, max_simp_dim :
         Stored inputs.
-    n_sets, n_samples:
+    n_sets, n_samples :
         Convenience properties.
 
     Notes
@@ -227,18 +242,43 @@ class Bundle:
 
     def __init__(
         self,
-        U: np.ndarray,
         X: np.ndarray,
         *,
+        U: Optional[np.ndarray] = None,
+        cover: Optional["Cover"] = None,
         distance_matrix: bool = False,
         pou: Optional[np.ndarray] = None,
+        landmarks: Optional[np.ndarray] = None,
         total_metric: Optional[object] = None,
         max_simp_dim: int = 3,
     ):
-        self.U = np.asarray(U, dtype=bool)
+        # --- accept either cover or U ---
+        if cover is None and U is None:
+            raise ValueError("Provide either cover=... or U=...")
+
+        if cover is not None and U is not None:
+            raise ValueError("Provide only one of cover=... or U=... (not both).")
+
+        if cover is not None:
+            U_use = np.asarray(cover.U, dtype=bool)
+            pou_use = None if getattr(cover, "pou", None) is None else np.asarray(cover.pou, dtype=float)
+            lm_use = None if getattr(cover, "landmarks", None) is None else np.asarray(cover.landmarks, dtype=float)
+        else:
+            U_use = np.asarray(U, dtype=bool)  # type: ignore[arg-type]
+            pou_use = None
+            lm_use = None
+
+        # explicit overrides win (do not mutate cover)
+        if pou is not None:
+            pou_use = np.asarray(pou, dtype=float)
+        if landmarks is not None:
+            lm_use = np.asarray(landmarks, dtype=float)
+
+        self.U = U_use
         self.X = np.asarray(X)
         self.distance_matrix = bool(distance_matrix)
-        self.pou = pou
+        self.pou = pou_use
+        self.landmarks = lm_use
         self.total_metric = total_metric
         self.max_simp_dim = int(max_simp_dim)
 
