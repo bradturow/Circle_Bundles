@@ -1,10 +1,14 @@
 Metrics
 =======
 
-Distance functions used on base spaces, fibers, and pullback product spaces.
+Metrics define distances on base/feature spaces used in cover construction and
+analysis.
+
+Reference
+---------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated
    :nosignatures:
 
    circle_bundles.EuclideanMetric
@@ -14,3 +18,9 @@ Distance functions used on base spaces, fibers, and pullback product spaces.
    circle_bundles.RP1UnitVectorMetric
    circle_bundles.RP2UnitVectorMetric
    circle_bundles.T2FlatMetric
+   circle_bundles.Torus_DiagQuotientMetric_R4
+   circle_bundles.Torus_KleinQuotientMetric_R4
+   circle_bundles.RP2_TrivialMetric
+   circle_bundles.RP2_TwistMetric
+   circle_bundles.RP2_FlipMetric
+   circle_bundles.S3QuotientMetric

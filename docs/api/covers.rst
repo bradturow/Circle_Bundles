@@ -1,13 +1,17 @@
 Covers
 ======
 
-Discrete open covers of the base space.
+Covers provide chart membership data (and optionally partitions of unity and
+landmarks) used by :class:`circle_bundles.Bundle`.
+
+Reference
+---------
 
 .. autosummary::
-   :toctree: generated/
+   :toctree: generated
    :nosignatures:
 
-   circle_bundles.MetricBallCover
-   circle_bundles.TriangulationStarCover
-   circle_bundles.make_s2_fibonacci_star_cover
-   circle_bundles.make_rp2_fibonacci_star_cover
+   circle_bundles.CoverData
+   circle_bundles.get_metric_ball_cover
+   circle_bundles.get_s2_fibonacci_cover
+   circle_bundles.get_rp2_fibonacci_cover

@@ -9,10 +9,11 @@ experimental utilities are documented separately.
 .. toctree::
    :maxdepth: 1
 
-   core_pipeline
+   core
+   results
    covers
    metrics
-   characteristic_classes
-   coordinatization
-   weights_filtration
-   analysis
+   utilities_analysis
+   utilities_viz
+   utilities_synthetic
+   utilities_optical_flow
