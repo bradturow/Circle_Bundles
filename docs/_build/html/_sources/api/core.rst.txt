@@ -10,18 +10,16 @@ Typical workflow
 
    import circle_bundles as cb
 
-   bundle = cb.Bundle(X, U=U, pou=pou, landmarks=landmarks)
+   bundle = cb.Bundle(X, U=U)
    lt = bundle.get_local_trivs()
    cp = bundle.get_classes()
-   bm = bundle.get_bundle_map()
+   bm = bundle.get_bundle_map(pou = pou)
 
    bundle.summary()
 
 Reference
 ---------
 
-.. autosummary::
-   :toctree: generated
-   :nosignatures:
-
-   circle_bundles.Bundle
+.. autoclass:: circle_bundles.Bundle
+   :members: get_local_trivs, get_classes, get_global_trivialization, get_bundle_map, get_frame_dataset, show_nerve, show_circle_nerve, compare_trivs, summary
+   :show-inheritance:

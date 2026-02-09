@@ -25,7 +25,7 @@ A collection of examples involving quotient metrics on the total space.
         :link: example_01_quotients_of_s2_trivial
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-rounded-2 sd-border-0 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -41,7 +41,7 @@ A collection of examples involving quotient metrics on the total space.
         :link: example_02_lens_spaces
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-rounded-2 sd-border-0 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -57,7 +57,7 @@ A collection of examples involving quotient metrics on the total space.
         :link: example_03_non_orientable_over_rp2
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-rounded-2 sd-border-0 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top

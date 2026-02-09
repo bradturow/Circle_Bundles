@@ -501,6 +501,13 @@ class Bundle:
         return self._bundle_map_summary
 
     def summary(
+        self,
+        modes: Optional[Iterable[Literal["nerve", "local_triv", "classes", "bundle_map"]]] = None,
+        *,
+        show: bool = True,
+        show_weight_hist: bool = False,
+        hist_bins: int = 40,
+    ) -> Dict[str, object]:
         """
         Display any summaries that are currently available and return them in a dict.
 
@@ -527,13 +534,6 @@ class Bundle:
         dict
             Mapping from summary name to summary object (some entries may be ``None`` if unavailable).
         """        
-        self,
-        modes: Optional[Iterable[Literal["nerve", "local_triv", "classes", "bundle_map"]]] = None,
-        *,
-        show: bool = True,
-        show_weight_hist: bool = False,
-        hist_bins: int = 40,
-    ) -> Dict[str, object]:
         if modes is None:
             modes_list: List[str] = ["nerve"]
             if self._local_triv is not None and self._quality is not None:
@@ -746,11 +746,6 @@ class Bundle:
         """
         Compute characteristic-class representatives and persistence with respect to the weights filtration.
 
-        Prerequisites
-        -------------------------------
-        You must run :meth:`get_local_trivs` first. 
-
-
         Parameters
         ----------
         edge_weights:
@@ -908,6 +903,11 @@ class Bundle:
     # ----------------------------
 
     def get_global_trivialization(
+        self,
+        weight: Optional[float] = None,
+        *,
+        pou: Optional[np.ndarray] = None,
+    ) -> np.ndarray:
         """
         Compute a global circle-valued coordinate using the Singer construction.
 
@@ -918,11 +918,6 @@ class Bundle:
         The returned array ``F`` is a global coordinate representation in :math:`\\mathbb{R}^2`
         (e.g., cosine/sine embedding), suitable for downstream visualization or learning.
 
-        Prerequisites 
-        -------------
-        You must have already run:
-        - :meth:`get_local_trivs` (local angles + cocycle),
-        - :meth:`get_classes` (to obtain the max-trivial certified subcomplex).
 
         Parameters
         ----------
@@ -948,12 +943,7 @@ class Bundle:
             If the maximal-trivial certified subcomplex is empty, if the chosen threshold yields
             no usable edges, if the cocycle is non-orientable on the selected subcomplex, or if
             ``weight`` exceeds the maximal-trivial threshold.
-        """
-        self,
-        weight: Optional[float] = None,
-        *,
-        pou: Optional[np.ndarray] = None,
-    ) -> np.ndarray:
+        """        
         self._require_local_trivs()
         if self._class_persistence is None:
             raise RuntimeError("Run bundle.get_classes(...) before get_global_trivialization().")
@@ -1033,18 +1023,17 @@ class Bundle:
     # ----------------------------
 
     def get_frame_dataset(
+        self,
+        *,
+        pou: Optional[np.ndarray] = None,
+        weight: Optional[float] = None,
+        packing: FramePacking = "coloring2",
+    ):
         """
         Build the pre-projection frame dataset used by the bundle-map solver.
 
         This method constructs the intermediate "frame" representation used by the
         bundle-map pipeline *before* any projection/reduction step. 
-
-        Prerequisites 
-        -------------
-        You must have already run:
-        - :meth:`get_local_trivs` (for the estimated transitions/cocycle),
-        - :meth:`get_classes` (for persistence + the cocycle-certified subcomplex),
-        - and you must provide a partition of unity via ``pou`` or ``self.pou``.
 
         Parameters
         ----------
@@ -1074,12 +1063,7 @@ class Bundle:
             If the cocycle-certified subcomplex is empty, or if ``weight`` exceeds the cocycle
             certification threshold, or if thresholding yields no edges.
         """        
-        self,
-        *,
-        pou: Optional[np.ndarray] = None,
-        weight: Optional[float] = None,
-        packing: FramePacking = "coloring2",
-    ):
+        
         self._require_local_trivs()
         self._require_classes()
         assert self._cocycle is not None and self._quality is not None
@@ -1149,13 +1133,6 @@ class Bundle:
         solver, along with the solver report and lightweight metadata. The output is intended
         to serve as a *global coordinatization* of the total space/fiber structure implied by
         the estimated cocycle, suitable for visualization and downstream learning tasks.
-
-        Prerequisites
-        -------------
-        You must have already run:
-        - :meth:`get_local_trivs`,
-        - :meth:`get_classes`,
-        - and you must provide a partition of unity via ``pou`` or ``self.pou``.
 
 
         Parameters
@@ -1632,20 +1609,6 @@ class Bundle:
     ):
         """
         Visualize a single-cycle nerve in a canonical circle layout (matplotlib).
-
-        This is a cover-free wrapper around :func:`circle_bundles.viz.nerve_circle.show_circle_nerve`.
-
-        Fixed policy
-        ------------
-        - If the nerve is a cycle, vertices are reindexed to a canonical cyclic order.
-        - Weight labels are selected by the ``weights`` source selector.
-        - plt.show() is never called.
-
-        Weight source
-        -------------
-        - "rms": RMS transition-angle error (prefers persistence edge_weights if present)
-        - "witness": witness diagnostics (only if available)
-        - "none": no weights shown
         """
         from .viz.nerve_circle import (
             show_circle_nerve as _show_circle_nerve,

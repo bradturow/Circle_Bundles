@@ -52,7 +52,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#notes">Notes</a></li>
 </ul>
 </li>
 </ul>
@@ -70,7 +69,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/results.html">Result objects and dataclasses</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/results.html#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#lower-level-results-stable">Lower-level results (stable)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#lower-level-results">Lower-level results</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/covers.html">Covers</a><ul>
@@ -105,24 +104,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../extras/index.html">Extras and utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/synthetic.html">Synthetic datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/viz.html">Visualization Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/optical_flow.html">Optical Flow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 </ul>
@@ -185,13 +166,13 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Set</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.nerve.combinatorics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">canon_edge</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.o2_cocycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">O2Cocycle</span><span class="p">,</span> <span class="n">TransitionReport</span><span class="p">,</span> <span class="n">estimate_transitions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.o2_cocycle</span><span class="w"> </span><span class="kn">import</span> <span class="n">O2Cocycle</span><span class="p">,</span> <span class="n">estimate_transitions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.trivializations.local_triv</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalTrivResult</span><span class="p">,</span> <span class="n">compute_local_triv</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.analysis.quality</span><span class="w"> </span><span class="kn">import</span> <span class="n">BundleQualityReport</span><span class="p">,</span> <span class="n">compute_bundle_quality_from_U</span>
 
@@ -199,15 +180,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.summaries.nerve_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_nerve_from_U</span><span class="p">,</span> <span class="n">NerveSummary</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.summaries.local_triv_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_local_trivs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.summaries.class_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_classes_and_persistence</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">.summaries.bundle_map_summary</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_bundle_map</span><span class="p">,</span> <span class="n">BundleMapSummary</span>
-
 
 <span class="c1"># classes + persistence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.analysis.class_persistence</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">compute_bundle_persistence</span><span class="p">,</span>
     <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">,</span>
-    <span class="n">build_edge_weights_from_transition_report</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># class reps + restricted-class report</span>
@@ -226,50 +204,32 @@
     <span class="n">FramePacking</span><span class="p">,</span>
     <span class="n">get_frame_dataset</span> <span class="k">as</span> <span class="n">_get_frame_dataset</span><span class="p">,</span>
     <span class="n">show_bundle_map_summary</span><span class="p">,</span>
-    <span class="n">get_bundle_map_v2</span><span class="p">,</span>   
+    <span class="n">get_bundle_map_v2</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># covers</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.covers.covers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CoverData</span>
-
 <span class="c1"># ----------------------------</span>
-<span class="c1"># Return type for get_local_trivs</span>
+<span class="c1"># Return type for get_local_trivs (public-facing)</span>
 <span class="c1"># ----------------------------</span>
 
-<div class="viewcode-block" id="LocalTrivAndCocycle">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.LocalTrivAndCocycle.html#circle_bundles.LocalTrivAndCocycle">[docs]</a>
+<div class="viewcode-block" id="LocalTrivsResult">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.LocalTrivsResult.html#circle_bundles.LocalTrivsResult">[docs]</a>
 <span class="nd">@dataclass</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">LocalTrivAndCocycle</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LocalTrivsResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return container for :meth:`Bundle.get_local_trivs`.</span>
+<span class="sd">    Minimal, user-facing output of :meth:`Bundle.get_local_trivs`.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    local_triv:</span>
-<span class="sd">        Local trivialization data (angles/coordinates, charts, etc.) produced by</span>
-<span class="sd">        :func:`circle_bundles.trivializations.local_triv.compute_local_triv`.</span>
+<span class="sd">    Fields</span>
+<span class="sd">    ------</span>
+<span class="sd">    f:</span>
+<span class="sd">        Local angles array of shape (n_sets, n_samples). Only meaningful where U[j,i]=True.</span>
 <span class="sd">    cocycle:</span>
-<span class="sd">        Estimated O(2) cocycle (transition data) produced by</span>
-<span class="sd">        :func:`circle_bundles.o2_cocycle.estimate_transitions`.</span>
-<span class="sd">    report:</span>
-<span class="sd">        Transition estimation report containing per-edge diagnostics such as RMS angle error.</span>
+<span class="sd">        Estimated O(2) cocycle (transition data).</span>
 <span class="sd">    quality:</span>
-<span class="sd">        Bundle-quality diagnostics produced by</span>
-<span class="sd">        :func:`circle_bundles.analysis.quality.compute_bundle_quality_from_U`.</span>
-<span class="sd">    nerve:</span>
-<span class="sd">        Nerve summary computed from ``U`` (independent of local trivializations).</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This is a lightweight container intended for interactive use and for caching</span>
-<span class="sd">    results on the :class:`Bundle` instance. It does not perform any computation.</span>
+<span class="sd">        Bundle-quality diagnostics. Must include RMS info (edgewise + aggregates).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">local_triv</span><span class="p">:</span> <span class="n">LocalTrivResult</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
     <span class="n">cocycle</span><span class="p">:</span> <span class="n">O2Cocycle</span>
-    <span class="n">report</span><span class="p">:</span> <span class="n">TransitionReport</span>
-    <span class="n">quality</span><span class="p">:</span> <span class="n">BundleQualityReport</span>
-    <span class="n">nerve</span><span class="p">:</span> <span class="n">NerveSummary</span></div>
+    <span class="n">quality</span><span class="p">:</span> <span class="n">BundleQualityReport</span></div>
 
 
 
@@ -298,16 +258,11 @@
 <span class="sd">    summary_text:</span>
 <span class="sd">        A plain-text summary (always available) describing class/persistence results.</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This container is stable for user-facing consumption even if internal result</span>
-<span class="sd">    types change, because downstream APIs should rely only on these attributes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">reps</span><span class="p">:</span> <span class="n">Any</span>                 <span class="c1"># class representatives object (lightweight)</span>
-    <span class="n">persistence</span><span class="p">:</span> <span class="n">Any</span>          <span class="c1"># PersistenceResult</span>
-    <span class="n">restricted</span><span class="p">:</span> <span class="n">Any</span>           <span class="c1"># derived class report on chosen subcomplex</span>
-    <span class="n">summary_text</span><span class="p">:</span> <span class="nb">str</span>         <span class="c1"># plain-text class summary (always returned)</span></div>
+    <span class="n">reps</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">persistence</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">restricted</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">summary_text</span><span class="p">:</span> <span class="nb">str</span></div>
 
 
 
@@ -320,7 +275,7 @@
 <span class="nd">@dataclass</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BundleMapResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Minimal, user-facing bundle-map output.</span>
+<span class="sd">    Return container for :meth:`Bundle.get_bundle_map`.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -340,13 +295,7 @@
 <span class="sd">    meta:</span>
 <span class="sd">        Light metadata dictionary (weight, packing, ambient_dim, etc.).</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This intentionally does **not** include any pullback object, product metric,</span>
-<span class="sd">    or concatenation with base coordinates. It is meant to be the *fiber/total-space*</span>
-<span class="sd">    coordinates only, with enough metadata to reproduce the run.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">F</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
     <span class="n">pre_F</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
     <span class="n">Omega_used</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
@@ -361,10 +310,10 @@
 <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="Bundle">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Bundle</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Cover-free bundle reconstruction driver.</span>
+<span class="sd">    Primary bundle analysis driver.</span>
 
 <span class="sd">    This class takes either</span>
 
@@ -378,18 +327,6 @@
 <span class="sd">    2. Computes local trivializations and an O(2) cocycle on overlaps.</span>
 <span class="sd">    3. Computes characteristic-class representatives and edge-driven persistence.</span>
 <span class="sd">    4. Optionally computes global bundle-map coordinates and solver summaries.</span>
-
-<span class="sd">    Design principles</span>
-<span class="sd">    -----------------</span>
-<span class="sd">    - The only required cover-like structure is the membership matrix ``U``.</span>
-<span class="sd">      A ``Cover`` object is accepted purely as a convenience wrapper.</span>
-<span class="sd">    - Nerve simplices are computed from ``U`` (with ``min_points=1``) up to ``max_simp_dim``.</span>
-<span class="sd">    - Computation is explicit: public methods **never auto-run prerequisites**.</span>
-<span class="sd">    - Summaries are standardized into a small set of uniform summary objects:</span>
-<span class="sd">        1) :class:`~circle_bundles.summaries.nerve_summary.NerveSummary`</span>
-<span class="sd">        2) Local trivialization summary</span>
-<span class="sd">        3) Class + persistence summary</span>
-<span class="sd">        4) Bundle-map summary (only if computed)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -418,12 +355,6 @@
 <span class="sd">    max_simp_dim :</span>
 <span class="sd">        Maximum simplex dimension to precompute from ``U``. Common values are 1, 2, or 3.</span>
 
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    U, X, distance_matrix, pou, landmarks, total_metric, max_simp_dim :</span>
-<span class="sd">        Stored inputs.</span>
-<span class="sd">    n_sets, n_samples :</span>
-<span class="sd">        Convenience properties.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -431,11 +362,8 @@
 <span class="sd">    invalidates downstream caches (e.g., computing new local trivializations clears</span>
 <span class="sd">    class/persistence caches).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">_REF_ANGLE</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
 
-<div class="viewcode-block" id="Bundle.__init__">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
@@ -447,7 +375,7 @@
         <span class="n">landmarks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">total_metric</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">max_simp_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
-        <span class="n">show_summary</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">show_summary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="c1"># --- accept either cover or U ---</span>
         <span class="k">if</span> <span class="n">cover</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">U</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -490,10 +418,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_tets_from_U</span><span class="p">(</span><span class="n">min_points</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_simp_dim</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">[]</span>
         <span class="p">)</span>
 
-        <span class="c1"># caches (trivs)</span>
+        <span class="c1"># caches (local triv + cocycle + quality)</span>
+        <span class="c1"># NOTE: we still keep LocalTrivResult privately for summary/debug convenience,</span>
+        <span class="c1"># but we no longer return it publicly.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LocalTrivResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_f</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">O2Cocycle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TransitionReport</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BundleQualityReport</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># caches (summaries)</span>
@@ -516,20 +446,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BundleMapSummary</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
-            <span class="n">fig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-            
     <span class="c1"># ----------------------------</span>
     <span class="c1"># requirement helpers (NO auto-running)</span>
     <span class="c1"># ----------------------------</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_require_local_trivs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="kc">None</span>
-        <span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Local trivializations/cocycle/quality not computed.</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="s2">&quot;Run: bundle.get_local_trivs(...) first.&quot;</span>
@@ -657,8 +581,6 @@
     <span class="c1"># summaries</span>
     <span class="c1"># ----------------------------</span>
 
-<div class="viewcode-block" id="Bundle.summarize_nerve">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.summarize_nerve">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summarize_nerve</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -669,57 +591,19 @@
         <span class="n">figsize</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NerveSummary</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute and optionally display a nerve summary derived from ``U``.</span>
-
-<span class="sd">        This summary is always available because it depends only on the membership</span>
-<span class="sd">        matrix ``U``. It does **not** require local trivializations.</span>
-
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - This method always uses the summary object&#39;s **auto** display behavior.</span>
-<span class="sd">          In particular, it does not expose any ``mode`` or ``latex`` parameters.</span>
-<span class="sd">          The returned :class:`~circle_bundles.summaries.nerve_summary.NerveSummary`</span>
-<span class="sd">          decides how to render math (LaTeX vs plain text) based on the active frontend.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        show:</span>
-<span class="sd">            If True and ``verbose=True``, display the summary in the active frontend.</span>
-<span class="sd">        verbose:</span>
-<span class="sd">            If True, display the summary (subject to ``show``). If False, only compute,</span>
-<span class="sd">            cache, and return the summary without display.</span>
-<span class="sd">        plot:</span>
-<span class="sd">            If True, include plots in the displayed summary (if applicable).</span>
-<span class="sd">        dpi:</span>
-<span class="sd">            DPI for matplotlib figures produced by the summary.</span>
-<span class="sd">        figsize:</span>
-<span class="sd">            Optional matplotlib figure size ``(width, height)`` in inches.</span>
-<span class="sd">        save_path:</span>
-<span class="sd">            Optional path to save summary figures.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        NerveSummary</span>
-<span class="sd">            A cached :class:`~circle_bundles.summaries.nerve_summary.NerveSummary` instance.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        The summary is cached on the Bundle instance as ``self._nerve_summary``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">summ</span> <span class="o">=</span> <span class="n">summarize_nerve_from_U</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
             <span class="n">max_simplex_dim</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_simp_dim</span><span class="p">),</span>
             <span class="n">min_points_simplex</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">force_compute_from_U</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">compute_cardinalities</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># show_summary handles plotting</span>
+            <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">show_tets_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">dpi</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">dpi</span><span class="p">),</span>
             <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">,</span>
             <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
             <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">latex</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>  <span class="c1"># internal: always auto</span>
+            <span class="n">latex</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_nerve_summary</span> <span class="o">=</span> <span class="n">summ</span>
@@ -735,37 +619,10 @@
                 <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">summ</span></div>
+        <span class="k">return</span> <span class="n">summ</span>
 
-
-
-<div class="viewcode-block" id="Bundle.summarize_local_trivs">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.summarize_local_trivs">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_local_trivs</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Display a local-trivialization summary **if** local trivializations exist.</span>
-
-<span class="sd">        This method never computes anything. If local trivializations have not been</span>
-<span class="sd">        computed (i.e. :meth:`get_local_trivs` has not been called), it returns ``None``.</span>
-
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - Always uses the summary object&#39;s **auto** display behavior.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        show:</span>
-<span class="sd">            If True, display the summary in the active frontend.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        object or None</span>
-<span class="sd">            The local-trivialization summary object, or ``None`` if unavailable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_local_trivs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="c1"># still supported because we keep _local_triv privately</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -779,12 +636,8 @@
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">summ</span></div>
+        <span class="k">return</span> <span class="n">summ</span>
 
-
-
-<div class="viewcode-block" id="Bundle.summarize_classes">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.summarize_classes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summarize_classes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -793,32 +646,6 @@
         <span class="n">show_weight_hist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">hist_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Display a class + persistence summary **if** class results exist.</span>
-
-<span class="sd">        This method never computes anything. If class representatives / persistence have</span>
-<span class="sd">        not been computed (i.e. :meth:`get_classes` has not been called), it returns ``None``.</span>
-
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - Always uses the summary object&#39;s **auto** display behavior.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        show:</span>
-<span class="sd">            If True, display the summary in the active frontend.</span>
-<span class="sd">        top_k:</span>
-<span class="sd">            Number of top classes/features to display in the summary.</span>
-<span class="sd">        show_weight_hist:</span>
-<span class="sd">            If True, include a histogram of edge weights.</span>
-<span class="sd">        hist_bins:</span>
-<span class="sd">            Number of bins for the edge-weight histogram.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        object or None</span>
-<span class="sd">            The class-summary object, or ``None`` if unavailable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_reps</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_restricted</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -837,52 +664,19 @@
                 <span class="n">hist_bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hist_bins</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">summ</span></div>
+        <span class="k">return</span> <span class="n">summ</span>
 
-
-
-<div class="viewcode-block" id="Bundle.summarize_bundle_map">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.summarize_bundle_map">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_bundle_map</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Display the bundle-map solver summary **if** a bundle map has been computed.</span>
-
-<span class="sd">        This method never computes anything. If :meth:`get_bundle_map` has not been called,</span>
-<span class="sd">        it returns ``None``.</span>
-
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - Always uses the summary object&#39;s **auto** display behavior.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        show:</span>
-<span class="sd">            If True, display the summary in the active frontend.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        BundleMapSummary or None</span>
-<span class="sd">            The cached summary object, or ``None`` if unavailable.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_bundle_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
-                <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span></div>
-
-
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span>
 
 <div class="viewcode-block" id="Bundle.summary">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.summary">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.summary">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">modes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">,</span> <span class="s2">&quot;local_triv&quot;</span><span class="p">,</span> <span class="s2">&quot;classes&quot;</span><span class="p">,</span> <span class="s2">&quot;bundle_map&quot;</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -900,10 +694,6 @@
 <span class="sd">        - ``&quot;classes&quot;`` if :meth:`get_classes` has been run,</span>
 <span class="sd">        - ``&quot;bundle_map&quot;`` if :meth:`get_bundle_map` has been run.</span>
 
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - This method always uses **auto** rendering for all summaries.</span>
-<span class="sd">          It does not expose any ``mode`` or ``latex`` parameters.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -920,7 +710,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
 <span class="sd">            Mapping from summary name to summary object (some entries may be ``None`` if unavailable).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
         <span class="k">if</span> <span class="n">modes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">modes_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -961,11 +751,7 @@
                 <span class="n">first_shown</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;nerve&quot;</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span>
-                    <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
-                    <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;local_triv&quot;</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s2">&quot;local_triv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_local_trivs</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;classes&quot;</span><span class="p">:</span>
@@ -976,15 +762,11 @@
                     <span class="n">hist_bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hist_bins</span><span class="p">),</span>
                 <span class="p">)</span>
             <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;bundle_map&quot;</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bundle_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_bundle_map</span><span class="p">(</span>
-                    <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
-                    <span class="n">rounding</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-                <span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bundle_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_bundle_map</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown summary mode </span><span class="si">{</span><span class="n">m</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">out</span></div>
-
 
 
     <span class="c1"># ----------------------------</span>
@@ -992,7 +774,7 @@
     <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="Bundle.get_local_trivs">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.get_local_trivs">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.get_local_trivs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_local_trivs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1002,18 +784,13 @@
         <span class="n">pou</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_summary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LocalTrivAndCocycle</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LocalTrivsResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute local trivializations, estimate an O(2) cocycle, and compute diagnostics.</span>
 
 <span class="sd">        This is the upstream computation needed by most later steps:</span>
 <span class="sd">        transitions/cocycle estimation and bundle-quality diagnostics.</span>
 
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - This method does not expose any ``mode`` or ``latex`` parameters.</span>
-<span class="sd">        - If ``show_summary=True``, it displays the local-trivialization summary using **auto**</span>
-<span class="sd">          rendering (via :meth:`Bundle.summary`).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1035,9 +812,8 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        LocalTrivAndCocycle</span>
-<span class="sd">            Container holding local trivializations, cocycle, transition report, quality report,</span>
-<span class="sd">            and an up-to-date nerve summary.</span>
+<span class="sd">        LocalTrivsResult</span>
+<span class="sd">            Container holding local trivializations, cocycle, and a quality report.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -1047,7 +823,7 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Calling this method invalidates downstream caches (classes, global trivialization, bundle map).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
         <span class="c1"># 1) local triv</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_matrix</span><span class="p">:</span>
             <span class="n">lt</span> <span class="o">=</span> <span class="n">compute_local_triv</span><span class="p">(</span>
@@ -1070,11 +846,13 @@
                 <span class="n">fail_fast</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span>
 
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
         <span class="c1"># 2) transitions (edges with overlap &gt;= min_points_edge)</span>
         <span class="n">edges_est</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edges_from_U</span><span class="p">(</span><span class="n">min_points</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">min_points_edge</span><span class="p">))</span>
         <span class="n">cocycle</span><span class="p">,</span> <span class="n">report</span> <span class="o">=</span> <span class="n">estimate_transitions</span><span class="p">(</span>
             <span class="n">U</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
-            <span class="n">f</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+            <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
             <span class="n">edges</span><span class="o">=</span><span class="n">edges_est</span><span class="p">,</span>
             <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">min_points</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">min_points_edge</span><span class="p">),</span>
@@ -1091,6 +869,8 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">pou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pou</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
+        <span class="c1"># NOTE: compute_bundle_quality_from_U still accepts local_triv + transitions_report</span>
+        <span class="c1"># internally, but we only *store* f + quality + cocycle going forward.</span>
         <span class="n">qual</span> <span class="o">=</span> <span class="n">compute_bundle_quality_from_U</span><span class="p">(</span>
             <span class="n">U</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
             <span class="n">pou</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
@@ -1106,10 +886,10 @@
             <span class="n">compute_witness</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="c1"># cache</span>
+        <span class="c1"># cache (keep lt privately for summaries)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="o">=</span> <span class="n">lt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_f</span> <span class="o">=</span> <span class="n">f</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="o">=</span> <span class="n">cocycle</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span> <span class="o">=</span> <span class="n">report</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="o">=</span> <span class="n">qual</span>
 
         <span class="c1"># invalidate downstream caches</span>
@@ -1123,20 +903,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># cache nerve summary (computed from U); do not show during compute</span>
-        <span class="n">nerve</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
-            <span class="c1"># auto rendering only; never computes anything extra</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">modes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;local_triv&quot;</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">LocalTrivAndCocycle</span><span class="p">(</span>
-            <span class="n">local_triv</span><span class="o">=</span><span class="n">lt</span><span class="p">,</span>
-            <span class="n">cocycle</span><span class="o">=</span><span class="n">cocycle</span><span class="p">,</span>
-            <span class="n">report</span><span class="o">=</span><span class="n">report</span><span class="p">,</span>
-            <span class="n">quality</span><span class="o">=</span><span class="n">qual</span><span class="p">,</span>
-            <span class="n">nerve</span><span class="o">=</span><span class="n">nerve</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
+        <span class="k">return</span> <span class="n">LocalTrivsResult</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">cocycle</span><span class="o">=</span><span class="n">cocycle</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">qual</span><span class="p">)</span></div>
 
 
     <span class="c1"># ----------------------------</span>
@@ -1144,34 +916,18 @@
     <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="Bundle.get_classes">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.get_classes">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.get_classes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_classes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">edge_weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">prefer_edge_weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
+        <span class="n">prefer_edge_weight</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;rms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
         <span class="n">show_summary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">show_weight_hist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">hist_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClassesAndPersistence</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute characteristic-class representatives and edge-driven persistence.</span>
-
-<span class="sd">        This method is the main entry point for producing cohomological diagnostics of the</span>
-<span class="sd">        estimated O(2) cocycle, including:</span>
-<span class="sd">        (i) lightweight class representatives on the nerve, (ii) an edge-weight filtration</span>
-<span class="sd">        and associated persistence computation, and (iii) a restriction of class data to a</span>
-<span class="sd">        chosen certified subcomplex.</span>
-
-<span class="sd">        Prerequisites (no auto-running)</span>
-<span class="sd">        -------------------------------</span>
-<span class="sd">        You must run :meth:`get_local_trivs` first. This method does **not** compute local</span>
-<span class="sd">        trivializations, transitions, or a cocycle automatically.</span>
-
-<span class="sd">        Display policy</span>
-<span class="sd">        --------------</span>
-<span class="sd">        - If ``show_summary=True``, displays the class/persistence summary using **auto**</span>
-<span class="sd">          rendering. No ``mode``/``latex`` parameters are exposed.</span>
+<span class="sd">        Compute characteristic-class representatives and persistence with respect to the weights filtration.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1214,9 +970,8 @@
 <span class="sd">        (global trivialization and bundle-map caches).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
-        
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_local_trivs</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
         <span class="c1"># ---- 1) reps only ----</span>
         <span class="n">reps</span> <span class="o">=</span> <span class="n">compute_class_representatives_from_nerve</span><span class="p">(</span>
@@ -1231,14 +986,14 @@
 
         <span class="c1"># ---- 2) persistence ----</span>
         <span class="k">if</span> <span class="n">edge_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rms</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">wit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;witness_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">ew</span> <span class="o">=</span> <span class="n">build_edge_weights_from_transition_report</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_edges_U</span><span class="p">,</span>
-                <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms</span><span class="p">,</span>
-                <span class="n">witness_err</span><span class="o">=</span><span class="n">wit</span><span class="p">,</span>
-                <span class="n">prefer</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">prefer_edge_weight</span><span class="p">),</span>
-            <span class="p">)</span>
+            <span class="n">prefer</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefer_edge_weight</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">prefer</span> <span class="o">!=</span> <span class="s2">&quot;rms&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;prefer_edge_weight must be &#39;rms&#39; (or pass edge_weights explicitly).&quot;</span><span class="p">)</span>
+
+            <span class="n">ew_src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ew_src</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;quality.rms_angle_err missing; rerun get_local_trivs (or provide edge_weights).&quot;</span><span class="p">)</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew_src</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">edge_weights</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
@@ -1259,7 +1014,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="o">=</span> <span class="n">p</span>
 
         <span class="c1"># ---- 3) restrict + derived class data ----</span>
-        <span class="n">kept_edges</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s1">&#39;cocycle&#39;</span><span class="p">)</span>
+        <span class="n">kept_edges</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;cocycle&quot;</span><span class="p">)</span>
         <span class="n">kept_edges_set</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">kept_edges</span><span class="p">}</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_induced_tris</span><span class="p">(</span><span class="n">tris</span><span class="p">):</span>
@@ -1300,18 +1055,13 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_restricted</span> <span class="o">=</span> <span class="n">restricted</span>
 
-        <span class="n">summ</span> <span class="o">=</span> <span class="n">summarize_classes_and_persistence</span><span class="p">(</span>
-            <span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span>
-            <span class="n">restricted</span><span class="o">=</span><span class="n">restricted</span><span class="p">,</span>
-            <span class="n">persistence</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
-        <span class="p">)</span>
-
+        <span class="n">summ</span> <span class="o">=</span> <span class="n">summarize_classes_and_persistence</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="n">restricted</span><span class="o">=</span><span class="n">restricted</span><span class="p">,</span> <span class="n">persistence</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
         <span class="n">summary_text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">summ</span><span class="o">.</span><span class="n">summary_text</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
             <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
                 <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
                 <span class="n">top_k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                 <span class="n">show_weight_hist</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_weight_hist</span><span class="p">),</span>
                 <span class="n">hist_bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hist_bins</span><span class="p">),</span>
@@ -1337,7 +1087,7 @@
     <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="Bundle.get_global_trivialization">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.get_global_trivialization">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.get_global_trivialization">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_global_trivialization</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1354,16 +1104,6 @@
 <span class="sd">        The returned array ``F`` is a global coordinate representation in :math:`\\mathbb{R}^2`</span>
 <span class="sd">        (e.g., cosine/sine embedding), suitable for downstream visualization or learning.</span>
 
-<span class="sd">        Prerequisites (no auto-running)</span>
-<span class="sd">        -------------------------------</span>
-<span class="sd">        You must have already run:</span>
-<span class="sd">        - :meth:`get_local_trivs` (local angles + cocycle),</span>
-<span class="sd">        - :meth:`get_classes` (to obtain the max-trivial certified subcomplex).</span>
-
-<span class="sd">        Partition of unity</span>
-<span class="sd">        ------------------</span>
-<span class="sd">        A partition of unity is required for this method. If ``pou`` is not provided, the</span>
-<span class="sd">        method uses ``self.pou``. The override does not overwrite ``self.pou``.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1389,40 +1129,28 @@
 <span class="sd">            If the maximal-trivial certified subcomplex is empty, if the chosen threshold yields</span>
 <span class="sd">            no usable edges, if the cocycle is non-orientable on the selected subcomplex, or if</span>
 <span class="sd">            ``weight`` exceeds the maximal-trivial threshold.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        - This method uses the **max-trivial** certified subcomplex (coboundary regime), not the</span>
-<span class="sd">          cocycle-certified regime.</span>
-<span class="sd">        - Internally, a vertex gauge is computed and applied consistently to both the cocycle and</span>
-<span class="sd">          local angles before constructing the Singer global coordinate.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># prerequisites (NO auto-running)</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_local_trivs</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Run bundle.get_classes(...) before get_global_trivialization().&quot;</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># partition of unity (required here)</span>
         <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_pou</span><span class="p">(</span><span class="n">pou</span><span class="p">)</span>
 
-        <span class="c1"># build edge weights</span>
-        <span class="n">rms</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">wit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;witness_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">ew</span> <span class="o">=</span> <span class="n">build_edge_weights_from_transition_report</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_edges_U</span><span class="p">,</span>
-            <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms</span><span class="p">,</span>
-            <span class="n">witness_err</span><span class="o">=</span><span class="n">wit</span><span class="p">,</span>
-            <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;rms&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># edge weights from quality (RMS-by-edge)</span>
+        <span class="n">ew_src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ew_src</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;quality.rms_angle_err missing; cannot build global trivialization weights.&quot;</span><span class="p">)</span>
+        <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew_src</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-        <span class="c1"># max-trivial edges from persistence</span>
         <span class="n">kept_edges_max</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span><span class="p">,</span> <span class="s2">&quot;max_trivial&quot;</span><span class="p">)</span>
         <span class="n">kept_set</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kept_edges_max</span><span class="p">}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">kept_set</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Max-trivial subcomplex has no edges; cannot build global trivialization.&quot;</span><span class="p">)</span>
 
-        <span class="n">max_allowed_weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ew</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">e</span><span class="p">))])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">kept_set</span> <span class="k">if</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="ow">in</span> <span class="n">ew</span><span class="p">)</span>
+        <span class="n">max_allowed_weight</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ew</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">e</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">kept_set</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">max_allowed_weight</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missing edge weights on max-trivial edges; cannot select a threshold.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">w</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_allowed_weight</span><span class="p">)</span>
@@ -1445,7 +1173,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">edges_stage</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No edges remain at this weight within the max-trivial subcomplex.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># orient the cocycle on the chosen 1-skeleton (fixes alignment)</span>
         <span class="n">ok</span><span class="p">,</span> <span class="n">coc_oriented</span><span class="p">,</span> <span class="n">phi_pm1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span><span class="o">.</span><span class="n">orient_if_possible</span><span class="p">(</span>
             <span class="n">edges_stage</span><span class="p">,</span>
             <span class="n">n_vertices</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_sets</span><span class="p">,</span>
@@ -1457,8 +1184,7 @@
                 <span class="s2">&quot;on the selected subcomplex (w₁ does not trivialize there).&quot;</span>
             <span class="p">)</span>
 
-        <span class="c1"># apply the SAME vertex gauge to local angles</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
         <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">apply_orientation_gauge_to_f</span><span class="p">(</span>
             <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
@@ -1467,7 +1193,6 @@
             <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="c1"># Singer using oriented theta (compatible with gauged f)</span>
         <span class="n">theta_use</span> <span class="o">=</span> <span class="n">coc_oriented</span><span class="o">.</span><span class="n">theta</span>
         <span class="n">F</span> <span class="o">=</span> <span class="n">build_global_trivialization_singer</span><span class="p">(</span>
             <span class="n">edges</span><span class="o">=</span><span class="n">edges_stage</span><span class="p">,</span>
@@ -1485,7 +1210,7 @@
     <span class="c1"># ----------------------------</span>
 
 <div class="viewcode-block" id="Bundle.get_frame_dataset">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.get_frame_dataset">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.get_frame_dataset">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_frame_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1496,17 +1221,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Build the pre-projection frame dataset used by the bundle-map solver.</span>
 
-<span class="sd">        This method constructs the intermediate &quot;frame&quot; representation used by the v2</span>
-<span class="sd">        bundle-map pipeline *before* any projection/reduction step. It is primarily intended</span>
-<span class="sd">        for inspection, debugging, and research workflows; most users will call</span>
-<span class="sd">        :meth:`get_bundle_map` directly.</span>
-
-<span class="sd">        Prerequisites (no auto-running)</span>
-<span class="sd">        -------------------------------</span>
-<span class="sd">        You must have already run:</span>
-<span class="sd">        - :meth:`get_local_trivs` (for the estimated transitions/cocycle),</span>
-<span class="sd">        - :meth:`get_classes` (for persistence + the cocycle-certified subcomplex),</span>
-<span class="sd">        - and you must provide a partition of unity via ``pou`` or ``self.pou``.</span>
+<span class="sd">        This method constructs the intermediate &quot;frame&quot; representation used by the</span>
+<span class="sd">        bundle-map pipeline *before* any projection/reduction step. </span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1535,49 +1251,31 @@
 <span class="sd">        ValueError</span>
 <span class="sd">            If the cocycle-certified subcomplex is empty, or if ``weight`` exceeds the cocycle</span>
 <span class="sd">            certification threshold, or if thresholding yields no edges.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        - This method uses the **cocycle-certified** regime (not max-trivial/coboundary).</span>
-<span class="sd">        - Frames returned here are *before* any reducer/projection; see :meth:`get_bundle_map`</span>
-<span class="sd">          for the end-to-end coordinatization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># prerequisites (NO auto-running)</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_local_trivs</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_classes</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># partition of unity (required)</span>
         <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_pou</span><span class="p">(</span><span class="n">pou</span><span class="p">)</span>
 
-        <span class="c1"># persistence must exist by _require_classes()</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span>
         <span class="k">assert</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># edge weights: prefer what&#39;s stored on persistence, else rebuild</span>
         <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;edge_weights&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rms</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">wit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;witness_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">ew</span> <span class="o">=</span> <span class="n">build_edge_weights_from_transition_report</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_edges_U</span><span class="p">,</span>
-                <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms</span><span class="p">,</span>
-                <span class="n">witness_err</span><span class="o">=</span><span class="n">wit</span><span class="p">,</span>
-                <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;rms&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">ew_src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ew_src</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No edge weights available (p.edge_weights missing and quality.rms_angle_err missing).&quot;</span><span class="p">)</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew_src</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-        <span class="c1"># cocycle-certified subcomplex</span>
         <span class="n">cocycle_edges</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;cocycle&quot;</span><span class="p">)</span>
         <span class="n">cocycle_set</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cocycle_edges</span><span class="p">}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cocycle_set</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cocycle subcomplex has no edges; cannot build frame dataset.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># cocycle threshold: maximum weight among cocycle edges</span>
-        <span class="c1"># (use only edges that appear in ew; missing weights are treated as +inf below)</span>
         <span class="n">w_cocycle</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ew</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cocycle_set</span> <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ew</span><span class="p">)</span>
 
-        <span class="c1"># optional thresholding, but weight cannot exceed cocycle threshold</span>
         <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">edges_used</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cocycle_set</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1591,7 +1289,6 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">edges_used</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No edges remain at this weight within the cocycle subcomplex.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Always pre-projection frames; remove other knobs from the public API</span>
         <span class="k">return</span> <span class="n">_get_frame_dataset</span><span class="p">(</span>
             <span class="n">U</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
             <span class="n">pou</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
@@ -1601,12 +1298,10 @@
             <span class="n">stage</span><span class="o">=</span><span class="s2">&quot;pre_projection&quot;</span><span class="p">,</span>
             <span class="n">max_frames</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">rng_seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">packing</span><span class="o">=</span><span class="n">packing</span><span class="p">,</span>  
+            <span class="n">packing</span><span class="o">=</span><span class="n">packing</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Bundle.get_bundle_map">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.get_bundle_map">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_bundle_map</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1618,32 +1313,17 @@
         <span class="n">show_summary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">recompute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleMapResult</span><span class="p">:</span>
+        <span class="n">SEMICIRCLE_TOL</span> <span class="o">=</span> <span class="mf">1e-8</span>
+        <span class="n">ROUNDING</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">COMPUTE_CD</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compute (or fetch cached) bundle-map coordinatization using the v2 pipeline.</span>
+<span class="sd">        Compute (or fetch cached) bundle-map coordinatization.</span>
 
 <span class="sd">        This method returns a global fiber-coordinate embedding produced by the bundle-map</span>
 <span class="sd">        solver, along with the solver report and lightweight metadata. The output is intended</span>
 <span class="sd">        to serve as a *global coordinatization* of the total space/fiber structure implied by</span>
 <span class="sd">        the estimated cocycle, suitable for visualization and downstream learning tasks.</span>
 
-<span class="sd">        Prerequisites (no auto-running)</span>
-<span class="sd">        -------------------------------</span>
-<span class="sd">        You must have already run:</span>
-<span class="sd">        - :meth:`get_local_trivs`,</span>
-<span class="sd">        - :meth:`get_classes`,</span>
-<span class="sd">        - and you must provide a partition of unity via ``pou`` or ``self.pou``.</span>
-
-<span class="sd">        Certified subcomplex</span>
-<span class="sd">        --------------------</span>
-<span class="sd">        The solver operates on the **cocycle-certified** subcomplex derived from persistence.</span>
-<span class="sd">        If ``weight`` is provided, the subcomplex is further restricted to edges with</span>
-<span class="sd">        weight &lt;= ``weight``; the value must not exceed the cocycle-certification threshold.</span>
-
-<span class="sd">        Fixed policy (by design)</span>
-<span class="sd">        ------------------------</span>
-<span class="sd">        - Summary display (if enabled) uses **auto** rendering.</span>
-<span class="sd">        - Semicircle tolerance is fixed internally at ``1e-8``.</span>
-<span class="sd">        - The chart-disagreement diagnostic is always computed.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1691,47 +1371,29 @@
 <span class="sd">        the chosen subcomplex (via ``weight``), ``packing``, ``strict_semicircle``, the reducer</span>
 <span class="sd">        signature, and whether a partition-of-unity override is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># fixed knobs</span>
-        <span class="n">SEMICIRCLE_TOL</span> <span class="o">=</span> <span class="mf">1e-8</span>
-        <span class="n">ROUNDING</span> <span class="o">=</span> <span class="mi">3</span>
-        <span class="n">COMPUTE_CD</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="c1"># prerequisites (NO auto-running)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_local_trivs</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_classes</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># partition of unity (required)</span>
         <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_require_pou</span><span class="p">(</span><span class="n">pou</span><span class="p">)</span>
 
-        <span class="c1"># persistence exists by _require_classes()</span>
         <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span>
         <span class="k">assert</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># edge weights: prefer what&#39;s stored on persistence, else rebuild</span>
         <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;edge_weights&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="n">rms</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">wit</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transition_report</span><span class="p">,</span> <span class="s2">&quot;witness_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">ew</span> <span class="o">=</span> <span class="n">build_edge_weights_from_transition_report</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_edges_U</span><span class="p">,</span>
-                <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms</span><span class="p">,</span>
-                <span class="n">witness_err</span><span class="o">=</span><span class="n">wit</span><span class="p">,</span>
-                <span class="n">prefer</span><span class="o">=</span><span class="s2">&quot;rms&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">ew_src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ew_src</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No edge weights available (p.edge_weights missing and quality.rms_angle_err missing).&quot;</span><span class="p">)</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew_src</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-        <span class="c1"># cocycle-certified subcomplex</span>
         <span class="n">cocycle_edges</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;cocycle&quot;</span><span class="p">)</span>
         <span class="n">cocycle_set</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cocycle_edges</span><span class="p">}</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cocycle_set</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cocycle subcomplex has no edges; cannot compute bundle map.&quot;</span><span class="p">)</span>
 
-        <span class="c1"># cocycle threshold: maximum weight among cocycle edges (ignoring missing weights)</span>
         <span class="n">w_cocycle</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ew</span><span class="p">[</span><span class="n">e</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">cocycle_set</span> <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ew</span><span class="p">)</span>
 
-        <span class="c1"># optional thresholding, but weight cannot exceed cocycle threshold</span>
         <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">edges_used</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cocycle_set</span><span class="p">)</span>
             <span class="n">weight_used</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1747,10 +1409,8 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No edges remain at this weight within the cocycle subcomplex.&quot;</span><span class="p">)</span>
             <span class="n">weight_used</span> <span class="o">=</span> <span class="n">w</span>
 
-        <span class="c1"># canonicalize edges for caching / downstream</span>
         <span class="n">edges_key</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">({</span><span class="n">canon_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges_used</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]}))</span>
 
-        <span class="c1"># reducer participates in caching via a lightweight key</span>
         <span class="n">red_key</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">reducer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">red_key</span> <span class="o">=</span> <span class="p">(</span>
@@ -1762,7 +1422,6 @@
                 <span class="nb">getattr</span><span class="p">(</span><span class="n">reducer</span><span class="p">,</span> <span class="s2">&quot;psc_verbosity&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="c1"># pou override participates in caching without hashing the full matrix</span>
         <span class="n">pou_key</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">pou</span><span class="p">)</span> <span class="k">if</span> <span class="n">pou</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span>
@@ -1778,32 +1437,24 @@
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">recompute</span> <span class="ow">or</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_cache</span><span class="p">:</span>
-            
-            <span class="c1"># cocycle-certified subcomplex edges (list of Edge tuples)</span>
             <span class="n">cocycle_edges_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;cocycle&quot;</span><span class="p">))</span>
 
             <span class="n">F</span><span class="p">,</span> <span class="n">pre_F</span><span class="p">,</span> <span class="n">Omega_used</span><span class="p">,</span> <span class="n">Phi_used</span><span class="p">,</span> <span class="n">report</span> <span class="o">=</span> <span class="n">get_bundle_map_v2</span><span class="p">(</span>
                 <span class="n">U</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
                 <span class="n">pou</span><span class="o">=</span><span class="n">P</span><span class="p">,</span>
-                <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+                <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f</span><span class="p">,</span>
                 <span class="n">Omega</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span><span class="o">.</span><span class="n">Omega</span><span class="p">,</span>
-
-                <span class="c1"># IMPORTANT: let v2 own the restriction logic</span>
                 <span class="n">edges</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="n">weight</span><span class="o">=</span><span class="n">weight_used</span><span class="p">,</span>
-
                 <span class="n">reducer</span><span class="o">=</span><span class="n">reducer</span><span class="p">,</span>
                 <span class="n">packing</span><span class="o">=</span><span class="n">packing</span><span class="p">,</span>
                 <span class="n">strict_semicircle</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">strict_semicircle</span><span class="p">),</span>
-
-                <span class="n">show_summary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># wrapper controls summary</span>
+                <span class="n">show_summary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="n">compute_chart_disagreement</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">COMPUTE_CD</span><span class="p">),</span>
-
-                <span class="c1"># REQUIRED when weight is None (and still useful when weight is not None)</span>
                 <span class="n">persistence</span><span class="o">=</span><span class="n">p</span><span class="p">,</span>
                 <span class="n">cocycle_subcomplex_edges</span><span class="o">=</span><span class="n">cocycle_edges_list</span><span class="p">,</span>
             <span class="p">)</span>
-            
+
             <span class="n">reducer_meta</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">reducer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">reducer_meta</span> <span class="o">=</span> <span class="p">{</span>
@@ -1815,8 +1466,8 @@
                     <span class="s2">&quot;psc_verbosity&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">reducer</span><span class="p">,</span> <span class="s2">&quot;psc_verbosity&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
                 <span class="p">}</span>
 
-            <span class="n">ambient_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># output dimension</span>
-                
+            <span class="n">ambient_dim</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">F</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">BundleMapResult</span><span class="p">(</span>
                 <span class="n">F</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">F</span><span class="p">),</span>
                 <span class="n">pre_F</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pre_F</span><span class="p">),</span>
@@ -1838,22 +1489,14 @@
         <span class="n">bm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_last</span> <span class="o">=</span> <span class="n">bm</span>
 
-        <span class="c1"># standardized summary object for bundle.summary()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="o">=</span> <span class="n">summarize_bundle_map</span><span class="p">(</span>
-                <span class="n">bm</span><span class="o">.</span><span class="n">report</span><span class="p">,</span>
-                <span class="n">meta</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bm</span><span class="o">.</span><span class="n">meta</span> <span class="ow">or</span> <span class="p">{}),</span>
-            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="o">=</span> <span class="n">summarize_bundle_map</span><span class="p">(</span><span class="n">bm</span><span class="o">.</span><span class="n">report</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bm</span><span class="o">.</span><span class="n">meta</span> <span class="ow">or</span> <span class="p">{}))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
-                    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-                    <span class="n">rounding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ROUNDING</span><span class="p">),</span>
-                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">rounding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ROUNDING</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">show_bundle_map_summary</span><span class="p">(</span>
                     <span class="n">bm</span><span class="o">.</span><span class="n">report</span><span class="p">,</span>
@@ -1863,15 +1506,14 @@
                     <span class="n">extra_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">bm</span>    </div>
+        <span class="k">return</span> <span class="n">bm</span>
 
-    
     <span class="c1"># --------------</span>
     <span class="c1"># Visualization</span>
     <span class="c1"># --------------</span>
-    
+
 <div class="viewcode-block" id="Bundle.compare_trivs">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.compare_trivs">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.compare_trivs">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">compare_trivs</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1888,21 +1530,14 @@
         <span class="n">edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Compare local trivializations on overlaps.</span>
+<span class="sd">        Compare local circular coordinates on overlaps.</span>
 
 <span class="sd">        This method produces a **static matplotlib diagnostic figure** showing pairs of</span>
 <span class="sd">        local fiber coordinates on chart overlaps, optionally aligning the second chart</span>
 <span class="sd">        to the first by an O(2) fit.</span>
 
-<span class="sd">        It is a cover-free wrapper around</span>
-<span class="sd">        :func:`circle_bundles.viz.angles.compare_trivs_from_U`.</span>
-
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        - This method **never computes** local trivializations. You must call</span>
-<span class="sd">          :meth:`get_local_trivs` first.</span>
-<span class="sd">        - Edge selection is cover-free: if ``edges`` is not provided, overlaps are</span>
-<span class="sd">          inferred directly from ``U`` by requiring ``|U_j ∩ U_k| &gt;= min_points_edge``.</span>
 <span class="sd">        - If there are more than ``max_pairs`` overlaps, the visualizer selects a subset</span>
 <span class="sd">          according to ``metric`` (typically WORST / MEDIAN / BEST).</span>
 
@@ -1951,14 +1586,11 @@
 <span class="sd">        RuntimeError</span>
 <span class="sd">            If local trivializations have not been computed (call :meth:`get_local_trivs` first).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># prerequisites (NO auto-running)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_local_trivs</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># Lazy import so bundle import doesn&#39;t pull matplotlib</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.viz.angles</span><span class="w"> </span><span class="kn">import</span> <span class="n">compare_trivs_from_U</span>
 
-        <span class="c1"># Choose edges</span>
         <span class="k">if</span> <span class="n">edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">edges_used</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edges_from_U</span><span class="p">(</span><span class="n">min_points</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">min_points_edge</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1966,7 +1598,7 @@
 
         <span class="k">return</span> <span class="n">compare_trivs_from_U</span><span class="p">(</span>
             <span class="n">U</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
-            <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+            <span class="n">f</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_f</span><span class="p">,</span>
             <span class="n">edges</span><span class="o">=</span><span class="n">edges_used</span><span class="p">,</span>
             <span class="n">ncols</span><span class="o">=</span><span class="n">ncols</span><span class="p">,</span>
             <span class="n">title_size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">title_size</span><span class="p">),</span>
@@ -1979,10 +1611,9 @@
             <span class="n">return_selected</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">return_selected</span><span class="p">),</span>
         <span class="p">)</span></div>
 
-    
 
 <div class="viewcode-block" id="Bundle.show_nerve">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.show_nerve">[docs]</a>
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.show_nerve">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">show_nerve</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -1997,141 +1628,10 @@
         <span class="n">edge_cutoff</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">highlight_edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">highlight_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
-        <span class="n">prefer_local_weights</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
+        <span class="n">prefer_local_weights</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;rms&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
         <span class="n">use_slider</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">mark_cutoff</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">show_title_value</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Visualize the nerve as an interactive Plotly figure.</span>
-
-<span class="sd">        If `landmarks` is not provided, this method tries to use stored landmarks from:</span>
-<span class="sd">          1) self.cover.landmarks (if present)</span>
-<span class="sd">          2) self.landmarks (if present)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">.viz.nerve_plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_nerve_figure</span><span class="p">,</span> <span class="n">nerve_with_slider_from_U</span>
-
-        <span class="c1"># ------------------------------------------------------------</span>
-        <span class="c1"># Landmarks resolution (explicit arg wins; else stored)</span>
-        <span class="c1"># ------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">landmarks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">L</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="c1"># (A) If Bundle stores a cover object</span>
-            <span class="n">cover</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;cover&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">cover</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">L</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;landmarks&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-            <span class="c1"># (B) If Bundle stores landmarks directly</span>
-            <span class="k">if</span> <span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">L</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;landmarks&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;No landmarks available for nerve visualization. &quot;</span>
-                    <span class="s2">&quot;Pass `landmarks=...` explicitly, or construct the Bundle with a cover &quot;</span>
-                    <span class="s2">&quot;that provides landmarks, or store `self.landmarks`.&quot;</span>
-                <span class="p">)</span>
-
-            <span class="n">landmarks</span> <span class="o">=</span> <span class="n">L</span>
-
-        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-        <span class="c1"># ------------------------------------------------------------</span>
-        <span class="c1"># Cached simplices from U</span>
-        <span class="c1"># ------------------------------------------------------------</span>
-        <span class="n">edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_edges_U&quot;</span><span class="p">,</span> <span class="p">[]))</span>
-        <span class="n">tris</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_tris_U&quot;</span><span class="p">,</span> <span class="p">[]))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">edges</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No nerve edges available on this Bundle (missing/empty _edges_U).&quot;</span><span class="p">)</span>
-
-        <span class="c1"># your existing policy for choosing weights</span>
-        <span class="n">ew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latest_edge_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">prefer_local_weights</span><span class="p">))</span>
-
-        <span class="c1"># --- static case ---</span>
-        <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">use_slider</span><span class="p">:</span>
-            <span class="n">fig</span> <span class="o">=</span> <span class="n">make_nerve_figure</span><span class="p">(</span>
-                <span class="n">landmarks</span><span class="o">=</span><span class="n">L</span><span class="p">,</span>
-                <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
-                <span class="n">triangles</span><span class="o">=</span><span class="n">tris</span><span class="p">,</span>
-                <span class="n">title</span><span class="o">=</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="s2">&quot;Nerve Visualization&quot;</span><span class="p">),</span>
-                <span class="n">show_labels</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_labels</span><span class="p">),</span>
-                <span class="n">show_axes</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_axes</span><span class="p">),</span>
-                <span class="n">tri_opacity</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tri_opacity</span><span class="p">),</span>
-                <span class="n">tri_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tri_color</span><span class="p">),</span>
-                <span class="n">cochains</span><span class="o">=</span><span class="n">cochains</span><span class="p">,</span>
-                <span class="n">edge_weights</span><span class="o">=</span><span class="n">ew</span><span class="p">,</span>
-                <span class="n">edge_cutoff</span><span class="o">=</span><span class="n">edge_cutoff</span><span class="p">,</span>
-                <span class="n">highlight_edges</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">highlight_edges</span><span class="p">)</span> <span class="k">if</span> <span class="n">highlight_edges</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">highlight_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">highlight_color</span><span class="p">),</span>
-            <span class="p">)</span>
-            <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-            <span class="k">return</span> <span class="n">fig</span>
-
-        <span class="c1"># --- compute a working jump cutoff ---</span>
-        <span class="k">if</span> <span class="n">mark_cutoff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">jump_cutoff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mark_cutoff</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">jump_cutoff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_max_trivial_cutoff</span><span class="p">(</span><span class="n">ew</span><span class="p">)</span>
-
-        <span class="n">show_jump</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">jump_cutoff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">nerve_with_slider_from_U</span><span class="p">(</span>
-            <span class="n">U</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
-            <span class="n">landmarks</span><span class="o">=</span><span class="n">L</span><span class="p">,</span>
-            <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
-            <span class="n">triangles</span><span class="o">=</span><span class="n">tris</span><span class="p">,</span>
-            <span class="n">edge_weights</span><span class="o">=</span><span class="n">ew</span><span class="p">,</span>
-            <span class="n">show_labels</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_labels</span><span class="p">),</span>
-            <span class="n">tri_opacity</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tri_opacity</span><span class="p">),</span>
-            <span class="n">tri_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tri_color</span><span class="p">),</span>
-            <span class="n">show_axes</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_axes</span><span class="p">),</span>
-            <span class="n">highlight_edges</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">highlight_edges</span><span class="p">)</span> <span class="k">if</span> <span class="n">highlight_edges</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">highlight_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">highlight_color</span><span class="p">),</span>
-            <span class="n">mark_cutoff</span><span class="o">=</span><span class="n">jump_cutoff</span><span class="p">,</span>             <span class="c1"># None =&gt; no button</span>
-            <span class="n">title</span><span class="o">=</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="s2">&quot;Nerve Visualization&quot;</span><span class="p">),</span>
-            <span class="n">show_title_value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_title_value</span><span class="p">),</span>
-            <span class="n">show_jump</span><span class="o">=</span><span class="n">show_jump</span><span class="p">,</span>
-            <span class="n">jump_label</span><span class="o">=</span><span class="s2">&quot;Jump to max-trivial&quot;</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
-
-    
-<div class="viewcode-block" id="Bundle.show_circle_nerve">
-<a class="viewcode-back" href="../../api/generated/circle_bundles.Bundle.html#circle_bundles.Bundle.show_circle_nerve">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">show_circle_nerve</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">use_max_trivial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">weights</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
-        <span class="n">omega</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">phi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">compute_phi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">fail_if_not_cycle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
-        <span class="n">dpi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">node_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
-        <span class="n">node_facecolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lightblue&quot;</span><span class="p">,</span>
-        <span class="n">node_edgecolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
-        <span class="n">node_label_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
-        <span class="n">removed_edge_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lightgray&quot;</span><span class="p">,</span>
-        <span class="n">removed_edge_lw</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
-        <span class="n">kept_edge_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
-        <span class="n">kept_edge_lw</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
-        <span class="n">omega_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
-        <span class="n">phi_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
-        <span class="n">weights_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
-        <span class="n">fontsize_node</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
-        <span class="n">fontsize_omega</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
-        <span class="n">fontsize_phi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
-        <span class="n">fontsize_weights</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span>
-        <span class="n">omega_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.09</span><span class="p">,</span>
-        <span class="n">weights_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.09</span><span class="p">,</span>
-        <span class="n">phi_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.14</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Visualize a single-cycle nerve in a canonical circle layout (matplotlib).</span>
@@ -2139,34 +1639,6 @@
 <span class="sd">        This visualization is designed for the common case where the 1-skeleton of the</span>
 <span class="sd">        nerve is a **single cycle graph**. The vertices are arranged evenly on a circle,</span>
 <span class="sd">        and edge annotations (weights, orientation data) are displayed directly on the plot.</span>
-
-<span class="sd">        This is a cover-free wrapper around :func:`circle_bundles.viz.nerve_circle.show_circle_nerve`.</span>
-
-<span class="sd">        Fixed policy</span>
-<span class="sd">        ------------</span>
-<span class="sd">        - If the nerve is a cycle, the vertices are **reindexed to a canonical cyclic order**</span>
-<span class="sd">          for a stable, clean layout.</span>
-<span class="sd">        - Edge weights are not provided directly as a dict; instead the ``weights`` argument</span>
-<span class="sd">          selects the source (see below).</span>
-<span class="sd">        - ``plt.show()`` is never called; the caller controls display.</span>
-
-<span class="sd">        Weight source</span>
-<span class="sd">        -------------</span>
-<span class="sd">        The ``weights`` argument selects which edge-weight labels (if any) are shown:</span>
-
-<span class="sd">        - ``&quot;rms&quot;``: RMS transition-angle error (prefers persistence ``edge_weights`` if present)</span>
-<span class="sd">        - ``&quot;witness&quot;``: witness / overlap diagnostic (prefers persistence ``edge_weights`` if present)</span>
-<span class="sd">        - ``&quot;none&quot;``: do not display weight labels</span>
-
-<span class="sd">        Orientation / cochain annotations</span>
-<span class="sd">        ---------------------------------</span>
-<span class="sd">        - ``omega`` (edge signs) controls O(1) data displayed on edges.</span>
-<span class="sd">          If not provided, the method attempts to use ``reps.omega_O1_used`` from cached</span>
-<span class="sd">          class representatives (if available).</span>
-<span class="sd">        - ``phi`` (vertex signs) controls vertex gauge/orientation markers.</span>
-<span class="sd">          If not provided and ``compute_phi=True``, the method attempts to compute a consistent</span>
-<span class="sd">          orientation gauge from the cached cocycle on either the max-trivial subcomplex</span>
-<span class="sd">          (when available) or the full cycle.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2224,8 +1696,118 @@
 <span class="sd">            If ``fail_if_not_cycle=True`` and the nerve graph is not a single cycle.</span>
 <span class="sd">        RuntimeError</span>
 <span class="sd">            If ``compute_phi=True`` but no cocycle is available (call :meth:`get_local_trivs` first).</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.viz.nerve_plotly</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_nerve_figure</span><span class="p">,</span> <span class="n">nerve_with_slider_from_U</span>
 
+        <span class="k">if</span> <span class="n">landmarks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">L</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">cover</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;cover&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cover</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cover</span><span class="p">,</span> <span class="s2">&quot;landmarks&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;landmarks&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">L</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;No landmarks available for nerve visualization. &quot;</span>
+                    <span class="s2">&quot;Pass `landmarks=...` explicitly, or construct the Bundle with a cover &quot;</span>
+                    <span class="s2">&quot;that provides landmarks, or store `self.landmarks`.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">landmarks</span> <span class="o">=</span> <span class="n">L</span>
+
+        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">landmarks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_edges_U&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">tris</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_tris_U&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">edges</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No nerve edges available on this Bundle (missing/empty _edges_U).&quot;</span><span class="p">)</span>
+
+        <span class="n">ew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latest_edge_weights</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">prefer_local_weights</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">use_slider</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">make_nerve_figure</span><span class="p">(</span>
+                <span class="n">landmarks</span><span class="o">=</span><span class="n">L</span><span class="p">,</span>
+                <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
+                <span class="n">triangles</span><span class="o">=</span><span class="n">tris</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="s2">&quot;Nerve Visualization&quot;</span><span class="p">),</span>
+                <span class="n">show_labels</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_labels</span><span class="p">),</span>
+                <span class="n">show_axes</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_axes</span><span class="p">),</span>
+                <span class="n">tri_opacity</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tri_opacity</span><span class="p">),</span>
+                <span class="n">tri_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tri_color</span><span class="p">),</span>
+                <span class="n">cochains</span><span class="o">=</span><span class="n">cochains</span><span class="p">,</span>
+                <span class="n">edge_weights</span><span class="o">=</span><span class="n">ew</span><span class="p">,</span>
+                <span class="n">edge_cutoff</span><span class="o">=</span><span class="n">edge_cutoff</span><span class="p">,</span>
+                <span class="n">highlight_edges</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">highlight_edges</span><span class="p">)</span> <span class="k">if</span> <span class="n">highlight_edges</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">highlight_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">highlight_color</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+        <span class="k">if</span> <span class="n">mark_cutoff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">jump_cutoff</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mark_cutoff</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">jump_cutoff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_try_max_trivial_cutoff</span><span class="p">(</span><span class="n">ew</span><span class="p">)</span>
+
+        <span class="n">show_jump</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">jump_cutoff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">nerve_with_slider_from_U</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">),</span>
+            <span class="n">landmarks</span><span class="o">=</span><span class="n">L</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span>
+            <span class="n">triangles</span><span class="o">=</span><span class="n">tris</span><span class="p">,</span>
+            <span class="n">edge_weights</span><span class="o">=</span><span class="n">ew</span><span class="p">,</span>
+            <span class="n">show_labels</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_labels</span><span class="p">),</span>
+            <span class="n">tri_opacity</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">tri_opacity</span><span class="p">),</span>
+            <span class="n">tri_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">tri_color</span><span class="p">),</span>
+            <span class="n">show_axes</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_axes</span><span class="p">),</span>
+            <span class="n">highlight_edges</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">highlight_edges</span><span class="p">)</span> <span class="k">if</span> <span class="n">highlight_edges</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">highlight_color</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">highlight_color</span><span class="p">),</span>
+            <span class="n">mark_cutoff</span><span class="o">=</span><span class="n">jump_cutoff</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="p">(</span><span class="n">title</span> <span class="ow">or</span> <span class="s2">&quot;Nerve Visualization&quot;</span><span class="p">),</span>
+            <span class="n">show_title_value</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_title_value</span><span class="p">),</span>
+            <span class="n">show_jump</span><span class="o">=</span><span class="n">show_jump</span><span class="p">,</span>
+            <span class="n">jump_label</span><span class="o">=</span><span class="s2">&quot;Jump to max-trivial&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Bundle.show_circle_nerve">
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.show_circle_nerve">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">show_circle_nerve</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">use_max_trivial</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
+        <span class="n">omega</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">phi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">compute_phi</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fail_if_not_cycle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span>
+        <span class="n">dpi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">node_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+        <span class="n">node_facecolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lightblue&quot;</span><span class="p">,</span>
+        <span class="n">node_edgecolor</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+        <span class="n">node_label_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;k&quot;</span><span class="p">,</span>
+        <span class="n">removed_edge_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;lightgray&quot;</span><span class="p">,</span>
+        <span class="n">removed_edge_lw</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
+        <span class="n">kept_edge_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="n">kept_edge_lw</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="n">omega_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="n">phi_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="n">weights_color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="n">fontsize_node</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">fontsize_omega</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">fontsize_phi</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+        <span class="n">fontsize_weights</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">9</span><span class="p">,</span>
+        <span class="n">omega_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.09</span><span class="p">,</span>
+        <span class="n">weights_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.09</span><span class="p">,</span>
+        <span class="n">phi_offset</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.14</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize a single-cycle nerve in a canonical circle layout (matplotlib).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">.viz.nerve_circle</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">show_circle_nerve</span> <span class="k">as</span> <span class="n">_show_circle_nerve</span><span class="p">,</span>
             <span class="n">is_single_cycle_graph</span><span class="p">,</span>
@@ -2263,12 +1845,10 @@
         <span class="k">if</span> <span class="n">weights</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="n">ew</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Reuse your central policy:</span>
-            <span class="c1"># - prefers persistence edge_weights when available</span>
-            <span class="c1"># - else uses local-triv report / quality depending on prefer</span>
+            <span class="c1"># central policy: persistence edge_weights &gt; quality-derived &gt; None</span>
             <span class="n">ew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latest_edge_weights</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
 
-        <span class="c1"># ---- omega: explicit override OR auto from reps (always-on) ----</span>
+        <span class="c1"># ---- omega: explicit override OR auto from reps ----</span>
         <span class="n">omega_use</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">omega</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">omega_use</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">omega</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -2301,8 +1881,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">phi_use</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># ---- ALWAYS reorder around the cycle for clean layout ----</span>
-        <span class="c1"># (Even if ok=False, cycle_order_from_edges may raise; but ok=False is only allowed if fail_if_not_cycle=False.)</span>
+        <span class="c1"># ---- reorder around the cycle for clean layout ----</span>
         <span class="k">if</span> <span class="n">ok</span><span class="p">:</span>
             <span class="n">order</span> <span class="o">=</span> <span class="n">cycle_order_from_edges</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">old_to_new</span> <span class="o">=</span> <span class="p">{</span><span class="n">old</span><span class="p">:</span> <span class="n">new</span> <span class="k">for</span> <span class="n">new</span><span class="p">,</span> <span class="n">old</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">order</span><span class="p">)}</span>
@@ -2313,7 +1892,6 @@
             <span class="n">w_r</span> <span class="o">=</span> <span class="n">reindex_edge_dict</span><span class="p">(</span><span class="n">ew</span><span class="p">,</span> <span class="n">old_to_new</span><span class="p">)</span> <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="n">phi_r</span> <span class="o">=</span> <span class="n">reindex_vertex_dict</span><span class="p">(</span><span class="n">phi_use</span><span class="p">,</span> <span class="n">old_to_new</span><span class="p">)</span> <span class="k">if</span> <span class="n">phi_use</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># not a cycle, but user asked not to fail; show &quot;as-is&quot;</span>
             <span class="n">edges_r</span><span class="p">,</span> <span class="n">kept_r</span><span class="p">,</span> <span class="n">omega_r</span><span class="p">,</span> <span class="n">w_r</span><span class="p">,</span> <span class="n">phi_r</span> <span class="o">=</span> <span class="n">edges</span><span class="p">,</span> <span class="n">kept_edges</span><span class="p">,</span> <span class="n">omega_use</span><span class="p">,</span> <span class="n">ew</span><span class="p">,</span> <span class="n">phi_use</span>
 
         <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2356,7 +1934,6 @@
 
 
 
-    
     <span class="c1"># ----------------------------</span>
     <span class="c1"># Accessors (NO auto-running)</span>
     <span class="c1"># ----------------------------</span>
@@ -2371,18 +1948,18 @@
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Cocycle not computed. Run: bundle.get_local_trivs(...) first.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Local angles not computed. Run: bundle.get_local_trivs(...) first.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_f</span>
+
+    <span class="c1"># (Back-compat / internal) keep available but not required by the public API.</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_local_triv_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LocalTrivResult</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Local trivializations not computed. Run: bundle.get_local_trivs(...) first.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_try_max_trivial_cutoff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edge_weights</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Best-effort: return the weight cutoff for the max-trivial subcomplex, or None.</span>
-
-<span class="sd">        This uses PersistenceResult + _edges_for_subcomplex_from_persistence(p, &quot;max_trivial&quot;).</span>
-<span class="sd">        It never raises.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">p</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_class_persistence&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -2395,7 +1972,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">kept</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="c1"># canonicalize weights dict (keys are (i,j))</span>
         <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">edge_weights</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
         <span class="n">ws</span> <span class="o">=</span> <span class="p">[</span><span class="n">ew</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kept</span><span class="p">]</span>
@@ -2403,10 +1979,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">ws</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="c1"># In your filtration, kept edges are exactly those with weight &lt;= cutoff,</span>
-        <span class="c1"># so cutoff = max weight among kept edges.</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">ws</span><span class="p">))</span>
-
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_latest_edge_weights</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2414,13 +1987,6 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">prefer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Weight policy (single knob `weights`):</span>
-<span class="sd">          - if `weights` provided: use it</span>
-<span class="sd">          - else if classes exist and persistence has `edge_weights`: use those</span>
-<span class="sd">          - else if local trivs exist: use transition_report weights (prefer &#39;rms&#39; by default)</span>
-<span class="sd">          - else: None</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># 0) explicit override always wins</span>
         <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">weights</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -2430,33 +1996,37 @@
         <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;edge_weights&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="c1"># accept either canonical (i,j) tuples or whatever mapping keys, but normalize</span>
                 <span class="k">return</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-        <span class="c1"># 2) local-triv transition weights (if available)</span>
-        <span class="n">tr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_transition_report&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">tr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># no local trivs computed</span>
+        <span class="c1"># 2) quality-derived weights (if available)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_quality&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">prefer</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefer</span><span class="p">)</span>
+        <span class="n">prefer</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefer</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">prefer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;rms&quot;</span><span class="p">,</span> <span class="s2">&quot;witness&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;prefer must be &#39;rms&#39;, &#39;witness&#39;, or &#39;none&#39;.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">prefer</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="n">prefer</span> <span class="o">==</span> <span class="s2">&quot;rms&quot;</span><span class="p">:</span>
-            <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># &quot;witness&quot;</span>
-            <span class="c1"># witness lives on quality in your code, but not always present</span>
-            <span class="n">q</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_quality&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s2">&quot;witness_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="k">if</span> <span class="n">q</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="c1"># witness-by-edge (if you add it later) + graceful fallback to RMS</span>
+        <span class="k">if</span> <span class="n">prefer</span> <span class="o">==</span> <span class="s2">&quot;witness&quot;</span><span class="p">:</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s2">&quot;witness_err_by_edge&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
+            <span class="c1"># fallback: use RMS if witness weights aren&#39;t available</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="c1"># prefer == &quot;rms&quot;</span>
+        <span class="n">ew</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
-
         <span class="k">return</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
-
 
 </pre></div>
 

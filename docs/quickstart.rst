@@ -2,7 +2,7 @@ Quickstart
 ==========
 
 This page demonstrates a minimal end-to-end example using a classical circle bundle:
-the Hopf fibration :math:`S^3 \to S^2`.
+the Hopf fibration :math:`S^3 \to S^2`. The Hopf fibration is a non-trivial orientable circle bundle with Euler number :math:`\pm 1`.
 
 Minimal working example
 -----------------------
@@ -15,31 +15,18 @@ Minimal working example
    # Sample points on S^3
    n_samples = 5000
    rng = np.random.default_rng(0)
-   s3_points = cb.sample_sphere(n_samples, dim=3, rng=rng)
+   s3_data = cb.sample_sphere(n_samples, dim=3, rng=rng)
 
    # Hopf projection S^3 -> S^2
-   base_points = cb.hopf_projection(s3_points)
+   base_points = cb.hopf_projection(s3_data)
 
    # Build an open cover of S^2
    n_landmarks = 60
-   s2_cover = cb.make_s2_fibonacci_star_cover(
+   s2_cover = cb.get_s2_fibonacci_cover(
        base_points,
        n_vertices=n_landmarks,
    )
 
-   # Run the bundle pipeline
-   bundle = cb.build_bundle(
-       s3_points,
-       s2_cover,
-       show=True,
-   )
-
-
-Notes
------
-
-- The primary entry point is :func:`circle_bundles.build_bundle`.
-- All downstream results are accessed via cached methods on
-  :class:`circle_bundles.BundleResult`.
-- Synthetic data generators and visualization helpers live in separate
-  submodules (``synthetic``, ``viz``, ``optical_flow``).
+   bundle = cb.Bundle(X = s3_data, U = s2_cover.U)
+   triv_result = bundle.get_local_trivs()
+   class_result = bundle.get_classes(show_summary = True)

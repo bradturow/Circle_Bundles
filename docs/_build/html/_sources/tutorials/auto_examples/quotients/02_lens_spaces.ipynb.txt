@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "a7bdd8bf",
+   "id": "172e8617",
    "metadata": {},
    "source": [
     "(example_02_lens_spaces)="

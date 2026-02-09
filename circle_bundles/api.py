@@ -12,12 +12,17 @@ from __future__ import annotations
 # Core workflow (recommended entry points)
 # =============================================================================
 
+# =============================================================================
+# Core workflow (recommended entry points)
+# =============================================================================
+
 from .bundle2 import (
     Bundle,
     LocalTrivsResult,
     ClassesAndPersistence,
     BundleMapResult,
 )
+
 
 # =============================================================================
 # Result + config types

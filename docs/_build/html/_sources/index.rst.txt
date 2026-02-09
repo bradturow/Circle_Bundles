@@ -9,11 +9,10 @@ The recommended usage is:
 
    import circle_bundles as cb
 
-   bundle = cb.build_bundle(data, cover, show=True)
-   pers = bundle.get_persistence()
-   gt = bundle.get_global_trivialization()
-   bm = bundle.get_bundle_map()
-   pb = bundle.get_pullback_data()
+   bundle = cb.Bundle(X = data, U = U)
+   triv_result = bundle.get_local_trivs()
+   class_result = bundle.get_classes()
+   bundle_map_result = bundle.get_bundle_map()
 
 .. toctree::
    :maxdepth: 2
@@ -33,12 +32,6 @@ The recommended usage is:
    :caption: API reference
 
    api/index
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Extras
-
-   extras/index
 
 .. toctree::
    :maxdepth: 1

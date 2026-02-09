@@ -52,7 +52,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#notes">Notes</a></li>
 </ul>
 </li>
 </ul>
@@ -70,7 +69,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/results.html">Result objects and dataclasses</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/results.html#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#lower-level-results-stable">Lower-level results (stable)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#lower-level-results">Lower-level results</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/covers.html">Covers</a><ul>
@@ -105,24 +104,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../extras/index.html">Extras and utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/synthetic.html">Synthetic datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/viz.html">Visualization Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/optical_flow.html">Optical Flow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 </ul>
@@ -1149,7 +1130,7 @@
 
 
 <div class="viewcode-block" id="Torus_KleinQuotientMetric_R4">
-<a class="viewcode-back" href="../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html#circle_bundles.Torus_KleinQuotientMetric_R4">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html#circle_bundles.Torus_KleinQuotientMetric_R4">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Torus_KleinQuotientMetric_R4</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">base_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z2&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Metric&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Z2 quotient metric on R^4 C^2-torus embedding that implements the Klein identification</span>
@@ -1173,7 +1154,7 @@
 
 
 <div class="viewcode-block" id="Torus_DiagQuotientMetric_R4">
-<a class="viewcode-back" href="../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html#circle_bundles.Torus_DiagQuotientMetric_R4">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html#circle_bundles.Torus_DiagQuotientMetric_R4">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">Torus_DiagQuotientMetric_R4</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">base_in</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;z2&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Metric&quot;</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Z2 quotient metric on R^4 C^2-torus embedding for the diagonal pi-shift:</span>
@@ -1274,7 +1255,7 @@
 
 
 <div class="viewcode-block" id="RP2_TrivialMetric">
-<a class="viewcode-back" href="../../extras/generated/circle_bundles.RP2_TrivialMetric.html#circle_bundles.RP2_TrivialMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/circle_bundles.RP2_TrivialMetric.html#circle_bundles.RP2_TrivialMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RP2_TrivialMetric</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Z2QuotientMetricR5</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Trivial circle bundle over RP^2: (v,z)~(-v,z).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Z2QuotientMetricR5</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">act_base_only</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RP2xS1&quot;</span><span class="p">)</span></div>
@@ -1282,7 +1263,7 @@
 
 
 <div class="viewcode-block" id="RP2_TwistMetric">
-<a class="viewcode-back" href="../../extras/generated/circle_bundles.RP2_TwistMetric.html#circle_bundles.RP2_TwistMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/circle_bundles.RP2_TwistMetric.html#circle_bundles.RP2_TwistMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RP2_TwistMetric</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Z2QuotientMetricR5</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Orientable nontrivial (monodromy -1): (v,z)~(-v,-z).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Z2QuotientMetricR5</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">act_pi_twist</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RP2_Twist&quot;</span><span class="p">)</span></div>
@@ -1290,7 +1271,7 @@
 
 
 <div class="viewcode-block" id="RP2_FlipMetric">
-<a class="viewcode-back" href="../../extras/generated/circle_bundles.RP2_FlipMetric.html#circle_bundles.RP2_FlipMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/circle_bundles.RP2_FlipMetric.html#circle_bundles.RP2_FlipMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">RP2_FlipMetric</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Z2QuotientMetricR5</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Non-orientable (reflection on fiber): (v,z)~(-v,conj z).&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Z2QuotientMetricR5</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">act_reflection_twist</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;RP2_Klein&quot;</span><span class="p">)</span></div>
@@ -1495,7 +1476,7 @@
 
 
 <div class="viewcode-block" id="S3QuotientMetric">
-<a class="viewcode-back" href="../../extras/generated/circle_bundles.S3QuotientMetric.html#circle_bundles.S3QuotientMetric">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/circle_bundles.S3QuotientMetric.html#circle_bundles.S3QuotientMetric">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">S3QuotientMetric</span><span class="p">(</span>
     <span class="n">p</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>

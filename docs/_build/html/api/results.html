@@ -25,8 +25,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="circle_bundles.LocalTrivAndCocycle" href="generated/circle_bundles.LocalTrivAndCocycle.html" />
-    <link rel="prev" title="circle_bundles.Bundle" href="generated/circle_bundles.Bundle.html" /> 
+    <link rel="next" title="circle_bundles.NerveSummary" href="generated/circle_bundles.NerveSummary.html" />
+    <link rel="prev" title="Core pipeline" href="core.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,7 +57,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../quickstart.html#minimal-working-example">Minimal working example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#notes">Notes</a></li>
 </ul>
 </li>
 </ul>
@@ -75,7 +74,7 @@
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Result objects and dataclasses</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#lower-level-results-stable">Lower-level results (stable)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#lower-level-results">Lower-level results</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a><ul>
@@ -110,24 +109,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="utilities_optical_flow.html">Optical flow utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../extras/index.html">Extras and utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../extras/synthetic.html">Synthetic datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../extras/viz.html">Visualization Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../extras/optical_flow.html">Optical Flow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 </ul>
@@ -193,35 +174,33 @@ to be user-facing, pickle-friendly, and resilient to refactors of internal
 implementations.</p>
 <section id="core-result-containers">
 <h2>Core result containers<a class="headerlink" href="#core-result-containers" title="Link to this heading"></a></h2>
+<p>These are the primary outputs returned by the high-level <code class="docutils literal notranslate"><span class="pre">Bundle</span></code> methods.</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.LocalTrivAndCocycle.html#circle_bundles.LocalTrivAndCocycle" title="circle_bundles.LocalTrivAndCocycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.LocalTrivAndCocycle</span></code></a></p></td>
-<td><p>Return container for <code class="xref py py-meth docutils literal notranslate"><span class="pre">Bundle.get_local_trivs()</span></code>.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.NerveSummary.html#circle_bundles.NerveSummary" title="circle_bundles.NerveSummary"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.NerveSummary</span></code></a></p></td>
+<td><p>Pretty summary of a cover nerve (recorded or computed from U) up to dimension 3, plus overlap evidence from U.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/circle_bundles.ClassesAndPersistence.html#circle_bundles.ClassesAndPersistence" title="circle_bundles.ClassesAndPersistence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.ClassesAndPersistence</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/circle_bundles.LocalTrivsResult.html#circle_bundles.LocalTrivsResult" title="circle_bundles.LocalTrivsResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.LocalTrivsResult</span></code></a></p></td>
+<td><p>Minimal, user-facing output of <code class="xref py py-meth docutils literal notranslate"><span class="pre">Bundle.get_local_trivs()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.ClassesAndPersistence.html#circle_bundles.ClassesAndPersistence" title="circle_bundles.ClassesAndPersistence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.ClassesAndPersistence</span></code></a></p></td>
 <td><p>Return container for <code class="xref py py-meth docutils literal notranslate"><span class="pre">Bundle.get_classes()</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.BundleMapResult.html#circle_bundles.BundleMapResult" title="circle_bundles.BundleMapResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.BundleMapResult</span></code></a></p></td>
-<td><p>Minimal, user-facing bundle-map output.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="generated/circle_bundles.BundleMapResult.html#circle_bundles.BundleMapResult" title="circle_bundles.BundleMapResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.BundleMapResult</span></code></a></p></td>
+<td><p>Return container for <code class="xref py py-meth docutils literal notranslate"><span class="pre">Bundle.get_bundle_map()</span></code>.</p></td>
 </tr>
 </tbody>
 </table>
 </section>
-<section id="lower-level-results-stable">
-<h2>Lower-level results (stable)<a class="headerlink" href="#lower-level-results-stable" title="Link to this heading"></a></h2>
+<section id="lower-level-results">
+<h2>Lower-level results<a class="headerlink" href="#lower-level-results" title="Link to this heading"></a></h2>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.LocalTrivResult.html#circle_bundles.LocalTrivResult" title="circle_bundles.LocalTrivResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.LocalTrivResult</span></code></a></p></td>
-<td><p>Result container for local trivialization (circle-coordinate) computations.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.BundleQualityReport.html#circle_bundles.BundleQualityReport" title="circle_bundles.BundleQualityReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.BundleQualityReport</span></code></a></p></td>
+<td><p>Summary of diagnostic and quality metrics for a reconstructed bundle.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle" title="circle_bundles.O2Cocycle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.O2Cocycle</span></code></a></p></td>
 <td><p>An estimated O(2)-valued 1-cochain (typically a cocycle) on a cover nerve.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.TransitionReport.html#circle_bundles.TransitionReport" title="circle_bundles.TransitionReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.TransitionReport</span></code></a></p></td>
-<td><p>Summary statistics and diagnostics for transition estimation.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="generated/circle_bundles.BundleQualityReport.html#circle_bundles.BundleQualityReport" title="circle_bundles.BundleQualityReport"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.BundleQualityReport</span></code></a></p></td>
-<td><p>Summary of diagnostic and quality metrics for a reconstructed bundle.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="generated/circle_bundles.PersistenceResult.html#circle_bundles.PersistenceResult" title="circle_bundles.PersistenceResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">circle_bundles.PersistenceResult</span></code></a></p></td>
 <td><p>Output of edge-driven persistence computations for characteristic classes.</p></td>
@@ -241,8 +220,8 @@ implementations.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="generated/circle_bundles.Bundle.html" class="btn btn-neutral float-left" title="circle_bundles.Bundle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="generated/circle_bundles.LocalTrivAndCocycle.html" class="btn btn-neutral float-right" title="circle_bundles.LocalTrivAndCocycle" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="core.html" class="btn btn-neutral float-left" title="Core pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="generated/circle_bundles.NerveSummary.html" class="btn btn-neutral float-right" title="circle_bundles.NerveSummary" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

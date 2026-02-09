@@ -57,7 +57,6 @@
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#minimal-working-example">Minimal working example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#notes">Notes</a></li>
 </ul>
 </li>
 </ul>
@@ -75,7 +74,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/results.html">Result objects and dataclasses</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/results.html#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/results.html#lower-level-results-stable">Lower-level results (stable)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/results.html#lower-level-results">Lower-level results</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/covers.html">Covers</a><ul>
@@ -110,24 +109,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/utilities_optical_flow.html">Optical flow utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="extras/index.html">Extras and utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="extras/synthetic.html">Synthetic datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extras/viz.html">Visualization Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extras/optical_flow.html">Optical Flow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extras/special_metrics.html">Specialized and quotient metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 </ul>
@@ -188,7 +169,7 @@
   <section id="quickstart">
 <h1>Quickstart<a class="headerlink" href="#quickstart" title="Link to this heading"></a></h1>
 <p>This page demonstrates a minimal end-to-end example using a classical circle bundle:
-the Hopf fibration <span class="math notranslate nohighlight">\(S^3 \to S^2\)</span>.</p>
+the Hopf fibration <span class="math notranslate nohighlight">\(S^3 \to S^2\)</span>. The Hopf fibration is a non-trivial orientable circle bundle with Euler number <span class="math notranslate nohighlight">\(\pm 1\)</span>.</p>
 <section id="minimal-working-example">
 <h2>Minimal working example<a class="headerlink" href="#minimal-working-example" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -197,36 +178,23 @@ the Hopf fibration <span class="math notranslate nohighlight">\(S^3 \to S^2\)</s
 <span class="c1"># Sample points on S^3</span>
 <span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5000</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">s3_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<span class="n">s3_data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
 
 <span class="c1"># Hopf projection S^3 -&gt; S^2</span>
-<span class="n">base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">hopf_projection</span><span class="p">(</span><span class="n">s3_points</span><span class="p">)</span>
+<span class="n">base_points</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">hopf_projection</span><span class="p">(</span><span class="n">s3_data</span><span class="p">)</span>
 
 <span class="c1"># Build an open cover of S^2</span>
 <span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">60</span>
-<span class="n">s2_cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">make_s2_fibonacci_star_cover</span><span class="p">(</span>
+<span class="n">s2_cover</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_s2_fibonacci_cover</span><span class="p">(</span>
     <span class="n">base_points</span><span class="p">,</span>
     <span class="n">n_vertices</span><span class="o">=</span><span class="n">n_landmarks</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="c1"># Run the bundle pipeline</span>
-<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">build_bundle</span><span class="p">(</span>
-    <span class="n">s3_points</span><span class="p">,</span>
-    <span class="n">s2_cover</span><span class="p">,</span>
-    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">Bundle</span><span class="p">(</span><span class="n">X</span> <span class="o">=</span> <span class="n">s3_data</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">s2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+<span class="n">triv_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_local_trivs</span><span class="p">()</span>
+<span class="n">class_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_classes</span><span class="p">(</span><span class="n">show_summary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>The primary entry point is <code class="xref py py-func docutils literal notranslate"><span class="pre">circle_bundles.build_bundle()</span></code>.</p></li>
-<li><p>All downstream results are accessed via cached methods on
-<code class="xref py py-class docutils literal notranslate"><span class="pre">circle_bundles.BundleResult</span></code>.</p></li>
-<li><p>Synthetic data generators and visualization helpers live in separate
-submodules (<code class="docutils literal notranslate"><span class="pre">synthetic</span></code>, <code class="docutils literal notranslate"><span class="pre">viz</span></code>, <code class="docutils literal notranslate"><span class="pre">optical_flow</span></code>).</p></li>
-</ul>
 </section>
 </section>
 

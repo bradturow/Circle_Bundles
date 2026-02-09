@@ -52,7 +52,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal working example</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#notes">Notes</a></li>
 </ul>
 </li>
 </ul>
@@ -70,7 +69,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result objects and dataclasses</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-results-stable">Lower-level results (stable)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-results">Lower-level results</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
@@ -105,24 +104,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<p class="caption" role="heading"><span class="caption-text">Extras</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../extras/index.html">Extras and utilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../extras/synthetic.html">Synthetic datasets</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../extras/viz.html">Visualization Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../extras/optical_flow.html">Optical Flow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../extras/special_metrics.html">Specialized and quotient metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../extras/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 </ul>
@@ -185,7 +166,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -221,6 +202,11 @@
 <span class="sd">    max_edge_rms, mean_edge_rms:</span>
 <span class="sd">        Maximum and mean RMS angular transition error over edges.</span>
 
+<span class="sd">    rms_angle_err:</span>
+<span class="sd">        Per-edge RMS angular transition error map. Keys are canonicalized edges (i,j)</span>
+<span class="sd">        with i&lt;j and values are nonnegative floats. This is useful for weighting edges</span>
+<span class="sd">        in visualizations/filtrations when a full TransitionReport is not retained.</span>
+
 <span class="sd">    eps_align_geo, eps_align_euc:</span>
 <span class="sd">        Worst-case alignment error (geodesic / Euclidean) for local trivializations.</span>
 
@@ -245,23 +231,27 @@
 <span class="sd">    cocycle_proj_dist:</span>
 <span class="sd">        Distance from the cocycle to the nearest projected cocycle representative.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">cocycle_defect</span><span class="p">:</span> <span class="nb">float</span>
 
     <span class="n">max_edge_rms</span><span class="p">:</span> <span class="nb">float</span>
     <span class="n">mean_edge_rms</span><span class="p">:</span> <span class="nb">float</span>
 
-    <span class="n">eps_align_geo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="n">eps_align_euc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="c1"># NEW: keep per-edge RMS for downstream weights/visualizations</span>
+    <span class="n">rms_angle_err</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">eps_align_geo_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
-    <span class="n">eps_align_euc_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">eps_align_geo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">eps_align_euc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">eps_align_geo_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">eps_align_euc_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">n_edges_estimated</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">n_edges_requested</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="n">n_triangles</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">n_edges_estimated</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_edges_requested</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_triangles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="n">witness_err</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>          <span class="c1"># chordal sup</span>
     <span class="n">witness_err_geo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>      <span class="c1"># geodesic sup (radians)</span>
@@ -269,8 +259,6 @@
     <span class="n">witness_err_geo_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># geodesic mean (radians)</span>
 
     <span class="n">cocycle_proj_dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
-
-
 
 
 
@@ -309,6 +297,34 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">_eps_geo_to_euc</span><span class="p">(</span><span class="n">eps_geo</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert geodesic angle (radians) to chordal distance in R^2.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">eps_geo</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_canon_edge_weight_map</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Best-effort conversion of an edge-&gt;weight mapping into canonical form.</span>
+
+<span class="sd">    Accepts mappings whose keys are (i,j) pairs in any order, possibly as lists/tuples.</span>
+<span class="sd">    Produces a dict keyed by Edge = (min(i,j), max(i,j)).</span>
+<span class="sd">    Returns None if input is None or cannot be interpreted as a mapping.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">out</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">e</span><span class="p">:</span> <span class="n">Edge</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+    <span class="k">return</span> <span class="n">out</span> <span class="ow">or</span> <span class="kc">None</span>
 
 
 <span class="c1"># ----------------------------</span>
@@ -477,7 +493,6 @@
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps_euc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span>
 
 
-
 <span class="c1"># ----------------------------</span>
 <span class="c1"># Main entry point</span>
 <span class="c1"># ----------------------------</span>
@@ -524,7 +539,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">triangles_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">triangles</span><span class="p">)</span>
 
-    <span class="c1"># paper delta </span>
+    <span class="c1"># paper delta</span>
     <span class="n">delta</span> <span class="o">=</span> <span class="n">compute_delta_from_triples</span><span class="p">(</span>
         <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
         <span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
@@ -544,6 +559,7 @@
     <span class="c1"># edge RMS summaries (from transitions_report)</span>
     <span class="n">max_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;max_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
     <span class="n">mean_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;mean_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">rms_angle_err</span> <span class="o">=</span> <span class="n">_canon_edge_weight_map</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
     <span class="c1"># epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)</span>
     <span class="n">eps_geo</span><span class="p">,</span> <span class="n">eps_geo_mean</span><span class="p">,</span> <span class="n">eps_euc</span><span class="p">,</span> <span class="n">eps_euc_mean</span> <span class="o">=</span> <span class="n">compute_eps_alignment_stats</span><span class="p">(</span>
@@ -577,8 +593,6 @@
             <span class="n">cocycle_projection_distance</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="c1"># Use the same edge set you used everywhere else</span>
-        <span class="c1"># and the cocycle&#39;s Omega (simplicial) as input.</span>
         <span class="n">Omega</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cocycle</span><span class="p">,</span> <span class="s2">&quot;Omega&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">Omega</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;cocycle.Omega is missing; cannot compute witness diagnostics.&quot;</span><span class="p">)</span>
@@ -590,7 +604,6 @@
             <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="c1"># witness stats compare local triv angles using Π(Ω) (Omega_true from frames)</span>
         <span class="n">w_geo</span><span class="p">,</span> <span class="n">w_geo_mean</span><span class="p">,</span> <span class="n">w_c</span><span class="p">,</span> <span class="n">w_c_mean</span> <span class="o">=</span> <span class="n">witness_error_stats</span><span class="p">(</span>
             <span class="n">U</span><span class="o">=</span><span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
             <span class="n">f</span><span class="o">=</span><span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
@@ -603,7 +616,6 @@
         <span class="n">witness_err</span> <span class="o">=</span> <span class="n">w_c</span>
         <span class="n">witness_err_mean</span> <span class="o">=</span> <span class="n">w_c_mean</span>
 
-        <span class="c1"># optionally record cocycle projection distance d_infty(Ω, Π(Ω))</span>
         <span class="n">cocycle_proj_dist</span> <span class="o">=</span> <span class="n">cocycle_projection_distance</span><span class="p">(</span>
             <span class="n">U</span><span class="o">=</span><span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
             <span class="n">Omega_simplicial</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span>
@@ -611,12 +623,12 @@
             <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
         <span class="p">)</span>
 
-    
     <span class="k">return</span> <span class="n">BundleQualityReport</span><span class="p">(</span>
         <span class="n">delta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">),</span>
         <span class="n">cocycle_defect</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">cocycle_defect</span><span class="p">),</span>
         <span class="n">max_edge_rms</span><span class="o">=</span><span class="n">max_edge_rms</span><span class="p">,</span>
         <span class="n">mean_edge_rms</span><span class="o">=</span><span class="n">mean_edge_rms</span><span class="p">,</span>
+        <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms_angle_err</span><span class="p">,</span>
         <span class="n">eps_align_geo</span><span class="o">=</span><span class="n">eps_geo</span><span class="p">,</span>
         <span class="n">eps_align_euc</span><span class="o">=</span><span class="n">eps_euc</span><span class="p">,</span>
         <span class="n">eps_align_geo_mean</span><span class="o">=</span><span class="n">eps_geo_mean</span><span class="p">,</span>
@@ -631,7 +643,6 @@
         <span class="n">witness_err_geo_mean</span><span class="o">=</span><span class="n">witness_err_geo_mean</span><span class="p">,</span>
         <span class="n">cocycle_proj_dist</span><span class="o">=</span><span class="n">cocycle_proj_dist</span><span class="p">,</span>
     <span class="p">)</span>
-
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">compute_bundle_quality_from_U</span><span class="p">(</span>
@@ -687,6 +698,7 @@
     <span class="c1"># edge RMS summaries (from transitions_report)</span>
     <span class="n">max_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;max_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
     <span class="n">mean_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;mean_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">rms_angle_err</span> <span class="o">=</span> <span class="n">_canon_edge_weight_map</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
 
     <span class="c1"># epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)</span>
     <span class="n">eps_geo</span><span class="p">,</span> <span class="n">eps_geo_mean</span><span class="p">,</span> <span class="n">eps_euc</span><span class="p">,</span> <span class="n">eps_euc_mean</span> <span class="o">=</span> <span class="n">compute_eps_alignment_stats</span><span class="p">(</span>
@@ -752,6 +764,7 @@
         <span class="n">cocycle_defect</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">cocycle_defect</span><span class="p">),</span>
         <span class="n">max_edge_rms</span><span class="o">=</span><span class="n">max_edge_rms</span><span class="p">,</span>
         <span class="n">mean_edge_rms</span><span class="o">=</span><span class="n">mean_edge_rms</span><span class="p">,</span>
+        <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms_angle_err</span><span class="p">,</span>
         <span class="n">eps_align_geo</span><span class="o">=</span><span class="n">eps_geo</span><span class="p">,</span>
         <span class="n">eps_align_euc</span><span class="o">=</span><span class="n">eps_euc</span><span class="p">,</span>
         <span class="n">eps_align_geo_mean</span><span class="o">=</span><span class="n">eps_geo_mean</span><span class="p">,</span>
