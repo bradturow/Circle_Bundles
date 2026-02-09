@@ -35,6 +35,7 @@ from .analysis.class_persistence import CobirthResult, CodeathResult, Persistenc
 from .characteristic_class import ClassResult
 from .trivializations.bundle_map import FramePacking
 from .summaries.nerve_summary import NerveSummary
+from .reduction.frame_reduction import FrameReducerConfig
 
 # =============================================================================
 # Covers (construction utilities)
@@ -106,6 +107,7 @@ __all__ = [
     "ClassResult",
     "FramePacking",
     "NerveSummary",
+    "FrameReducerConfig",    
 
     # Covers
     "CoverData",

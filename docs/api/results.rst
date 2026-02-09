@@ -20,8 +20,8 @@ These are the primary outputs returned by the high-level ``Bundle`` methods.
    circle_bundles.BundleMapResult
 
 
-Lower-level results 
--------------------
+Lower-level result containers
+-----------------------------
 
 .. autosummary::
    :toctree: generated
@@ -32,3 +32,14 @@ Lower-level results
    circle_bundles.PersistenceResult
    circle_bundles.CobirthResult
    circle_bundles.CodeathResult
+
+
+Configuration objects
+---------------------
+
+.. autosummary::
+   :toctree: generated
+   :nosignatures:
+
+   circle_bundles.DreimacCCConfig
+   circle_bundles.FrameReducerConfig
