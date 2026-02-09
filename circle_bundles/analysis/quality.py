@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 
@@ -36,6 +36,11 @@ class BundleQualityReport:
     max_edge_rms, mean_edge_rms:
         Maximum and mean RMS angular transition error over edges.
 
+    rms_angle_err:
+        Per-edge RMS angular transition error map. Keys are canonicalized edges (i,j)
+        with i<j and values are nonnegative floats. This is useful for weighting edges
+        in visualizations/filtrations when a full TransitionReport is not retained.
+
     eps_align_geo, eps_align_euc:
         Worst-case alignment error (geodesic / Euclidean) for local trivializations.
 
@@ -60,23 +65,27 @@ class BundleQualityReport:
     cocycle_proj_dist:
         Distance from the cocycle to the nearest projected cocycle representative.
     """
+
     delta: float
     cocycle_defect: float
 
     max_edge_rms: float
     mean_edge_rms: float
 
-    eps_align_geo: Optional[float]
-    eps_align_euc: Optional[float]
+    # NEW: keep per-edge RMS for downstream weights/visualizations
+    rms_angle_err: Optional[Dict[Edge, float]] = None
 
-    eps_align_geo_mean: Optional[float]
-    eps_align_euc_mean: Optional[float]
+    eps_align_geo: Optional[float] = None
+    eps_align_euc: Optional[float] = None
 
-    alpha: Optional[float]
+    eps_align_geo_mean: Optional[float] = None
+    eps_align_euc_mean: Optional[float] = None
 
-    n_edges_estimated: int
-    n_edges_requested: int
-    n_triangles: int
+    alpha: Optional[float] = None
+
+    n_edges_estimated: int = 0
+    n_edges_requested: int = 0
+    n_triangles: int = 0
 
     witness_err: Optional[float] = None          # chordal sup
     witness_err_geo: Optional[float] = None      # geodesic sup (radians)
@@ -84,8 +93,6 @@ class BundleQualityReport:
     witness_err_geo_mean: Optional[float] = None # geodesic mean (radians)
 
     cocycle_proj_dist: Optional[float] = None
-
-
 
 
 # ----------------------------
@@ -123,6 +130,34 @@ def _s1_geodesic_from_unit_vectors(u: np.ndarray, v: np.ndarray) -> np.ndarray:
 def _eps_geo_to_euc(eps_geo: float) -> float:
     """Convert geodesic angle (radians) to chordal distance in R^2."""
     return float(2.0 * np.sin(float(eps_geo) / 2.0))
+
+
+def _canon_edge_weight_map(d: object) -> Optional[Dict[Edge, float]]:
+    """
+    Best-effort conversion of an edge->weight mapping into canonical form.
+
+    Accepts mappings whose keys are (i,j) pairs in any order, possibly as lists/tuples.
+    Produces a dict keyed by Edge = (min(i,j), max(i,j)).
+    Returns None if input is None or cannot be interpreted as a mapping.
+    """
+    if d is None:
+        return None
+    try:
+        items = dict(d).items()
+    except Exception:
+        return None
+
+    out: Dict[Edge, float] = {}
+    for k, w in items:
+        try:
+            a, b = k
+            e: Edge = (int(a), int(b))
+            e = (e[0], e[1]) if e[0] <= e[1] else (e[1], e[0])
+            out[e] = float(w)
+        except Exception:
+            continue
+
+    return out or None
 
 
 # ----------------------------
@@ -291,7 +326,6 @@ def compute_alpha_from_eps_delta_euc(
     return float(eps_euc) / (1.0 - float(delta))
 
 
-
 # ----------------------------
 # Main entry point
 # ----------------------------
@@ -338,7 +372,7 @@ def compute_bundle_quality(
     else:
         triangles_list = list(triangles)
 
-    # paper delta 
+    # paper delta
     delta = compute_delta_from_triples(
         cover.U,
         local_triv.f,
@@ -358,6 +392,7 @@ def compute_bundle_quality(
     # edge RMS summaries (from transitions_report)
     max_edge_rms = float(getattr(transitions_report, "max_rms_angle_err", 0.0))
     mean_edge_rms = float(getattr(transitions_report, "mean_rms_angle_err", 0.0))
+    rms_angle_err = _canon_edge_weight_map(getattr(transitions_report, "rms_angle_err", None))
 
     # epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)
     eps_geo, eps_geo_mean, eps_euc, eps_euc_mean = compute_eps_alignment_stats(
@@ -391,8 +426,6 @@ def compute_bundle_quality(
             cocycle_projection_distance,
         )
 
-        # Use the same edge set you used everywhere else
-        # and the cocycle's Omega (simplicial) as input.
         Omega = getattr(cocycle, "Omega", None)
         if Omega is None:
             raise AttributeError("cocycle.Omega is missing; cannot compute witness diagnostics.")
@@ -404,7 +437,6 @@ def compute_bundle_quality(
             edges=edges_list,
         )
 
-        # witness stats compare local triv angles using Π(Ω) (Omega_true from frames)
         w_geo, w_geo_mean, w_c, w_c_mean = witness_error_stats(
             U=cover.U,
             f=local_triv.f,
@@ -417,7 +449,6 @@ def compute_bundle_quality(
         witness_err = w_c
         witness_err_mean = w_c_mean
 
-        # optionally record cocycle projection distance d_infty(Ω, Π(Ω))
         cocycle_proj_dist = cocycle_projection_distance(
             U=cover.U,
             Omega_simplicial=Omega,
@@ -425,12 +456,12 @@ def compute_bundle_quality(
             edges=edges_list,
         )
 
-    
     return BundleQualityReport(
         delta=float(delta),
         cocycle_defect=float(cocycle_defect),
         max_edge_rms=max_edge_rms,
         mean_edge_rms=mean_edge_rms,
+        rms_angle_err=rms_angle_err,
         eps_align_geo=eps_geo,
         eps_align_euc=eps_euc,
         eps_align_geo_mean=eps_geo_mean,
@@ -445,7 +476,6 @@ def compute_bundle_quality(
         witness_err_geo_mean=witness_err_geo_mean,
         cocycle_proj_dist=cocycle_proj_dist,
     )
-
 
 
 def compute_bundle_quality_from_U(
@@ -501,6 +531,7 @@ def compute_bundle_quality_from_U(
     # edge RMS summaries (from transitions_report)
     max_edge_rms = float(getattr(transitions_report, "max_rms_angle_err", 0.0))
     mean_edge_rms = float(getattr(transitions_report, "mean_rms_angle_err", 0.0))
+    rms_angle_err = _canon_edge_weight_map(getattr(transitions_report, "rms_angle_err", None))
 
     # epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)
     eps_geo, eps_geo_mean, eps_euc, eps_euc_mean = compute_eps_alignment_stats(
@@ -566,6 +597,7 @@ def compute_bundle_quality_from_U(
         cocycle_defect=float(cocycle_defect),
         max_edge_rms=max_edge_rms,
         mean_edge_rms=mean_edge_rms,
+        rms_angle_err=rms_angle_err,
         eps_align_geo=eps_geo,
         eps_align_euc=eps_euc,
         eps_align_geo_mean=eps_geo_mean,

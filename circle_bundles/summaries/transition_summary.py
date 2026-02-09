@@ -2,14 +2,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 
 import numpy as np
 
-from ..o2_cocycle import TransitionReport
+from ..nerve.combinatorics import Edge
 
 if TYPE_CHECKING:
-    # Avoid heavy imports at runtime; this is just for type hints.
     from ..analysis.quality import BundleQualityReport
 
 
@@ -48,19 +47,58 @@ def _fmt_mean_euc_with_geo_pi(d_euc_mean: Optional[float], *, decimals: int = 3)
     return f"{d_euc_mean:.{decimals}f} (\\bar{{\\varepsilon}}_{{\\text{{triv}}}}^{{\\text{{geo}}}}={theta/np.pi:.{decimals}f}\\pi)"
 
 
+def _canon_edge_weight_map(d: object) -> Optional[Dict[Edge, float]]:
+    """
+    Best-effort conversion of an edge->weight mapping into canonical form.
+
+    Accepts mappings whose keys are (i,j) pairs in any order.
+    Produces a dict keyed by Edge = (min(i,j), max(i,j)).
+    Returns None if input is None or cannot be interpreted as a mapping.
+    """
+    if d is None:
+        return None
+    try:
+        items = dict(d).items()
+    except Exception:
+        return None
+
+    out: Dict[Edge, float] = {}
+    for k, w in items:
+        try:
+            a, b = k
+            e: Edge = (int(a), int(b))
+            if e[0] > e[1]:
+                e = (e[1], e[0])
+            out[e] = float(w)
+        except Exception:
+            continue
+
+    return out or None
+
+
 @dataclass
 class TransitionSummary:
     """
     A lightweight summary: (Diagnostics) + (Transitions).
 
-    - Diagnostics portion is intentionally aligned with characteristic_class.show_summary,
-      EXCEPT we omit the Euler rounding diagnostic (since we don't compute Euler yet).
-    - Transition portion reports the O(2) estimation stats from TransitionReport.
+    IMPORTANT (post-refactor)
+    -------------------------
+    The Bundle pipeline may no longer retain a full TransitionReport object.
+    Therefore this summary is designed to work in two modes:
+
+      1) If `report` is provided, transitions section uses it (backward compatible).
+      2) If `report` is None, transitions section is derived from `quality`
+         (requires BundleQualityReport to include rms aggregates and per-edge map).
+
+    Diagnostics portion is aligned with characteristic_class.show_summary (minus Euler rounding).
     """
     n_sets: int
     n_samples: int
-    report: TransitionReport
     quality: Optional["BundleQualityReport"] = None
+
+    # Optional legacy payload (kept for backwards compatibility)
+    report: Optional[Any] = None
+
     warnings: Tuple[str, ...] = ()
 
     # ----------------------------
@@ -74,8 +112,8 @@ class TransitionSummary:
         def _tline(label: str, content: str) -> str:
             return f"{IND}{label:<{LABEL_W}} {content}"
 
-        rep = self.report
         q = self.quality
+        rep = self.report
 
         lines: List[str] = []
         lines.append("=== Diagnostics ===")
@@ -128,13 +166,66 @@ class TransitionSummary:
 
         lines.append("")
         lines.append("=== Transitions (O(2) estimation) ===")
-        lines.append(_tline("min_points:", f"{int(rep.min_points)}"))
-        lines.append(_tline("edges requested:", f"{int(rep.n_edges_requested)}"))
-        lines.append(_tline("edges estimated:", f"{int(rep.n_edges_estimated)}"))
-        if rep.missing_edges:
-            lines.append(_tline("missing edges:", f"{len(rep.missing_edges)}"))
-        lines.append(_tline("mean RMS angle err:", f"{float(rep.mean_rms_angle_err):.6g} rad"))
-        lines.append(_tline("max  RMS angle err:", f"{float(rep.max_rms_angle_err):.6g} rad"))
+
+        # --- transitions block: prefer legacy report if present ---
+        if rep is not None:
+            # Best-effort access (don’t assume exact class)
+            mp = getattr(rep, "min_points", None)
+            n_req = getattr(rep, "n_edges_requested", None)
+            n_est = getattr(rep, "n_edges_estimated", None)
+            missing = getattr(rep, "missing_edges", None)
+            mean_rms = getattr(rep, "mean_rms_angle_err", None)
+            max_rms = getattr(rep, "max_rms_angle_err", None)
+
+            lines.append(_tline("min_points:", f"{int(mp)}" if mp is not None else "—"))
+            lines.append(_tline("edges requested:", f"{int(n_req)}" if n_req is not None else "—"))
+            lines.append(_tline("edges estimated:", f"{int(n_est)}" if n_est is not None else "—"))
+            if missing:
+                try:
+                    lines.append(_tline("missing edges:", f"{len(missing)}"))
+                except Exception:
+                    lines.append(_tline("missing edges:", "—"))
+            if mean_rms is not None:
+                lines.append(_tline("mean RMS angle err:", f"{float(mean_rms):.6g} rad"))
+            else:
+                lines.append(_tline("mean RMS angle err:", "—"))
+            if max_rms is not None:
+                lines.append(_tline("max  RMS angle err:", f"{float(max_rms):.6g} rad"))
+            else:
+                lines.append(_tline("max  RMS angle err:", "—"))
+
+        # --- otherwise derive from quality ---
+        else:
+            if q is None:
+                lines.append(_tline("(no transitions data)", "—"))
+            else:
+                rms_map = _canon_edge_weight_map(getattr(q, "rms_angle_err", None))
+                mp = getattr(q, "min_points", None)  # usually not present; keep soft
+                n_req = getattr(q, "n_edges_requested", None)
+                n_est = getattr(q, "n_edges_estimated", None)
+                mean_rms = getattr(q, "mean_edge_rms", None)
+                max_rms = getattr(q, "max_edge_rms", None)
+
+                lines.append(_tline("min_points:", f"{int(mp)}" if mp is not None else "—"))
+                lines.append(_tline("edges requested:", f"{int(n_req)}" if n_req is not None else "—"))
+                lines.append(_tline("edges estimated:", f"{int(n_est)}" if n_est is not None else "—"))
+
+                # If we have the per-edge map, we can report its size too (helpful sanity check)
+                if rms_map is not None:
+                    lines.append(_tline("RMS map entries:", f"{len(rms_map)}"))
+
+                lines.append(
+                    _tline(
+                        "mean RMS angle err:",
+                        f"{float(mean_rms):.6g} rad" if mean_rms is not None else "—",
+                    )
+                )
+                lines.append(
+                    _tline(
+                        "max  RMS angle err:",
+                        f"{float(max_rms):.6g} rad" if max_rms is not None else "—",
+                    )
+                )
 
         for w in self.warnings:
             lines.append("")
@@ -174,6 +265,8 @@ def _display_summary_latex(summary: TransitionSummary) -> bool:
 
     Mirrors the characteristic_class summary *Diagnostics* rows (minus Euler rounding),
     then adds a small Transitions block.
+
+    Works with either a legacy `report` OR quality-derived transition stats.
     """
     try:
         from IPython.display import display, Math  # type: ignore
@@ -231,7 +324,9 @@ def _display_summary_latex(summary: TransitionSummary) -> bool:
             diag_rows.append(
                 (
                     r"\text{Mean triv error}",
-                    r"\bar{\varepsilon}_{\text{triv}}" + r" = " + _latex_eps_with_geo_pi(eps_triv_mean, mean=True),
+                    r"\bar{\varepsilon}_{\text{triv}}"
+                    + r" = "
+                    + _latex_eps_with_geo_pi(eps_triv_mean, mean=True),
                 )
             )
         if delta is not None:
@@ -265,14 +360,55 @@ def _display_summary_latex(summary: TransitionSummary) -> bool:
                 )
             )
 
+    # --- transitions rows: report-first, else quality-derived ---
     trans_rows: List[Tuple[str, str]] = []
-    trans_rows.append((r"\text{min\_points}", f"{int(rep.min_points)}"))
-    trans_rows.append((r"\text{edges requested}", f"{int(rep.n_edges_requested)}"))
-    trans_rows.append((r"\text{edges estimated}", f"{int(rep.n_edges_estimated)}"))
-    if rep.missing_edges:
-        trans_rows.append((r"\text{missing edges}", f"{len(rep.missing_edges)}"))
-    trans_rows.append((r"\text{mean RMS angle err}", f"{float(rep.mean_rms_angle_err):.6g}\ \mathrm{{rad}}"))
-    trans_rows.append((r"\text{max RMS angle err}", f"{float(rep.max_rms_angle_err):.6g}\ \mathrm{{rad}}"))
+
+    def _num_or_dash(x: Any) -> str:
+        if x is None:
+            return r"\text{—}"
+        try:
+            return f"{int(x)}"
+        except Exception:
+            return r"\text{—}"
+
+    if rep is not None:
+        trans_rows.append((r"\text{min\_points}", _num_or_dash(getattr(rep, "min_points", None))))
+        trans_rows.append((r"\text{edges requested}", _num_or_dash(getattr(rep, "n_edges_requested", None))))
+        trans_rows.append((r"\text{edges estimated}", _num_or_dash(getattr(rep, "n_edges_estimated", None))))
+        missing = getattr(rep, "missing_edges", None)
+        if missing:
+            try:
+                trans_rows.append((r"\text{missing edges}", f"{len(missing)}"))
+            except Exception:
+                pass
+        mean_rms = getattr(rep, "mean_rms_angle_err", None)
+        max_rms = getattr(rep, "max_rms_angle_err", None)
+        trans_rows.append(
+            (r"\text{mean RMS angle err}", f"{float(mean_rms):.6g}\ \mathrm{{rad}}" if mean_rms is not None else r"\text{—}")
+        )
+        trans_rows.append(
+            (r"\text{max RMS angle err}", f"{float(max_rms):.6g}\ \mathrm{{rad}}" if max_rms is not None else r"\text{—}")
+        )
+    else:
+        if q is None:
+            trans_rows.append((r"\text{(no transitions data)}", r""))
+        else:
+            trans_rows.append((r"\text{min\_points}", _num_or_dash(getattr(q, "min_points", None))))
+            trans_rows.append((r"\text{edges requested}", _num_or_dash(getattr(q, "n_edges_requested", None))))
+            trans_rows.append((r"\text{edges estimated}", _num_or_dash(getattr(q, "n_edges_estimated", None))))
+
+            rms_map = _canon_edge_weight_map(getattr(q, "rms_angle_err", None))
+            if rms_map is not None:
+                trans_rows.append((r"\text{RMS map entries}", f"{len(rms_map)}"))
+
+            mean_rms = getattr(q, "mean_edge_rms", None)
+            max_rms = getattr(q, "max_edge_rms", None)
+            trans_rows.append(
+                (r"\text{mean RMS angle err}", f"{float(mean_rms):.6g}\ \mathrm{{rad}}" if mean_rms is not None else r"\text{—}")
+            )
+            trans_rows.append(
+                (r"\text{max RMS angle err}", f"{float(max_rms):.6g}\ \mathrm{{rad}}" if max_rms is not None else r"\text{—}")
+            )
 
     def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:
         out: List[str] = []
@@ -301,20 +437,34 @@ def _display_summary_latex(summary: TransitionSummary) -> bool:
 
 
 def summarize_transitions(
-    rep: TransitionReport,
+    rep: Optional[Any] = None,
     *,
     quality: Optional["BundleQualityReport"] = None,
+    n_sets: Optional[int] = None,
+    n_samples: Optional[int] = None,
     warnings: Tuple[str, ...] = (),
 ) -> TransitionSummary:
     """
     Factory helper.
 
-    quality should be a BundleQualityReport (from analysis/quality.py).
+    Backward compatible:
+      - Old call: summarize_transitions(rep, quality=...)
+      - New call: summarize_transitions(None, quality=..., n_sets=..., n_samples=...)
+
+    If rep is provided, n_sets/n_samples default to attributes on rep if present.
+    Otherwise, you should pass n_sets/n_samples explicitly (or accept 0 defaults).
     """
+    if rep is not None:
+        ns = int(getattr(rep, "n_sets", n_sets or 0))
+        nsm = int(getattr(rep, "n_samples", n_samples or 0))
+    else:
+        ns = int(n_sets or 0)
+        nsm = int(n_samples or 0)
+
     return TransitionSummary(
-        n_sets=int(getattr(rep, "n_sets", 0)),
-        n_samples=int(getattr(rep, "n_samples", 0)),
-        report=rep,
+        n_sets=ns,
+        n_samples=nsm,
         quality=quality,
+        report=rep,
         warnings=tuple(warnings),
     )

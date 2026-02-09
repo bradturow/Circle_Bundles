@@ -14,17 +14,17 @@ from __future__ import annotations
 
 from .bundle2 import (
     Bundle,
-    LocalTrivAndCocycle,
+    LocalTrivsResult,
     ClassesAndPersistence,
     BundleMapResult,
 )
 
 # =============================================================================
-# Result + config types 
+# Result + config types
 # =============================================================================
 
 from .trivializations.local_triv import LocalTrivResult, DreimacCCConfig
-from .o2_cocycle import O2Cocycle, TransitionReport
+from .o2_cocycle import O2Cocycle
 from .analysis.quality import BundleQualityReport
 from .analysis.class_persistence import CobirthResult, CodeathResult, PersistenceResult
 from .characteristic_class import ClassResult
@@ -86,7 +86,7 @@ from .geometry.geometric_unwrapping import get_cocycle_dict, lift_base_points
 __all__ = [
     # Core workflow
     "Bundle",
-    "LocalTrivAndCocycle",
+    "LocalTrivsResult",
     "ClassesAndPersistence",
     "BundleMapResult",
 
@@ -94,7 +94,6 @@ __all__ = [
     "LocalTrivResult",
     "DreimacCCConfig",
     "O2Cocycle",
-    "TransitionReport",
     "BundleQualityReport",
     "CobirthResult",
     "CodeathResult",
