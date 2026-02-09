@@ -74,6 +74,21 @@ class LocalTrivsResult:
 class ClassesAndPersistence:
     """
     Return container for :meth:`Bundle.get_classes`.
+
+    Attributes
+    ----------
+    reps:
+        Class representative object computed from the nerve and cocycle (lightweight).
+        The precise type is implementation-defined.
+    persistence:
+        Persistence output describing edge-driven persistence of class/cocycle structure.
+        The precise type is implementation-defined.
+    restricted:
+        Derived characteristic-class report restricted to a chosen subcomplex.
+        The precise type is implementation-defined.
+    summary_text:
+        A plain-text summary (always available) describing class/persistence results.
+
     """
     reps: Any
     persistence: Any
@@ -88,7 +103,26 @@ class ClassesAndPersistence:
 @dataclass
 class BundleMapResult:
     """
-    Minimal, user-facing bundle-map output.
+    Return container for :meth:`Bundle.get_bundle_map`.
+
+    Attributes
+    ----------
+    F:
+        Global fiber coordinates returned by the solver in the solver's ambient
+        frame space. Shape is ``(n_samples, D_used)``.
+    pre_F:
+        Pre-projection coordinates (or pre-reduction coordinates) used internally
+        by the v2 bundle-map pipeline. Shape is solver-defined.
+    Omega_used:
+        Edge-indexed O(2) transitions actually used by the solver. Keys are
+        canonicalized edges of type :class:`circle_bundles.nerve.combinatorics.Edge`.
+    Phi_used:
+        Vertex gauge / orientation choices used by the solver (implementation-defined).
+    report:
+        Solver report object (implementation-defined).
+    meta:
+        Light metadata dictionary (weight, packing, ambient_dim, etc.).
+
     """
     F: np.ndarray
     pre_F: np.ndarray
@@ -104,9 +138,55 @@ class BundleMapResult:
 
 class Bundle:
     """
-    Cover-free bundle reconstruction driver.
-    """
+    Primary bundle analysis driver.
 
+    This class takes either
+
+    - a minimal :class:`~circle_bundles.covers.Cover` object (holding ``U``, optional ``pou``,
+      and optional ``landmarks``), **or**
+    - a raw membership matrix ``U``,
+
+    together with total-space data ``X`` (either a point cloud or a distance matrix). It then:
+
+    1. Builds the nerve simplices (edges/triangles/tetrahedra) **directly from** ``U``.
+    2. Computes local trivializations and an O(2) cocycle on overlaps.
+    3. Computes characteristic-class representatives and edge-driven persistence.
+    4. Optionally computes global bundle-map coordinates and solver summaries.
+
+    Parameters
+    ----------
+    X :
+        Either a point cloud of shape ``(n_samples, D)`` (if ``distance_matrix=False``),
+        or a distance matrix of shape ``(n_samples, n_samples)`` (if ``distance_matrix=True``).
+    U :
+        Boolean membership matrix of shape ``(n_sets, n_samples)``. Entry ``U[j, i]``
+        indicates whether sample ``i`` belongs to chart/set ``j``.
+        Provide exactly one of ``U`` or ``cover``.
+    cover :
+        Optional :class:`~circle_bundles.covers.Cover` object holding ``U`` and (optionally)
+        ``pou`` and ``landmarks``. If provided, its fields are used as defaults.
+        Provide exactly one of ``U`` or ``cover``.
+    distance_matrix :
+        If True, interpret ``X`` as a distance matrix. If False, interpret ``X`` as a point cloud.
+    pou :
+        Optional partition of unity of shape ``(n_sets, n_samples)``. If ``cover`` is provided,
+        this overrides ``cover.pou`` for this Bundle (and does not mutate the cover).
+    landmarks :
+        Optional landmark coordinates of shape ``(n_sets, dB)`` used by visualization helpers.
+        If ``cover`` is provided, this overrides ``cover.landmarks`` for this Bundle.
+    total_metric :
+        Optional metric object passed through to local-trivialization computations.
+        Only used when ``distance_matrix=False``.
+    max_simp_dim :
+        Maximum simplex dimension to precompute from ``U``. Common values are 1, 2, or 3.
+
+
+    Notes
+    -----
+    This object caches intermediate results. Any method that changes upstream state
+    invalidates downstream caches (e.g., computing new local trivializations clears
+    class/persistence caches).
+    """
     _REF_ANGLE: float = 0.0
 
     def __init__(
@@ -421,6 +501,32 @@ class Bundle:
         return self._bundle_map_summary
 
     def summary(
+        """
+        Display any summaries that are currently available and return them in a dict.
+
+        By default (``modes=None``), this displays:
+        - ``"nerve"`` (always available),
+        - ``"local_triv"`` if :meth:`get_local_trivs` has been run,
+        - ``"classes"`` if :meth:`get_classes` has been run,
+        - ``"bundle_map"`` if :meth:`get_bundle_map` has been run.
+
+
+        Parameters
+        ----------
+        modes:
+            Iterable selecting which summaries to consider. If None, uses the default policy above.
+        show:
+            If True, display summaries in the active frontend.
+        show_weight_hist:
+            Whether to show the edge-weight histogram in the class summary.
+        hist_bins:
+            Histogram bins for the class-summary weight histogram.
+
+        Returns
+        -------
+        dict
+            Mapping from summary name to summary object (some entries may be ``None`` if unavailable).
+        """        
         self,
         modes: Optional[Iterable[Literal["nerve", "local_triv", "classes", "bundle_map"]]] = None,
         *,
@@ -499,6 +605,45 @@ class Bundle:
         show_summary: bool = False,
         verbose: bool = True,
     ) -> LocalTrivsResult:
+        """
+        Compute local trivializations, estimate an O(2) cocycle, and compute diagnostics.
+
+        This is the upstream computation needed by most later steps:
+        transitions/cocycle estimation and bundle-quality diagnostics.
+
+
+        Parameters
+        ----------
+        cc:
+            Local coordinate constructor / charting method passed to
+            :func:`~circle_bundles.trivializations.local_triv.compute_local_triv`
+            (e.g. ``"pca2"``).
+        min_patch_size:
+            Minimum number of samples required to compute a local trivialization on a chart.
+        min_points_edge:
+            Minimum overlap size ``|U_j ∩ U_k|`` required to include an edge (j,k) in cocycle estimation.
+        pou:
+            Optional partition-of-unity override used for computing quality diagnostics.
+            If omitted, uses ``self.pou`` when available. This does not overwrite ``self.pou``.
+        show_summary:
+            If True, display the local-trivialization summary after computing (auto rendering).
+        verbose:
+            Verbosity forwarded to the local trivialization routine.
+
+        Returns
+        -------
+        LocalTrivsResult
+            Container holding local trivializations, cocycle, and a quality report.
+
+        Raises
+        ------
+        ValueError
+            If shapes are inconsistent (e.g. invalid ``pou`` shape).
+
+        Notes
+        -----
+        Calling this method invalidates downstream caches (classes, global trivialization, bundle map).
+        """        
         # 1) local triv
         if self.distance_matrix:
             lt = compute_local_triv(
@@ -598,6 +743,55 @@ class Bundle:
         show_weight_hist: bool = False,
         hist_bins: int = 40,
     ) -> ClassesAndPersistence:
+        """
+        Compute characteristic-class representatives and persistence with respect to the weights filtration.
+
+        Prerequisites
+        -------------------------------
+        You must run :meth:`get_local_trivs` first. 
+
+
+        Parameters
+        ----------
+        edge_weights:
+            Optional explicit edge-weight map for the nerve filtration. Keys are vertex-index
+            pairs ``(j, k)`` (order is ignored). Values should be nonnegative and represent
+            "badness" (smaller = better) so that increasing the threshold adds edges.
+            If omitted, weights are derived from the cached transition report using
+            ``prefer_edge_weight``.
+        prefer_edge_weight:
+            Which transition diagnostic to prefer when deriving edge weights automatically.
+            Typical values are ``"rms"`` (RMS angle fit error) or ``"witness"`` (when available).
+            Ignored if ``edge_weights`` is provided.
+        show_summary:
+            If True, display a class + persistence summary in the active frontend.
+        show_weight_hist:
+            If True, include a histogram of the edge-weight distribution in the displayed summary.
+        hist_bins:
+            Number of bins for the edge-weight histogram.
+
+        Returns
+        -------
+        ClassesAndPersistence
+            Container with fields:
+            - ``reps``: class representatives (lightweight; implementation-defined type),
+            - ``persistence``: persistence output (implementation-defined type),
+            - ``restricted``: derived class data computed on the chosen subcomplex,
+            - ``summary_text``: a plain-text description of the results.
+
+        Raises
+        ------
+        RuntimeError
+            If local trivializations/cocycle have not been computed (see prerequisites).
+        ValueError
+            If the selected restriction mode yields an empty subcomplex or if inputs are inconsistent.
+
+        Notes
+        -----
+        Calling this method invalidates downstream caches that depend on class/persistence state
+        (global trivialization and bundle-map caches).
+        """
+        
         self._require_local_trivs()
         assert self._cocycle is not None and self._quality is not None
 
@@ -714,6 +908,47 @@ class Bundle:
     # ----------------------------
 
     def get_global_trivialization(
+        """
+        Compute a global circle-valued coordinate using the Singer construction.
+
+        This method produces a *global* fiber coordinate (an :math:`\\mathbb{S}^1`-valued
+        coordinatization) by solving a Singer-type global alignment problem on a certified
+        orientable 1-skeleton, and then blending local angles using a partition of unity.
+
+        The returned array ``F`` is a global coordinate representation in :math:`\\mathbb{R}^2`
+        (e.g., cosine/sine embedding), suitable for downstream visualization or learning.
+
+        Prerequisites 
+        -------------
+        You must have already run:
+        - :meth:`get_local_trivs` (local angles + cocycle),
+        - :meth:`get_classes` (to obtain the max-trivial certified subcomplex).
+
+        Parameters
+        ----------
+        weight:
+            Optional edge-weight threshold used to further restrict the certified max-trivial
+            subcomplex. If None, the maximal-trivial cutoff is used.
+            If provided, it must be less than or equal to the maximal-trivial threshold;
+            otherwise an error is raised.
+        pou:
+            Optional partition-of-unity override of shape ``(n_sets, n_samples)``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Global fiber coordinate array of shape ``(n_samples, 2)`` (degree-normalized).
+
+        Raises
+        ------
+        RuntimeError
+            If prerequisites have not been computed (see above), or if no partition of unity
+            is available via ``pou`` or ``self.pou``.
+        ValueError
+            If the maximal-trivial certified subcomplex is empty, if the chosen threshold yields
+            no usable edges, if the cocycle is non-orientable on the selected subcomplex, or if
+            ``weight`` exceeds the maximal-trivial threshold.
+        """
         self,
         weight: Optional[float] = None,
         *,
@@ -798,6 +1033,47 @@ class Bundle:
     # ----------------------------
 
     def get_frame_dataset(
+        """
+        Build the pre-projection frame dataset used by the bundle-map solver.
+
+        This method constructs the intermediate "frame" representation used by the
+        bundle-map pipeline *before* any projection/reduction step. 
+
+        Prerequisites 
+        -------------
+        You must have already run:
+        - :meth:`get_local_trivs` (for the estimated transitions/cocycle),
+        - :meth:`get_classes` (for persistence + the cocycle-certified subcomplex),
+        - and you must provide a partition of unity via ``pou`` or ``self.pou``.
+
+        Parameters
+        ----------
+        pou:
+            Optional partition-of-unity override of shape ``(n_sets, n_samples)``.
+            If omitted, uses ``self.pou``. The override does not overwrite ``self.pou``.
+        weight:
+            Optional edge-weight threshold used to restrict the cocycle-certified subcomplex.
+            If None, the full cocycle-certified subcomplex is used.
+            If provided, it must be <= the cocycle-certification threshold (the largest weight
+            at which the class representatives still certify as cocycles).
+        packing:
+            Frame-packing strategy used when assembling the frame dataset (implementation-defined).
+            Typical values include ``"coloring2"``.
+
+        Returns
+        -------
+        object
+            A frame dataset object produced by the internal v2 pipeline (implementation-defined type).
+            The returned dataset corresponds to ``stage="pre_projection"``.
+
+        Raises
+        ------
+        RuntimeError
+            If prerequisites have not been computed, or if no partition of unity is available.
+        ValueError
+            If the cocycle-certified subcomplex is empty, or if ``weight`` exceeds the cocycle
+            certification threshold, or if thresholding yields no edges.
+        """        
         self,
         *,
         pou: Optional[np.ndarray] = None,
@@ -866,7 +1142,68 @@ class Bundle:
         SEMICIRCLE_TOL = 1e-8
         ROUNDING = 3
         COMPUTE_CD = True
+        """
+        Compute (or fetch cached) bundle-map coordinatization.
 
+        This method returns a global fiber-coordinate embedding produced by the bundle-map
+        solver, along with the solver report and lightweight metadata. The output is intended
+        to serve as a *global coordinatization* of the total space/fiber structure implied by
+        the estimated cocycle, suitable for visualization and downstream learning tasks.
+
+        Prerequisites
+        -------------
+        You must have already run:
+        - :meth:`get_local_trivs`,
+        - :meth:`get_classes`,
+        - and you must provide a partition of unity via ``pou`` or ``self.pou``.
+
+
+        Parameters
+        ----------
+        pou:
+            Optional partition-of-unity override of shape ``(n_sets, n_samples)``.
+            If omitted, uses ``self.pou``. The override does not overwrite ``self.pou``.
+        weight:
+            Optional edge-weight threshold used to restrict the cocycle-certified subcomplex.
+            If None, uses the full cocycle-certified subcomplex.
+        reducer:
+            Optional reducer/projection object for the v2 pipeline (implementation-defined).
+            If provided, it participates in caching via a lightweight key derived from common
+            reducer attributes (e.g., method, stage, target dimension).
+        packing:
+            Frame-packing strategy used by the solver (implementation-defined).
+        strict_semicircle:
+            If True, enforce a stricter semicircle constraint in the v2 solver.
+        show_summary:
+            If True, display the bundle-map solver summary in the active frontend.
+        recompute:
+            If True, force recomputation even if a matching result is available in the cache.
+
+        Returns
+        -------
+        BundleMapResult
+            Object with fields:
+            - ``F``: global fiber coordinates of shape ``(n_samples, D_used)``,
+            - ``pre_F``: pre-projection coordinates (solver-defined),
+            - ``Omega_used``: edge-indexed transitions used by the solver,
+            - ``Phi_used``: vertex gauge/orientation choices used by the solver,
+            - ``report``: solver report (implementation-defined),
+            - ``meta``: metadata dict (e.g., weight, packing, ambient_dim, reducer summary).
+
+        Raises
+        ------
+        RuntimeError
+            If prerequisites have not been computed, or if no partition of unity is available.
+        ValueError
+            If the cocycle-certified subcomplex is empty, if ``weight`` exceeds the cocycle
+            certification threshold, or if thresholding yields no edges.
+
+        Notes
+        -----
+        Results are cached on the :class:`Bundle` instance. The cache key depends on:
+        the chosen subcomplex (via ``weight``), ``packing``, ``strict_semicircle``, the reducer
+        signature, and whether a partition-of-unity override is used.
+        """
         self._require_local_trivs()
         self._require_classes()
         assert self._cocycle is not None and self._f is not None and self._quality is not None
@@ -1023,6 +1360,63 @@ class Bundle:
         min_points_edge: int = 1,
         edges: Optional[List[Tuple[int, int]]] = None,
     ):
+        """
+        Compare local circular coordinates on overlaps.
+
+        This method produces a **static matplotlib diagnostic figure** showing pairs of
+        local fiber coordinates on chart overlaps, optionally aligning the second chart
+        to the first by an O(2) fit.
+
+        Notes
+        -----
+        - If there are more than ``max_pairs`` overlaps, the visualizer selects a subset
+          according to ``metric`` (typically WORST / MEDIAN / BEST).
+
+        Parameters
+        ----------
+        ncols:
+            Number of columns in the comparison grid, or ``"auto"`` for an automatic layout.
+        title_size:
+            Font size for subplot titles.
+        align:
+            If True, align the second chart to the first on each overlap using an O(2) fit
+            (useful when comparing angles up to a global reflection/rotation on overlaps).
+        s:
+            Marker size scaling for scatter plots.
+        save_path:
+            Optional path to save the figure (e.g., ``"compare_trivs.png"``).
+        max_pairs:
+            Maximum number of overlap pairs to display.
+        metric:
+            Overlap scoring metric used to rank/select pairs. Common values are:
+
+            - ``"mean"``: mean circle-fit / angle disagreement on the overlap
+            - ``"rms"``: RMS circle-fit / angle disagreement on the overlap
+        show:
+            If True, display the figure (matplotlib). If False, return the figure without display.
+        return_selected:
+            If True, also return diagnostics about which overlaps were displayed.
+        min_points_edge:
+            Minimum overlap size required to include an edge when ``edges`` is not provided.
+        edges:
+            Optional explicit list of chart-index edges ``[(j, k), ...]`` to consider. If provided,
+            this overrides ``min_points_edge``.
+
+        Returns
+        -------
+        matplotlib.figure.Figure or tuple
+            If ``return_selected=False`` (default), returns the matplotlib figure.
+
+            If ``return_selected=True``, returns ``(fig, selected_edges, err_by_edge)``, where:
+
+            - ``selected_edges`` is the list of overlaps actually displayed
+            - ``err_by_edge`` maps each overlap edge to its diagnostic error value
+
+        Raises
+        ------
+        RuntimeError
+            If local trivializations have not been computed (call :meth:`get_local_trivs` first).
+        """
         self._require_local_trivs()
         assert self._f is not None
 
@@ -1067,6 +1461,70 @@ class Bundle:
         mark_cutoff: Optional[float] = None,
         show_title_value: bool = True,
     ):
+        """
+        Visualize a single-cycle nerve in a canonical circle layout (matplotlib).
+
+        This visualization is designed for the common case where the 1-skeleton of the
+        nerve is a **single cycle graph**. The vertices are arranged evenly on a circle,
+        and edge annotations (weights, orientation data) are displayed directly on the plot.
+
+        Parameters
+        ----------
+        use_max_trivial:
+            If True and persistence results are available, highlight edges belonging to the
+            max-trivial subcomplex (when meaningful). If False, draw all edges uniformly.
+        weights:
+            Weight-label source selector: ``"rms"``, ``"witness"``, or ``"none"``.
+        omega:
+            Optional explicit edge-sign dict mapping ``(i, j)`` to ``±1``. If None, an attempt is
+            made to pull a default from cached class representatives.
+        phi:
+            Optional explicit vertex-sign dict mapping vertex index to ``±1``.
+        compute_phi:
+            If True and ``phi`` is not provided, attempt to compute a consistent gauge from
+            the cached cocycle. Requires local trivializations/cocycle to have been computed.
+        fail_if_not_cycle:
+            If True (default), raise if the nerve graph is not a single cycle. If False,
+            attempt to visualize "as-is" without canonical cycle reindexing.
+        title:
+            Optional plot title. Defaults to ``"Nerve Visualization"``.
+        save_path:
+            Optional path to save the figure.
+        ax:
+            Optional matplotlib Axes to draw into. If None, a new figure/axes are created.
+        figsize:
+            Figure size (inches) used only when ``ax is None``.
+        dpi:
+            Optional DPI used only when ``ax is None``.
+        r:
+            Radius of the circle layout.
+        node_size, node_facecolor, node_edgecolor, node_label_color:
+            Node styling options.
+        removed_edge_color, removed_edge_lw:
+            Styling for edges not in the highlighted/kept set.
+        kept_edge_color, kept_edge_lw:
+            Styling for highlighted/kept edges.
+        omega_color, phi_color, weights_color:
+            Text colors for omega/phi/weight annotations.
+        fontsize_node, fontsize_omega, fontsize_phi, fontsize_weights:
+            Font sizes for node labels and annotations.
+        omega_offset, weights_offset, phi_offset:
+            Radial offsets used to place text annotations without overlapping edges.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The matplotlib figure.
+
+        Raises
+        ------
+        RuntimeError
+            If the Bundle has no cached nerve edges.
+        ValueError
+            If ``fail_if_not_cycle=True`` and the nerve graph is not a single cycle.
+        RuntimeError
+            If ``compute_phi=True`` but no cocycle is available (call :meth:`get_local_trivs` first).
+        """        
         from .viz.nerve_plotly import make_nerve_figure, nerve_with_slider_from_U
 
         if landmarks is None:
