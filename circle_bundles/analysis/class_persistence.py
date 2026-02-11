@@ -1002,7 +1002,7 @@ def summarize_edge_driven_persistence(
     Notes
     -----
     - "k" means number of edges removed (heaviest-first).
-    - "r" means cutoff weight at that stage (∞ for the full complex).
+    - "r" means cutoff weight at that stage (max finite edge weight for the full complex).
     - |W_r^(d)| are the counts of d-simplices in the induced subcomplex.
 
     If show_weight_hist=True, renders a side-by-side Matplotlib figure with:
@@ -1024,17 +1024,17 @@ def summarize_edge_driven_persistence(
     # ----------------------------
     # Helpers
     # ----------------------------
-    def worst(edges: List[Edge]) -> List[Tuple[Edge, float]]:
-        arr = [(canon_edge_tuple(e), ew[canon_edge_tuple(e)]) for e in edges if canon_edge_tuple(e) in ew]
-        arr.sort(key=lambda t: (-t[1], t[0]))
-        return arr[:top_k]
-
     def fmt_r_3(w: float) -> str:
         if np.isposinf(w):
             return "∞"
         if np.isneginf(w):
             return "-∞"
         return f"{float(w):.3f}"
+
+    def worst(edges: List[Edge]) -> List[Tuple[Edge, float]]:
+        arr = [(canon_edge_tuple(e), ew[canon_edge_tuple(e)]) for e in edges if canon_edge_tuple(e) in ew]
+        arr.sort(key=lambda t: (-t[1], t[0]))
+        return arr[:top_k]
 
     def stage_sizes(k_removed: int) -> Tuple[int, int, int]:
         k = int(k_removed)
@@ -1049,6 +1049,11 @@ def summarize_edge_driven_persistence(
         kept_tets = induced_tetrahedra_from_edges(TT_all, kept_edges) if TT_all else []
 
         return (len(kept_edges), len(kept_tris), len(kept_tets))
+
+    # "Full complex" cutoff: max finite edge weight (more truthful than ∞)
+    finite_weights = [w for w in ew.values() if np.isfinite(w)]
+    r_full = max(finite_weights) if finite_weights else float("inf")
+    r_full_str = fmt_r_3(float(r_full))
 
     # ----------------------------
     # Pull events
@@ -1073,7 +1078,7 @@ def summarize_edge_driven_persistence(
     rows: List[Tuple[str, int, str, int, int, int, List[Tuple[Edge, float]]]] = []
 
     full_ke, full_kt, full_ktt = stage_sizes(0)
-    rows.append(("Full nerve", 0, "∞", full_ke, full_kt, full_ktt, []))
+    rows.append(("Full nerve", 0, r_full_str, full_ke, full_kt, full_ktt, []))
 
     def add_row(label: str, res_obj: Union[CobirthResult, CodeathResult]):
         k = int(res_obj.k_removed)

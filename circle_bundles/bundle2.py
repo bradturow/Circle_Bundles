@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Set
+from typing import Any, Dict, Iterable, List, Literal, Optional, Tuple, Set, Union
 
 import numpy as np
 
@@ -1736,8 +1736,128 @@ class Bundle:
 
 
     # ----------------------------
-    # Accessors (NO auto-running)
+    # Accessors 
     # ----------------------------
+
+    def get_simplices(
+        self,
+        dims: Optional[Union[int, Iterable[int]]] = None,
+        *,
+        weight: Optional[Union[float, str]] = None,
+        vertices_as_tuples: bool = False,
+        canonicalize: bool = True,
+        prefer_edge_weight: str = "rms",
+    ) -> Any:
+        """
+        Return cached nerve simplices, optionally restricted by:
+
+        - a numeric edge-weight cutoff (float), or
+        - a named persistence stage (str): "cocycle" or "coboundary".
+
+        Stage semantics
+        --------------
+        - "cocycle": maximal stage where (by your persistence definition) both class reps are cocycles.
+        - "coboundary": alias for the former "max_trivial" stage.
+
+        Filtration convention
+        ---------------------
+        Vertices (0-simplices) always have weight 0, so this method ALWAYS returns the full
+        vertex set {0,...,n_sets-1} (or tuples), regardless of `weight`.
+        Only edges/triangles/tetrahedra are filtered.
+        """
+        # ---- normalize dims argument ----
+        single_dim = isinstance(dims, int)
+        if dims is None:
+            dims_list = [0, 1, 2, 3]
+        elif single_dim:
+            dims_list = [int(dims)]
+        else:
+            dims_list = [int(d) for d in list(dims)]
+
+        allowed = {0, 1, 2, 3}
+        bad = [d for d in dims_list if d not in allowed]
+        if bad:
+            raise ValueError(f"dims must be among {sorted(allowed)}; got invalid {bad}.")
+
+        max_cached = int(min(3, getattr(self, "max_simp_dim", 3)))
+
+        def _canon(sig):
+            if not canonicalize:
+                return tuple(int(x) for x in sig)
+            return tuple(sorted(int(x) for x in sig))
+
+        # ---- full cached simplices ----
+        edges_all = sorted({_canon((a, b)) for (a, b) in getattr(self, "_edges_U", [])}) if max_cached >= 1 else []
+        tris_all  = sorted({_canon((a, b, c)) for (a, b, c) in getattr(self, "_tris_U", [])}) if max_cached >= 2 else []
+        tets_all  = sorted({_canon((a, b, c, d)) for (a, b, c, d) in getattr(self, "_tets_U", [])}) if max_cached >= 3 else []
+
+        # ---- vertices are ALWAYS full (weight 0) ----
+        verts_list = list(range(int(self.n_sets)))
+        if vertices_as_tuples:
+            verts_out: Any = [(int(i),) for i in verts_list]
+        else:
+            verts_out = [int(i) for i in verts_list]
+
+        # helpers: induced higher simplices from kept edges
+        def _tri_edges(t):
+            a, b, c = t
+            return [tuple(sorted((a, b))), tuple(sorted((a, c))), tuple(sorted((b, c)))]
+
+        def _tet_edges(tt):
+            a, b, c, d = tt
+            return [
+                tuple(sorted((a, b))), tuple(sorted((a, c))), tuple(sorted((a, d))),
+                tuple(sorted((b, c))), tuple(sorted((b, d))), tuple(sorted((c, d))),
+            ]
+
+        # ---- compute kept edges according to restriction ----
+        if weight is None:
+            kept_edges = edges_all
+
+        elif isinstance(weight, str):
+            stage = str(weight).lower().strip()
+            if stage == "coboundary":
+                stage = "max_trivial"
+            if stage not in {"cocycle", "max_trivial"}:
+                raise ValueError("weight stage must be one of {'cocycle','coboundary'} (or a float).")
+
+            p = getattr(self, "_class_persistence", None)
+            if p is None:
+                raise RuntimeError(
+                    f"weight='{weight}' requires persistence. Run bundle.get_classes(...) first."
+                )
+
+            kept = _edges_for_subcomplex_from_persistence(p, stage)  # stage is 'cocycle' or 'max_trivial'
+            kept_edges = sorted({_canon((a, b)) for (a, b) in kept})
+
+        else:
+            w = float(weight)
+            ew = self._latest_edge_weights(None, prefer=str(prefer_edge_weight))
+            if ew is None:
+                raise RuntimeError(
+                    "No edge weights available for numeric cutoff.\n"
+                    "Run bundle.get_local_trivs(...) or bundle.get_classes(...) first."
+                )
+            ew_c = {tuple(sorted((int(a), int(b)))): float(val) for (a, b), val in ew.items()}
+            kept_edges = [e for e in edges_all if float(ew_c.get(tuple(e), np.inf)) <= w]
+
+        kept_edge_set = set(kept_edges)
+
+        kept_tris = [t for t in tris_all if all(e in kept_edge_set for e in _tri_edges(t))]
+        kept_tets = [tt for tt in tets_all if all(e in kept_edge_set for e in _tet_edges(tt))]
+
+        # ---- assemble output ----
+        out: Dict[int, Any] = {}
+        if 0 in dims_list:
+            out[0] = verts_out
+        if 1 in dims_list:
+            out[1] = kept_edges if max_cached >= 1 else []
+        if 2 in dims_list:
+            out[2] = kept_tris if max_cached >= 2 else []
+        if 3 in dims_list:
+            out[3] = kept_tets if max_cached >= 3 else []
+
+        return out[dims_list[0]] if single_dim else out
 
     def get_quality(self) -> BundleQualityReport:
         if self._quality is None:

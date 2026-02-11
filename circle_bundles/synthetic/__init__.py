@@ -94,6 +94,7 @@ from .tori_and_kb import (
     const,
     small_to_big,
     sample_C2_torus,
+    sample_foldy_klein_bottle,    
 )
 
 __all__ = [
@@ -151,4 +152,5 @@ __all__ = [
     "const",
     "small_to_big",
     "sample_C2_torus",
+    "sample_foldy_klein_bottle",
 ]

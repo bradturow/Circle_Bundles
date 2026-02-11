@@ -12,7 +12,7 @@ __all__ = [
     "wrap_angle",
     "sample_C2_torus",
     "torus_base_projection_from_data",
-    "kb_pairwise_distances_from_data",
+    "sample_foldy_klein_bottle",
 ]
 
 AngleFunc = Callable[[np.ndarray], np.ndarray]
@@ -163,71 +163,126 @@ def torus_base_projection_from_data(data: np.ndarray, *, eps: float = 1e-12) -> 
     return z2 / nrm
 
 
-# ----------------------------
-# Klein bottle metric on the torus parameterization
-# ----------------------------
 
-def _kb_angle_dist(
-    alpha1: np.ndarray,
-    theta1: np.ndarray,
-    alpha2: np.ndarray,
-    theta2: np.ndarray,
-) -> np.ndarray:
+# ------------------------------------------------------------
+# Folded circle in R^4 (just add w=0)
+# ------------------------------------------------------------
+
+def folded_circle_r4(theta: np.ndarray, amp: float) -> np.ndarray:
     """
-    Distance on the Klein bottle viewed as a quotient of the flat torus by:
-        (alpha, theta) ~ (alpha + pi, -theta)
-
-    We use the induced quotient metric:
-        d_KB(p,q) = min( d_T(p,q), d_T(p, g(q)) )
-    where d_T is the flat torus metric with circular distances in each angle,
-    and g(alpha,theta) = (alpha+pi, -theta).
-
-    Returns array broadcasted over inputs.
+    theta: (n,) array
+    returns: (n,4) points (cosθ, sinθ, amp*sin(2θ), 0)
     """
-    # torus distance between (a1,t1) and (a2,t2)
-    da = _angle_dist(alpha1, alpha2)
-    dt = _angle_dist(theta1, theta2)
-    d0 = np.sqrt(da * da + dt * dt)
+    theta = np.asarray(theta, float)
+    return np.column_stack([
+        np.cos(theta),
+        np.sin(theta),
+        amp * np.sin(2.0 * theta),
+        np.zeros_like(theta),
+    ])
 
-    # torus distance between (a1,t1) and g(a2,t2) = (a2+pi, -t2)
-    da_g = _angle_dist(alpha1, wrap_angle(alpha2 + np.pi))
-    dt_g = _angle_dist(theta1, wrap_angle(-theta2))
-    d1 = np.sqrt(da_g * da_g + dt_g * dt_g)
+# ------------------------------------------------------------
+# SO(4) path implementing the reflection symmetry as a rotation
+# ------------------------------------------------------------
 
-    return np.minimum(d0, d1)
+def _rodrigues_3d(axis: np.ndarray, angle: float) -> np.ndarray:
+    """
+    3D Rodrigues rotation matrix for unit axis and angle.
+    """
+    axis = np.asarray(axis, float)
+    axis = axis / np.linalg.norm(axis)
+    ax, ay, az = axis
+    K = np.array([[0, -az, ay],
+                  [az, 0, -ax],
+                  [-ay, ax, 0]], dtype=float)
+    I = np.eye(3)
+    return I + np.sin(angle) * K + (1 - np.cos(angle)) * (K @ K)
 
+def G_of_t(t: float) -> np.ndarray:
+    """
+    Returns G(t) in SO(4) such that:
+      - G(0) = I
+      - G(2π) acts as (x,y,z,w) -> (y,x,z,-w)
 
-def kb_pairwise_distances_from_data(
-    data: np.ndarray,
+    Construction:
+      rotate by angle alpha=t/2 in the 3D subspace spanned by (x,y,w),
+      about the axis (1,1,0) (in (x,y,w)-coords).
+      z is left fixed.
+    """
+    alpha = 0.5 * float(t)  # goes 0 -> π as t goes 0 -> 2π
+    axis_xyw = np.array([1.0, 1.0, 0.0])  # axis in (x,y,w)
+    R3 = _rodrigues_3d(axis_xyw, alpha)
+
+    # Place R3 into a 4x4 acting on indices [0,1,3] (x,y,w), keeping z (index 2) fixed.
+    G = np.eye(4)
+    idx = [0, 1, 3]
+    for i, ii in enumerate(idx):
+        for j, jj in enumerate(idx):
+            G[ii, jj] = R3[i, j]
+    return G
+
+# ------------------------------------------------------------
+# Klein bottle dataset (mapping torus of an orientation-reversing involution)
+# ------------------------------------------------------------
+
+def sample_foldy_klein_bottle(
+    n: int,
     *,
-    eps: float = 1e-12,
-) -> np.ndarray:
+    amp: float = 1,
+    base_radius: float = 1,
+    noise: float = 0.05,
+    rng: Optional[np.random.Generator] = None,
+) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Compute an (n,n) distance matrix using the Klein bottle quotient metric
-    on angles extracted from the R^4 torus data.
+    Samples an embedded Klein bottle-like total space in R^2 x R^4 = R^6.
 
-    - alpha is recovered from (x1,x2) via atan2
-    - theta is recovered from (x3,x4) via atan2
+    Parameters
+    ----------
+    n : int
+        Number of samples.
+    amp : float
+        Amplitude of the folded-circle oscillation.
+    base_radius : float
+        Radius of the embedded base circle.
+    noise : float
+        Standard deviation of i.i.d. Gaussian noise added to ambient coordinates.
+        (noise=0 gives noiseless data)
+    rng : np.random.Generator, optional
+        Random number generator.
 
-    This does NOT change the ambient embedding; it gives you a KB-topology metric
-    on the same point cloud.
+    Returns
+    -------
+    X : (n,6) ndarray
+        Ambient coordinates.
+    t : (n,) ndarray
+        Base parameter (ground truth).
     """
-    data = np.asarray(data, dtype=float)
-    if data.ndim != 2 or data.shape[1] != 4:
-        raise ValueError(f"Expected data shape (n,4). Got {data.shape}.")
-    n = data.shape[0]
+    if rng is None:
+        rng = np.random.default_rng()
 
-    # Recover angles; robust even if radii vary (atan2 ignores scale)
-    alpha = wrap_angle(np.arctan2(data[:, 1], data[:, 0]))
-    theta = wrap_angle(np.arctan2(data[:, 3], data[:, 2]))
+    # Base + fiber parameters
+    t = rng.uniform(0.0, 2.0 * np.pi, size=n)
+    theta = rng.uniform(0.0, 2.0 * np.pi, size=n)
 
-    # Pairwise quotient metric (O(n^2))
-    A1 = alpha[:, None]
-    T1 = theta[:, None]
-    A2 = alpha[None, :]
-    T2 = theta[None, :]
+    # Base embedding
+    base = np.column_stack([
+        base_radius * np.cos(t),
+        base_radius * np.sin(t),
+    ])
 
-    D = _kb_angle_dist(A1, T1, A2, T2)
-    # zero diagonal numerically
-    np.fill_diagonal(D, 0.0)
-    return D
+    # Fiber embedding
+    fib0 = folded_circle_r4(theta, amp=amp)
+
+    fib = np.empty_like(fib0)
+    for i in range(n):
+        G = G_of_t(t[i])
+        fib[i] = G @ fib0[i]
+
+    # Combine
+    X = np.hstack([base, fib])
+
+    # Add ambient noise
+    if noise > 0.0:
+        X = X + rng.normal(scale=noise, size=X.shape)
+
+    return X, t

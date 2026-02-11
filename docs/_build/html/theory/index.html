@@ -20,6 +20,8 @@
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -60,7 +62,21 @@
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Theory</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Theory</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API reference</span></p>
 <ul>
@@ -118,10 +134,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/core/index.html">Core</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/02_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/03_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/04_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -167,7 +184,184 @@
              
   <section id="theory">
 <h1>Theory<a class="headerlink" href="#theory" title="Link to this heading"></a></h1>
-<p>(coming soon…)</p>
+<p><code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> is a toolkit for analyzing and coordinatizing high-dimensional
+datasets which approximately arise as noisy samples from the total spaces of
+circle bundles.</p>
+<p>This page provides a brief overview of the underlying theory and the algorithms
+implemented in the package. For a complete theoretical development and proofs,
+see the accompanying paper [1].</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>We use the term <em>circle bundle</em> to refer to any fiber bundle whose fiber is the
+circle <span class="math notranslate nohighlight">\(\mathbb{S}^1\)</span>, not necessarily a principal bundle.</p>
+<p>Up to isomorphism, circle bundles over a metric space <span class="math notranslate nohighlight">\(B\)</span> are completely
+classified by a pair of characteristic classes:</p>
+<ul class="simple">
+<li><p>the <strong>orientation class</strong> <span class="math notranslate nohighlight">\(\mathrm{sw}_1 \in H^1(B; \mathbb{Z}_2)\)</span>, and</p></li>
+<li><p>the <strong>(twisted) Euler class</strong> <span class="math notranslate nohighlight">\(\tilde e \in H^2(B; \widetilde{\mathbb{Z}})\)</span>,</p></li>
+</ul>
+<p>which encode global obstructions to orientability and triviality, respectively.
+Crucially, these invariants admit formulations that can be recovered from purely
+local data, making them well suited for data-analytic settings.</p>
+<p>A nonzero characteristic class indicates that the bundle is <em>non-trivial</em>, in the
+sense that its total space <span class="math notranslate nohighlight">\(E\)</span> is not homeomorphic to the product
+<span class="math notranslate nohighlight">\(B \times \mathbb{S}^1\)</span>. Only trivial bundles admit global circular
+coordinate systems.</p>
+<p>In general, any circle bundle over a compact metric space can be realized
+(non-uniquely) as the pullback of the tautological circle bundle</p>
+<div class="math notranslate nohighlight">
+\[V(2,d) \times_{O(2)} \mathbb{S}^1 \;\longrightarrow\; \mathrm{Gr}(2,d),\]</div>
+<p>for sufficiently large <span class="math notranslate nohighlight">\(d\)</span>. When the total space <span class="math notranslate nohighlight">\(E\)</span> is a
+low-dimensional manifold embedded in <span class="math notranslate nohighlight">\(\mathbb{R}^D\)</span> with <span class="math notranslate nohighlight">\(D\)</span> large,
+it is often possible to choose <span class="math notranslate nohighlight">\(d\)</span> such that <span class="math notranslate nohighlight">\(2d \ll D\)</span>. This
+perspective underlies the topology-respecting dimensionality reduction methods
+implemented in <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code>.</p>
+<p>In [1], the authors introduce the notion of a <em>discrete approximate circle
+bundle</em>, together with algorithms for estimating characteristic classes and for
+constructing global coordinate systems that respect the inferred topology. The
+<code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> package implements several of these algorithms.</p>
+</section>
+<section id="algorithms">
+<h2>Algorithms<a class="headerlink" href="#algorithms" title="Link to this heading"></a></h2>
+<section id="overview">
+<h3>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h3>
+<p>Given a dataset <span class="math notranslate nohighlight">\(X\)</span> equipped with a projection <span class="math notranslate nohighlight">\(\pi : X \to B\)</span> and a
+finite open cover <span class="math notranslate nohighlight">\(\mathcal{U} = \{U_j\}_{j=1}^n\)</span> of the base space, the
+pipeline proceeds in three main stages:</p>
+<ol class="arabic simple">
+<li><p><strong>Cocycle fitting</strong> (local trivializations and transition matrices),</p></li>
+<li><p><strong>Classification</strong> (estimation of characteristic classes),</p></li>
+<li><p><strong>Coordinatization</strong> (construction of global bundle coordinates).</p></li>
+</ol>
+<p>Each stage is described in detail below.</p>
+</section>
+<section id="cocycle-fitting">
+<h3>Cocycle Fitting<a class="headerlink" href="#cocycle-fitting" title="Link to this heading"></a></h3>
+<p>Given a family of local circular coordinate functions</p>
+<div class="math notranslate nohighlight">
+\[f_j : \pi^{-1}(U_j) \to \mathbb{S}^1,\]</div>
+<p>the goal is to estimate transition matrices
+<span class="math notranslate nohighlight">\(\Omega_{jk} \in O(2)\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[f_j(x) \;\approx\; \Omega_{jk} f_k(x),
+\quad x \in \pi^{-1}(U_j \cap U_k).\]</div>
+<p>This is formulated as a least-squares Procrustes problem over <span class="math notranslate nohighlight">\(O(2)\)</span> on each
+overlap.</p>
+<p>A corresponding <strong>weight function</strong></p>
+<div class="math notranslate nohighlight">
+\[w : N(\mathcal{U})^{(1)} \to [0,\infty)\]</div>
+<p>is defined by measuring the mean squared alignment error on overlaps. These
+weights quantify the reliability of each transition and induce a filtration on
+the nerve of the cover.</p>
+</section>
+<section id="classification">
+<h3>Classification<a class="headerlink" href="#classification" title="Link to this heading"></a></h3>
+<p>The weight function <span class="math notranslate nohighlight">\(w\)</span> induces a <strong>weights filtration</strong>
+<span class="math notranslate nohighlight">\(\{W^r\}_{r \ge 0}\)</span> on the nerve <span class="math notranslate nohighlight">\(N(\mathcal{U})\)</span>, where <span class="math notranslate nohighlight">\(W^r\)</span>
+denotes the maximal subcomplex whose 1-skeleton consists of edges with weight at
+most <span class="math notranslate nohighlight">\(r\)</span>.</p>
+<p>Given the simplicial <span class="math notranslate nohighlight">\(O(2)\)</span>-valued cocycle <span class="math notranslate nohighlight">\(\Omega\)</span> and the weights
+<span class="math notranslate nohighlight">\(w\)</span>, the algorithm computes cochains</p>
+<div class="math notranslate nohighlight">
+\[\mathrm{sw}_1 \in C^1(N(\mathcal{U}); \mathbb{Z}_2),
+\qquad
+\tilde e \in C^2(N(\mathcal{U}); \mathbb{Z}),\]</div>
+<p>representing estimates of the orientation class and twisted Euler class,
+respectively.</p>
+<p>The <strong>cobirth</strong> and <strong>codeath</strong> of these classes with respect to the filtration
+<span class="math notranslate nohighlight">\(\{W^r\}\)</span> are computed. When well-defined, the twisted Euler number (up to
+sign) is also extracted at the cobirth scale.</p>
+</section>
+<section id="coordinatization">
+<h3>Coordinatization<a class="headerlink" href="#coordinatization" title="Link to this heading"></a></h3>
+<p>Let <span class="math notranslate nohighlight">\((b_{\mathrm{sw}_1}, d_{\mathrm{sw}_1})\)</span> and
+<span class="math notranslate nohighlight">\((b_{\tilde e}, d_{\tilde e})\)</span> denote the lifetimes of the estimated
+characteristic classes.</p>
+<p>For a given weight threshold <span class="math notranslate nohighlight">\(r\)</span>, the base space is cut along unreliable
+overlaps to produce a modified space <span class="math notranslate nohighlight">\(B^r\)</span> with an induced cover
+<span class="math notranslate nohighlight">\(\mathcal{U}^r\)</span> satisfying</p>
+<div class="math notranslate nohighlight">
+\[N(\mathcal{U}^r) = W^r.\]</div>
+<ul>
+<li><p>For <span class="math notranslate nohighlight">\(r \le \min\{b_{\mathrm{sw}_1}, b_{\tilde e}\}\)</span>, a <strong>classifying map</strong></p>
+<div class="math notranslate nohighlight">
+\[\mathrm{cl}^r : B^r \to \mathrm{Gr}(2,d)\]</div>
+<p>is constructed, together with an associated bundle map</p>
+<div class="math notranslate nohighlight">
+\[F^r : X \to V(2,d) \times_{O(2)} \mathbb{S}^1 \subset \mathbb{R}^{2d}.\]</div>
+</li>
+<li><p>For <span class="math notranslate nohighlight">\(r \le \min\{d_{\mathrm{sw}_1}, d_{\tilde e}\}\)</span>, the bundle over
+<span class="math notranslate nohighlight">\(B^r\)</span> is trivial, and a <strong>global trivialization</strong></p>
+<div class="math notranslate nohighlight">
+\[F^r : X \to B^r \times \mathbb{S}^1\]</div>
+<p>is produced.</p>
+</li>
+</ul>
+</section>
+</section>
+<section id="algorithm-1-local-trivializations-and-transition-matrices">
+<h2>Algorithm 1: Local Trivializations and Transition Matrices<a class="headerlink" href="#algorithm-1-local-trivializations-and-transition-matrices" title="Link to this heading"></a></h2>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>Dataset <span class="math notranslate nohighlight">\(X\)</span> (point cloud or distance matrix)</p></li>
+<li><p>Projection <span class="math notranslate nohighlight">\(\pi : X \to B\)</span> and good open cover <span class="math notranslate nohighlight">\(\mathcal{U}\)</span></p></li>
+<li><p>Binary membership array encoding <span class="math notranslate nohighlight">\(\pi(x_m) \in U_j\)</span></p></li>
+</ul>
+<p>Optional inputs:</p>
+<ul class="simple">
+<li><p>Local circular coordinates <span class="math notranslate nohighlight">\(\{f_j\}\)</span></p></li>
+<li><p>Choice of local coordinate algorithm (default: PCA2 or UMAP2)</p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>Local circular coordinates <span class="math notranslate nohighlight">\(\{f_j\}\)</span></p></li>
+<li><p>Transition matrices <span class="math notranslate nohighlight">\(\{\Omega_{jk} \in O(2)\}\)</span></p></li>
+<li><p>Weight function <span class="math notranslate nohighlight">\(w : N(\mathcal{U})^{(1)} \to [0,\infty)\)</span></p></li>
+</ul>
+</section>
+<section id="algorithm-2-characteristic-classes">
+<h2>Algorithm 2: Characteristic Classes<a class="headerlink" href="#algorithm-2-characteristic-classes" title="Link to this heading"></a></h2>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>Injective weight function <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li><p>Simplicial <span class="math notranslate nohighlight">\(O(2)\)</span>-valued 1-cochain <span class="math notranslate nohighlight">\(\Omega\)</span></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>Cochains <span class="math notranslate nohighlight">\(\mathrm{sw}_1\)</span> and <span class="math notranslate nohighlight">\(\tilde e\)</span></p></li>
+<li><p>Cobirth and codeath scales</p></li>
+<li><p>Twisted Euler number (when defined)</p></li>
+</ul>
+</section>
+<section id="algorithm-3-pullback-bundle-coordinates">
+<h2>Algorithm 3: Pullback Bundle Coordinates<a class="headerlink" href="#algorithm-3-pullback-bundle-coordinates" title="Link to this heading"></a></h2>
+<p><strong>Inputs</strong></p>
+<ul class="simple">
+<li><p>Dataset <span class="math notranslate nohighlight">\(X\)</span></p></li>
+<li><p>Cover membership array</p></li>
+<li><p>Local circular coordinates <span class="math notranslate nohighlight">\(\{f_j\}\)</span></p></li>
+<li><p>Transition matrices <span class="math notranslate nohighlight">\(\{\Omega_{jk}\}\)</span></p></li>
+<li><p>Partition of unity subordinate to <span class="math notranslate nohighlight">\(\mathcal{U}\)</span></p></li>
+<li><p>Weight function <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li><p>Threshold <span class="math notranslate nohighlight">\(r\)</span></p></li>
+</ul>
+<p><strong>Outputs</strong></p>
+<ul class="simple">
+<li><p>Classifying map <span class="math notranslate nohighlight">\(\mathrm{cl}^r\)</span> and bundle map <span class="math notranslate nohighlight">\(F^r\)</span></p></li>
+<li><p>Global trivialization when it exists</p></li>
+</ul>
+</section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p><em>Discrete Approximate Circle Bundles</em>.
+arXiv:2508.12914 [math.AT], 2025.
+https://doi.org/10.48550/arXiv.2508.12914</p>
+</aside>
+</aside>
+</section>
 </section>
 
 

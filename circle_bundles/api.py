@@ -85,6 +85,20 @@ from .analysis.local_analysis import (
 
 from .geometry.geometric_unwrapping import get_cocycle_dict, lift_base_points
 
+# ==========================
+# Additional helpers
+# ==========================
+
+from .synthetic import *
+from .viz import *
+from .optical_flow import *
+
+from .synthetic import __all__ as _syn_all
+from .viz import __all__ as _viz_all
+from .optical_flow import __all__ as _of_all
+
+
+
 # =============================================================================
 # Public export list
 # =============================================================================
@@ -143,3 +157,5 @@ __all__ = [
     "get_cocycle_dict",
     "lift_base_points",
 ]
+
+__all__ += [*_syn_all, *_viz_all, *_of_all]
