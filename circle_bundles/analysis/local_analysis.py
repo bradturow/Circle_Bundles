@@ -10,6 +10,7 @@ __all__ = [
     "plot_local_pca",
     "get_local_rips",
     "plot_local_rips",
+    "local_pca",
 ]
 
 
@@ -456,5 +457,131 @@ def plot_local_rips(
     if save_path is not None:
         fig.savefig(save_path, bbox_inches="tight")
         print(f"Saved local Rips figure to {save_path}")
+
+    return fig, axes
+
+
+def local_pca(
+    data: np.ndarray,
+    U: np.ndarray,
+    *,
+    f: np.ndarray | None = None,
+    to_view: Sequence[int] | None = None,
+    n_components: int = 2,
+    n_cols: int = 3,
+    titles: str | Sequence[str] | None = "default",
+    font_size: int = 16,
+    point_size: float = 10.0,
+    cmap: str = "hsv",
+    save_path: str | None = None,
+    show: bool = True,
+):
+    """
+    Compute and plot local PCA embeddings for fibers of a cover.
+
+    Each fiber j is plotted using:
+        data[U[j]]          (points)
+        f[j, U[j]]          (colors, if provided)
+
+    No subsampling. No index ambiguity. If dimensions don't match, this errors.
+
+    Parameters
+    ----------
+    data : (n_points, d) array
+        Ambient data.
+    U : (n_fibers, n_points) bool array
+        Cover membership matrix.
+    f : (n_fibers, n_points) array, optional
+        Local circular coordinates. Used for coloring if provided.
+    to_view : list[int], optional
+        Fibers to plot. Default: all.
+    n_components : int
+        PCA dimension (must be >= 2 for plotting).
+    n_cols : int
+        Number of subplot columns.
+    titles : "default", None, or list[str]
+        Title style.
+    cmap : str
+        Matplotlib colormap for angle coloring.
+    save_path : str, optional
+        Save figure path.
+    show : bool
+        Whether to display the figure.
+
+    Returns
+    -------
+    fig, axes
+    """
+    import matplotlib.pyplot as plt
+    from sklearn.decomposition import PCA
+
+    data = np.asarray(data)
+    U = _as_bool_U(U)
+
+    n_fibers, n_points = U.shape
+
+    if f is not None:
+        f = np.asarray(f, dtype=float)
+        if f.shape != U.shape:
+            raise ValueError(f"f must have shape {U.shape}, got {f.shape}")
+
+    fiber_ids = _as_fiber_ids(to_view, n_fibers)
+
+    if titles == "default":
+        titles_list = _default_titles(fiber_ids)
+    elif titles is None:
+        titles_list = None
+    else:
+        titles_list = list(titles)
+
+    fig, axes = _subplots_grid(len(fiber_ids), n_cols=int(n_cols))
+    last_k = -1
+
+    for k, j in enumerate(fiber_ids):
+        last_k = k
+        ax = axes[k]
+
+        idx = np.where(U[j])[0].astype(int)
+        if idx.size < 2:
+            ax.set_axis_off()
+            continue
+
+        Xj = data[idx]
+        proj = PCA(n_components=int(n_components)).fit_transform(Xj)
+
+        if proj.shape[1] < 2:
+            raise ValueError("Need at least 2 PCA components to plot.")
+
+        if f is None:
+            ax.scatter(proj[:, 0], proj[:, 1], s=float(point_size))
+        else:
+            angles = np.mod(f[j, idx], 2 * np.pi)
+            sc = ax.scatter(
+                proj[:, 0],
+                proj[:, 1],
+                s=float(point_size),
+                c=angles,
+                cmap=cmap,
+            )
+#            fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.04)
+
+        ax.set_xlabel("PCA 1")
+        ax.set_ylabel("PCA 2")
+        ax.grid(True, alpha=0.3)
+
+        if titles_list is not None:
+            ax.set_title(titles_list[k], fontsize=int(font_size))
+
+    for i in range(last_k + 1, len(axes)):
+        axes[i].set_axis_off()
+
+    fig.tight_layout()
+
+    if save_path is not None:
+        fig.savefig(save_path, bbox_inches="tight")
+        print(f"Saved local PCA figure to {save_path}")
+
+    if show:
+        plt.show()
 
     return fig, axes

@@ -62,6 +62,7 @@ from .metrics import (
     RP2_TwistMetric,
     RP2_FlipMetric,
     S3QuotientMetric,
+    ProductMetricConcat,
 )
 
 # =============================================================================
@@ -143,7 +144,8 @@ __all__ = [
     "RP2_TwistMetric",
     "RP2_FlipMetric",
     "S3QuotientMetric",
-
+    "ProductMetricConcat",
+    
     # Advanced utilities
     "fiberwise_clustering",
     "get_cluster_persistence",

@@ -569,7 +569,7 @@ def reduction_curve_psc(
     rng_seed: int = 0,
     psc_verbosity: int = 0,
     use_manopt: bool = True,
-    plot: bool = False,
+    plot: bool = True,
     progress: bool = False,
 ) -> Tuple[np.ndarray, np.ndarray]:
     """

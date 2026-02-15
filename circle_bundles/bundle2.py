@@ -405,7 +405,6 @@ class Bundle:
     # ----------------------------
     # summaries
     # ----------------------------
-
     def summarize_nerve(
         self,
         *,
@@ -435,7 +434,6 @@ class Bundle:
 
         if verbose and show:
             summ.show_summary(
-                show=True,
                 mode="auto",
                 plot=("auto" if plot else False),
                 show_tets_plot=True,
@@ -446,7 +444,7 @@ class Bundle:
 
         return summ
 
-    def summarize_local_trivs(self, *, show: bool = True):
+    def summarize_local_trivs(self):
         # still supported because we keep _local_triv privately
         if self._local_triv is None or self._quality is None:
             return None
@@ -458,20 +456,40 @@ class Bundle:
             quality=self._quality,
         )
 
-        if show:
-            summ.show_summary(show=True, mode="auto")
+
+        summ.show_summary(mode="auto")
 
         return summ
 
     def summarize_classes(
         self,
         *,
-        show: bool = True,
-        top_k: int = 10,
-        show_weight_hist: bool = False,
-        hist_bins: int = 40,
+        show_classes: bool = True,
+        show_persistence: bool = True,
+        show_rounding_distance: bool = False,
     ):
-        if self._class_reps is None or self._class_persistence is None or self._class_restricted is None:
+        """
+        Summarize class reps + restricted class data + persistence.
+
+        Parameters
+        ----------
+        show_classes:
+            Whether to display the characteristic class block.
+        show_persistence:
+            Whether to display the persistence/cutoff block.
+        show_rounding_distance:
+            Whether to display the Euler rounding distance (when available).
+
+        Returns
+        -------
+        ClassSummary or None
+            The summary object, or None if class results are not available.
+        """
+        if (
+            self._class_reps is None
+            or self._class_persistence is None
+            or self._class_restricted is None
+        ):
             return None
 
         summ = summarize_classes_and_persistence(
@@ -480,33 +498,25 @@ class Bundle:
             persistence=self._class_persistence,
         )
 
-        if show:
-            summ.show_summary(
-                show=True,
-                mode="auto",
-                top_k=int(top_k),
-                show_weight_hist=bool(show_weight_hist),
-                hist_bins=int(hist_bins),
-            )
+        summ.show_summary(
+            show_classes=bool(show_classes),
+            show_persistence=bool(show_persistence),
+            show_rounding_distance=bool(show_rounding_distance),
+        )
 
         return summ
 
-    def summarize_bundle_map(self, *, show: bool = True):
+    def summarize_bundle_map(self):
         if self._bundle_map_summary is None:
             return None
 
-        if show:
-            self._bundle_map_summary.show_summary(show=True, mode="auto")
+        self._bundle_map_summary.show_summary(mode="auto")
 
         return self._bundle_map_summary
 
     def summary(
         self,
         modes: Optional[Iterable[Literal["nerve", "local_triv", "classes", "bundle_map"]]] = None,
-        *,
-        show: bool = True,
-        show_weight_hist: bool = False,
-        hist_bins: int = 40,
     ) -> Dict[str, object]:
         """
         Display any summaries that are currently available and return them in a dict.
@@ -517,23 +527,16 @@ class Bundle:
         - ``"classes"`` if :meth:`get_classes` has been run,
         - ``"bundle_map"`` if :meth:`get_bundle_map` has been run.
 
-
         Parameters
         ----------
         modes:
-            Iterable selecting which summaries to consider. If None, uses the default policy above.
-        show:
-            If True, display summaries in the active frontend.
-        show_weight_hist:
-            Whether to show the edge-weight histogram in the class summary.
-        hist_bins:
-            Histogram bins for the class-summary weight histogram.
+            Iterable selecting which summaries to display. If None, uses the default policy above.
 
         Returns
         -------
         dict
             Mapping from summary name to summary object (some entries may be ``None`` if unavailable).
-        """        
+        """
         if modes is None:
             modes_list: List[str] = ["nerve"]
             if self._local_triv is not None and self._quality is not None:
@@ -553,39 +556,26 @@ class Bundle:
         first_shown = True
 
         for m in modes_list:
-            will_show = False
-            if show:
-                if m == "nerve":
-                    will_show = True
-                elif m == "local_triv":
-                    will_show = self._local_triv is not None and self._quality is not None
-                elif m == "classes":
-                    will_show = (
-                        self._class_reps is not None
-                        and self._class_persistence is not None
-                        and self._class_restricted is not None
-                    )
-                elif m == "bundle_map":
-                    will_show = self._bundle_map_summary is not None
-
-            if will_show and not first_shown:
+            if not first_shown:
                 print("")
-            if will_show:
-                first_shown = False
+            first_shown = False
 
             if m == "nerve":
-                out["nerve"] = self.summarize_nerve(show=show, verbose=True, plot=True)
+                out["nerve"] = self.summarize_nerve(verbose=True, plot=True)
+
             elif m == "local_triv":
-                out["local_triv"] = self.summarize_local_trivs(show=show)
+                out["local_triv"] = self.summarize_local_trivs()
+
             elif m == "classes":
                 out["classes"] = self.summarize_classes(
-                    show=show,
-                    top_k=10,
-                    show_weight_hist=bool(show_weight_hist),
-                    hist_bins=int(hist_bins),
+                    show_classes=True,
+                    show_persistence=True,
+                    show_rounding_distance=True,
                 )
+
             elif m == "bundle_map":
-                out["bundle_map"] = self.summarize_bundle_map(show=show)
+                out["bundle_map"] = self.summarize_bundle_map()
+
             else:
                 raise ValueError(f"Unknown summary mode {m!r}.")
 
@@ -726,7 +716,7 @@ class Bundle:
         self.summarize_nerve(show=False, verbose=False)
 
         if show_summary:
-            self.summary(modes=["local_triv"], show=True)
+            self.summary(modes=["local_triv"])
 
         return LocalTrivsResult(f=f, cocycle=cocycle, quality=qual)
 
@@ -739,58 +729,17 @@ class Bundle:
         *,
         edge_weights: Optional[Dict[Tuple[int, int], float]] = None,
         prefer_edge_weight: Literal["rms"] = "rms",
-        show_summary: bool = False,
-        show_weight_hist: bool = False,
-        hist_bins: int = 40,
+        show_classes: bool = False,
+        show_persistence: bool = False,
+        show_rounding_distance: bool = False,
     ) -> ClassesAndPersistence:
         """
         Compute characteristic-class representatives and persistence with respect to the weights filtration.
-
-        Parameters
-        ----------
-        edge_weights:
-            Optional explicit edge-weight map for the nerve filtration. Keys are vertex-index
-            pairs ``(j, k)`` (order is ignored). Values should be nonnegative and represent
-            "badness" (smaller = better) so that increasing the threshold adds edges.
-            If omitted, weights are derived from the cached transition report using
-            ``prefer_edge_weight``.
-        prefer_edge_weight:
-            Which transition diagnostic to prefer when deriving edge weights automatically.
-            Typical values are ``"rms"`` (RMS angle fit error) or ``"witness"`` (when available).
-            Ignored if ``edge_weights`` is provided.
-        show_summary:
-            If True, display a class + persistence summary in the active frontend.
-        show_weight_hist:
-            If True, include a histogram of the edge-weight distribution in the displayed summary.
-        hist_bins:
-            Number of bins for the edge-weight histogram.
-
-        Returns
-        -------
-        ClassesAndPersistence
-            Container with fields:
-            - ``reps``: class representatives (lightweight; implementation-defined type),
-            - ``persistence``: persistence output (implementation-defined type),
-            - ``restricted``: derived class data computed on the chosen subcomplex,
-            - ``summary_text``: a plain-text description of the results.
-
-        Raises
-        ------
-        RuntimeError
-            If local trivializations/cocycle have not been computed (see prerequisites).
-        ValueError
-            If the selected restriction mode yields an empty subcomplex or if inputs are inconsistent.
-
-        Notes
-        -----
-        Calling this method invalidates downstream caches that depend on class/persistence state
-        (global trivialization and bundle-map caches).
         """
-        
+
         self._require_local_trivs()
         assert self._cocycle is not None and self._quality is not None
 
-        # ---- 1) reps only ----
         reps = compute_class_representatives_from_nerve(
             cocycle=self._cocycle,
             edges=self._edges_U,
@@ -801,7 +750,6 @@ class Bundle:
         )
         self._class_reps = reps
 
-        # ---- 2) persistence ----
         if edge_weights is None:
             prefer = str(prefer_edge_weight).lower().strip()
             if prefer != "rms":
@@ -809,7 +757,9 @@ class Bundle:
 
             ew_src = getattr(self._quality, "rms_angle_err", None)
             if ew_src is None:
-                raise RuntimeError("quality.rms_angle_err missing; rerun get_local_trivs (or provide edge_weights).")
+                raise RuntimeError(
+                    "quality.rms_angle_err missing; rerun get_local_trivs (or provide edge_weights)."
+                )
             ew = {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in dict(ew_src).items()}
         else:
             ew = {tuple(sorted((int(a), int(b)))): float(w) for (a, b), w in edge_weights.items()}
@@ -827,20 +777,19 @@ class Bundle:
             setattr(p, "edge_weights", dict(ew))
         except Exception:
             pass
-
         self._class_persistence = p
 
-        # ---- 3) restrict + derived class data ----
         kept_edges = _edges_for_subcomplex_from_persistence(p, "cocycle")
         kept_edges_set = {tuple(e) for e in kept_edges}
 
         def _induced_tris(tris):
             out = []
             for (i, j, k) in tris:
-                eij = tuple(sorted((i, j)))
-                eik = tuple(sorted((i, k)))
-                ejk = tuple(sorted((j, k)))
-                if eij in kept_edges_set and eik in kept_edges_set and ejk in kept_edges_set:
+                if (
+                    tuple(sorted((i, j))) in kept_edges_set
+                    and tuple(sorted((i, k))) in kept_edges_set
+                    and tuple(sorted((j, k))) in kept_edges_set
+                ):
                     out.append((i, j, k))
             return out
 
@@ -875,16 +824,13 @@ class Bundle:
         summ = summarize_classes_and_persistence(reps=reps, restricted=restricted, persistence=p)
         summary_text = str(summ.summary_text)
 
-        if show_summary:
+        if show_classes or show_persistence:
             summ.show_summary(
-                show=True,
-                mode="auto",
-                top_k=10,
-                show_weight_hist=bool(show_weight_hist),
-                hist_bins=int(hist_bins),
+                show_classes=bool(show_classes),
+                show_persistence=bool(show_persistence),
+                show_rounding_distance=bool(show_rounding_distance),
             )
 
-        # invalidate downstream caches
         self._global_F = None
         self._global_meta = None
         self._bundle_map_cache.clear()
@@ -1306,11 +1252,10 @@ class Bundle:
 
         if show_summary:
             if self._bundle_map_summary is not None:
-                self._bundle_map_summary.show_summary(show=True, mode="auto", rounding=int(ROUNDING))
+                self._bundle_map_summary.show_summary(mode="auto", rounding=int(ROUNDING))
             else:
                 show_bundle_map_summary(
                     bm.report,
-                    show=True,
                     mode="auto",
                     rounding=int(ROUNDING),
                     extra_rows=None,

@@ -13,6 +13,7 @@ __all__ = [
     "sample_C2_torus",
     "torus_base_projection_from_data",
     "sample_foldy_klein_bottle",
+    "sample_foldy_klein_bottle_mixed",
 ]
 
 AngleFunc = Callable[[np.ndarray], np.ndarray]
@@ -284,5 +285,102 @@ def sample_foldy_klein_bottle(
     # Add ambient noise
     if noise > 0.0:
         X = X + rng.normal(scale=noise, size=X.shape)
+
+    return X, t
+
+
+
+
+
+import numpy as np
+from typing import Optional, Tuple
+
+# --- keep your existing folded_circle_r4, _rodrigues_3d, G_of_t ---
+
+
+def _random_orthogonal(D: int, rng: np.random.Generator, det_sign: int = +1) -> np.ndarray:
+    """
+    Haar-ish random orthogonal matrix via QR. Optionally force det = +1 (SO(D)).
+    """
+    A = rng.normal(size=(D, D))
+    Q, R = np.linalg.qr(A)
+    # make Q deterministic w.r.t QR sign convention
+    s = np.sign(np.diag(R))
+    s[s == 0] = 1.0
+    Q = Q @ np.diag(s)
+
+    if det_sign is not None:
+        if det_sign not in (+1, -1):
+            raise ValueError("det_sign must be +1, -1, or None.")
+        if np.linalg.det(Q) * det_sign < 0:
+            Q[:, 0] *= -1.0  # flip one column to change determinant
+    return Q
+
+
+def sample_foldy_klein_bottle_mixed(
+    n: int,
+    *,
+    amp_fiber: float = 1.0,
+    amp_base: Optional[float] = 1.0,
+    base_radius: float = 1.0,   # only used if amp_base is None (plain circle base)
+    noise: float = 0.05,
+    rigid_motion: bool = True,
+    translate_scale: float = 0.0,
+    det_sign: int = +1,
+    rng: Optional[np.random.Generator] = None,
+) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Like sample_foldy_klein_bottle, but optionally:
+      - embed the base circle nonlinearly in R^4 (using folded_circle_r4),
+      - then apply a global rigid motion in ambient space to intermix coordinates.
+
+    Returns
+    -------
+    X : (n, D) array
+        Ambient coordinates. D=6 if base is 2D circle; D=8 if base is 4D folded.
+    t : (n,) array
+        Base parameter (ground truth).
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+
+    # Base + fiber parameters
+    t = rng.uniform(0.0, 2.0 * np.pi, size=n)
+    theta = rng.uniform(0.0, 2.0 * np.pi, size=n)
+
+    # --- Base embedding ---
+    if amp_base is None:
+        # original base in R^2
+        base = np.column_stack([
+            base_radius * np.cos(t),
+            base_radius * np.sin(t),
+        ])
+    else:
+        # folded base in R^4 (same style as fiber)
+        # NOTE: base_radius can be absorbed by scaling; we keep it for convenience
+        base = base_radius * folded_circle_r4(t, amp=float(amp_base))  # (n,4)
+
+    # --- Fiber embedding (same as yours) ---
+    fib0 = folded_circle_r4(theta, amp=float(amp_fiber))  # (n,4)
+
+    fib = np.empty_like(fib0)
+    for i in range(n):
+        G = G_of_t(t[i])
+        fib[i] = G @ fib0[i]
+
+    # --- Combine ---
+    X = np.hstack([base, fib])  # (n, 2+4) or (n, 4+4)
+
+    # --- Global rigid motion (mix coordinates) ---
+    if rigid_motion:
+        D = X.shape[1]
+        Q = _random_orthogonal(D, rng=rng, det_sign=det_sign)  # det_sign=+1 => SO(D)
+        X = X @ Q  # right-multiply: mixes coordinate axes
+        if translate_scale and translate_scale != 0.0:
+            X = X + rng.normal(scale=float(translate_scale), size=(1, D))
+
+    # --- Ambient noise ---
+    if noise > 0.0:
+        X = X + rng.normal(scale=float(noise), size=X.shape)
 
     return X, t
