@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional, Tuple
 
+import io
 import socket
 import numpy as np
 
@@ -270,6 +271,64 @@ def _call_get_dist_mat(
     return np.asarray(_get_dist_mat(bp, metric=base_metric))
 
 
+def _fig_to_png_bytes(fig, *, scale: int = 1) -> bytes:
+    """
+    Convert a plotly figure to PNG bytes (requires kaleido).
+    - scale=1 is much faster than scale=2 for 3D.
+    """
+    try:
+        import plotly.io as pio
+        # Avoid any attempt to fetch mathjax in headless chrome (can stall on some setups)
+        pio.defaults.mathjax = None
+        return fig.to_image(format="png", engine="kaleido", scale=int(scale))
+    except Exception as e:
+        msg = str(e)
+        if "not compatible with this version of Kaleido" in msg or "compatible with this version of Kaleido" in msg:
+            raise RuntimeError(
+                "Plotly/Kaleido version mismatch.\n"
+                "Fix by either:\n"
+                "  pip install -U 'plotly>=6.1.1'   (recommended)\n"
+                "or\n"
+                "  pip install -U 'kaleido==0.2.1'  (for Plotly 5.x)\n"
+            ) from e
+        if "requires the kaleido package" in msg.lower():
+            raise RuntimeError("Static export requires kaleido. Install with `pip install -U kaleido`.") from e
+        raise
+
+
+def _combine_pngs_to_pdf_bytes(
+    png_left: bytes,
+    png_right: bytes,
+    *,
+    gap: int = 24,   # pixels between panels
+    pad: int = 0,    # outer padding
+) -> bytes:
+    """
+    Combine two PNGs side-by-side into ONE tight PDF (no extra whitespace).
+    Requires pillow: pip install pillow
+    """
+    try:
+        from PIL import Image
+    except ImportError as e:
+        raise ImportError("Combining snapshots requires pillow. Install with `pip install pillow`.") from e
+
+    L = Image.open(io.BytesIO(png_left)).convert("RGB")
+    R = Image.open(io.BytesIO(png_right)).convert("RGB")
+
+    W = L.width + int(gap) + R.width + 2 * int(pad)
+    H = max(L.height, R.height) + 2 * int(pad)
+    out = Image.new("RGB", (W, H), (255, 255, 255))
+
+    yL = int(pad) + (H - 2 * int(pad) - L.height) // 2
+    yR = int(pad) + (H - 2 * int(pad) - R.height) // 2
+    out.paste(L, (int(pad), yL))
+    out.paste(R, (int(pad) + L.width + int(gap), yR))
+
+    buf = io.BytesIO()
+    out.save(buf, format="PDF")  # tight to the composed image bounds
+    return buf.getvalue()
+
+
 # ----------------------------
 # Prep (pure)
 # ----------------------------
@@ -299,7 +358,7 @@ def prepare_bundle_viz_inputs(
 
     If full_dist_mat is provided and same_metric=True, we will:
       - use it directly if no downsampling happened
-      - otherwise subset it via dist_mat = full_dist_mat[sample_inds][:, sample_inds]
+      - otherwise subset it via dist_mat = full_dist_mat[np.ix_(sample_inds, sample_inds)]
     """
     base_points = np.asarray(base_points)
     data = np.asarray(data)
@@ -690,22 +749,39 @@ def _make_figures(
                     )
                 )
 
+    # Show the 3D axes box/grid/backdrop, but hide tick labels (numbers).
+    _axis_style = dict(
+        showbackground=True,
+        showgrid=True,
+        zeroline=False,
+        showticklabels=False,
+        title="",  # no axis label text
+    )
+    _scene_style = dict(
+        xaxis=_axis_style,
+        yaxis=_axis_style,
+        zaxis=_axis_style,
+    )
+
     fig_base.update_layout(
         title="Base Points",
-        scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
-        margin=dict(l=0, r=0, t=30, b=30),
+        scene=_scene_style,
+        margin=dict(l=0, r=0, t=30, b=0),
         showlegend=False,
-        uirevision="bundle-viewer",   # ✅ preserve camera
+        uirevision="bundle-viewer",  # preserve camera between updates
+        width=650,
+        height=450,
     )
     fig_data.update_layout(
         title="Fiber Data",
-        scene=dict(xaxis_title="X", yaxis_title="Y", zaxis_title="Z"),
-        margin=dict(l=0, r=0, t=30, b=30),
+        scene=_scene_style,
+        margin=dict(l=0, r=0, t=30, b=0),
         showlegend=False,
-        uirevision="bundle-viewer",   # ✅ preserve camera
+        uirevision="bundle-viewer",  # preserve camera between updates
+        width=650,
+        height=450,
     )
-    
-    
+
     return fig_base, fig_data, label, variance_text
 
 
@@ -727,11 +803,10 @@ def make_bundle_app(
     - Imports dash lazily (only when this is called).
     - Plotly/sklearn are also lazy via helper functions called here.
     """
-    # Local imports so importing this module doesn't require dash
     try:
         import dash
         from dash import dcc, html
-        from dash.dependencies import Input, Output
+        from dash.dependencies import Input, Output, State
     except ImportError as e:
         raise ImportError(
             "make_bundle_app requires dash. Install with `pip install dash`."
@@ -767,6 +842,20 @@ def make_bundle_app(
     app = dash.Dash(__name__)
 
     layout_children = [
+        # persistent selection + download
+        dcc.Store(id="selected-index-store", data=None),
+        dcc.Download(id="download-pdf"),
+        html.Div(
+            [
+                html.Button(
+                    "Save snapshot (PDF)",
+                    id="save-snapshot-btn",
+                    n_clicks=0,
+                    style={"fontSize": 14, "padding": "8px 14px"},
+                ),
+            ],
+            style={"textAlign": "center", "marginTop": "8px", "marginBottom": "8px"},
+        ),
         html.Div(
             [
                 html.Div(
@@ -775,10 +864,6 @@ def make_bundle_app(
                             id="base-plot",
                             style={"width": "100%", "height": "400px", "margin-bottom": "25px"},
                             config={"displayModeBar": True},
-                        ),
-                        html.Div(
-                            id="selected-point",
-                            style={"fontSize": 16, "marginTop": "10px", "textAlign": "center"},
                         ),
                     ],
                     style={"width": "50%", "display": "inline-block", "verticalAlign": "top"},
@@ -789,10 +874,6 @@ def make_bundle_app(
                             id="data-plot",
                             style={"width": "100%", "height": "400px", "margin-bottom": "25px"},
                             config={"displayModeBar": True},
-                        ),
-                        html.Div(
-                            id="pca-variance",
-                            style={"fontSize": 16, "marginTop": "10px", "textAlign": "center"},
                         ),
                     ],
                     style={"width": "50%", "display": "inline-block", "verticalAlign": "top"},
@@ -815,10 +896,6 @@ def make_bundle_app(
             ],
             style={"width": "80%", "margin": "auto", "margin-top": "20px"},
         ),
-        html.Div(
-            "Adjust the neighborhood radius (r):",
-            style={"fontSize": 16, "marginTop": "-10px", "textAlign": "center"},
-        ),
     ]
 
     if densities is not None:
@@ -837,10 +914,6 @@ def make_bundle_app(
                         tooltip={"placement": "bottom", "always_visible": True},
                         updatemode="drag",
                     ),
-                    html.Div(
-                        "Density threshold: show points with density > d",
-                        style={"fontSize": 16, "textAlign": "center"},
-                    ),
                 ],
                 style={"width": "80%", "margin": "auto", "margin-top": "20px"},
             )
@@ -848,40 +921,141 @@ def make_bundle_app(
 
     app.layout = html.Div(layout_children, style={"margin": "auto", "maxWidth": "95vw"})
 
-    callback_inputs = [Input("base-plot", "clickData"), Input("radius-slider", "value")]
-    if densities is not None:
-        callback_inputs.append(Input("density-slider", "value"))
-
+    # Persist selection
     @app.callback(
-        [Output("base-plot", "figure"), Output("data-plot", "figure"),
-         Output("selected-point", "children"), Output("pca-variance", "children")],
-        callback_inputs,
+        Output("selected-index-store", "data"),
+        Input("base-plot", "clickData"),
+        State("selected-index-store", "data"),
     )
-    def update_figures(clickData, r, density_threshold=None):
-        selected_index = _parse_click_index(clickData)
+    def _remember_selected_index(clickData, current):
+        idx = _parse_click_index(clickData)
+        return current if idx is None else int(idx)
 
-        fig_base, fig_data, label, variance_text = _make_figures(
-            base_embedded=base_embedded,
-            explained_variance=explained_variance,
-            base_landmark_masks=base_landmark_masks,
-            base_landmarks_embedded=base_landmarks_embedded,
-            data=data,
-            dist_mat=dist_mat,
-            colors=colors,
-            normalized_colors=normalized_colors,
-            densities=densities,
-            data_landmark_masks=data_landmark_masks,
-            selected_index=selected_index,
-            r=float(r),
-            density_threshold=None if density_threshold is None else float(density_threshold),
+    # Update figures (use stored selection)
+    if densities is not None:
+        @app.callback(
+            [Output("base-plot", "figure"), Output("data-plot", "figure")],
+            [Input("selected-index-store", "data"), Input("radius-slider", "value"), Input("density-slider", "value")],
         )
-        return fig_base, fig_data, label, variance_text
+        def update_figures(selected_index_store, r, density_threshold):
+            selected_index = int(selected_index_store) if selected_index_store is not None else None
+            fig_base, fig_data, _, _ = _make_figures(
+                base_embedded=base_embedded,
+                explained_variance=explained_variance,
+                base_landmark_masks=base_landmark_masks,
+                base_landmarks_embedded=base_landmarks_embedded,
+                data=data,
+                dist_mat=dist_mat,
+                colors=colors,
+                normalized_colors=normalized_colors,
+                densities=densities,
+                data_landmark_masks=data_landmark_masks,
+                selected_index=selected_index,
+                r=float(r),
+                density_threshold=None if density_threshold is None else float(density_threshold),
+            )
+            return fig_base, fig_data
+
+        # Download combined PDF snapshot (side-by-side)
+        @app.callback(
+            Output("download-pdf", "data"),
+            Input("save-snapshot-btn", "n_clicks"),
+            State("selected-index-store", "data"),
+            State("radius-slider", "value"),
+            State("density-slider", "value"),
+            prevent_initial_call=True,
+        )
+        def _download_snapshot_pdf(n_clicks, selected_index_store, r, density_threshold):
+            if selected_index_store is None:
+                return dash.no_update
+
+            selected_index = int(selected_index_store)
+            fig_base, fig_data, _, _ = _make_figures(
+                base_embedded=base_embedded,
+                explained_variance=explained_variance,
+                base_landmark_masks=base_landmark_masks,
+                base_landmarks_embedded=base_landmarks_embedded,
+                data=data,
+                dist_mat=dist_mat,
+                colors=colors,
+                normalized_colors=normalized_colors,
+                densities=densities,
+                data_landmark_masks=data_landmark_masks,
+                selected_index=selected_index,
+                r=float(r),
+                density_threshold=None if density_threshold is None else float(density_threshold),
+            )
+
+            png_left = _fig_to_png_bytes(fig_base, scale=1)
+            png_right = _fig_to_png_bytes(fig_data, scale=1)
+            pdf_bytes = _combine_pngs_to_pdf_bytes(png_left, png_right, gap=24, pad=0)
+
+            fname = f"bundle_snapshot_i{selected_index}_r{float(r):.3f}_d{float(density_threshold):.3f}.pdf"
+            return dcc.send_bytes(pdf_bytes, fname)
+
+    else:
+        @app.callback(
+            [Output("base-plot", "figure"), Output("data-plot", "figure")],
+            [Input("selected-index-store", "data"), Input("radius-slider", "value")],
+        )
+        def update_figures(selected_index_store, r):
+            selected_index = int(selected_index_store) if selected_index_store is not None else None
+            fig_base, fig_data, _, _ = _make_figures(
+                base_embedded=base_embedded,
+                explained_variance=explained_variance,
+                base_landmark_masks=base_landmark_masks,
+                base_landmarks_embedded=base_landmarks_embedded,
+                data=data,
+                dist_mat=dist_mat,
+                colors=colors,
+                normalized_colors=normalized_colors,
+                densities=None,
+                data_landmark_masks=data_landmark_masks,
+                selected_index=selected_index,
+                r=float(r),
+                density_threshold=None,
+            )
+            return fig_base, fig_data
+
+        @app.callback(
+            Output("download-pdf", "data"),
+            Input("save-snapshot-btn", "n_clicks"),
+            State("selected-index-store", "data"),
+            State("radius-slider", "value"),
+            prevent_initial_call=True,
+        )
+        def _download_snapshot_pdf(n_clicks, selected_index_store, r):
+            if selected_index_store is None:
+                return dash.no_update
+
+            selected_index = int(selected_index_store)
+            fig_base, fig_data, _, _ = _make_figures(
+                base_embedded=base_embedded,
+                explained_variance=explained_variance,
+                base_landmark_masks=base_landmark_masks,
+                base_landmarks_embedded=base_landmarks_embedded,
+                data=data,
+                dist_mat=dist_mat,
+                colors=colors,
+                normalized_colors=normalized_colors,
+                densities=None,
+                data_landmark_masks=data_landmark_masks,
+                selected_index=selected_index,
+                r=float(r),
+                density_threshold=None,
+            )
+
+            png_left = _fig_to_png_bytes(fig_base, scale=1)
+            png_right = _fig_to_png_bytes(fig_data, scale=1)
+            pdf_bytes = _combine_pngs_to_pdf_bytes(png_left, png_right, gap=24, pad=0)
+
+            fname = f"bundle_snapshot_i{selected_index}_r{float(r):.3f}.pdf"
+            return dcc.send_bytes(pdf_bytes, fname)
 
     return app
 
 
 def run_bundle_app(app, *, port: Optional[int] = None, debug: bool = False):
-    # local import (dash is optional until you run)
     if port is None:
         port = find_free_port()
     url = f"http://127.0.0.1:{int(port)}/"
@@ -918,8 +1092,16 @@ def show_bundle_vis(
     - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat/base_metric).
     - "Fiber Data" shows PCA of data restricted to the selected neighborhood.
 
-    This function only requires Dash/Plotly/sklearn if it is actually called.
+    Snapshots
+    ---------
+    The save button downloads a combined PDF (side-by-side) containing ONLY the two Plotly figures
+    (no sliders, no UI).
     """
+    try:
+        from dash import dcc  # noqa: F401
+    except Exception:
+        pass
+
     viz = prepare_bundle_viz_inputs(
         base_points=np.asarray(base_points),
         data=np.asarray(data),
@@ -963,7 +1145,7 @@ def save_bundle_snapshot(
           pip install -U kaleido
     """
     try:
-        import plotly.graph_objects as go  # noqa: F401  (for return type at runtime)
+        import plotly.graph_objects as go  # noqa: F401
     except ImportError as e:
         raise ImportError(
             "save_bundle_snapshot requires plotly. Install with `pip install plotly`."

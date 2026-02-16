@@ -86,13 +86,11 @@ _HAVE_PLOTLY_DASH = False
 try:
     from .bundle_dash import (
         show_bundle_vis,
-        save_bundle_snapshot,
     )
     _HAVE_PLOTLY_DASH = True
 except ImportError:
     # Optional dependency not installed
     show_bundle_vis = None  # type: ignore[assignment]
-    save_bundle_snapshot = None  # type: ignore[assignment]
 
 
 __all__ = [
@@ -133,5 +131,4 @@ __all__ = [
 if _HAVE_PLOTLY_DASH:
     __all__ += [
         "show_bundle_vis",
-        "save_bundle_snapshot",
     ]

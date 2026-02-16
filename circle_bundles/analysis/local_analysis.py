@@ -6,11 +6,9 @@ from typing import Sequence, Tuple, List
 import numpy as np
 
 __all__ = [
-    "get_local_pca",
-    "plot_local_pca",
     "get_local_rips",
     "plot_local_rips",
-    "local_pca",
+    "get_local_pca",
 ]
 
 
@@ -125,7 +123,7 @@ def get_dense_fiber_indices(
     return fiber_ids, idx_list
 
 
-def get_local_pca(
+def old_get_local_pca(
     data: np.ndarray,
     U: np.ndarray,
     p_values: np.ndarray | Sequence[float] | None = None,
@@ -461,7 +459,7 @@ def plot_local_rips(
     return fig, axes
 
 
-def local_pca(
+def get_local_pca(
     data: np.ndarray,
     U: np.ndarray,
     *,

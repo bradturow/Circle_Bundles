@@ -11,7 +11,7 @@ __all__ = ["fiber_vis"]
 
 def fiber_vis(
     data: np.ndarray,
-    vis_func: Callable,
+    vis_func: Optional[Callable] = None,
     *,
     vis_data: Optional[np.ndarray] = None,
     selected_indices: Optional[Sequence[int]] = None,
@@ -28,18 +28,21 @@ def fiber_vis(
     scatter_s: float = 10.0,
 ):
     """
-    Visualize up to `max_images` items from `data` by embedding them to 3D (PCA)
-    and overlaying thumbnails rendered by `vis_func`.
+    Visualize up to `max_images` items from `data` by embedding them to 3D (PCA).
+
+    - If `vis_func` is provided: overlay thumbnails rendered by `vis_func`.
+    - If `vis_func` is None: just show the embedded points.
 
     Parameters
     ----------
     data : (N, d) array
-    vis_func : callable(datum) -> (Figure | ndarray image)
+    vis_func : optional callable(datum) -> (Figure | ndarray image)
         Something render_to_rgba can handle after vis_func returns.
+        If None, no thumbnails are rendered; points only.
     vis_data : optional data source for vis_func (same length N)
         If provided, thumbnails are rendered from vis_data[idx] while embedding uses data[idx].
     selected_indices : optional explicit indices to visualize
-    max_images : cap on number of thumbnails
+    max_images : cap on number of items/points shown (and thumbnails if vis_func given)
     random_state : RNG seed used when selected_indices is None
 
     Subplot usage
@@ -62,7 +65,9 @@ def fiber_vis(
     if vis_data is not None:
         vis_data = np.asarray(vis_data)
         if vis_data.shape[0] != N:
-            raise ValueError(f"vis_data must have same length as data. Got {vis_data.shape[0]} vs {N}.")
+            raise ValueError(
+                f"vis_data must have same length as data. Got {vis_data.shape[0]} vs {N}."
+            )
 
     max_images = int(max_images)
     if max_images <= 0:
@@ -72,7 +77,9 @@ def fiber_vis(
     if selected_indices is None:
         rng = np.random.default_rng(random_state)
         k = min(max_images, N)
-        selected_indices = np.sort(rng.choice(np.arange(N, dtype=int), size=k, replace=False)).tolist()
+        selected_indices = np.sort(
+            rng.choice(np.arange(N, dtype=int), size=k, replace=False)
+        ).tolist()
     else:
         selected_indices = [int(i) for i in selected_indices][: min(max_images, len(selected_indices))]
         selected_indices = [i for i in selected_indices if 0 <= i < N]
@@ -112,7 +119,7 @@ def fiber_vis(
     if clear_ax:
         ax.cla()
 
-    # light scatter so the space is visible (but not noisy)
+    # ---- always show points ----
     ax.scatter(
         embedded[:, 0],
         embedded[:, 1],
@@ -121,29 +128,31 @@ def fiber_vis(
         s=float(scatter_s),
     )
 
-    # Ensure transforms/projection are ready
-    fig.canvas.draw()
+    # If no vis_func supplied, we're done (aside from aesthetics/save/show)
+    if vis_func is not None:
+        # Ensure transforms/projection are ready
+        fig.canvas.draw()
 
-    # ---- overlays ----
-    for i, (x, y, z) in enumerate(embedded):
-        idx = int(selected_indices[i])
-        try:
-            datum = vis_data[idx] if vis_data is not None else selected_data[i]
-            rendered = vis_func(datum)
-            img = render_to_rgba(rendered, transparent_border=True, trim=True)
+        # ---- overlays ----
+        for i, (x, y, z) in enumerate(embedded):
+            idx = int(selected_indices[i])
+            try:
+                datum = vis_data[idx] if vis_data is not None else selected_data[i]
+                rendered = vis_func(datum)
+                img = render_to_rgba(rendered, transparent_border=True, trim=True)
 
-            x2, y2, _ = proj_transform(float(x), float(y), float(z), ax.get_proj())
-            ab = AnnotationBbox(
-                OffsetImage(img, zoom=float(zoom)),
-                (x2, y2),
-                xycoords="data",
-                frameon=False,
-            )
-            ax.add_artist(ab)
-        except Exception as e:
-            print(f"Error rendering image at index {idx}: {type(e).__name__}: {e}")
+                x2, y2, _ = proj_transform(float(x), float(y), float(z), ax.get_proj())
+                ab = AnnotationBbox(
+                    OffsetImage(img, zoom=float(zoom)),
+                    (x2, y2),
+                    xycoords="data",
+                    frameon=False,
+                )
+                ax.add_artist(ab)
+            except Exception as e:
+                print(f"Error rendering image at index {idx}: {type(e).__name__}: {e}")
 
-    # Aesthetics
+    # ---- aesthetics ----
     ax.grid(True)
     try:
         ax.set_box_aspect([1, 1, 1])

@@ -79,7 +79,6 @@ from .analysis.fiberwise_clustering import (
 
 from .analysis.local_analysis import (
     get_local_pca,
-    plot_local_pca,
     get_local_rips,
     plot_local_rips,
 )
@@ -153,7 +152,6 @@ __all__ = [
     "plot_fiberwise_pca_grid",
     "plot_fiberwise_summary_bars",
     "get_local_pca",
-    "plot_local_pca",
     "get_local_rips",
     "plot_local_rips",
     "get_cocycle_dict",

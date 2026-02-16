@@ -271,7 +271,7 @@ class Bundle:
         self._bundle_map_summary: Optional[BundleMapSummary] = None
 
         if show_summary:
-            self.summary(show=True)
+            self.summary()
 
     # ----------------------------
     # requirement helpers (NO auto-running)

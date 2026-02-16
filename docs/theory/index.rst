@@ -7,7 +7,8 @@ circle bundles.
 
 This page provides a brief overview of the underlying theory and the algorithms
 implemented in the package. For a complete theoretical development and proofs,
-see the accompanying paper [1].
+see the accompanying paper :cite:`TurowPerea2025DiscreteApproximateCircleBundles`.
+
 
 Introduction
 ------------
@@ -43,10 +44,10 @@ it is often possible to choose :math:`d` such that :math:`2d \ll D`. This
 perspective underlies the topology-respecting dimensionality reduction methods
 implemented in ``circle_bundles``.
 
-In [1], the authors introduce the notion of a *discrete approximate circle
-bundle*, together with algorithms for estimating characteristic classes and for
-constructing global coordinate systems that respect the inferred topology. The
-``circle_bundles`` package implements several of these algorithms.
+In :cite:`TurowPerea2025DiscreteApproximateCircleBundles`, the authors introduce
+the notion of a *discrete approximate circle bundle*, together with algorithms
+for estimating characteristic classes and for constructing global coordinate
+systems that respect the inferred topology. The ``circle_bundles`` package implements several of these algorithms.
 
 Algorithms
 ----------
@@ -209,7 +210,5 @@ Algorithm 3: Pullback Bundle Coordinates
 References
 ----------
 
-.. [1]  
-   *Discrete Approximate Circle Bundles*.  
-   arXiv:2508.12914 [math.AT], 2025.  
-   https://doi.org/10.48550/arXiv.2508.12914
+.. bibliography::
+   :style: alpha

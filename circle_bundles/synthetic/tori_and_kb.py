@@ -11,12 +11,12 @@ __all__ = [
     "small_to_big",
     "wrap_angle",
     "sample_C2_torus",
-    "torus_base_projection_from_data",
     "sample_foldy_klein_bottle",
-    "sample_foldy_klein_bottle_mixed",
+    "sample_R3_torus",
 ]
 
 AngleFunc = Callable[[np.ndarray], np.ndarray]
+
 
 
 def const(value: float) -> AngleFunc:
@@ -150,18 +150,121 @@ def sample_C2_torus(
     return data, base_points, alpha
 
 
-def torus_base_projection_from_data(data: np.ndarray, *, eps: float = 1e-12) -> np.ndarray:
+
+def sample_R3_torus(
+    n_points: int,
+    *,
+    # Major radius (constant)
+    R: float = 2.0,
+    # Minor radius r(theta) = center + amplitude * sin(frequency * theta + phase)
+    r_center: float = 0.8,
+    r_amplitude: float = 0.3,
+    r_frequency: int = 2,
+    r_phase: float = 0.0,
+    # Relative noise on minor radius: r_noisy = r * (1 + sigma * N(0,1))
+    sigma: float = 0.0,
+    rng: Optional[np.random.Generator] = None,
+    require_ring_torus: bool = True,
+    # Returns
+    return_theta: bool = False,
+    return_alpha: bool = False,
+) -> Union[
+    Tuple[np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+]:
     """
-    Recover base points (cos theta, sin theta) from data in R^4 by normalizing (x3,x4).
-    This works even if R(theta) varies (as long as it's positive).
+    Sample a torus-of-revolution in R^3 where the tube (fiber) radius varies sinusoidally with base angle theta.
+
+    Parameterization:
+        r(theta) = r_center + r_amplitude * sin(r_frequency * theta + r_phase)
+
+        x = (R + r(theta) cos(alpha)) cos(theta)
+        y = (R + r(theta) cos(alpha)) sin(theta)
+        z = r(theta) sin(alpha)
+
+    Returns
+    -------
+    data : (n_points, 3)
+    base_points : (n_points, 2) = (cos(theta), sin(theta))
+    alpha : (n_points,)       fiber angle
+    theta : (n_points,)       base angle (optional)
+    r_vals : (n_points,)      realized tube radius after noise (only returned when
+                              return_theta and return_alpha are both True)
     """
-    data = np.asarray(data, dtype=float)
-    if data.ndim != 2 or data.shape[1] != 4:
-        raise ValueError(f"Expected data shape (n,4). Got {data.shape}.")
-    z2 = data[:, 2:4]
-    nrm = np.linalg.norm(z2, axis=1, keepdims=True)
-    nrm = np.maximum(nrm, eps)
-    return z2 / nrm
+    n_points = int(n_points)
+    if n_points <= 0:
+        raise ValueError(f"n_points must be positive. Got {n_points}.")
+
+    rng = np.random.default_rng() if rng is None else rng
+
+    R = float(R)
+    r_center = float(r_center)
+    r_amplitude = float(r_amplitude)
+    r_phase = float(r_phase)
+    r_frequency = int(r_frequency)
+
+    if R <= 0.0:
+        raise ValueError(f"R must be > 0. Got {R}.")
+    if r_frequency < 0:
+        raise ValueError(f"r_frequency must be >= 0. Got {r_frequency}.")
+    if r_center <= 0.0:
+        raise ValueError(f"r_center must be > 0. Got {r_center}.")
+    if r_amplitude < 0.0:
+        raise ValueError(f"r_amplitude must be >= 0. Got {r_amplitude}.")
+
+    angles = 2.0 * np.pi * rng.random((n_points, 2))
+    alpha = angles[:, 0]
+    theta = angles[:, 1]
+
+    # sinusoidal tube radius
+    r_vals = r_center + r_amplitude * np.sin(r_frequency * theta + r_phase)
+
+    if np.any(r_vals <= 0.0):
+        rmin = float(np.min(r_vals))
+        raise ValueError(
+            "Sinusoidal r(theta) became non-positive. "
+            f"Minimum value was {rmin:.6g}. "
+            "Increase r_center or decrease r_amplitude."
+        )
+
+    if sigma != 0.0:
+        r_vals = r_vals * (1.0 + float(sigma) * rng.normal(size=n_points))
+        r_vals = np.maximum(r_vals, 1e-12)
+
+    if require_ring_torus:
+        # pointwise ring torus condition (prevents axis-crossing)
+        if np.any(R <= r_vals):
+            bad = np.where(R <= r_vals)[0]
+            i0 = int(bad[0])
+            raise ValueError(
+                "require_ring_torus=True but found theta where R <= r(theta). "
+                f"Example index {i0}: R={R:.6g}, r={r_vals[i0]:.6g}. "
+                "Increase R, decrease r_center/r_amplitude, or set require_ring_torus=False."
+            )
+
+    ca = np.cos(alpha)
+    sa = np.sin(alpha)
+    ct = np.cos(theta)
+    st = np.sin(theta)
+
+    radial = R + r_vals * ca
+    data = np.empty((n_points, 3), dtype=float)
+    data[:, 0] = radial * ct
+    data[:, 1] = radial * st
+    data[:, 2] = r_vals * sa
+
+    base_points = np.column_stack([ct, st])
+
+    if return_theta and return_alpha:
+        return data, base_points, alpha, theta, r_vals
+    if return_theta:
+        return data, base_points, alpha, theta
+    if return_alpha:
+        return data, base_points, alpha
+    return data, base_points, alpha
+
+
 
 
 
@@ -222,78 +325,8 @@ def G_of_t(t: float) -> np.ndarray:
             G[ii, jj] = R3[i, j]
     return G
 
-# ------------------------------------------------------------
-# Klein bottle dataset (mapping torus of an orientation-reversing involution)
-# ------------------------------------------------------------
-
-def sample_foldy_klein_bottle(
-    n: int,
-    *,
-    amp: float = 1,
-    base_radius: float = 1,
-    noise: float = 0.05,
-    rng: Optional[np.random.Generator] = None,
-) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Samples an embedded Klein bottle-like total space in R^2 x R^4 = R^6.
-
-    Parameters
-    ----------
-    n : int
-        Number of samples.
-    amp : float
-        Amplitude of the folded-circle oscillation.
-    base_radius : float
-        Radius of the embedded base circle.
-    noise : float
-        Standard deviation of i.i.d. Gaussian noise added to ambient coordinates.
-        (noise=0 gives noiseless data)
-    rng : np.random.Generator, optional
-        Random number generator.
-
-    Returns
-    -------
-    X : (n,6) ndarray
-        Ambient coordinates.
-    t : (n,) ndarray
-        Base parameter (ground truth).
-    """
-    if rng is None:
-        rng = np.random.default_rng()
-
-    # Base + fiber parameters
-    t = rng.uniform(0.0, 2.0 * np.pi, size=n)
-    theta = rng.uniform(0.0, 2.0 * np.pi, size=n)
-
-    # Base embedding
-    base = np.column_stack([
-        base_radius * np.cos(t),
-        base_radius * np.sin(t),
-    ])
-
-    # Fiber embedding
-    fib0 = folded_circle_r4(theta, amp=amp)
-
-    fib = np.empty_like(fib0)
-    for i in range(n):
-        G = G_of_t(t[i])
-        fib[i] = G @ fib0[i]
-
-    # Combine
-    X = np.hstack([base, fib])
-
-    # Add ambient noise
-    if noise > 0.0:
-        X = X + rng.normal(scale=noise, size=X.shape)
-
-    return X, t
 
 
-
-
-
-import numpy as np
-from typing import Optional, Tuple
 
 # --- keep your existing folded_circle_r4, _rodrigues_3d, G_of_t ---
 
@@ -317,7 +350,7 @@ def _random_orthogonal(D: int, rng: np.random.Generator, det_sign: int = +1) -> 
     return Q
 
 
-def sample_foldy_klein_bottle_mixed(
+def sample_foldy_klein_bottle(
     n: int,
     *,
     amp_fiber: float = 1.0,
