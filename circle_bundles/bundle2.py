@@ -1694,42 +1694,6 @@ class Bundle:
         When the nerve is a cycle, vertices and annotations are reindexed to follow
         the cyclic order for a clean, readable layout.
         """
-        self,
-        *,
-        use_max_trivial: bool = True,
-        weights: str = "rms",
-        omega: Optional[Dict[Tuple[int, int], int]] = None,
-        phi: Optional[Dict[int, int]] = None,
-        compute_phi: bool = True,
-        fail_if_not_cycle: bool = True,
-        title: Optional[str] = None,
-        save_path: Optional[str] = None,
-        ax=None,
-        figsize: tuple[float, float] = (5.0, 5.0),
-        dpi: Optional[int] = None,
-        r: float = 1.0,
-        node_size: float = 600,
-        node_facecolor: str = "lightblue",
-        node_edgecolor: str = "k",
-        node_label_color: str = "k",
-        removed_edge_color: str = "lightgray",
-        removed_edge_lw: float = 1.5,
-        kept_edge_color: str = "black",
-        kept_edge_lw: float = 4.0,
-        omega_color: str = "blue",
-        phi_color: str = "red",
-        weights_color: str = "black",
-        fontsize_node: int = 12,
-        fontsize_omega: int = 12,
-        fontsize_phi: int = 12,
-        fontsize_weights: int = 9,
-        omega_offset: float = 0.09,
-        weights_offset: float = 0.09,
-        phi_offset: float = 0.14,
-    ):
-        """
-        Visualize a single-cycle nerve in a canonical circle layout (matplotlib).
-        """
         from .viz.nerve_circle import (
             show_circle_nerve as _show_circle_nerve,
             is_single_cycle_graph,

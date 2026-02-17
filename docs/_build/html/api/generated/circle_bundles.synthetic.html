@@ -79,26 +79,41 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../core.html">Core pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../core.html#typical-workflow">Typical workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../core.html#reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core.html#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../results.html">Result objects and dataclasses</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../results.html#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../results.html#lower-level-result-containers">Lower-level result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../results.html#configuration-objects">Configuration objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results.html#configuration-objects">Configuration Objects</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../covers.html">Covers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../covers.html#reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../metrics.html">Metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../metrics.html#reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../utilities_analysis.html">Analysis utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -124,14 +139,14 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_optical_flow_torus.html">Extended Torus Model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>

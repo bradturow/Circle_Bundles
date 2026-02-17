@@ -29,5 +29,5 @@ Minimal Working Example
 
    bundle = cb.Bundle(X=s3_data, U=s2_cover.U)
    triv_result = bundle.get_local_trivs(verbose = False)
-   class_result = bundle.get_classes(show_classes=True)
+   class_result = bundle.get_classes()
    print(class_result.summary_text)

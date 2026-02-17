@@ -25,7 +25,7 @@
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Star Pyramid Meshes" href="04_triangle_meshes.html" />
+    <link rel="next" title="Sintel Optical Flow Dataset" href="04_optical_flow_torus.html" />
     <link rel="prev" title="Folded Klein Bottle" href="02_foldy_klein_bottle.html" /> 
 </head>
 
@@ -81,26 +81,41 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/core.html">Core pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#typical-workflow">Typical workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result objects and dataclasses</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#core-result-containers">Core result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-result-containers">Lower-level result containers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#configuration-objects">Configuration objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#configuration-objects">Configuration Objects</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/covers.html#reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/metrics.html#reference">Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_analysis.html">Analysis utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -126,14 +141,14 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">All Tutorials</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="01_optical_flow_torus.html">Extended Torus Model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Torus With Varying Fiber Radius</a></li>
-<li class="toctree-l3"><a class="reference internal" href="01_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
 <li class="toctree-l3"><a class="reference internal" href="02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Synthetic Natural Image Patches</a></li>
-<li class="toctree-l3"><a class="reference internal" href="04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="05_tri_prism_densities.html">Triangle Prism Densities</a></li>
-<li class="toctree-l3"><a class="reference internal" href="06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#all-tutorials">All Tutorials</a></li>
@@ -176,9 +191,7 @@
 <p>An example application of the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to a synthetic dataset of
 high-contrast <span class="math notranslate nohighlight">\(n \times n\)</span> optical image patches sampled from a known model with
 the topology of a Klein bottle embedded in <span class="math notranslate nohighlight">\(\mathbb{R}^{n^2}\)</span>
-(see <span id="id1">[<a class="reference internal" href="#id5" title="Gunnar Carlsson, Tigran Ishkhanov, Vin de Silva, and Afra Zomorodian. On the local behavior of spaces of natural images. International Journal of Computer Vision, 76(1):1–12, 2008. URL: https://link.springer.com/article/10.1007/s11263-007-0056-x, doi:10.1007/s11263-007-0056-x.">CIdSZ08</a>]</span> for details).
-DREiMac’s circular coordinates algorithm <span id="id2">[<a class="reference internal" href="#id6" title="Jose A. Perea, Luis Scoccola, and Christopher J. Tralie. Dreimac: dimensionality reduction with eilenberg–maclane coordinates. Journal of Open Source Software, 8(91):5791, 2023. URL: https://doi.org/10.21105/joss.05791, doi:10.21105/joss.05791.">PST23</a>]</span>
-is used to produce a projection map to <span class="math notranslate nohighlight">\(\mathbb{S}^1\)</span>.</p>
+(see <span id="id1">[<a class="reference internal" href="../../../references.html#id3" title="Gunnar Carlsson, Tigran Ishkhanov, Vin de Silva, and Afra Zomorodian. On the local behavior of spaces of natural images. International Journal of Computer Vision, 76(1):1–12, 2008. URL: https://link.springer.com/article/10.1007/s11263-007-0056-x, doi:10.1007/s11263-007-0056-x.">CIdSZ08</a>]</span> for details).</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -232,8 +245,7 @@ is used to produce a projection map to <span class="math notranslate nohighlight
 <img alt="../../../_images/dab87e51c6be818e656b2e210c5478d99795ad24e1264dc38f43494cd2228ffd.png" src="../../../_images/dab87e51c6be818e656b2e210c5478d99795ad24e1264dc38f43494cd2228ffd.png" />
 </div>
 </div>
-<p>Recall that for a Klein bottle <span class="math notranslate nohighlight">\(K\)</span>, one has <span class="math notranslate nohighlight">\(H^{1}(K;\mathbb{Z})\cong \mathbb{Z}\oplus\mathbb{Z}_{2}\)</span> and <span class="math notranslate nohighlight">\(H^{2}(K;\mathbb{Z})=0\)</span>.</p>
-<p>Compute persistence diagrams over <span class="math notranslate nohighlight">\(\mathbb{Z}_{2}\)</span> and <span class="math notranslate nohighlight">\(\mathbb{Z}_{3}\)</span> for a sample of the dataset:</p>
+<p>Recall that for a Klein bottle <span class="math notranslate nohighlight">\(K\)</span>, one has <span class="math notranslate nohighlight">\(H^{1}(K;\mathbb{Z})\cong \mathbb{Z}\oplus\mathbb{Z}_{2}\)</span> and <span class="math notranslate nohighlight">\(H^{2}(K;\mathbb{Z})=0\)</span>. Compute persistence diagrams over <span class="math notranslate nohighlight">\(\mathbb{Z}_{2}\)</span> and <span class="math notranslate nohighlight">\(\mathbb{Z}_{3}\)</span> for a sample of the dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dgms_2</span> <span class="o">=</span> <span class="n">ripser</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxdim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_perm</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="s2">&quot;dgms&quot;</span><span class="p">]</span>
@@ -253,7 +265,7 @@ is used to produce a projection map to <span class="math notranslate nohighlight
 <img alt="../../../_images/14fa7d2230625c47ec036dca09a7f0776f656216c475cbf5539b0dbb711ae4ca.png" src="../../../_images/14fa7d2230625c47ec036dca09a7f0776f656216c475cbf5539b0dbb711ae4ca.png" />
 </div>
 </div>
-<p>As expected, the <span class="math notranslate nohighlight">\(\mathbb{Z}_{2}\)</span> diagram shows two 1-dimensional persistent classes and one 2-dimensional persistent class, but the <span class="math notranslate nohighlight">\(\mathbb{Z}_{3}\)</span> diagram shows a single 1-dimensional persistent classes and no 2-dimensional persistent classes.</p>
+<p>As expected, the <span class="math notranslate nohighlight">\(\mathbb{Z}_{2}\)</span> diagram shows two 1-dimensional persistent classes and one 2-dimensional persistent class, but the <span class="math notranslate nohighlight">\(\mathbb{Z}_{3}\)</span> diagram shows a single 1-dimensional persistent class and no 2-dimensional persistent classes.</p>
 <p>Use the DREiMac circular coordinates algorithm to construct a map to <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span> which captures the circular topological feature represented by the 1-dimensional <span class="math notranslate nohighlight">\(\mathbb{Z}_{3}\)</span> persistent class:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -385,29 +397,6 @@ is used to produce a projection map to <span class="math notranslate nohighlight
 </div>
 </div>
 <p>Notice the abrupt reflection in the coordinates between columns 4 and 5 in the diagram above. Everywhere else, the coordinate system varies continuously, and the edges of the diagram roughly coincide.</p>
-<section id="references">
-<h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
-<div class="docutils container" id="id3">
-<div role="list" class="citation-list">
-<div class="citation" id="id8" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>BWSB12<span class="fn-bracket">]</span></span>
-<p>D. J. Butler, J. Wulff, G. B. Stanley, and M. J. Black. A naturalistic open source movie for optical flow evaluation. In <em>European Conference on Computer Vision (ECCV), Part IV, LNCS 7577</em>, 611–625. Springer-Verlag, 2012. URL: <a class="reference external" href="https://link.springer.com/chapter/10.1007/978-3-642-33783-3_44">https://link.springer.com/chapter/10.1007/978-3-642-33783-3_44</a>, <a class="reference external" href="https://doi.org/10.1007/978-3-642-33783-3_44">doi:10.1007/978-3-642-33783-3_44</a>.</p>
-</div>
-<div class="citation" id="id5" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">CIdSZ08</a><span class="fn-bracket">]</span></span>
-<p>Gunnar Carlsson, Tigran Ishkhanov, Vin de Silva, and Afra Zomorodian. On the local behavior of spaces of natural images. <em>International Journal of Computer Vision</em>, 76(1):1–12, 2008. URL: <a class="reference external" href="https://link.springer.com/article/10.1007/s11263-007-0056-x">https://link.springer.com/article/10.1007/s11263-007-0056-x</a>, <a class="reference external" href="https://doi.org/10.1007/s11263-007-0056-x">doi:10.1007/s11263-007-0056-x</a>.</p>
-</div>
-<div class="citation" id="id6" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">PST23</a><span class="fn-bracket">]</span></span>
-<p>Jose A. Perea, Luis Scoccola, and Christopher J. Tralie. Dreimac: dimensionality reduction with eilenberg–maclane coordinates. <em>Journal of Open Source Software</em>, 8(91):5791, 2023. URL: <a class="reference external" href="https://doi.org/10.21105/joss.05791">https://doi.org/10.21105/joss.05791</a>, <a class="reference external" href="https://doi.org/10.21105/joss.05791">doi:10.21105/joss.05791</a>.</p>
-</div>
-<div class="citation" id="id4" role="doc-biblioentry">
-<span class="label"><span class="fn-bracket">[</span>TP25<span class="fn-bracket">]</span></span>
-<p>Brad Turow and Jose A. Perea. Discrete approximate circle bundles. <em>arXiv preprint arXiv:2508.12914</em>, 2025. arXiv:2508.12914. URL: <a class="reference external" href="https://arxiv.org/abs/2508.12914">https://arxiv.org/abs/2508.12914</a>.</p>
-</div>
-</div>
-</div>
-</section>
 </section>
 
 
@@ -415,7 +404,7 @@ is used to produce a projection map to <span class="math notranslate nohighlight
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="02_foldy_klein_bottle.html" class="btn btn-neutral float-left" title="Folded Klein Bottle" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="04_triangle_meshes.html" class="btn btn-neutral float-right" title="Star Pyramid Meshes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="04_optical_flow_torus.html" class="btn btn-neutral float-right" title="Sintel Optical Flow Dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
