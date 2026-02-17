@@ -1,28 +1,19 @@
 Installation
 ============
 
-circle_bundles requires Python 3.9 or newer.
+``circle_bundles`` requires Python 3.9 or newer.
 
 Basic installation
 ------------------
 
-The recommended way to install is via pip:
+Install the package directly from GitHub using ``pip``:
 
 .. code-block:: bash
 
-   pip install circle_bundles
+   pip install git+https://github.com/bradturow/Circle_Bundles.git
 
+Then import the package in Python as:
 
-Optional dependencies
----------------------
+.. code-block:: python
 
-Some features (visualization, optical flow, persistence) rely on optional
-packages such as:
-
-- matplotlib
-- plotly
-- gudhi
-- ripser
-- dreimac
-
-These can be installed manually as needed.
+   import circle_bundles

@@ -1,25 +1,34 @@
 # circle_bundles
 
-`circle_bundles` is a Python package providing computational tools for constructing and analyzing
-**discrete approximate circle bundles** from data. The package implements an end-to-end pipeline
-for detecting circle-bundle structure in point clouds, computing local trivializations and
-transition functions, and extracting global topological invariants such as orientability and
-Euler-type characteristic classes.
+`circle_bundles` is a Python package providing computational tools for constructing and analyzing  
+**discrete approximate circle bundles** in data.
 
-The software accompanies the methods introduced in *Discrete Approximate Circle Bundles* (Turow and Perea) and
-supports both synthetic and real-world datasets, including applications to optical flow patch
-spaces.
+The package implements an end-to-end pipeline for detecting circle-bundle structure in point
+clouds, computing local trivializations and transition functions, and extracting global
+topological invariants such as orientability and Euler-type characteristic classes.
+
+This software accompanies the methods introduced in *Discrete Approximate Circle Bundles*
+(Turow & Perea) and supports both synthetic and real-world datasets, including applications
+to optical flow patch spaces.
+
+---
+
+## Documentation
+
+Full documentation, including tutorials and worked examples, is available at:
+
+**https://circle-bundles.readthedocs.io**
 
 ---
 
 ## Installation
 
-Clone the repository and install the package in editable mode:
+`circle_bundles` requires Python 3.9 or newer.
+
+Install directly from GitHub using `pip`:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/circle_bundles.git
-cd circle_bundles
-pip install -e .
+pip install git+https://github.com/bradturow/Circle_Bundles.git
 ```
 
 After installation, you should be able to import the package from Python:
@@ -32,56 +41,62 @@ import circle_bundles
 
 ## Quick example
 
-The following example constructs a discrete approximate circle bundle from synthetic data
-exhibiting circle-bundle structure (a torus-based example), builds a cover of the base space,
-and checks whether the resulting bundle is orientable.
+A minimal end-to-end example using a classical circle bundle: the Hopf fibration  
+\( S^3 \to S^2 \). The Hopf fibration is a non-trivial orientable circle bundle with Euler
+number \( \pm 1 \).
 
 ```python
 import numpy as np
+import circle_bundles as cb
 
-from circle_bundles.api import build_bundle
-from circle_bundles.synthetic.tori_and_kb import sample_C2_torus
-from circle_bundles.base_covers import MetricBallCover
-
-# Sample synthetic data exhibiting circle-bundle structure (torus example)
+# Sample points on S^3
+n_samples = 3000
 rng = np.random.default_rng(0)
-data, base_points, _ = sample_C2_torus(n_points=2000, rng=rng)
+s3_data = cb.sample_sphere(n_samples, dim=3, rng=rng)
 
-# Build a metric-ball cover of the base using evenly spaced landmarks
-n_landmarks = 12
-angs = np.linspace(0.0, 2.0 * np.pi, n_landmarks, endpoint=False)
-landmarks = np.column_stack([np.cos(angs), np.sin(angs)])
-radius = 1.4 * np.pi / n_landmarks
+# Hopf projection S^3 -> S^2
+base_points = cb.hopf_projection(s3_data)
 
-cover = MetricBallCover(base_points, landmarks, radius)
+# Build an open cover of S^2
+n_landmarks = 60
+s2_cover = cb.get_s2_fibonacci_cover(
+    base_points,
+    n_vertices=n_landmarks,
+)
 
-# Construct the discrete approximate circle bundle (quiet, README-safe)
-bundle = build_bundle(data, cover, show=False, verbose=False)
+bundle = cb.Bundle(X=s3_data, U=s2_cover.U)
+bundle.get_local_trivs(verbose=False)
+class_result = bundle.get_classes()
 
-# Check triviality via orientability
-print("Bundle orientable:", bundle.classes.orientable)
+print(class_result.summary_text)
 ```
 
 ---
 
-## Notebooks
+## Tutorials
+
+Tutorials and example workflows are provided as part of the documentation and rendered
+via Read the Docs.
+
+The source notebooks live in:
 
 - `notebooks/tutorials/`  
-  Minimal tutorial demonstrating the core pipeline.
+  Core tutorials demonstrating the main analysis pipeline and example datasets.
 
-- `notebooks/demos/` 
-  Application-oriented and advanced demonstrations (not required for software review).
-
-- `notebooks/paper_circle_bundles/` and `notebooks/paper_optical_flow/`  
-  Notebooks reproducing figures and experiments from the accompanying papers.
-
+For narrative explanations and rendered outputs, see the documentation site.
 
 ---
 
 ## Citation
 
-If you use this software in academic work, please cite it using the metadata provided in
-`CITATION.cff`.
+If you use this software in academic work, please cite:
+
+Brad Turow and José A. Perea.  
+**circle_bundles: Discrete Approximate Circle Bundles for Data Analysis** (version 0.1.0), 2026.  
+Northeastern University.  
+Available at: https://github.com/bradturow/circle_bundles
+
+A `CITATION.cff` file is also provided for convenience.
 
 ---
 
