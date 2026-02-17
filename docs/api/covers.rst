@@ -1,11 +1,8 @@
 Covers
 ======
 
-Covers provide chart membership data (and optionally partitions of unity and
-landmarks) used by :class:`circle_bundles.Bundle`.
-
-Reference
----------
+Covers provide chart membership data and optionally partitions of unity (and
+landmarks for visualization) used by :class:`circle_bundles.Bundle`.
 
 .. autosummary::
    :toctree: generated

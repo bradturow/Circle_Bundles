@@ -12,7 +12,7 @@ from .o2_cocycle import O2Cocycle, estimate_transitions
 from .trivializations.local_triv import LocalTrivResult, compute_local_triv
 from .analysis.quality import BundleQualityReport, compute_bundle_quality_from_U
 
-# Summaries (polished + uniform)
+# Summaries
 from .summaries.nerve_summary import summarize_nerve_from_U, NerveSummary
 from .summaries.local_triv_summary import summarize_local_trivs
 from .summaries.class_summary import summarize_classes_and_persistence
@@ -30,7 +30,7 @@ from .characteristic_class import (
     compute_class_data_on_complex,
 )
 
-# global trivialization (Singer only) + orientation gauge helper
+# global trivialization 
 from .trivializations.global_trivialization import (
     build_global_trivialization_singer,
     apply_orientation_gauge_to_f,
@@ -468,23 +468,6 @@ class Bundle:
         show_persistence: bool = True,
         show_rounding_distance: bool = False,
     ):
-        """
-        Summarize class reps + restricted class data + persistence.
-
-        Parameters
-        ----------
-        show_classes:
-            Whether to display the characteristic class block.
-        show_persistence:
-            Whether to display the persistence/cutoff block.
-        show_rounding_distance:
-            Whether to display the Euler rounding distance (when available).
-
-        Returns
-        -------
-        ClassSummary or None
-            The summary object, or None if class results are not available.
-        """
         if (
             self._class_reps is None
             or self._class_persistence is None
@@ -723,7 +706,6 @@ class Bundle:
     # ----------------------------
     # classes + persistence
     # ----------------------------
-
     def get_classes(
         self,
         *,
@@ -734,9 +716,62 @@ class Bundle:
         show_rounding_distance: bool = False,
     ) -> ClassesAndPersistence:
         """
-        Compute characteristic-class representatives and persistence with respect to the weights filtration.
+        Compute characteristic-class representatives and their persistence.
+    
+        This method computes discrete representatives of the characteristic classes
+        associated to the estimated bundle cocycle (e.g. Euler class, orientation data),
+        and studies their stability under a filtration of the nerve of the cover.
+    
+        The filtration is induced by assigning weights to edges of the nerve, typically
+        derived from local trivialization quality (e.g. RMS angular error). Persistent
+        cohomology is then used to identify robust class representatives and to restrict
+        the computation to a well-supported subcomplex.
+    
+        The result includes:
+          - raw characteristic-class representatives on the full nerve,
+          - persistent cocycle data with respect to the edge-weight filtration,
+          - restricted class data computed on the induced persistent subcomplex,
+          - a concise human-readable summary.
+    
+        Local trivializations and an O(2)-valued cocycle must already be available;
+        these are computed automatically by :meth:`get_local_trivs` if needed.
+    
+        Parameters
+        ----------
+        edge_weights : dict[(int, int), float], optional
+            Explicit edge weights for the nerve filtration. Keys should be unordered
+            vertex pairs ``(i, j)``. If not provided, weights are inferred from bundle
+            quality metrics (see ``prefer_edge_weight``).
+    
+        prefer_edge_weight : {"rms"}, default="rms"
+            Which quality-derived edge weight to use when ``edge_weights`` is not
+            provided. Currently only RMS angular error is supported.
+    
+        show_classes : bool, default=False
+            If True, display the computed characteristic-class representatives.
+    
+        show_persistence : bool, default=False
+            If True, display class persistence information
+    
+        show_rounding_distance : bool, default=False
+            If True, include rounding-distance diagnostic when displaying summaries.
+    
+        Returns
+        -------
+        ClassesAndPersistence
+            An object containing:
+              - ``reps``: characteristic-class representatives on the full nerve,
+              - ``persistence``: persistence data for cocycles under the filtration,
+              - ``restricted``: class data recomputed on the persistent subcomplex,
+              - ``summary_text``: a concise textual summary suitable for logging
+                or documentation output.
+    
+        Notes
+        -----
+        This method resets any cached global trivialization or bundle map, since
+        class computation may change the effective subcomplex used for downstream
+        constructions.
         """
-
         self._require_local_trivs()
         assert self._cocycle is not None and self._quality is not None
 
@@ -845,7 +880,7 @@ class Bundle:
         )
 
     # ----------------------------
-    # global trivialization (Singer only)
+    # global trivialization
     # ----------------------------
 
     def get_global_trivialization(
@@ -1518,7 +1553,147 @@ class Bundle:
             jump_label="Jump to max-trivial",
         )
 
+
+
     def show_circle_nerve(
+        self,
+        *,
+        use_max_trivial: bool = True,
+        weights: str = "rms",
+        omega: Optional[Dict[Tuple[int, int], int]] = None,
+        phi: Optional[Dict[int, int]] = None,
+        compute_phi: bool = True,
+        fail_if_not_cycle: bool = True,
+        title: Optional[str] = None,
+        save_path: Optional[str] = None,
+        ax=None,
+        figsize: tuple[float, float] = (5.0, 5.0),
+        dpi: Optional[int] = None,
+        r: float = 1.0,
+        node_size: float = 600,
+        node_facecolor: str = "lightblue",
+        node_edgecolor: str = "k",
+        node_label_color: str = "k",
+        removed_edge_color: str = "lightgray",
+        removed_edge_lw: float = 1.5,
+        kept_edge_color: str = "black",
+        kept_edge_lw: float = 4.0,
+        omega_color: str = "blue",
+        phi_color: str = "red",
+        weights_color: str = "black",
+        fontsize_node: int = 12,
+        fontsize_omega: int = 12,
+        fontsize_phi: int = 12,
+        fontsize_weights: int = 9,
+        omega_offset: float = 0.09,
+        weights_offset: float = 0.09,
+        phi_offset: float = 0.14,
+    ):
+        """
+        Visualize the nerve when it is a single cycle.
+    
+        This helper draws the 1-skeleton of the cover nerve in a canonical circular
+        layout and can optionally annotate it with:
+    
+        - **kept edges** from a persistence-derived "max trivial" subcomplex,
+        - an edge cochain ``omega`` (typically the orientation/monodromy data),
+        - a vertex cochain ``phi`` taking values in ``{±1}`` (an orientation gauge),
+        - edge weights used for the filtration (e.g. RMS transition error).
+    
+        The function is intended for the common situation where the nerve is a
+        cycle graph (e.g. a good cover of a base circle), providing a compact
+        diagnostic view of which edges are trusted and what twisting data is
+        present.
+    
+        Parameters
+        ----------
+        use_max_trivial : bool, default=True
+            If True and persistence data is available (from :meth:`get_classes`),
+            highlight the edges kept by the "max_trivial" persistent subcomplex.
+            Kept edges are drawn with thicker styling.
+    
+        weights : {"rms", "witness", "none"}, default="rms"
+            Which edge weights to display on the cycle. If "none", no edge weights
+            are shown. Otherwise, weights are pulled from the latest available
+            source (persistence edge weights when available, else quality-derived).
+    
+        omega : dict[(int, int), int], optional
+            Edge labels to display (e.g. values in ``{0,1}`` or ``{±1}`` depending
+            on convention). Keys should be unordered pairs ``(i, j)``.
+            If not provided, the method attempts to use ``reps.omega_O1_used`` from
+            the most recently computed class representatives.
+    
+        phi : dict[int, int], optional
+            Vertex labels (typically ``±1``) to display. If not provided and
+            ``compute_phi=True``, an attempt is made to compute ``phi`` by orienting
+            the current cocycle along either the kept edges (if available) or all
+            cycle edges.
+    
+        compute_phi : bool, default=True
+            Whether to attempt automatic computation of ``phi`` when ``phi`` is not
+            provided. Requires that a cocycle has been computed via
+            :meth:`get_local_trivs`.
+    
+        fail_if_not_cycle : bool, default=True
+            If True, raise a ValueError when the nerve is not a single cycle graph.
+            If False, the method will still attempt a plot using the given edge set
+            (without enforcing cycle ordering).
+    
+        title : str, optional
+            Title for the plot. Defaults to "Nerve Visualization".
+    
+        save_path : str, optional
+            If provided, save the figure to this path.
+    
+        ax : matplotlib Axes, optional
+            Existing axes to draw into. If None, a new figure/axes are created.
+    
+        figsize : (float, float), default=(5.0, 5.0)
+            Matplotlib figure size in inches (used when ``ax`` is None).
+    
+        dpi : int, optional
+            DPI for the created figure (used when ``ax`` is None).
+    
+        r : float, default=1.0
+            Radius of the circular layout.
+    
+        node_size, node_facecolor, node_edgecolor, node_label_color :
+            Styling options for vertices and their labels.
+    
+        removed_edge_color, removed_edge_lw :
+            Styling for edges not in ``kept_edges`` (when ``use_max_trivial=True``).
+    
+        kept_edge_color, kept_edge_lw :
+            Styling for kept edges.
+    
+        omega_color, phi_color, weights_color :
+            Text colors for omega/phi/weight annotations.
+    
+        fontsize_node, fontsize_omega, fontsize_phi, fontsize_weights :
+            Font sizes for node labels and annotations.
+    
+        omega_offset, weights_offset, phi_offset : float
+            Radial offsets for drawing omega/weights/phi text relative to the cycle.
+    
+        Returns
+        -------
+        matplotlib.figure.Figure
+            The created figure (or the figure associated with ``ax``).
+    
+        Raises
+        ------
+        RuntimeError
+            If nerve edge data is missing (no stored nerve edges), or if ``phi`` is
+            requested to be computed but no cocycle is available.
+    
+        ValueError
+            If the nerve is not a single cycle graph and ``fail_if_not_cycle=True``.
+    
+        Notes
+        -----
+        When the nerve is a cycle, vertices and annotations are reindexed to follow
+        the cyclic order for a clean, readable layout.
+        """
         self,
         *,
         use_max_trivial: bool = True,
@@ -1683,7 +1858,6 @@ class Bundle:
     # ----------------------------
     # Accessors 
     # ----------------------------
-
     def get_simplices(
         self,
         dims: Optional[Union[int, Iterable[int]]] = None,
@@ -1694,21 +1868,58 @@ class Bundle:
         prefer_edge_weight: str = "rms",
     ) -> Any:
         """
-        Return cached nerve simplices, optionally restricted by:
-
-        - a numeric edge-weight cutoff (float), or
-        - a named persistence stage (str): "cocycle" or "coboundary".
-
-        Stage semantics
-        --------------
-        - "cocycle": maximal stage where (by your persistence definition) both class reps are cocycles.
-        - "coboundary": alias for the former "max_trivial" stage.
-
-        Filtration convention
-        ---------------------
-        Vertices (0-simplices) always have weight 0, so this method ALWAYS returns the full
-        vertex set {0,...,n_sets-1} (or tuples), regardless of `weight`.
-        Only edges/triangles/tetrahedra are filtered.
+        Return cached simplices of the nerve, optionally filtered by weight or persistence stage.
+    
+        This method provides access to the simplices of the nerve of the cover (vertices,
+        edges, triangles, and tetrahedra) that were computed and cached during bundle
+        construction. The returned simplices can be restricted either by an explicit
+        edge-weight threshold or by a named persistence stage derived from class computation.
+    
+        Parameters
+        ----------
+        dims : int or iterable of int, optional
+            Which simplex dimensions to return. For example:
+            ``0`` for vertices, ``1`` for edges, ``(1, 2)`` for edges and triangles.
+            If None, simplices of all available dimensions are returned.
+    
+        weight : float or {"cocycle", "coboundary"}, optional
+            Restrict simplices using either:
+            
+            - a numeric edge-weight cutoff (float), keeping only simplices whose
+              constituent edges have weight ≤ ``weight``; or
+            - a named persistence stage (string), interpreted as:
+              
+              * ``"cocycle"``: the maximal stage where the class representatives are cocycles;
+              * ``"coboundary"``: alias for the former ``"max_trivial"`` persistence stage.
+    
+            If None, no filtering is applied and the full cached nerve is returned.
+    
+        vertices_as_tuples : bool, default=False
+            If True, return vertices as singleton tuples ``(i,)`` rather than integers ``i``.
+            This can be useful for uniform handling of simplices across dimensions.
+    
+        canonicalize : bool, default=True
+            If True, return simplices in canonical sorted order with unique orientation
+            conventions. If False, preserve the internal ordering as stored.
+    
+        prefer_edge_weight : str, default="rms"
+            When ``weight`` is given as a string stage name, specifies which edge-weight
+            source to prefer if multiple are available (e.g. RMS angular error).
+    
+        Returns
+        -------
+        Any
+            A dictionary (or nested structure) mapping each requested dimension to the
+            corresponding list of simplices, with the exact structure depending on
+            ``dims`` and formatting options.
+    
+        Notes
+        -----
+        **Filtration convention.**
+        Vertices (0-simplices) are always assigned weight 0. Consequently, this method
+        always returns the full vertex set ``{0, …, n_sets−1}`` (or singleton tuples),
+        regardless of the value of ``weight``. Only edges, triangles, and higher simplices
+        are subject to filtering.
         """
         # ---- normalize dims argument ----
         single_dim = isinstance(dims, int)

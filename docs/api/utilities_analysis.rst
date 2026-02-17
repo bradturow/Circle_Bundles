@@ -10,7 +10,7 @@ required for the core pipeline.
 
    circle_bundles.fiberwise_clustering
    
-   circle_bundles.show_local_pca
+   circle_bundles.get_local_pca
    circle_bundles.get_local_rips
    circle_bundles.plot_local_rips
 

@@ -1,11 +1,7 @@
 Metrics
 =======
 
-Metrics define distances on base/feature spaces used in cover construction and
-analysis.
-
-Reference
----------
+Metrics define distances on base/total spaces used in cover construction, analysis and visualization.
 
 .. autosummary::
    :toctree: generated

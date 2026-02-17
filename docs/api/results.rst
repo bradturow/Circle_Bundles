@@ -1,11 +1,9 @@
-Result objects and dataclasses
-==============================
+Result and Configuration Dataclasses
+====================================
 
-Most computations return small, stable dataclass containers. These are designed
-to be user-facing, pickle-friendly, and resilient to refactors of internal
-implementations.
+Results and configurations are stored as small dataclasses.
 
-Core result containers
+Main Result Containers
 ----------------------
 
 These are the primary outputs returned by the high-level ``Bundle`` methods.
@@ -20,7 +18,7 @@ These are the primary outputs returned by the high-level ``Bundle`` methods.
    circle_bundles.BundleMapResult
 
 
-Lower-level result containers
+Lower-Level Result Containers
 -----------------------------
 
 .. autosummary::
@@ -34,7 +32,7 @@ Lower-level result containers
    circle_bundles.CodeathResult
 
 
-Configuration objects
+Configuration Objects
 ---------------------
 
 .. autosummary::
