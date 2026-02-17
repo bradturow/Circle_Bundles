@@ -12,7 +12,7 @@ The recommended usage is:
    bundle = cb.Bundle(X = data, U = U)
    triv_result = bundle.get_local_trivs()
    class_result = bundle.get_classes()
-   bundle_map_result = bundle.get_bundle_map()
+   bundle_map_result = bundle.get_bundle_map(pou = pou)
 
 .. toctree::
    :maxdepth: 2

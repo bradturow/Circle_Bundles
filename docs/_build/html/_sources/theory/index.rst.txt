@@ -206,9 +206,3 @@ Algorithm 3: Pullback Bundle Coordinates
 
 - Classifying map :math:`\mathrm{cl}^r` and bundle map :math:`F^r`
 - Global trivialization when it exists
-
-References
-----------
-
-.. bibliography::
-   :style: alpha

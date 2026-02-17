@@ -44,7 +44,6 @@ from .mesh_vis import (
     make_density_visualizer,
     make_tri_prism_visualizer,
     make_star_pyramid_visualizer,
-    make_rotating_mesh_clip,
 )
 
 # ----------------------------
@@ -66,11 +65,7 @@ from .opt_flow_patches import (
 from .s2_bundles import (
     sample_sphere,
     hopf_projection,
-    spin3_adjoint_to_so3,
-    so3_to_s2_projection,
     sample_s2_trivial,
-    tangent_frame_on_s2,
-    sample_s2_unit_tangent,
 )
 
 from .so3_sampling import (
@@ -91,9 +86,6 @@ from .step_edges import (
 )
 
 from .tori_and_kb import (
-    const,
-    small_to_big,
-    sample_C2_torus,
     sample_foldy_klein_bottle,
     sample_R3_torus,
 )
@@ -124,7 +116,6 @@ __all__ = [
     "make_density_visualizer",
     "make_tri_prism_visualizer",
     "make_star_pyramid_visualizer",
-    "make_rotating_mesh_clip",
 
     # nat img / flow patches
     "sample_nat_img_kb",
@@ -135,11 +126,7 @@ __all__ = [
     # S^2 / SO(3)
     "sample_sphere",
     "hopf_projection",
-    "spin3_adjoint_to_so3",
-    "so3_to_s2_projection",
     "sample_s2_trivial",
-    "tangent_frame_on_s2",
-    "sample_s2_unit_tangent",
     "sample_so3",
     "project_o3",
 
@@ -150,9 +137,6 @@ __all__ = [
     "sample_binary_step_edges",
     "mean_center",
     "sample_step_edge_torus",
-    "const",
-    "small_to_big",
-    "sample_C2_torus",
     "sample_foldy_klein_bottle",
     "sample_R3_torus",
 ]

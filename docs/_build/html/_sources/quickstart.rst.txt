@@ -29,4 +29,4 @@ Minimal working example
 
    bundle = cb.Bundle(X = s3_data, U = s2_cover.U)
    triv_result = bundle.get_local_trivs()
-   class_result = bundle.get_classes(show_summary = True)
+   class_result = bundle.get_classes(show_classes = True)

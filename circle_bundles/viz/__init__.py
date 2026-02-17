@@ -31,7 +31,6 @@ from . import (
 # Always-available 
 # ----------------------------
 from .angles import (
-    compare_angle_pairs,
     compare_trivs,
 )
 
@@ -39,32 +38,12 @@ from .base_vis import (
     base_vis as base_vis,
 )
 
-from .circle_vis import (
-    circle_vis,
-    circle_vis_grid,
-)
-
 from .fiber_vis import (
     fiber_vis,
 )
 
-from .fiberwise_clustering_vis import (
-    make_patch_cluster_diagram,
-    get_G_vertex_coords,
-    plot_component_patch_diagram,
-)
-
-from .gudhi_graph_utils import (
-    graph_to_st,
-    create_st_dicts,
-)
-
 from .lattice_vis import (
     lattice_vis,
-)
-
-from .nerve_circle import (
-    show_circle_nerve,
 )
 
 from .nerve_vis import (
@@ -110,19 +89,10 @@ __all__ = [
     "image_utils",
 
     # always-available exports
-    "compare_angle_pairs",
     "compare_trivs",
     "base_vis",
-    "circle_vis",
-    "circle_vis_grid",
     "fiber_vis",
-    "make_patch_cluster_diagram",
-    "get_G_vertex_coords",
-    "plot_component_patch_diagram",
-    "graph_to_st",
-    "create_st_dicts",
     "lattice_vis",
-    "show_circle_nerve",
     "nerve_vis",
     "show_pca",
     "show_data_vis",

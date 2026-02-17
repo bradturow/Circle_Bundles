@@ -24,18 +24,6 @@ from .contrast import (
 )
 
 # ----------------------------
-# flow_frames
-# ----------------------------
-from .flow_frames import (
-    change_path,
-    get_labeled_frame,
-    write_video_from_frames,
-    get_labeled_video,
-    annotate_optical_flow,
-    get_sintel_scene_folders,
-)
-
-# ----------------------------
 # flow_processing
 # ----------------------------
 from .flow_processing import (
@@ -64,14 +52,6 @@ __all__ = [
     "get_dct_basis",
     "get_predominant_dirs",
     "get_lifted_predominant_dirs",
-
-    # flow_frames
-    "change_path",
-    "get_labeled_frame",
-    "write_video_from_frames",
-    "get_labeled_video",
-    "annotate_optical_flow",
-    "get_sintel_scene_folders",
 
     # flow_processing
     "read_flo",

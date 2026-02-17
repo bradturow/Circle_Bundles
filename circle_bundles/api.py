@@ -71,10 +71,6 @@ from .metrics import (
 
 from .analysis.fiberwise_clustering import (
     fiberwise_clustering,
-    get_cluster_persistence,
-    get_filtered_cluster_graph,
-    plot_fiberwise_pca_grid,
-    plot_fiberwise_summary_bars,
 )
 
 from .analysis.local_analysis import (
@@ -147,10 +143,6 @@ __all__ = [
     
     # Advanced utilities
     "fiberwise_clustering",
-    "get_cluster_persistence",
-    "get_filtered_cluster_graph",
-    "plot_fiberwise_pca_grid",
-    "plot_fiberwise_summary_bars",
     "get_local_pca",
     "get_local_rips",
     "plot_local_rips",
