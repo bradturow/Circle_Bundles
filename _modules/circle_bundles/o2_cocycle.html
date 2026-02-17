@@ -1,0 +1,996 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.o2_cocycle &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/core.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#typical-workflow">Typical workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/core.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/results.html">Result objects and dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#core-result-containers">Core result containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#lower-level-result-containers">Lower-level result containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/results.html#configuration-objects">Configuration objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/covers.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/metrics.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utilities_analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_optical_flow_torus.html">Extended Torus Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.o2_cocycle</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.o2_cocycle</h1><div class="highlight"><pre>
+<span></span><span class="c1"># circle_bundles/o2_cocycle.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities for estimating and working with O(2)-valued cocycles from local angle data.</span>
+
+<span class="sd">This module turns local angular coordinates on a cover into estimated transition maps</span>
+<span class="sd">on overlaps, represented as 2×2 matrices in O(2).</span>
+
+<span class="sd">Core data model</span>
+<span class="sd">--------------</span>
+<span class="sd">Let U be a cover membership matrix and f be local angles:</span>
+
+<span class="sd">- U has shape (n_sets, n_samples) with boolean entries.</span>
+<span class="sd">  U[j, s] == True means sample s lies in the j-th cover set.</span>
+<span class="sd">- f has shape (n_sets, n_samples) in radians.</span>
+<span class="sd">  f[j, s] is only meaningful when U[j, s] is True.</span>
+
+<span class="sd">Transitions are stored on *directed* edges (j, k) with j &lt; k by default:</span>
+
+<span class="sd">    Omega[(j, k)] ∈ O(2)  maps k-coordinates -&gt; j-coordinates.</span>
+
+<span class="sd">So, if v_k is a unit-vector encoding of an angle in chart k, then Omega[(j,k)] @ v_k</span>
+<span class="sd">is the corresponding unit-vector in chart j (up to estimation error).</span>
+
+<span class="sd">Decomposition convention</span>
+<span class="sd">------------------------</span>
+<span class="sd">We decompose O ∈ O(2) using a fixed reflection axis angle `ref_angle`:</span>
+
+<span class="sd">    O = R(theta) * r(ref_angle),</span>
+
+<span class="sd">where:</span>
+<span class="sd">- det(O) = +1  =&gt; r = I</span>
+<span class="sd">- det(O) = -1  =&gt; r is reflection across the line through the origin at angle `ref_angle`</span>
+<span class="sd">- theta is returned in [0, 2π).</span>
+
+<span class="sd">This convention is used consistently throughout the codebase (including when</span>
+<span class="sd">constructing Z₂ and O(1) cochains from determinants).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">Mat2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.nerve.combinatorics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">canon_edge</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Mat2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;angles_to_unit&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rotation_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;reflection_axis_matrix&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;r_from_det&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;project_to_O2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;det_sign&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;decompose_O2_as_R_times_r&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TransitionReport&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;O2Cocycle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;estimate_transitions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;complete_edge_orientations&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Basic helpers</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">angles_to_unit</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;(n,) angles -&gt; (n,2) unit vectors.&quot;&quot;&quot;</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">theta</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">theta</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># O(2) helpers</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">rotation_matrix</span><span class="p">(</span><span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat2</span><span class="p">:</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="n">s</span><span class="p">],</span>
+                     <span class="p">[</span><span class="n">s</span><span class="p">,</span>  <span class="n">c</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reflection_axis_matrix</span><span class="p">(</span><span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat2</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reflection across the line through the origin making angle ref_angle with +x axis:</span>
+<span class="sd">        r_a = R(a) diag(1,-1) R(-a)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ref_angle</span><span class="p">)</span>
+    <span class="n">c2</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="n">c2</span><span class="p">,</span>  <span class="n">s2</span><span class="p">],</span>
+                     <span class="p">[</span> <span class="n">s2</span><span class="p">,</span> <span class="o">-</span><span class="n">c2</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">r_from_det</span><span class="p">(</span><span class="n">det</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">det</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;det must be ±1&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">det</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">reflection_axis_matrix</span><span class="p">(</span><span class="n">ref_angle</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">project_to_O2</span><span class="p">(</span><span class="n">M</span><span class="p">:</span> <span class="n">Mat2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat2</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Project a near-orthogonal 2x2 matrix to O(2) via SVD.&quot;&quot;&quot;</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">M</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;M must be 2x2.&quot;</span><span class="p">)</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">U</span> <span class="o">@</span> <span class="n">Vt</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">det_sign</span><span class="p">(</span><span class="n">O</span><span class="p">:</span> <span class="n">Mat2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">O</span><span class="p">))</span>
+    <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">decompose_O2_as_R_times_r</span><span class="p">(</span><span class="n">O</span><span class="p">:</span> <span class="n">Mat2</span><span class="p">,</span> <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decompose an orthogonal 2×2 matrix into a rotation times a fixed-axis reflection.</span>
+
+<span class="sd">    We write an input matrix O ∈ O(2) in the form</span>
+
+<span class="sd">        O = R(theta) * r(ref_angle),</span>
+
+<span class="sd">where:</span>
+<span class="sd">- R(theta) is a counterclockwise rotation by theta,</span>
+<span class="sd">- r(ref_angle) is either the identity (if det(O)=+1) or the reflection across the line</span>
+<span class="sd">  making angle `ref_angle` with the +x-axis (if det(O)=-1).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    O:</span>
+<span class="sd">        A 2×2 (approximately) orthogonal matrix.</span>
+<span class="sd">    ref_angle:</span>
+<span class="sd">        Reflection axis angle in radians. Only affects the decomposition when det(O)=-1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    theta:</span>
+<span class="sd">        Rotation angle in radians, normalized to the interval [0, 2π).</span>
+<span class="sd">    det:</span>
+<span class="sd">        The determinant sign of O, returned as +1 or -1.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If O is not 2×2 or is not approximately orthogonal.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This is a *convention choice*: many decompositions are possible for det=-1, but by</span>
+<span class="sd">    fixing a reflection axis via `ref_angle`, the decomposition becomes deterministic and</span>
+<span class="sd">    compatible across the library.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">O</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;O must be 2x2.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Keep your convention: require approximately orthogonal.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">O</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">O</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;O must be orthogonal (approximately).&quot;</span><span class="p">)</span>
+
+    <span class="n">det</span> <span class="o">=</span> <span class="n">det_sign</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">r_from_det</span><span class="p">(</span><span class="n">det</span><span class="p">,</span> <span class="n">ref_angle</span><span class="p">)</span>     <span class="c1"># r^{-1} = r</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">O</span> <span class="o">@</span> <span class="n">r</span>                          <span class="c1"># O = R r =&gt; R = O r</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">R</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">theta</span><span class="p">,</span> <span class="n">det</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Transition estimation</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransitionReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Summary statistics and diagnostics for transition estimation.</span>
+
+<span class="sd">    A TransitionReport is returned alongside an :class:`O2Cocycle` by</span>
+<span class="sd">    :func:`estimate_transitions`. It records basic sizes, missing overlaps, and</span>
+<span class="sd">    per-edge fit errors.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_sets:</span>
+<span class="sd">        Number of cover sets (rows of U).</span>
+<span class="sd">    n_samples:</span>
+<span class="sd">        Number of samples (columns of U).</span>
+<span class="sd">    min_points:</span>
+<span class="sd">        Minimum overlap size required to estimate a transition on an edge.</span>
+<span class="sd">    n_edges_requested:</span>
+<span class="sd">        Number of edges requested for estimation. If no explicit edge list is provided,</span>
+<span class="sd">        this equals n_sets choose 2.</span>
+<span class="sd">    n_edges_estimated:</span>
+<span class="sd">        Number of edges for which a transition was successfully estimated.</span>
+<span class="sd">    missing_edges:</span>
+<span class="sd">        List of edges (j, k) that were requested but skipped due to insufficient overlap.</span>
+<span class="sd">    overlap_sizes:</span>
+<span class="sd">        Dict mapping each requested edge (j, k) to the number of overlap samples :math:`|U_j \\cap U_k|`.</span>
+<span class="sd">    rms_angle_err:</span>
+<span class="sd">        Dict mapping each estimated edge (j, k) to an RMS angular error (radians) measured</span>
+<span class="sd">        on the overlap points.</span>
+<span class="sd">    max_rms_angle_err:</span>
+<span class="sd">        Maximum RMS angular error among estimated edges (0 if no edges estimated).</span>
+<span class="sd">    mean_rms_angle_err:</span>
+<span class="sd">        Mean RMS angular error among estimated edges (0 if no edges estimated).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The RMS angular error is computed after applying the estimated transition to unit</span>
+<span class="sd">    vectors derived from angles, i.e. it measures discrepancy on S¹ (via arccos of dot products).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_sets</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">min_points</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">n_edges_requested</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">n_edges_estimated</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">missing_edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span>
+
+    <span class="n">overlap_sizes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="n">rms_angle_err</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+
+    <span class="n">max_rms_angle_err</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">mean_rms_angle_err</span><span class="p">:</span> <span class="nb">float</span>
+
+
+<div class="viewcode-block" id="O2Cocycle">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">O2Cocycle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An estimated O(2)-valued 1-cochain (typically a cocycle) on a cover nerve.</span>
+
+<span class="sd">    The primary field is ``Omega``, a dictionary mapping directed edges to 2×2 matrices:</span>
+
+<span class="sd">        Omega[(j, k)] maps k-coordinates -&gt; j-coordinates.</span>
+
+<span class="sd">    For convenience and downstream characteristic class computations, we also store</span>
+<span class="sd">    determinant signs and rotation angles from a fixed-axis decomposition.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Omega:</span>
+<span class="sd">        Dict mapping edges (j, k) to 2×2 matrices in O(2).</span>
+<span class="sd">    theta:</span>
+<span class="sd">        Dict mapping edges (j, k) to angles theta ∈ [0, 2π) such that</span>
+<span class="sd">        Omega[(j,k)] = R(theta) * r(ref_angle) under this module&#39;s convention.</span>
+<span class="sd">    det:</span>
+<span class="sd">        Dict mapping edges (j, k) to det(Omega[(j,k)]) ∈ {+1, -1}.</span>
+<span class="sd">    err:</span>
+<span class="sd">        Optional dict mapping edges (j, k) to an RMS angular error (radians) on overlaps.</span>
+<span class="sd">    ref_angle:</span>
+<span class="sd">        Reflection axis angle (radians) used when decomposing det=-1 matrices.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - By default, :func:`estimate_transitions` stores only canonical edges (j&lt;k).</span>
+<span class="sd">      Use :meth:`complete_orientations` (or :func:`complete_edge_orientations`) if you want</span>
+<span class="sd">      both directions (j,k) and (k,j).</span>
+<span class="sd">    - The edge convention is important: Omega[(j,k)] is designed so that it takes</span>
+<span class="sd">      vectors in chart k to vectors in chart j.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Typical usage is via a bundle construction pipeline, but you can also estimate</span>
+<span class="sd">    transitions directly from local angles::</span>
+
+<span class="sd">        cocycle, report = estimate_transitions(U, f, min_points=10)</span>
+<span class="sd">        Omega_full = cocycle.complete_orientations().Omega</span>
+<span class="sd">        omega_Z2 = cocycle.omega_Z2()</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    estimate_transitions :</span>
+<span class="sd">        Fit O(2) transitions from overlap data.</span>
+<span class="sd">    complete_edge_orientations :</span>
+<span class="sd">        Low-level helper to fill reversed edges by transposition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Omega</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">Mat2</span><span class="p">]</span>                  <span class="c1"># (j,k) -&gt; 2x2 O(2) matrix, maps k -&gt; j</span>
+    <span class="n">theta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>                 <span class="c1"># (j,k) -&gt; angle in [0, 2π)</span>
+    <span class="n">det</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>                     <span class="c1"># (j,k) -&gt; ±1</span>
+    <span class="n">err</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># (j,k) -&gt; RMS angular error (radians), optional</span>
+    <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<div class="viewcode-block" id="O2Cocycle.omega_Z2">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle.omega_Z2">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">omega_Z2</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert determinants to a Z₂-valued 1-cochain.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        omega:</span>
+<span class="sd">            Dict mapping edges to values in {0,1}, using the convention:</span>
+<span class="sd">            det=+1 ↦ 0 and det=-1 ↦ 1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">e</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">[</span><span class="n">e</span><span class="p">]))</span> <span class="o">//</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="O2Cocycle.omega_O1">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle.omega_O1">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">omega_O1</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the determinant-sign cochain as an O(1) (i.e. {±1}) valued 1-cochain.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        omega:</span>
+<span class="sd">            Dict mapping edges to ±1.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="O2Cocycle.theta_normalized">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle.theta_normalized">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">theta_normalized</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the rotation angles as an R/Z-valued cochain represented in [0, 1).</span>
+
+<span class="sd">        The stored ``theta`` values are in radians in [0, 2π). This method converts to</span>
+<span class="sd">        fractions of a full turn by dividing by 2π and reducing modulo 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        theta01:</span>
+<span class="sd">            Dict mapping edges to floats in [0,1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">th</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">e2</span> <span class="o">=</span> <span class="n">canon_edge</span><span class="p">(</span><span class="o">*</span><span class="n">e</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">e2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">th</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span> <span class="o">%</span> <span class="mf">1.0</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="O2Cocycle.restrict">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle.restrict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restrict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">edges</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Edge</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;O2Cocycle&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Restrict this cocycle to a specified set of edges.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        edges:</span>
+<span class="sd">            Iterable of edges. Edges are canonicalized to (min, max) form.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cocycle_restricted:</span>
+<span class="sd">            A new :class:`O2Cocycle` containing only entries whose edges appear in `edges`.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Any edge not present in the underlying dicts is silently skipped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">edges2</span> <span class="o">=</span> <span class="p">{</span><span class="n">canon_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">O2Cocycle</span><span class="p">(</span>
+            <span class="n">Omega</span><span class="o">=</span><span class="p">{</span><span class="n">e</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">Omega</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges2</span> <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Omega</span><span class="p">},</span>
+            <span class="n">theta</span><span class="o">=</span><span class="p">{</span><span class="n">e</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges2</span> <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">},</span>
+            <span class="n">det</span><span class="o">=</span><span class="p">{</span><span class="n">e</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges2</span> <span class="k">if</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">},</span>
+            <span class="n">err</span><span class="o">=</span><span class="p">{</span><span class="n">e</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges2</span><span class="p">}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">err</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">ref_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_angle</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="O2Cocycle.complete_orientations">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle.complete_orientations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">complete_orientations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;O2Cocycle&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an equivalent cocycle with both edge orientations filled in.</span>
+
+<span class="sd">        For each undirected edge {j,k}, this ensures both directed entries are present:</span>
+
+<span class="sd">            Omega[(j,k)] maps k-&gt;j,</span>
+<span class="sd">            Omega[(k,j)] = Omega[(j,k)]^T maps j-&gt;k.</span>
+
+<span class="sd">        Determinants, angles, and errors are also populated for the reversed edges in a way</span>
+<span class="sd">        consistent with this module&#39;s decomposition convention.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Omega_full</span><span class="p">,</span> <span class="n">det_full</span><span class="p">,</span> <span class="n">theta_full</span><span class="p">,</span> <span class="n">err_full</span> <span class="o">=</span> <span class="n">complete_edge_orientations</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Omega</span><span class="p">,</span>
+            <span class="n">ref_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_angle</span><span class="p">,</span>
+            <span class="n">dets</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">,</span>
+            <span class="n">thetas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">,</span>
+            <span class="n">errs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">O2Cocycle</span><span class="p">(</span>
+            <span class="n">Omega</span><span class="o">=</span><span class="n">Omega_full</span><span class="p">,</span>
+            <span class="n">det</span><span class="o">=</span><span class="n">det_full</span><span class="p">,</span>
+            <span class="n">theta</span><span class="o">=</span><span class="n">theta_full</span><span class="p">,</span>
+            <span class="n">err</span><span class="o">=</span><span class="n">err_full</span><span class="p">,</span>
+            <span class="n">ref_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_angle</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="O2Cocycle.orient_if_possible">
+<a class="viewcode-back" href="../../api/generated/circle_bundles.O2Cocycle.html#circle_bundles.O2Cocycle.orient_if_possible">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">orient_if_possible</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">edges</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">n_vertices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">require_all_edges_present</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;O2Cocycle&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempt to gauge-transform the cocycle so that det=+1 on a chosen 1-skeleton.</span>
+
+<span class="sd">        This is an &quot;orientability test&quot; for the determinant-sign cochain on the graph</span>
+<span class="sd">        given by `edges`. We look for an assignment φ_j ∈ {+1, -1} to vertices such that</span>
+<span class="sd">        for each undirected edge {j,k}:</span>
+
+<span class="sd">            φ_j * φ_k = det_{jk},</span>
+
+<span class="sd">        where det_{jk} is det(Omega_{jk}) on that edge.</span>
+
+<span class="sd">        If such a φ exists, we build a gauge g_j ∈ O(2) using the fixed reflection axis:</span>
+
+<span class="sd">            g_j = I            if φ_j = +1</span>
+<span class="sd">            g_j = r(ref_angle) if φ_j = -1</span>
+
+<span class="sd">        and transform transitions by</span>
+
+<span class="sd">            Omega&#39;_{jk} = g_j * Omega_{jk} * g_k^{-1},</span>
+
+<span class="sd">        which forces det(Omega&#39;_{jk}) = +1 on all edges in the given 1-skeleton.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        edges:</span>
+<span class="sd">            The set of edges defining the 1-skeleton on which to test/orient.</span>
+<span class="sd">        n_vertices:</span>
+<span class="sd">            Number of vertices in the graph. If None, inferred as 1 + max index seen in `edges`.</span>
+<span class="sd">        require_all_edges_present:</span>
+<span class="sd">            If True, returns (False, self, phi) immediately if any requested edge is missing</span>
+<span class="sd">            from this cocycle&#39;s determinant dict. If False, missing edges are ignored.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ok:</span>
+<span class="sd">            True if the orientation assignment exists.</span>
+<span class="sd">        cocycle_oriented:</span>
+<span class="sd">            If ok is True, the gauge-transformed cocycle; otherwise the original cocycle.</span>
+<span class="sd">        phi:</span>
+<span class="sd">            An integer array of shape (n_vertices,) with entries in {+1,-1} giving φ.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is useful when you want to reduce an O(2)-bundle problem to an S¹-bundle problem</span>
+<span class="sd">        on a subcomplex where the bundle is orientable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="p">[</span><span class="n">canon_edge</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span> <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">]</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">E</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">n_vertices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">E</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">n_vertices</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_vertices</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">E</span><span class="p">)</span>
+
+        <span class="n">adj</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">E</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">require_all_edges_present</span><span class="p">:</span>
+                    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">phi</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;det[(j,k)] must be ±1; got </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> on edge </span><span class="si">{</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">adj</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+            <span class="n">adj</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
+
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>  <span class="c1"># 0 means unassigned</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">phi</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">phi</span><span class="p">[</span><span class="n">start</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">stack</span> <span class="o">=</span> <span class="p">[</span><span class="n">start</span><span class="p">]</span>
+            <span class="k">while</span> <span class="n">stack</span> <span class="ow">and</span> <span class="n">ok</span><span class="p">:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">s_uv</span><span class="p">)</span> <span class="ow">in</span> <span class="n">adj</span><span class="p">[</span><span class="n">u</span><span class="p">]:</span>
+                    <span class="n">want</span> <span class="o">=</span> <span class="n">s_uv</span> <span class="o">*</span> <span class="n">phi</span><span class="p">[</span><span class="n">u</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">phi</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">phi</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">=</span> <span class="n">want</span>
+                        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">phi</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="o">!=</span> <span class="n">want</span><span class="p">:</span>
+                        <span class="n">ok</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="n">phi_pm1</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">phi_pm1</span><span class="p">[</span><span class="n">phi_pm1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">phi_pm1</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="n">reflection_axis_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_angle</span><span class="p">)</span>
+        <span class="n">G</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Mat2</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">if</span> <span class="n">phi_pm1</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">R</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">)]</span>
+
+        <span class="n">Omega_new</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">Mat2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">det_new</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">theta_new</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">err_new</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">err</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">err</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">),</span> <span class="n">O</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Omega</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">jj</span> <span class="o">&lt;</span> <span class="n">n_vertices</span> <span class="ow">and</span> <span class="n">kk</span> <span class="o">&lt;</span> <span class="n">n_vertices</span><span class="p">:</span>
+                <span class="n">O2</span> <span class="o">=</span> <span class="n">G</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">@</span> <span class="n">O</span> <span class="o">@</span> <span class="n">G</span><span class="p">[</span><span class="n">kk</span><span class="p">]</span>  <span class="c1"># inverse = itself</span>
+                <span class="n">O2</span> <span class="o">=</span> <span class="n">project_to_O2</span><span class="p">(</span><span class="n">O2</span><span class="p">)</span>
+                <span class="n">th2</span><span class="p">,</span> <span class="n">d2</span> <span class="o">=</span> <span class="n">decompose_O2_as_R_times_r</span><span class="p">(</span><span class="n">O2</span><span class="p">,</span> <span class="n">ref_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_angle</span><span class="p">)</span>
+                <span class="n">Omega_new</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">O2</span>
+                <span class="n">det_new</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span>
+                <span class="n">theta_new</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">th2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">Omega_new</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">O</span>
+                <span class="n">det_new</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">det</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span>
+                <span class="n">theta_new</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">theta</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span>
+
+        <span class="n">coc_oriented</span> <span class="o">=</span> <span class="n">O2Cocycle</span><span class="p">(</span>
+            <span class="n">Omega</span><span class="o">=</span><span class="n">Omega_new</span><span class="p">,</span>
+            <span class="n">theta</span><span class="o">=</span><span class="n">theta_new</span><span class="p">,</span>
+            <span class="n">det</span><span class="o">=</span><span class="n">det_new</span><span class="p">,</span>
+            <span class="n">err</span><span class="o">=</span><span class="n">err_new</span><span class="p">,</span>
+            <span class="n">ref_angle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_angle</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">coc_oriented</span><span class="p">,</span> <span class="n">phi_pm1</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">estimate_transitions</span><span class="p">(</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Edge</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">fail_fast_missing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">O2Cocycle</span><span class="p">,</span> <span class="n">TransitionReport</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Estimate O(2) transition maps on overlaps from local angle data.</span>
+
+<span class="sd">    This routine fits, for each requested edge (j,k), an orthogonal matrix Omega[(j,k)] ∈ O(2)</span>
+<span class="sd">    that best maps unit vectors derived from chart k to unit vectors derived from chart j</span>
+<span class="sd">    over the overlap samples :math:`U[j] \\cap U[k]`.</span>
+
+<span class="sd">    The fit is a (weighted) orthogonal Procrustes problem on S¹-embedded unit vectors:</span>
+<span class="sd">    each angle θ is converted to v(θ) = (cos θ, sin θ), and we choose Omega minimizing</span>
+
+<span class="sd">        Σ_s w_s || Omega v_k(s) - v_j(s) ||²</span>
+
+<span class="sd">    over overlap samples s.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    U:</span>
+<span class="sd">        Boolean membership matrix of shape (n_sets, n_samples).</span>
+<span class="sd">    f:</span>
+<span class="sd">        Local angles in radians, shape (n_sets, n_samples). Values are only used where U is True.</span>
+<span class="sd">    edges:</span>
+<span class="sd">        Optional iterable of edges on which to estimate transitions. If None, attempts all pairs j&lt;k.</span>
+<span class="sd">        Each edge is canonicalized to (min, max).</span>
+<span class="sd">    weights:</span>
+<span class="sd">        Optional per-sample nonnegative weights of shape (n_samples,). If None, uniform weights are used.</span>
+<span class="sd">        Weights are renormalized on each overlap to sum to 1.</span>
+<span class="sd">    min_points:</span>
+<span class="sd">        Minimum number of overlap samples required to estimate a transition on an edge.</span>
+<span class="sd">    ref_angle:</span>
+<span class="sd">        Reflection axis angle (radians) used in the decomposition convention</span>
+<span class="sd">        Omega = R(theta) r(ref_angle) when det=-1.</span>
+<span class="sd">    fail_fast_missing:</span>
+<span class="sd">        If True and `edges` is provided explicitly, raise an error as soon as an edge has overlap</span>
+<span class="sd">        size &lt; min_points. If False, record such edges in the report and continue.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    cocycle:</span>
+<span class="sd">        An :class:`O2Cocycle` containing Omega, determinant signs, angles, and per-edge RMS errors.</span>
+<span class="sd">        By default, transitions are stored only on canonical edges (j&lt;k).</span>
+<span class="sd">    report:</span>
+<span class="sd">        A :class:`TransitionReport` with overlap sizes, missing edges, and summary error statistics.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - The stored convention is: Omega[(j,k)] maps k-coordinates -&gt; j-coordinates.</span>
+<span class="sd">    - If you want transitions on both orientations (j,k) and (k,j), call</span>
+<span class="sd">      :meth:`O2Cocycle.complete_orientations` (or :func:`complete_edge_orientations`).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span> <span class="o">=</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;f must have shape </span><span class="si">{</span><span class="p">(</span><span class="n">n_sets</span><span class="p">,</span><span class="w"> </span><span class="n">n_samples</span><span class="p">)</span><span class="si">}</span><span class="s2">; got </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weights</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;weights must have shape </span><span class="si">{</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,)</span><span class="si">}</span><span class="s2">; got </span><span class="si">{</span><span class="n">weights</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">edge_list</span> <span class="o">=</span> <span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_sets</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_sets</span><span class="p">)]</span>
+        <span class="n">requested</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">edge_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">canon_edge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span> <span class="k">if</span> <span class="n">a</span> <span class="o">!=</span> <span class="n">b</span><span class="p">))</span>
+        <span class="n">requested</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">Omega</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">Mat2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">dets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">thetas</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">errs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">overlap_sizes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">missing_edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edge_list</span><span class="p">:</span>
+        <span class="n">overlap</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">overlap</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">overlap_sizes</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">m</span>
+
+        <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="n">min_points</span><span class="p">:</span>
+            <span class="n">missing_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">fail_fast_missing</span> <span class="ow">and</span> <span class="n">requested</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Edge </span><span class="si">{</span><span class="p">(</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2"> has overlap </span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2"> &lt; min_points=</span><span class="si">{</span><span class="n">min_points</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># vj is target, vk is source</span>
+        <span class="n">vj</span> <span class="o">=</span> <span class="n">angles_to_unit</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+        <span class="n">vk</span> <span class="o">=</span> <span class="n">angles_to_unit</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+
+        <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+        <span class="n">wsum</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">w</span> <span class="o">/</span> <span class="p">(</span><span class="n">wsum</span> <span class="k">if</span> <span class="n">wsum</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="c1"># Weighted orthogonal Procrustes: minimize || (O vk) - vj ||</span>
+        <span class="c1"># (Keep your exact convention / formula.)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="p">(</span><span class="n">vk</span> <span class="o">*</span> <span class="n">w</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">])</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">vj</span>
+        <span class="n">U_svd</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">Vt_svd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+        <span class="n">O</span> <span class="o">=</span> <span class="n">Vt_svd</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">U_svd</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="c1"># ensure in O(2) numerically</span>
+        <span class="n">O</span> <span class="o">=</span> <span class="n">project_to_O2</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>
+
+        <span class="n">theta</span><span class="p">,</span> <span class="n">det</span> <span class="o">=</span> <span class="n">decompose_O2_as_R_times_r</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">ref_angle</span><span class="o">=</span><span class="n">ref_angle</span><span class="p">)</span>
+
+        <span class="c1"># RMS angular error on overlap</span>
+        <span class="n">vk_trans</span> <span class="o">=</span> <span class="p">(</span><span class="n">O</span> <span class="o">@</span> <span class="n">vk</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">dot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">vj</span> <span class="o">*</span> <span class="n">vk_trans</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">dot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dot</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">ang_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ang_err</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+
+        <span class="n">Omega</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">O</span>
+        <span class="n">dets</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">det</span>
+        <span class="n">thetas</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">theta</span>
+        <span class="n">errs</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">err</span>
+
+    <span class="n">err_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">errs</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">TransitionReport</span><span class="p">(</span>
+        <span class="n">n_sets</span><span class="o">=</span><span class="n">n_sets</span><span class="p">,</span>
+        <span class="n">n_samples</span><span class="o">=</span><span class="n">n_samples</span><span class="p">,</span>
+        <span class="n">min_points</span><span class="o">=</span><span class="n">min_points</span><span class="p">,</span>
+        <span class="n">n_edges_requested</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">edge_list</span><span class="p">),</span>
+        <span class="n">n_edges_estimated</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">Omega</span><span class="p">),</span>
+        <span class="n">missing_edges</span><span class="o">=</span><span class="n">missing_edges</span><span class="p">,</span>
+        <span class="n">overlap_sizes</span><span class="o">=</span><span class="n">overlap_sizes</span><span class="p">,</span>
+        <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">errs</span><span class="p">,</span>
+        <span class="n">max_rms_angle_err</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">err_vals</span><span class="p">))</span> <span class="k">if</span> <span class="n">err_vals</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">mean_rms_angle_err</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">err_vals</span><span class="p">))</span> <span class="k">if</span> <span class="n">err_vals</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">cocycle</span> <span class="o">=</span> <span class="n">O2Cocycle</span><span class="p">(</span>
+        <span class="n">Omega</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span>
+        <span class="n">det</span><span class="o">=</span><span class="n">dets</span><span class="p">,</span>
+        <span class="n">theta</span><span class="o">=</span><span class="n">thetas</span><span class="p">,</span>
+        <span class="n">err</span><span class="o">=</span><span class="n">errs</span><span class="p">,</span>
+        <span class="n">ref_angle</span><span class="o">=</span><span class="n">ref_angle</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">cocycle</span><span class="p">,</span> <span class="n">report</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Complete reversed orientations</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">complete_edge_orientations</span><span class="p">(</span>
+    <span class="n">Omega</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">Mat2</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">ref_angle</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">dets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">thetas</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">errs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">Mat2</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fill in both directed orientations of each edge by transposition.</span>
+
+<span class="sd">    Given a dictionary Omega containing some set of edges (often only canonical edges j&lt;k),</span>
+<span class="sd">    this function returns a new dictionary Omega_full that contains *both* directions:</span>
+
+<span class="sd">        Omega_full[(j,k)] and Omega_full[(k,j)] = Omega_full[(j,k)]^T.</span>
+
+<span class="sd">    The determinant, angle, and error dictionaries are also completed to match.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Omega:</span>
+<span class="sd">        Dict mapping edges to 2×2 matrices. Entries may include only canonical edges or a mix</span>
+<span class="sd">        of directions.</span>
+<span class="sd">    ref_angle:</span>
+<span class="sd">        Reflection axis angle used when recomputing decompositions for reversed edges.</span>
+<span class="sd">    dets:</span>
+<span class="sd">        Optional determinant-sign dict aligned with Omega.</span>
+<span class="sd">        If not provided for an edge, the determinant is computed from the matrix.</span>
+<span class="sd">    thetas:</span>
+<span class="sd">        Optional angle dict aligned with Omega.</span>
+<span class="sd">        If not provided for an edge, the angle is computed via :func:`decompose_O2_as_R_times_r`.</span>
+<span class="sd">    errs:</span>
+<span class="sd">        Optional RMS-error dict aligned with Omega. If provided, reversed edges inherit the same</span>
+<span class="sd">        error as the forward edge.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Omega_full:</span>
+<span class="sd">        Dict containing both orientations of each edge.</span>
+<span class="sd">    det_full:</span>
+<span class="sd">        Determinant signs aligned with Omega_full.</span>
+<span class="sd">    theta_full:</span>
+<span class="sd">        Angles aligned with Omega_full (in radians, in [0, 2π) under this module&#39;s convention).</span>
+<span class="sd">    err_full:</span>
+<span class="sd">        Errors aligned with Omega_full, or None if `errs` was None.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Edge conventions are preserved: if Omega[(j,k)] maps k-&gt;j, then Omega[(k,j)] maps j-&gt;k.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Omega_full</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="n">Mat2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">det_full</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">theta_full</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">err_full</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">errs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># Process a deterministic set of base edges to avoid double work if Omega already had both directions.</span>
+    <span class="n">base_edges</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Edge</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Omega</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">jj</span> <span class="o">==</span> <span class="n">kk</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">base_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">canon_edge</span><span class="p">(</span><span class="n">jj</span><span class="p">,</span> <span class="n">kk</span><span class="p">))</span>
+    <span class="n">base_edges</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">base_edges</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">base_edges</span><span class="p">:</span>
+        <span class="c1"># Prefer stored canonical direction if present; else use whichever is present.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Omega</span><span class="p">:</span>
+            <span class="n">O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Omega</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">O_dir</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">Omega</span><span class="p">:</span>
+            <span class="n">O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Omega</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>  <span class="c1"># convert to (j,k) direction</span>
+            <span class="n">O_dir</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">Omega_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">O</span>
+
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dets</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span> <span class="k">if</span> <span class="p">(</span><span class="n">dets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">dets</span><span class="p">)</span> <span class="k">else</span> <span class="n">det_sign</span><span class="p">(</span><span class="n">O</span><span class="p">)</span>
+        <span class="n">det_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">d</span>
+
+        <span class="k">if</span> <span class="n">thetas</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">thetas</span><span class="p">:</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">thetas</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">th</span> <span class="o">=</span> <span class="n">decompose_O2_as_R_times_r</span><span class="p">(</span><span class="n">O</span><span class="p">,</span> <span class="n">ref_angle</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">theta_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">err_full</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">errs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">:</span>
+                <span class="n">err_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">errs</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)])</span>
+            <span class="k">elif</span> <span class="n">errs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">errs</span><span class="p">:</span>
+                <span class="n">err_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">errs</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">err_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+
+        <span class="c1"># Reverse</span>
+        <span class="n">O_rev</span> <span class="o">=</span> <span class="n">O</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">Omega_full</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">O_rev</span>
+        <span class="n">th_rev</span><span class="p">,</span> <span class="n">d_rev</span> <span class="o">=</span> <span class="n">decompose_O2_as_R_times_r</span><span class="p">(</span><span class="n">O_rev</span><span class="p">,</span> <span class="n">ref_angle</span><span class="o">=</span><span class="n">ref_angle</span><span class="p">)</span>
+        <span class="n">det_full</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d_rev</span><span class="p">)</span>
+        <span class="n">theta_full</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">th_rev</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">err_full</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">err_full</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="n">err_full</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span>
+
+    <span class="k">return</span> <span class="n">Omega_full</span><span class="p">,</span> <span class="n">det_full</span><span class="p">,</span> <span class="n">theta_full</span><span class="p">,</span> <span class="n">err_full</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.fiberwise_clustering &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="circle_bundles.get_local_rips" href="circle_bundles.get_local_rips.html" />
+    <link rel="prev" title="Analysis utilities" href="../utilities_analysis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#basic-installation">Basic installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../installation.html#optional-dependencies">Optional dependencies</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../quickstart.html#minimal-working-example">Minimal working example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../core.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../core.html#typical-workflow">Typical workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../results.html">Result objects and dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../results.html#core-result-containers">Core result containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results.html#lower-level-result-containers">Lower-level result containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../results.html#configuration-objects">Configuration objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../covers.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../metrics.html#reference">Reference</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="../utilities_analysis.html">Analysis utilities</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_optical_flow_torus.html">Extended Torus Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/01_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/all/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../utilities_analysis.html">Analysis utilities</a></li>
+      <li class="breadcrumb-item active">circle_bundles.fiberwise_clustering</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/generated/circle_bundles.fiberwise_clustering.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="circle-bundles-fiberwise-clustering">
+<h1>circle_bundles.fiberwise_clustering<a class="headerlink" href="#circle-bundles-fiberwise-clustering" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="circle_bundles.fiberwise_clustering">
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">fiberwise_clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sample_values</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">build_pca_embeddings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pca_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/analysis/fiberwise_clustering.html#fiberwise_clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.fiberwise_clustering" title="Link to this definition"></a></dt>
+<dd><p>Cluster each fiber with DBSCAN and then merge clusters globally via an overlap graph.</p>
+<p>This is a useful diagnostic tool when you have a cover (fibers) over the dataset and
+want to see whether local cluster structure aligns across overlaps.</p>
+<section id="workflow">
+<h2>Workflow<a class="headerlink" href="#workflow" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>For each fiber r (row of <code class="docutils literal notranslate"><span class="pre">U</span></code>), run DBSCAN on the points <code class="docutils literal notranslate"><span class="pre">data[U[r]]</span></code> using
+<code class="docutils literal notranslate"><span class="pre">eps_values[r]</span></code> and <code class="docutils literal notranslate"><span class="pre">min_sample_values[r]</span></code>.</p></li>
+<li><p>Create a graph whose nodes are <em>fiber-clusters</em> <code class="docutils literal notranslate"><span class="pre">(r,</span> <span class="pre">label)</span></code> (excluding label <code class="docutils literal notranslate"><span class="pre">-1</span></code>).
+Each node stores the list of sample indices belonging to that DBSCAN cluster.</p></li>
+<li><p>Add an edge between two nodes if the corresponding fiber-clusters share at least one
+sample index that is non-noise in both fibers. Edges store <code class="docutils literal notranslate"><span class="pre">indices_shared</span></code>.</p></li>
+<li><p>Define a global component label per sample by taking connected components of the graph
+and assigning each sample that appears in any node of that connected component.</p></li>
+</ol>
+<dl class="field-list">
+<dt class="field-odd">param data<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">d)</span></code> containing the ambient data vectors.</p>
+</dd>
+<dt class="field-even">param U<span class="colon">:</span></dt>
+<dd class="field-even"><p>Boolean membership matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_samples)</span></code>. Row <code class="docutils literal notranslate"><span class="pre">r</span></code> indicates
+which samples lie in fiber/cover set <code class="docutils literal notranslate"><span class="pre">U_r</span></code>.</p>
+</dd>
+<dt class="field-odd">param eps_values<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,)</span></code> with the DBSCAN <code class="docutils literal notranslate"><span class="pre">eps</span></code> parameter used for each fiber.</p>
+</dd>
+<dt class="field-even">param min_sample_values<span class="colon">:</span></dt>
+<dd class="field-even"><p>Array of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,)</span></code> with the DBSCAN <code class="docutils literal notranslate"><span class="pre">min_samples</span></code> parameter used for each fiber.</p>
+</dd>
+<dt class="field-odd">param build_pca_embeddings<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If True, compute PCA embeddings (within each fiber) for quick plotting with
+<code class="xref py py-func docutils literal notranslate"><span class="pre">plot_fiberwise_pca_grid()</span></code>.</p>
+</dd>
+<dt class="field-even">param pca_dim<span class="colon">:</span></dt>
+<dd class="field-even"><p>Number of PCA components to compute per fiber (typically 2).</p>
+</dd>
+<dt class="field-odd">returns<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><em>components</em> – Integer array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,)</span></code> giving a global component label per sample.
+Samples not belonging to any non-noise fiber-cluster remain <code class="docutils literal notranslate"><span class="pre">-1</span></code>.</p></li>
+<li><p><em>G</em> – A <code class="docutils literal notranslate"><span class="pre">networkx.Graph</span></code>. Nodes are tuples <code class="docutils literal notranslate"><span class="pre">(fiber_idx,</span> <span class="pre">cluster_label)</span></code> with node attribute
+<code class="docutils literal notranslate"><span class="pre">indices</span></code> (list of sample indices). Edges indicate overlap, and store
+<code class="docutils literal notranslate"><span class="pre">indices_shared</span></code> (the supporting sample indices).</p></li>
+<li><p><em>graph_dict</em> – A simple serialization-friendly representation of the graph (nodes/links).</p></li>
+<li><p><em>cl</em> – Integer array of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_samples)</span></code> giving the DBSCAN label of each sample
+within each fiber. Label <code class="docutils literal notranslate"><span class="pre">-1</span></code> denotes noise (or not present in that fiber).</p></li>
+<li><p><em>summary</em> –</p>
+<dl class="simple">
+<dt>Dict of helpful arrays for downstream plotting, including:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">fiber_component_counts</span></code>: number of DBSCAN clusters per fiber (excluding noise)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">global_component_counts</span></code>: number of graph nodes per global component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">point_counts</span></code>: number of samples assigned to each global component</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pca_store</span></code>: per-fiber PCA embeddings if requested</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>This routine requires optional dependencies: <code class="docutils literal notranslate"><span class="pre">networkx</span></code> and <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p></li>
+<li><p>Edge weights are not computed here. If you want a weighted filtration on the cluster graph,
+call <code class="xref py py-func docutils literal notranslate"><span class="pre">get_weights()</span></code> (internal helper) or attach your own <code class="docutils literal notranslate"><span class="pre">edge[&quot;weight&quot;]</span></code> values.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">components</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">graph_dict</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">fiberwise_clustering</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">data</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">eps_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mf">0.25</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">min_sample_values</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">U</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">10</span><span class="p">),</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plot_fiberwise_summary_bars</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>eps_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>min_sample_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>)</p></li>
+<li><p><strong>build_pca_embeddings</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>pca_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../utilities_analysis.html" class="btn btn-neutral float-left" title="Analysis utilities" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="circle_bundles.get_local_rips.html" class="btn btn-neutral float-right" title="circle_bundles.get_local_rips" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

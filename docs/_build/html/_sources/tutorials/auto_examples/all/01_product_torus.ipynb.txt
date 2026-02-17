@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "91f33560",
+   "id": "fccc1f93",
    "metadata": {},
    "source": [
     "(example_01_product_torus)="
