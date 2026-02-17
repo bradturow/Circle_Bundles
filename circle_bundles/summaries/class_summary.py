@@ -563,8 +563,11 @@ class ClassSummary:
         e_label = r"\text{Euler}" if bool(orientable) else r"\text{(twisted) Euler}"
         rows.append((e_label, _e_tex()))
 
-        if spin is not None and bool(orientable):
-            rows.append((r"\text{Spin}", r"\text{True}" if bool(spin) else r"\text{False}"))
+        # Only report spin separately when Euler number is NOT provided
+        # (If eZ is provided, we already show "(spin)/(not spin)" next to the Euler number.)
+        if (spin is not None) and bool(orientable) and (eZ is None):
+            w2_tex = r"w_2 = 0\ (\text{spin})" if bool(spin) else r"w_2 \neq 0\ (\text{not spin})"
+            rows.append((r"\text{Spin}", w2_tex))
 
         if warn is True:
             kk = r"\text{?}" if warn_k is None else str(int(warn_k))
@@ -683,9 +686,14 @@ def summarize_classes_and_persistence(*, reps: Any, restricted: Any, persistence
             else:
                 lines.append(_tline("(twisted) Euler:", "ẽ ≠ 0"))
 
-    if spin is not None and bool(orientable):
-        lines.append(_tline("spin:", f"{bool(spin)}"))
-
+    # Only report spin separately when Euler number is NOT provided
+    # (If eZ is provided, parity note "(spin)/(not spin)" is already shown.)
+    if (spin is not None) and bool(orientable) and (eZ is None):
+        if bool(spin):
+            lines.append(_tline("Spin:", "w₂ = 0 (spin)"))
+        else:
+            lines.append(_tline("Spin:", "w₂ ≠ 0 (not spin)"))
+    
     # --- requested warning ---
     if euler_not_cocycle_on_full is True:
         k_str = _fmt_int_or_dash(euler_cob_k)
