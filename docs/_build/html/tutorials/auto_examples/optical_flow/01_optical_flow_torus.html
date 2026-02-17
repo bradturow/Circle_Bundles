@@ -107,7 +107,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -133,12 +132,12 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Optical Flow</a><ul class="current">
@@ -156,6 +155,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -208,7 +211,7 @@
 
 <span class="n">patches_per_frame</span> <span class="o">=</span> <span class="mi">400</span>
 <span class="n">folder_path</span> <span class="o">=</span> <span class="s2">&quot;.../MPI-Sintel-complete/training/flow&quot;</span>   <span class="c1">#path to Sintel flow frames</span>
-
+<span class="n">folder_path</span> <span class="o">=</span> <span class="s2">&quot;/Users/bradturow/Desktop/TDA/MPI-Sintel-complete/training/flow&quot;</span>
 <span class="n">patch_df</span><span class="p">,</span> <span class="n">file_paths</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_patch_sample</span><span class="p">(</span>
     <span class="n">folder_path</span><span class="p">,</span>
     <span class="n">patches_per_frame</span> <span class="o">=</span> <span class="n">patches_per_frame</span><span class="p">,</span>
@@ -274,7 +277,7 @@ Finalizing dataframe... Done
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/7d0bb1dc9f11438f00a98b628bc83cebc547845518000ee56678e346d2c1e69c.png" src="../../../_images/7d0bb1dc9f11438f00a98b628bc83cebc547845518000ee56678e346d2c1e69c.png" />
+<img alt="../../../_images/beae14919762aabf3d570d213f257c7a564d72140e4e48e92cbfb4f1c8ca6334.png" src="../../../_images/beae14919762aabf3d570d213f257c7a564d72140e4e48e92cbfb4f1c8ca6334.png" />
 </div>
 </div>
 <p>Observe that we see a single 1-dimensional persistent class and no persistent classes in dimension 2.</p>
@@ -284,7 +287,7 @@ Finalizing dataframe... Done
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predom_dirs</span><span class="p">,</span> <span class="n">ratios</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_predominant_dirs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>  
 
 <span class="c1">#Construct a cover of the base space</span>
-<span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">12</span>
 <span class="n">landmarks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">n_landmarks</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span> <span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">overlap</span> <span class="o">=</span> <span class="mf">1.99</span>
 <span class="n">radius</span> <span class="o">=</span> <span class="n">overlap</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">n_landmarks</span><span class="p">)</span>
@@ -303,15 +306,15 @@ Finalizing dataframe... Done
 <div class="cell_output docutils container">
 <p class="rubric" id="cover-and-nerve-summary">Cover And Nerve Summary</p>
 <ul class="simple">
-<li><p>$n_\text{sets} = 16$, $n_\text{samples} = 25000$</p></li>
+<li><p>$n_\text{sets} = 12$, $n_\text{samples} = 25000$</p></li>
 </ul>
 <p><strong>Recorded Simplex Counts:</strong></p>
 <ul class="simple">
-<li><p>$#(\text{0-simplices}) = 16$</p></li>
-<li><p>$#(\text{1-simplices}) = 16$</p></li>
+<li><p>$#(\text{0-simplices}) = 12$</p></li>
+<li><p>$#(\text{1-simplices}) = 12$</p></li>
 <li><p><em>No recorded simplices in dimensions</em> $\ge 2$</p></li>
 </ul>
-<img alt="../../../_images/fce4aa0216a9b1fdbafd9b88a15f829162f24bb24b7bea7c98c43c584b8b8ed4.png" src="../../../_images/fce4aa0216a9b1fdbafd9b88a15f829162f24bb24b7bea7c98c43c584b8b8ed4.png" />
+<img alt="../../../_images/c369ada4199909509f7baf7de0fcb08d5e2b40291f2d3e13d42bc4554bcfe4f9.png" src="../../../_images/c369ada4199909509f7baf7de0fcb08d5e2b40291f2d3e13d42bc4554bcfe4f9.png" />
 </div>
 </div>
 <p>View a sample of the dataset arranged by predominant flow direction:</p>
@@ -362,7 +365,7 @@ Finalizing dataframe... Done
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/9958accf47e14f25b05471f8de72d71b619f0ee360466e153b6f633e22565fda.png" src="../../../_images/9958accf47e14f25b05471f8de72d71b619f0ee360466e153b6f633e22565fda.png" />
+<img alt="../../../_images/1e71a02b01aa79d4174e05664ceea18ba1f5017ad0db2e8a6b7d69fbb3f4a39a.png" src="../../../_images/1e71a02b01aa79d4174e05664ceea18ba1f5017ad0db2e8a6b7d69fbb3f4a39a.png" />
 </div>
 </div>
 <p>Observe that each <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span> has a single 1-dimensional (circular) persistent feature, supporting the hypothesis that the data has the structure of a discrete approximate circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\)</span>. Up to isormorphism, there are two possible global structures for a circle bundle over <span class="math notranslate nohighlight">\(\mathbb{RP}^{1}\cong\mathbb{S}^{1}\)</span>, namely the torus (trivial) and the Klein bottle (non-orientable). These two possibilities are distinguished by the orientation class <span class="math notranslate nohighlight">\(w_{1}\)</span>.</p>
@@ -376,13 +379,13 @@ Finalizing dataframe... Done
 </div>
 <div class="cell_output docutils container">
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Local Trivialization Summary} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.215\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.068\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.053\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.017\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.215\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\end{aligned}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Local Trivialization Summary} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.250\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.080\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.059\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.019\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.250\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\end{aligned}\end{split}\]</div>
 <div class="output text_latex math notranslate nohighlight">
 \[\begin{split}\displaystyle \begin{aligned}\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 = 0\ (\text{orientable})\\[3pt]\quad \text{Euler class} &amp;:\quad e = 0\ (\text{trivial})\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta\theta, e) = 0\end{aligned}\end{split}\]</div>
 <div class="output text_html"><div style='height:12pt'></div></div><div class="output text_latex math notranslate nohighlight">
 \[\displaystyle \textbf{Class Persistence}\]</div>
 <div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{array}{lrrrrr}\textbf{Stage} &amp; k &amp; r &amp; |W_r^{(1)}| &amp; |W_r^{(2)}| &amp; |W_r^{(3)}| \\ \hline \text{Full nerve} &amp; 0 &amp; \infty &amp; 16 &amp; 0 &amp; 0 \\ \text{w₁ cobirth} &amp; 0 &amp; \infty &amp; 16 &amp; 0 &amp; 0 \\ \text{w₁ codeath} &amp; 0 &amp; \infty &amp; 16 &amp; 0 &amp; 0 \\ \text{Euler cobirth} &amp; 0 &amp; \infty &amp; 16 &amp; 0 &amp; 0 \\ \text{Euler codeath} &amp; 0 &amp; \infty &amp; 16 &amp; 0 &amp; 0\end{array}\end{split}\]</div>
+\[\begin{split}\displaystyle \begin{array}{lrrrrr}\textbf{Stage} &amp; k &amp; r &amp; |W_r^{(1)}| &amp; |W_r^{(2)}| &amp; |W_r^{(3)}| \\ \hline \text{Full nerve} &amp; 0 &amp; 0.100 &amp; 12 &amp; 0 &amp; 0 \\ \text{w₁ cobirth} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0 \\ \text{w₁ codeath} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0 \\ \text{Euler cobirth} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0 \\ \text{Euler codeath} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0\end{array}\end{split}\]</div>
 </div>
 </div>
 <p>View the correlations between local circular coordinates on overlaps:</p>
@@ -394,7 +397,7 @@ Finalizing dataframe... Done
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/f8625f40caf0ec037766981eba6b944d93648c3a7e5cea9837a93c1ad7ff0608.png" src="../../../_images/f8625f40caf0ec037766981eba6b944d93648c3a7e5cea9837a93c1ad7ff0608.png" />
+<img alt="../../../_images/fbbf000974a63bbe716fa5f7d1fa5d2219f173572d217edf6aab47494357a8ad.png" src="../../../_images/fbbf000974a63bbe716fa5f7d1fa5d2219f173572d217edf6aab47494357a8ad.png" />
 </div>
 </div>
 <p>Since the global structure is trivial, synchronize local circular coordinates to construct a toroidal coordinate system for the dataset:</p>
@@ -435,10 +438,10 @@ Finalizing dataframe... Done
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>16076 high-directionality patches
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>16023 high-directionality patches
 </pre></div>
 </div>
-<img alt="../../../_images/38451a9512aa3f1edd62dc65e03f6a033e2115b4a1c19843d68b8ba3e0a3c54d.png" src="../../../_images/38451a9512aa3f1edd62dc65e03f6a033e2115b4a1c19843d68b8ba3e0a3c54d.png" />
+<img alt="../../../_images/edb720e1666784f309c950b5cd1dacada15493afe848e673bc93260f5750899a.png" src="../../../_images/edb720e1666784f309c950b5cd1dacada15493afe848e673bc93260f5750899a.png" />
 </div>
 </div>
 <p>View a sample of low-directionality patches arranged by toroidal coordinates:</p>
@@ -471,10 +474,10 @@ Finalizing dataframe... Done
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5314 low-directionality patches
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5338 low-directionality patches
 </pre></div>
 </div>
-<img alt="../../../_images/7875f4cd1202087687bd9dc679710a3a5adc22b2ee38d5b226af82affa1ce742.png" src="../../../_images/7875f4cd1202087687bd9dc679710a3a5adc22b2ee38d5b226af82affa1ce742.png" />
+<img alt="../../../_images/5da9a3564dc0e0156cb10bc9778854fa57dfe3ec76e0c41a028cecb98016ae2c.png" src="../../../_images/5da9a3564dc0e0156cb10bc9778854fa57dfe3ec76e0c41a028cecb98016ae2c.png" />
 </div>
 </div>
 <p>Observe that every column is nearly identical: this reflects the fact that the low-directionality data is concentrated near a single circle at the center of the thickened torus structure.</p>

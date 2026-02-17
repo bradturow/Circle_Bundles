@@ -556,7 +556,7 @@ class ClassSummary:
                     parity_note = r"\ (\text{spin})" if (k % 2 == 0) else r"\ (\text{not spin})"
                     return rf"\pm {k}" + parity_note
                 return rf"\pm {k}"
-            return r"e \neq 0" if bool(orientable) else r"\tilde{e}\neq 0"
+            return r"e \neq 0\ (\text{non-trivial})" if bool(orientable) else r"\tilde{e}\neq 0"
 
         rows: List[Tuple[str, str]] = []
         rows.append((r"\text{Stiefel--Whitney}", _w1_tex()))
@@ -565,7 +565,7 @@ class ClassSummary:
 
         # Only report spin separately when Euler number is NOT provided
         # (If eZ is provided, we already show "(spin)/(not spin)" next to the Euler number.)
-        if (spin is not None) and bool(orientable) and (eZ is None):
+        if (spin is not None) and bool(orientable) and (eZ is None) and (not e_zero_for_print):
             w2_tex = r"w_2 = 0\ (\text{spin})" if bool(spin) else r"w_2 \neq 0\ (\text{not spin})"
             rows.append((r"\text{Spin}", w2_tex))
 
@@ -688,7 +688,7 @@ def summarize_classes_and_persistence(*, reps: Any, restricted: Any, persistence
 
     # Only report spin separately when Euler number is NOT provided
     # (If eZ is provided, parity note "(spin)/(not spin)" is already shown.)
-    if (spin is not None) and bool(orientable) and (eZ is None):
+    if (spin is not None) and bool(orientable) and (eZ is None) and (not e_zero_for_print):
         if bool(spin):
             lines.append(_tline("Spin:", "w₂ = 0 (spin)"))
         else:

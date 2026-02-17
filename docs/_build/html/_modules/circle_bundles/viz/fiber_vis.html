@@ -102,7 +102,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -128,12 +127,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -151,6 +150,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -193,7 +196,7 @@
 <a class="viewcode-back" href="../../../api/generated/circle_bundles.viz.html#circle_bundles.viz.fiber_vis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">fiber_vis</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">vis_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">vis_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">vis_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">selected_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -210,18 +213,21 @@
     <span class="n">scatter_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Visualize up to `max_images` items from `data` by embedding them to 3D (PCA)</span>
-<span class="sd">    and overlaying thumbnails rendered by `vis_func`.</span>
+<span class="sd">    Visualize up to `max_images` items from `data` by embedding them to 3D (PCA).</span>
+
+<span class="sd">    - If `vis_func` is provided: overlay thumbnails rendered by `vis_func`.</span>
+<span class="sd">    - If `vis_func` is None: just show the embedded points.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : (N, d) array</span>
-<span class="sd">    vis_func : callable(datum) -&gt; (Figure | ndarray image)</span>
+<span class="sd">    vis_func : optional callable(datum) -&gt; (Figure | ndarray image)</span>
 <span class="sd">        Something render_to_rgba can handle after vis_func returns.</span>
+<span class="sd">        If None, no thumbnails are rendered; points only.</span>
 <span class="sd">    vis_data : optional data source for vis_func (same length N)</span>
 <span class="sd">        If provided, thumbnails are rendered from vis_data[idx] while embedding uses data[idx].</span>
 <span class="sd">    selected_indices : optional explicit indices to visualize</span>
-<span class="sd">    max_images : cap on number of thumbnails</span>
+<span class="sd">    max_images : cap on number of items/points shown (and thumbnails if vis_func given)</span>
 <span class="sd">    random_state : RNG seed used when selected_indices is None</span>
 
 <span class="sd">    Subplot usage</span>
@@ -244,7 +250,9 @@
     <span class="k">if</span> <span class="n">vis_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">vis_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vis_data</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vis_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">N</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;vis_data must have same length as data. Got </span><span class="si">{</span><span class="n">vis_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;vis_data must have same length as data. Got </span><span class="si">{</span><span class="n">vis_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> vs </span><span class="si">{</span><span class="n">N</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
     <span class="n">max_images</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_images</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">max_images</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -254,7 +262,9 @@
     <span class="k">if</span> <span class="n">selected_indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">random_state</span><span class="p">)</span>
         <span class="n">k</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_images</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-        <span class="n">selected_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">selected_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+            <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">selected_indices</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">selected_indices</span><span class="p">][:</span> <span class="nb">min</span><span class="p">(</span><span class="n">max_images</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">))]</span>
         <span class="n">selected_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">selected_indices</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">N</span><span class="p">]</span>
@@ -294,7 +304,7 @@
     <span class="k">if</span> <span class="n">clear_ax</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
 
-    <span class="c1"># light scatter so the space is visible (but not noisy)</span>
+    <span class="c1"># ---- always show points ----</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
         <span class="n">embedded</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
         <span class="n">embedded</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
@@ -303,29 +313,31 @@
         <span class="n">s</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">scatter_s</span><span class="p">),</span>
     <span class="p">)</span>
 
-    <span class="c1"># Ensure transforms/projection are ready</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="c1"># If no vis_func supplied, we&#39;re done (aside from aesthetics/save/show)</span>
+    <span class="k">if</span> <span class="n">vis_func</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Ensure transforms/projection are ready</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
 
-    <span class="c1"># ---- overlays ----</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">embedded</span><span class="p">):</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">datum</span> <span class="o">=</span> <span class="n">vis_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">vis_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">selected_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">rendered</span> <span class="o">=</span> <span class="n">vis_func</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">render_to_rgba</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="n">transparent_border</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># ---- overlays ----</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">embedded</span><span class="p">):</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selected_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">datum</span> <span class="o">=</span> <span class="n">vis_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">vis_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">selected_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">rendered</span> <span class="o">=</span> <span class="n">vis_func</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+                <span class="n">img</span> <span class="o">=</span> <span class="n">render_to_rgba</span><span class="p">(</span><span class="n">rendered</span><span class="p">,</span> <span class="n">transparent_border</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-            <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">proj_transform</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_proj</span><span class="p">())</span>
-            <span class="n">ab</span> <span class="o">=</span> <span class="n">AnnotationBbox</span><span class="p">(</span>
-                <span class="n">OffsetImage</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">zoom</span><span class="p">)),</span>
-                <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span>
-                <span class="n">xycoords</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span>
-                <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error rendering image at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">proj_transform</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">z</span><span class="p">),</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_proj</span><span class="p">())</span>
+                <span class="n">ab</span> <span class="o">=</span> <span class="n">AnnotationBbox</span><span class="p">(</span>
+                    <span class="n">OffsetImage</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">zoom</span><span class="p">)),</span>
+                    <span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">),</span>
+                    <span class="n">xycoords</span><span class="o">=</span><span class="s2">&quot;data&quot;</span><span class="p">,</span>
+                    <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ab</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error rendering image at index </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="c1"># Aesthetics</span>
+    <span class="c1"># ---- aesthetics ----</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">set_box_aspect</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>

@@ -102,7 +102,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -128,12 +127,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -151,6 +150,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -191,11 +194,12 @@
     <span class="s2">&quot;small_to_big&quot;</span><span class="p">,</span>
     <span class="s2">&quot;wrap_angle&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sample_C2_torus&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;torus_base_projection_from_data&quot;</span><span class="p">,</span>
     <span class="s2">&quot;sample_foldy_klein_bottle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sample_R3_torus&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">AngleFunc</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
+
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">const</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AngleFunc</span><span class="p">:</span>
@@ -335,18 +339,124 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">torus_base_projection_from_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+
+<div class="viewcode-block" id="sample_R3_torus">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.sample_R3_torus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_R3_torus</span><span class="p">(</span>
+    <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="c1"># Major radius (constant)</span>
+    <span class="n">R</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+    <span class="c1"># Minor radius r(theta) = center + amplitude * sin(frequency * theta + phase)</span>
+    <span class="n">r_center</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">r_amplitude</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">r_frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">r_phase</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="c1"># Relative noise on minor radius: r_noisy = r * (1 + sigma * N(0,1))</span>
+    <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">require_ring_torus</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># Returns</span>
+    <span class="n">return_theta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">return_alpha</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+<span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Recover base points (cos theta, sin theta) from data in R^4 by normalizing (x3,x4).</span>
-<span class="sd">    This works even if R(theta) varies (as long as it&#39;s positive).</span>
+<span class="sd">    Sample a torus-of-revolution in R^3 where the tube (fiber) radius varies sinusoidally with base angle theta.</span>
+
+<span class="sd">    Parameterization:</span>
+<span class="sd">        r(theta) = r_center + r_amplitude * sin(r_frequency * theta + r_phase)</span>
+
+<span class="sd">        x = (R + r(theta) cos(alpha)) cos(theta)</span>
+<span class="sd">        y = (R + r(theta) cos(alpha)) sin(theta)</span>
+<span class="sd">        z = r(theta) sin(alpha)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data : (n_points, 3)</span>
+<span class="sd">    base_points : (n_points, 2) = (cos(theta), sin(theta))</span>
+<span class="sd">    alpha : (n_points,)       fiber angle</span>
+<span class="sd">    theta : (n_points,)       base angle (optional)</span>
+<span class="sd">    r_vals : (n_points,)      realized tube radius after noise (only returned when</span>
+<span class="sd">                              return_theta and return_alpha are both True)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected data shape (n,4). Got </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-    <span class="n">z2</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
-    <span class="n">nrm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">z2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">nrm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">nrm</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">z2</span> <span class="o">/</span> <span class="n">nrm</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_points</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_points must be positive. Got </span><span class="si">{</span><span class="n">n_points</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+    <span class="n">r_center</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r_center</span><span class="p">)</span>
+    <span class="n">r_amplitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r_amplitude</span><span class="p">)</span>
+    <span class="n">r_phase</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">r_phase</span><span class="p">)</span>
+    <span class="n">r_frequency</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">r_frequency</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">R</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;R must be &gt; 0. Got </span><span class="si">{</span><span class="n">R</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r_frequency</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;r_frequency must be &gt;= 0. Got </span><span class="si">{</span><span class="n">r_frequency</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r_center</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;r_center must be &gt; 0. Got </span><span class="si">{</span><span class="n">r_center</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">r_amplitude</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;r_amplitude must be &gt;= 0. Got </span><span class="si">{</span><span class="n">r_amplitude</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">angles</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">angles</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># sinusoidal tube radius</span>
+    <span class="n">r_vals</span> <span class="o">=</span> <span class="n">r_center</span> <span class="o">+</span> <span class="n">r_amplitude</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">r_frequency</span> <span class="o">*</span> <span class="n">theta</span> <span class="o">+</span> <span class="n">r_phase</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">r_vals</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="n">rmin</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">r_vals</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Sinusoidal r(theta) became non-positive. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Minimum value was </span><span class="si">{</span><span class="n">rmin</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="s2">&quot;Increase r_center or decrease r_amplitude.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sigma</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">r_vals</span> <span class="o">=</span> <span class="n">r_vals</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">n_points</span><span class="p">))</span>
+        <span class="n">r_vals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">r_vals</span><span class="p">,</span> <span class="mf">1e-12</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">require_ring_torus</span><span class="p">:</span>
+        <span class="c1"># pointwise ring torus condition (prevents axis-crossing)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">R</span> <span class="o">&lt;=</span> <span class="n">r_vals</span><span class="p">):</span>
+            <span class="n">bad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">R</span> <span class="o">&lt;=</span> <span class="n">r_vals</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">i0</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bad</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;require_ring_torus=True but found theta where R &lt;= r(theta). &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Example index </span><span class="si">{</span><span class="n">i0</span><span class="si">}</span><span class="s2">: R=</span><span class="si">{</span><span class="n">R</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">, r=</span><span class="si">{</span><span class="n">r_vals</span><span class="p">[</span><span class="n">i0</span><span class="p">]</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="s2">&quot;Increase R, decrease r_center/r_amplitude, or set require_ring_torus=False.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="n">ca</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">sa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="n">ct</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">radial</span> <span class="o">=</span> <span class="n">R</span> <span class="o">+</span> <span class="n">r_vals</span> <span class="o">*</span> <span class="n">ca</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_points</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">radial</span> <span class="o">*</span> <span class="n">ct</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">radial</span> <span class="o">*</span> <span class="n">st</span>
+    <span class="n">data</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">r_vals</span> <span class="o">*</span> <span class="n">sa</span>
+
+    <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">ct</span><span class="p">,</span> <span class="n">st</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">return_theta</span> <span class="ow">and</span> <span class="n">return_alpha</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">r_vals</span>
+    <span class="k">if</span> <span class="n">return_theta</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">theta</span>
+    <span class="k">if</span> <span class="n">return_alpha</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">base_points</span><span class="p">,</span> <span class="n">alpha</span></div>
+
+
+
 
 
 
@@ -407,42 +517,55 @@
             <span class="n">G</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="n">R3</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">G</span>
 
-<span class="c1"># ------------------------------------------------------------</span>
-<span class="c1"># Klein bottle dataset (mapping torus of an orientation-reversing involution)</span>
-<span class="c1"># ------------------------------------------------------------</span>
+
+
+
+<span class="c1"># --- keep your existing folded_circle_r4, _rodrigues_3d, G_of_t ---</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_random_orthogonal</span><span class="p">(</span><span class="n">D</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">,</span> <span class="n">det_sign</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Haar-ish random orthogonal matrix via QR. Optionally force det = +1 (SO(D)).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
+    <span class="n">Q</span><span class="p">,</span> <span class="n">R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">qr</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+    <span class="c1"># make Q deterministic w.r.t QR sign convention</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+    <span class="n">s</span><span class="p">[</span><span class="n">s</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">det_sign</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">det_sign</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;det_sign must be +1, -1, or None.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span> <span class="o">*</span> <span class="n">det_sign</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">Q</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>  <span class="c1"># flip one column to change determinant</span>
+    <span class="k">return</span> <span class="n">Q</span>
+
 
 <div class="viewcode-block" id="sample_foldy_klein_bottle">
 <a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.sample_foldy_klein_bottle">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sample_foldy_klein_bottle</span><span class="p">(</span>
     <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">amp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">base_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">amp_fiber</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">amp_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">base_radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>   <span class="c1"># only used if amp_base is None (plain circle base)</span>
     <span class="n">noise</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">rigid_motion</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">translate_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">det_sign</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">+</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Samples an embedded Klein bottle-like total space in R^2 x R^4 = R^6.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    n : int</span>
-<span class="sd">        Number of samples.</span>
-<span class="sd">    amp : float</span>
-<span class="sd">        Amplitude of the folded-circle oscillation.</span>
-<span class="sd">    base_radius : float</span>
-<span class="sd">        Radius of the embedded base circle.</span>
-<span class="sd">    noise : float</span>
-<span class="sd">        Standard deviation of i.i.d. Gaussian noise added to ambient coordinates.</span>
-<span class="sd">        (noise=0 gives noiseless data)</span>
-<span class="sd">    rng : np.random.Generator, optional</span>
-<span class="sd">        Random number generator.</span>
+<span class="sd">    Like sample_foldy_klein_bottle, but optionally:</span>
+<span class="sd">      - embed the base circle nonlinearly in R^4 (using folded_circle_r4),</span>
+<span class="sd">      - then apply a global rigid motion in ambient space to intermix coordinates.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    X : (n,6) ndarray</span>
-<span class="sd">        Ambient coordinates.</span>
-<span class="sd">    t : (n,) ndarray</span>
+<span class="sd">    X : (n, D) array</span>
+<span class="sd">        Ambient coordinates. D=6 if base is 2D circle; D=8 if base is 4D folded.</span>
+<span class="sd">    t : (n,) array</span>
 <span class="sd">        Base parameter (ground truth).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -452,26 +575,40 @@
     <span class="n">t</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
 
-    <span class="c1"># Base embedding</span>
-    <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span>
-        <span class="n">base_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
-        <span class="n">base_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
-    <span class="p">])</span>
+    <span class="c1"># --- Base embedding ---</span>
+    <span class="k">if</span> <span class="n">amp_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># original base in R^2</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span>
+            <span class="n">base_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+            <span class="n">base_radius</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">t</span><span class="p">),</span>
+        <span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># folded base in R^4 (same style as fiber)</span>
+        <span class="c1"># NOTE: base_radius can be absorbed by scaling; we keep it for convenience</span>
+        <span class="n">base</span> <span class="o">=</span> <span class="n">base_radius</span> <span class="o">*</span> <span class="n">folded_circle_r4</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">amp</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">amp_base</span><span class="p">))</span>  <span class="c1"># (n,4)</span>
 
-    <span class="c1"># Fiber embedding</span>
-    <span class="n">fib0</span> <span class="o">=</span> <span class="n">folded_circle_r4</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">amp</span><span class="o">=</span><span class="n">amp</span><span class="p">)</span>
+    <span class="c1"># --- Fiber embedding (same as yours) ---</span>
+    <span class="n">fib0</span> <span class="o">=</span> <span class="n">folded_circle_r4</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">amp</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">amp_fiber</span><span class="p">))</span>  <span class="c1"># (n,4)</span>
 
     <span class="n">fib</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">fib0</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
         <span class="n">G</span> <span class="o">=</span> <span class="n">G_of_t</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="n">fib</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">G</span> <span class="o">@</span> <span class="n">fib0</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
-    <span class="c1"># Combine</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">base</span><span class="p">,</span> <span class="n">fib</span><span class="p">])</span>
+    <span class="c1"># --- Combine ---</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">base</span><span class="p">,</span> <span class="n">fib</span><span class="p">])</span>  <span class="c1"># (n, 2+4) or (n, 4+4)</span>
 
-    <span class="c1"># Add ambient noise</span>
+    <span class="c1"># --- Global rigid motion (mix coordinates) ---</span>
+    <span class="k">if</span> <span class="n">rigid_motion</span><span class="p">:</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">_random_orthogonal</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span> <span class="n">det_sign</span><span class="o">=</span><span class="n">det_sign</span><span class="p">)</span>  <span class="c1"># det_sign=+1 =&gt; SO(D)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">Q</span>  <span class="c1"># right-multiply: mixes coordinate axes</span>
+        <span class="k">if</span> <span class="n">translate_scale</span> <span class="ow">and</span> <span class="n">translate_scale</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">translate_scale</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="p">))</span>
+
+    <span class="c1"># --- Ambient noise ---</span>
     <span class="k">if</span> <span class="n">noise</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">noise</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">t</span></div>
 

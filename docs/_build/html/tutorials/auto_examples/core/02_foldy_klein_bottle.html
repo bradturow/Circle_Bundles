@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Synthetic Natural Image Patches" href="03_synthetic_natural_image_patches.html" />
-    <link rel="prev" title="Product Torus With Varying Fiber Radius" href="01_product_torus.html" /> 
+    <link rel="prev" title="Torus With Varying Fiber Radius" href="01_product_torus.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -107,7 +107,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -133,12 +132,12 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html">Core</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../optical_flow/index.html">Optical Flow</a><ul>
@@ -156,6 +155,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -186,8 +189,9 @@
              
   <section class="tex2jax_ignore mathjax_ignore" id="folded-klein-bottle">
 <span id="example-02-foldy-klein-bottle"></span><h1>Folded Klein Bottle<a class="headerlink" href="#folded-klein-bottle" title="Link to this heading"></a></h1>
-<p>An example of an application of the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to a dataset where the fibers of the underlying model are topological circles but not geometric ones, and PCA2 fails produce local circular coordinates which are usable for analysis. We instead use the Dreimac library’s topologically-flavored sparse circular coordinate algorithm.</p>
-<p>We generate a noisy sampling from a 2-manifold <span class="math notranslate nohighlight">\(M\)</span> with the topology of a Klein bottle, defined as follows: let <span class="math notranslate nohighlight">\(\gamma:\mathbb{R}\to \mathbb{R}^{4}\)</span> be defined by <span class="math notranslate nohighlight">\(\gamma(t) = (\sin (t), \cos(t), \sin(2t),0)\)</span> for all <span class="math notranslate nohighlight">\(t\in\mathbb{R}\)</span>, and let <span class="math notranslate nohighlight">\(F = \gamma(\mathbb{R})\subset\mathbb{R}^{4}\)</span>.  Note that <span class="math notranslate nohighlight">\(F\)</span> is topologically a circle, but geometrically it is folded. In particular, <span class="math notranslate nohighlight">\(F\)</span> is invariant under a reflection in the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> coordinates. Now, define <span class="math notranslate nohighlight">\(R:[0,2\pi]\to SO(4)\)</span> by</p>
+<p>An example of an application of the <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> pipeline to a dataset where the fibers of the underlying model are topological circles but not geometric ones, and <span class="math notranslate nohighlight">\(\text{PCA}_{2}\)</span> fails produce local circular coordinates which are usable for analysis. We instead use the DREiMac library’s topologically-flavored sparse circular coordinate algorithm.</p>
+<p>The model manifold <span class="math notranslate nohighlight">\(M\)</span> is defined as follows: let <span class="math notranslate nohighlight">\(\gamma:\mathbb{R}\to \mathbb{R}^{4}\)</span> be defined by <span class="math notranslate nohighlight">\(\gamma(t) = (\sin (t), \cos(t), \sin(2t),0)\)</span> for all <span class="math notranslate nohighlight">\(t\in\mathbb{R}\)</span>, and let <span class="math notranslate nohighlight">\(F = \gamma(\mathbb{R})\subset\mathbb{R}^{4}\)</span>.<br />
+Note that <span class="math notranslate nohighlight">\(F\)</span> is topologically a circle, but geometrically it looks “folded over” in 3-dimensional space (identified with a subspace of <span class="math notranslate nohighlight">\(\mathbb{R}^{4}\)</span> in the obvious way).  In particular, <span class="math notranslate nohighlight">\(F\)</span> is invariant under a reflection in the <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(y\)</span> coordinates. Now, define <span class="math notranslate nohighlight">\(R:[0,2\pi]\to SO(4)\)</span> by</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}R(t) = \left(\begin{array}{cccc}
 a &amp; b &amp; 0 &amp; d\\
@@ -197,17 +201,22 @@ b &amp; a &amp; 0 &amp; -d\\
 \end{array}\right)\end{split}\]</div>
 <p>where</p>
 <div class="math notranslate nohighlight">
-\[\alpha = \frac{t}{2},\hspace{1cm}a = \frac{1 + \cos(\alpha)}{2},\hspace{1cm}b = \frac{1 - \cos(\alpha)}{2}\]</div>
+\[\tau = \frac{t}{2},\hspace{1cm}a = \frac{1 + \cos(\tau)}{2},\hspace{1cm}b = \frac{1 - \cos(\tau)}{2}\]</div>
 <div class="math notranslate nohighlight">
-\[c = \cos(\alpha),\hspace{1cm}d =  \frac{\sqrt{2}}{2}\sin(\alpha)\]</div>
-<p>Observe in particular that <span class="math notranslate nohighlight">\(R(0) = I\)</span>, <span class="math notranslate nohighlight">\(R(2\pi)\)</span> is the matrix which maps <span class="math notranslate nohighlight">\((x,y,z,w)\)</span> to <span class="math notranslate nohighlight">\((y,x,z,-w)\)</span> and <span class="math notranslate nohighlight">\(R(t)\)</span> fixes the <span class="math notranslate nohighlight">\(z\)</span> axis for all <span class="math notranslate nohighlight">\(t\)</span>. Finally, we define <span class="math notranslate nohighlight">\(M\)</span> by</p>
+\[c = \cos(\tau),\hspace{1cm}d =  \frac{\sqrt{2}}{2}\sin(\tau)\]</div>
+<p>Observe in particular that <span class="math notranslate nohighlight">\(R(0) = I\)</span>, <span class="math notranslate nohighlight">\(R(2\pi)\)</span> is the matrix which maps <span class="math notranslate nohighlight">\((x,y,z,w)\)</span> to <span class="math notranslate nohighlight">\((y,x,z,-w)\)</span> and <span class="math notranslate nohighlight">\(R(t)\)</span> fixes the <span class="math notranslate nohighlight">\(z\)</span>-axis for all <span class="math notranslate nohighlight">\(t\)</span>. Finally, define <span class="math notranslate nohighlight">\(\widetilde{M}\)</span> by</p>
 <div class="math notranslate nohighlight">
-\[M = \{(u,v)\in\mathbb{R}^{2}\times\mathbb{R}^{4}: u = (\cos(\theta),\sin(\theta)), \ v\in R(\theta)F\}\]</div>
-<p>with a projection map <span class="math notranslate nohighlight">\(\pi:M\to \mathbb{S}^{1}\)</span> onto the first factor.</p>
+\[\widetilde{M} = \{(u,v)\in\mathbb{R}^{4}\times\mathbb{R}^{4}: u = \gamma (t), \ v\in R(t)F\}\]</div>
+<p>and apply an <span class="math notranslate nohighlight">\(SO(8)\)</span> rotation to obtain the manifold <span class="math notranslate nohighlight">\(M\)</span>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ripser</span><span class="w"> </span><span class="kn">import</span> <span class="n">ripser</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">persim</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_diagrams</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dreimac</span><span class="w"> </span><span class="kn">import</span> <span class="n">CircularCoords</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
 </pre></div>
@@ -217,22 +226,53 @@ b &amp; a &amp; 0 &amp; -d\\
 <p>First, generate a noisy sampling of the manifold <span class="math notranslate nohighlight">\(M\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">5000</span>
-<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.1</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.05</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_foldy_klein_bottle</span><span class="p">(</span><span class="n">n_landmarks</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="n">base_angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>  <span class="c1">#Compute base projections to S1 = R/(2pi Z)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_foldy_klein_bottle</span><span class="p">(</span><span class="n">n_landmarks</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">rng</span> <span class="o">=</span> <span class="n">rng</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Optionally run the cell below to view an interactive visualization of the projection map:</p>
+<p>Show a PCA visualization of the dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">app</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">show_bundle_vis</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> 
-                         <span class="n">base_points</span> <span class="o">=</span> <span class="n">base_angles</span><span class="p">,</span> 
-                         <span class="n">base_metric</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">S1AngleMetric</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cb</span><span class="o">.</span><span class="n">show_pca</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">elev</span> <span class="o">=</span> <span class="mi">35</span><span class="p">,</span> <span class="n">azim</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/fbef2e1ec2099514cab4214bdb070380e36a71e00248457afca513a218d603b9.png" src="../../../_images/fbef2e1ec2099514cab4214bdb070380e36a71e00248457afca513a218d603b9.png" />
+</div>
+</div>
+<p>Compute persistence diagrams from a subsample of the data:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dgms_2</span> <span class="o">=</span> <span class="n">ripser</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">maxdim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_perm</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="s2">&quot;dgms&quot;</span><span class="p">]</span>
+<span class="n">dgms_3</span> <span class="o">=</span> <span class="n">ripser</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">coeff</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">maxdim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">n_perm</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="s2">&quot;dgms&quot;</span><span class="p">]</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">plot_diagrams</span><span class="p">(</span><span class="n">dgms_2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$\mathbb</span><span class="si">{Z}</span><span class="s2">_</span><span class="si">{2}</span><span class="s2">$ Coefficients&quot;</span><span class="p">)</span>
+<span class="n">plot_diagrams</span><span class="p">(</span><span class="n">dgms_3</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">title</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;$\mathbb</span><span class="si">{Z}</span><span class="s2">_</span><span class="si">{3}</span><span class="s2">$ Coefficients&quot;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../../_images/58142ac3b890306f4fc0f07f4cecf1fe47e15da0cf7aee89e6acb9bfa99e3ea2.png" src="../../../_images/58142ac3b890306f4fc0f07f4cecf1fe47e15da0cf7aee89e6acb9bfa99e3ea2.png" />
+</div>
+</div>
+<p>The persistence diagrams above reflect the Klein bottle topology of the underlying manifold <span class="math notranslate nohighlight">\(M\)</span>. In particular, note that <span class="math notranslate nohighlight">\(H^{1}(M;\mathbb{Z})\cong \mathbb{Z}\oplus\mathbb{Z}_{2}\)</span> and <span class="math notranslate nohighlight">\(H^{2}(M;\mathbb{Z}) = 0\)</span>.</p>
+<p>To certify this topology with local-to-global analysis, use the 1-dimensional <span class="math notranslate nohighlight">\(\mathbb{Z}_{3}\)</span> persistent class representative as input for the DREiMac circular coordinates algorithm:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prime</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">n_landmarks</span> <span class="o">=</span> <span class="mi">500</span><span class="p">)</span>
+<span class="n">base_angles</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">get_coordinates</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -250,46 +290,33 @@ b &amp; a &amp; 0 &amp; -d\\
     <span class="n">landmarks</span><span class="p">,</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span><span class="p">,</span>
     <span class="n">metric</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">S1AngleMetric</span><span class="p">())</span>
-
-<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">Bundle</span><span class="p">(</span><span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">cover</span> <span class="o">=</span> <span class="n">cover</span><span class="p">,</span> <span class="n">show_summary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<p class="rubric" id="cover-and-nerve-summary">Cover And Nerve Summary</p>
-<ul class="simple">
-<li><p>$n_\text{sets} = 12$, $n_\text{samples} = 5000$</p></li>
-</ul>
-<p><strong>Recorded Simplex Counts:</strong></p>
-<ul class="simple">
-<li><p>$#(\text{0-simplices}) = 12$</p></li>
-<li><p>$#(\text{1-simplices}) = 12$</p></li>
-<li><p><em>No recorded simplices in dimensions</em> $\ge 2$</p></li>
-</ul>
-<img alt="../../../_images/6eaf7d6d313f48d3a42c50e5320d323860c53884fdde56ea6a7654d4ee0bd0db.png" src="../../../_images/6eaf7d6d313f48d3a42c50e5320d323860c53884fdde56ea6a7654d4ee0bd0db.png" />
 </div>
 </div>
 <p>Show PCA projections of the data in several <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fiber_ids</span><span class="p">,</span> <span class="n">idx_list</span><span class="p">,</span> <span class="n">proj_list</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_local_pca</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span> <span class="n">to_view</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span><span class="mi">9</span><span class="p">])</span>
-<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">plot_local_pca</span><span class="p">(</span><span class="n">fiber_ids</span><span class="p">,</span> <span class="n">proj_list</span><span class="p">,</span> <span class="n">n_cols</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_local_pca</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
+                      <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                      <span class="n">to_view</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">],</span>
+                     <span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/1c6374b2ae76c350fa6d0de4a6d931027a323b86398a063ac176e7bc3e6c00fe.png" src="../../../_images/1c6374b2ae76c350fa6d0de4a6d931027a323b86398a063ac176e7bc3e6c00fe.png" />
+<img alt="../../../_images/4c44fbdfcaca981ecf053a1c0dca457b445a1fce662a035bcf51247c3644b8c5.png" src="../../../_images/4c44fbdfcaca981ecf053a1c0dca457b445a1fce662a035bcf51247c3644b8c5.png" />
 </div>
 </div>
-<p>The PCA projections indicate that the fibers are not geometric circles, and PCA2 will fail to produce reasonable local circular coordinates or reliable transition matrices.</p>
+<p>The PCA projections indicate that the fibers are not geometric circles, and <span class="math notranslate nohighlight">\(\text{PCA}_{2}\)</span> will fail to produce reasonable local circular coordinates or reliable transition matrices.</p>
 <p>On the other hand, since the fibers look like <span class="math notranslate nohighlight">\(\mathbb{S}^{1}\)</span> <span class="math notranslate nohighlight">\(\textit{topologically}\)</span>, we expect each set <span class="math notranslate nohighlight">\(\pi^{-1}(U_{j})\)</span> to produce a prominant 1-dimensional persistent homology class. Compute the persistence diagrams:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fiber_ids</span><span class="p">,</span> <span class="n">dense_idx_list</span><span class="p">,</span> <span class="n">rips_list</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_local_rips</span><span class="p">(</span>
     <span class="n">data</span><span class="p">,</span>
     <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
-    <span class="n">to_view</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">8</span><span class="p">],</span> <span class="c1">#Choose a few diagrams to compute </span>
+    <span class="n">to_view</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="c1">#Choose a few diagrams to compute </span>
                        <span class="c1">#(or compute all by setting to None)</span>
     <span class="n">maxdim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">n_perm</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
@@ -307,49 +334,52 @@ b &amp; a &amp; 0 &amp; -d\\
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/0c86bfbdfdb4c870eaee64e3492baee2d6be1534b7c55a26d8573225ffcd3966.png" src="../../../_images/0c86bfbdfdb4c870eaee64e3492baee2d6be1534b7c55a26d8573225ffcd3966.png" />
+<img alt="../../../_images/86591b4bd48c0882be86a49991e082b6e9772000e040dc7ac8d7fbb4209d5edd.png" src="../../../_images/86591b4bd48c0882be86a49991e082b6e9772000e040dc7ac8d7fbb4209d5edd.png" />
 </div>
 </div>
-<p>Use Dreimac to construct a system of local circular coordinate functions and compute characteristic classes:</p>
+<p>Use the DREiMac circular coordinates algorithm to construct a system of local circular coordinate functions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">dreimac</span><span class="w"> </span><span class="kn">import</span> <span class="n">CircularCoords</span>
-<span class="n">cc_alg</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">DreimacCCConfig</span><span class="p">(</span><span class="n">landmarks_per_patch</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">CircularCoords_cls</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cc_alg</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">DreimacCCConfig</span><span class="p">(</span><span class="n">landmarks_per_patch</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">CircularCoords_cls</span> <span class="o">=</span> <span class="n">CircularCoords</span><span class="p">)</span>
 
-<span class="n">triv_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_local_trivs</span><span class="p">(</span><span class="n">show_summary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">cc</span> <span class="o">=</span> <span class="n">cc_alg</span><span class="p">)</span>
-<span class="n">class_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_classes</span><span class="p">(</span><span class="n">show_summary</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">Bundle</span><span class="p">(</span><span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">,</span> <span class="n">cover</span> <span class="o">=</span> <span class="n">cover</span><span class="p">)</span>
+<span class="n">triv_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_local_trivs</span><span class="p">(</span><span class="n">cc</span> <span class="o">=</span> <span class="n">cc_alg</span><span class="p">)</span>
+
+<span class="c1"># Show local PCA projections colored according to angles computed with Dreimac:</span>
+<span class="n">to_view</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">get_local_pca</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> 
+                      <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+                      <span class="n">f</span> <span class="o">=</span> <span class="n">triv_result</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+                      <span class="n">to_view</span> <span class="o">=</span> <span class="n">to_view</span><span class="p">,</span>
+                     <span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Local Trivialization Summary} &amp; \\[6pt]\quad \text{Trivialization error} &amp;:\quad \varepsilon_{\text{triv}} := \sup_{(j\,k)\in\mathcal{N}(\mathcal{U})}\sup_{x\in\pi^{-1}(U_j\cap U_k)} d_{\mathbb{C}}(\Omega_{jk}f_k(x),f_j(x)) = 0.694\ \left(\varepsilon_{\text{triv}}^{\text{geo}}=0.225\pi\right)\\[3pt]\quad \text{Mean triv error} &amp;:\quad \bar{\varepsilon}_{\text{triv}} = 0.166\ \left(\bar{\varepsilon}_{\text{triv}}^{\text{geo}}=0.053\pi\right)\\[3pt]\quad \text{Surjectivity defect} &amp;:\quad \delta := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\min_{v\in\{i,j,k\}} d_H\!\left(f_v(\pi^{-1}(U_i\cap U_j\cap U_k)),\mathbb{S}^1\right) = 0.000\\[3pt]\quad \text{Stability ratio} &amp;:\quad \alpha := \varepsilon_{\text{triv}}/(1-\delta) = 0.694\\[3pt]\quad \text{Cocycle error} &amp;:\quad \varepsilon_{\mathrm{coc}} := \sup_{(i\,j\,k)\in\mathcal{N}(\mathcal{U})}\left\|\Omega_{ij}\Omega_{jk}\Omega_{ki}-I\right\|_F = 0.000\end{aligned}\end{split}\]</div>
-<div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{aligned}\textbf{Characteristic Classes} &amp; \\[6pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[3pt]\quad \text{(twisted) Euler class} &amp;:\quad \tilde{e} = 0\\[3pt]\quad \text{Euler rounding dist.} &amp;:\quad d_\infty(\delta_\omega\theta, \tilde{e}) = 0\end{aligned}\end{split}\]</div>
-<div class="output text_html"><div style='height:12pt'></div></div><div class="output text_latex math notranslate nohighlight">
-\[\displaystyle \textbf{Class Persistence}\]</div>
-<div class="output text_latex math notranslate nohighlight">
-\[\begin{split}\displaystyle \begin{array}{lrrrrr}\textbf{Stage} &amp; k &amp; r &amp; |W_r^{(1)}| &amp; |W_r^{(2)}| &amp; |W_r^{(3)}| \\ \hline \text{Full nerve} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0 \\ \text{w₁ cobirth} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0 \\ \text{w₁ codeath} &amp; 1 &amp; 0.281 &amp; 11 &amp; 0 &amp; 0 \\ \text{Euler cobirth} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0 \\ \text{Euler codeath} &amp; 0 &amp; \infty &amp; 12 &amp; 0 &amp; 0\end{array}\end{split}\]</div>
+<img alt="../../../_images/e6d2a4db998680e610f39403a54e6006ceeccfd7a8d049c85451b9c769e8f8a3.png" src="../../../_images/e6d2a4db998680e610f39403a54e6006ceeccfd7a8d049c85451b9c769e8f8a3.png" />
 </div>
 </div>
-<p>The result above confirm the Klein bottle topology underlying the dataset.  View some correlations between local circular coordinate functions on overlaps:</p>
+<p>Now, compute characteristic classes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">compare_trivs</span><span class="p">(</span><span class="n">max_pairs</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">class_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_classes</span><span class="p">(</span><span class="n">show_classes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../../../_images/25b78eb47886cfae654ab9ad576d6222eddbee4e3ce54428b834372d136eac35.png" src="../../../_images/25b78eb47886cfae654ab9ad576d6222eddbee4e3ce54428b834372d136eac35.png" />
+<div class="output text_latex math notranslate nohighlight">
+\[\begin{split}\displaystyle \begin{aligned}\textbf{Characteristic Classes} &amp; \\[8pt]\quad \text{Stiefel--Whitney} &amp;:\quad w_1 \neq 0\ (\text{non-orientable})\\[4pt]\quad \text{(twisted) Euler} &amp;:\quad \tilde{e}=0\end{aligned}\end{split}\]</div>
 </div>
 </div>
+<p>From the computed characteristic classes, we can infer that the 2-manifold underlying the dataset has the topology of a Klein bottle, as expected.</p>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="01_product_torus.html" class="btn btn-neutral float-left" title="Product Torus With Varying Fiber Radius" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="01_product_torus.html" class="btn btn-neutral float-left" title="Torus With Varying Fiber Radius" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="03_synthetic_natural_image_patches.html" class="btn btn-neutral float-right" title="Synthetic Natural Image Patches" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

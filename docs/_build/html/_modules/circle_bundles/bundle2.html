@@ -102,7 +102,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -128,12 +127,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -151,6 +150,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -182,7 +185,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Set</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -462,7 +465,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BundleMapSummary</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
 
     <span class="c1"># ----------------------------</span>
     <span class="c1"># requirement helpers (NO auto-running)</span>
@@ -596,7 +599,6 @@
     <span class="c1"># ----------------------------</span>
     <span class="c1"># summaries</span>
     <span class="c1"># ----------------------------</span>
-
     <span class="k">def</span><span class="w"> </span><span class="nf">summarize_nerve</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
@@ -626,7 +628,6 @@
 
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">show</span><span class="p">:</span>
             <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
-                <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
                 <span class="n">plot</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;auto&quot;</span> <span class="k">if</span> <span class="n">plot</span> <span class="k">else</span> <span class="kc">False</span><span class="p">),</span>
                 <span class="n">show_tets_plot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -637,7 +638,7 @@
 
         <span class="k">return</span> <span class="n">summ</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_local_trivs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_local_trivs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># still supported because we keep _local_triv privately</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
@@ -649,20 +650,42 @@
             <span class="n">quality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-            <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+
+        <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">summ</span>
 
+<div class="viewcode-block" id="Bundle.summarize_classes">
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.summarize_classes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">summarize_classes</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">top_k</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="n">show_weight_hist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">hist_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">show_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">show_persistence</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">show_rounding_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_reps</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_restricted</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Summarize class reps + restricted class data + persistence.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        show_classes:</span>
+<span class="sd">            Whether to display the characteristic class block.</span>
+<span class="sd">        show_persistence:</span>
+<span class="sd">            Whether to display the persistence/cutoff block.</span>
+<span class="sd">        show_rounding_distance:</span>
+<span class="sd">            Whether to display the Euler rounding distance (when available).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ClassSummary or None</span>
+<span class="sd">            The summary object, or None if class results are not available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_class_reps</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_restricted</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="n">summ</span> <span class="o">=</span> <span class="n">summarize_classes_and_persistence</span><span class="p">(</span>
@@ -671,23 +694,20 @@
             <span class="n">persistence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-            <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
-                <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">top_k</span><span class="p">),</span>
-                <span class="n">show_weight_hist</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_weight_hist</span><span class="p">),</span>
-                <span class="n">hist_bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hist_bins</span><span class="p">),</span>
-            <span class="p">)</span>
+        <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
+            <span class="n">show_classes</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_classes</span><span class="p">),</span>
+            <span class="n">show_persistence</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_persistence</span><span class="p">),</span>
+            <span class="n">show_rounding_distance</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_rounding_distance</span><span class="p">),</span>
+        <span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">summ</span>
+        <span class="k">return</span> <span class="n">summ</span></div>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_bundle_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">summarize_bundle_map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span>
 
@@ -696,10 +716,6 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">summary</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">modes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">,</span> <span class="s2">&quot;local_triv&quot;</span><span class="p">,</span> <span class="s2">&quot;classes&quot;</span><span class="p">,</span> <span class="s2">&quot;bundle_map&quot;</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">show_weight_hist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">hist_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Display any summaries that are currently available and return them in a dict.</span>
@@ -710,23 +726,16 @@
 <span class="sd">        - ``&quot;classes&quot;`` if :meth:`get_classes` has been run,</span>
 <span class="sd">        - ``&quot;bundle_map&quot;`` if :meth:`get_bundle_map` has been run.</span>
 
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        modes:</span>
-<span class="sd">            Iterable selecting which summaries to consider. If None, uses the default policy above.</span>
-<span class="sd">        show:</span>
-<span class="sd">            If True, display summaries in the active frontend.</span>
-<span class="sd">        show_weight_hist:</span>
-<span class="sd">            Whether to show the edge-weight histogram in the class summary.</span>
-<span class="sd">        hist_bins:</span>
-<span class="sd">            Histogram bins for the class-summary weight histogram.</span>
+<span class="sd">            Iterable selecting which summaries to display. If None, uses the default policy above.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        dict</span>
 <span class="sd">            Mapping from summary name to summary object (some entries may be ``None`` if unavailable).</span>
-<span class="sd">        &quot;&quot;&quot;</span>        
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">modes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">modes_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -746,39 +755,26 @@
         <span class="n">first_shown</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modes_list</span><span class="p">:</span>
-            <span class="n">will_show</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="n">show</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;nerve&quot;</span><span class="p">:</span>
-                    <span class="n">will_show</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;local_triv&quot;</span><span class="p">:</span>
-                    <span class="n">will_show</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_triv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;classes&quot;</span><span class="p">:</span>
-                    <span class="n">will_show</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_class_reps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_class_restricted</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="p">)</span>
-                <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;bundle_map&quot;</span><span class="p">:</span>
-                    <span class="n">will_show</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
-            <span class="k">if</span> <span class="n">will_show</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">first_shown</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">first_shown</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">will_show</span><span class="p">:</span>
-                <span class="n">first_shown</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">first_shown</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;nerve&quot;</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;nerve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
             <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;local_triv&quot;</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;local_triv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_local_trivs</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;local_triv&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_local_trivs</span><span class="p">()</span>
+
             <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;classes&quot;</span><span class="p">:</span>
                 <span class="n">out</span><span class="p">[</span><span class="s2">&quot;classes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_classes</span><span class="p">(</span>
-                    <span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">,</span>
-                    <span class="n">top_k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                    <span class="n">show_weight_hist</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_weight_hist</span><span class="p">),</span>
-                    <span class="n">hist_bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hist_bins</span><span class="p">),</span>
+                    <span class="n">show_classes</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">show_persistence</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">show_rounding_distance</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">)</span>
+
             <span class="k">elif</span> <span class="n">m</span> <span class="o">==</span> <span class="s2">&quot;bundle_map&quot;</span><span class="p">:</span>
-                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bundle_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_bundle_map</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="n">show</span><span class="p">)</span>
+                <span class="n">out</span><span class="p">[</span><span class="s2">&quot;bundle_map&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">summarize_bundle_map</span><span class="p">()</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown summary mode </span><span class="si">{</span><span class="n">m</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
@@ -922,7 +918,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">summarize_nerve</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">modes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;local_triv&quot;</span><span class="p">],</span> <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="n">modes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;local_triv&quot;</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">LocalTrivsResult</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">cocycle</span><span class="o">=</span><span class="n">cocycle</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">qual</span><span class="p">)</span></div>
 
@@ -938,58 +934,17 @@
         <span class="o">*</span><span class="p">,</span>
         <span class="n">edge_weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">prefer_edge_weight</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;rms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
-        <span class="n">show_summary</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">show_weight_hist</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">hist_bins</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span>
+        <span class="n">show_classes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">show_persistence</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">show_rounding_distance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClassesAndPersistence</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute characteristic-class representatives and persistence with respect to the weights filtration.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        edge_weights:</span>
-<span class="sd">            Optional explicit edge-weight map for the nerve filtration. Keys are vertex-index</span>
-<span class="sd">            pairs ``(j, k)`` (order is ignored). Values should be nonnegative and represent</span>
-<span class="sd">            &quot;badness&quot; (smaller = better) so that increasing the threshold adds edges.</span>
-<span class="sd">            If omitted, weights are derived from the cached transition report using</span>
-<span class="sd">            ``prefer_edge_weight``.</span>
-<span class="sd">        prefer_edge_weight:</span>
-<span class="sd">            Which transition diagnostic to prefer when deriving edge weights automatically.</span>
-<span class="sd">            Typical values are ``&quot;rms&quot;`` (RMS angle fit error) or ``&quot;witness&quot;`` (when available).</span>
-<span class="sd">            Ignored if ``edge_weights`` is provided.</span>
-<span class="sd">        show_summary:</span>
-<span class="sd">            If True, display a class + persistence summary in the active frontend.</span>
-<span class="sd">        show_weight_hist:</span>
-<span class="sd">            If True, include a histogram of the edge-weight distribution in the displayed summary.</span>
-<span class="sd">        hist_bins:</span>
-<span class="sd">            Number of bins for the edge-weight histogram.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        ClassesAndPersistence</span>
-<span class="sd">            Container with fields:</span>
-<span class="sd">            - ``reps``: class representatives (lightweight; implementation-defined type),</span>
-<span class="sd">            - ``persistence``: persistence output (implementation-defined type),</span>
-<span class="sd">            - ``restricted``: derived class data computed on the chosen subcomplex,</span>
-<span class="sd">            - ``summary_text``: a plain-text description of the results.</span>
-
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        RuntimeError</span>
-<span class="sd">            If local trivializations/cocycle have not been computed (see prerequisites).</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If the selected restriction mode yields an empty subcomplex or if inputs are inconsistent.</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        Calling this method invalidates downstream caches that depend on class/persistence state</span>
-<span class="sd">        (global trivialization and bundle-map caches).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_require_local_trivs</span><span class="p">()</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
-        <span class="c1"># ---- 1) reps only ----</span>
         <span class="n">reps</span> <span class="o">=</span> <span class="n">compute_class_representatives_from_nerve</span><span class="p">(</span>
             <span class="n">cocycle</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cocycle</span><span class="p">,</span>
             <span class="n">edges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_edges_U</span><span class="p">,</span>
@@ -1000,7 +955,6 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_reps</span> <span class="o">=</span> <span class="n">reps</span>
 
-        <span class="c1"># ---- 2) persistence ----</span>
         <span class="k">if</span> <span class="n">edge_weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">prefer</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefer_edge_weight</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">prefer</span> <span class="o">!=</span> <span class="s2">&quot;rms&quot;</span><span class="p">:</span>
@@ -1008,7 +962,9 @@
 
             <span class="n">ew_src</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quality</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">ew_src</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;quality.rms_angle_err missing; rerun get_local_trivs (or provide edge_weights).&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;quality.rms_angle_err missing; rerun get_local_trivs (or provide edge_weights).&quot;</span>
+                <span class="p">)</span>
             <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew_src</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ew</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">edge_weights</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -1026,20 +982,19 @@
             <span class="nb">setattr</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;edge_weights&quot;</span><span class="p">,</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ew</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">pass</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_class_persistence</span> <span class="o">=</span> <span class="n">p</span>
 
-        <span class="c1"># ---- 3) restrict + derived class data ----</span>
         <span class="n">kept_edges</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="s2">&quot;cocycle&quot;</span><span class="p">)</span>
         <span class="n">kept_edges_set</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">kept_edges</span><span class="p">}</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_induced_tris</span><span class="p">(</span><span class="n">tris</span><span class="p">):</span>
             <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tris</span><span class="p">:</span>
-                <span class="n">eij</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)))</span>
-                <span class="n">eik</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)))</span>
-                <span class="n">ejk</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)))</span>
-                <span class="k">if</span> <span class="n">eij</span> <span class="ow">in</span> <span class="n">kept_edges_set</span> <span class="ow">and</span> <span class="n">eik</span> <span class="ow">in</span> <span class="n">kept_edges_set</span> <span class="ow">and</span> <span class="n">ejk</span> <span class="ow">in</span> <span class="n">kept_edges_set</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)))</span> <span class="ow">in</span> <span class="n">kept_edges_set</span>
+                    <span class="ow">and</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)))</span> <span class="ow">in</span> <span class="n">kept_edges_set</span>
+                    <span class="ow">and</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)))</span> <span class="ow">in</span> <span class="n">kept_edges_set</span>
+                <span class="p">):</span>
                     <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">out</span>
 
@@ -1074,16 +1029,13 @@
         <span class="n">summ</span> <span class="o">=</span> <span class="n">summarize_classes_and_persistence</span><span class="p">(</span><span class="n">reps</span><span class="o">=</span><span class="n">reps</span><span class="p">,</span> <span class="n">restricted</span><span class="o">=</span><span class="n">restricted</span><span class="p">,</span> <span class="n">persistence</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
         <span class="n">summary_text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">summ</span><span class="o">.</span><span class="n">summary_text</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">show_classes</span> <span class="ow">or</span> <span class="n">show_persistence</span><span class="p">:</span>
             <span class="n">summ</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span>
-                <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
-                <span class="n">top_k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                <span class="n">show_weight_hist</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_weight_hist</span><span class="p">),</span>
-                <span class="n">hist_bins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">hist_bins</span><span class="p">),</span>
+                <span class="n">show_classes</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_classes</span><span class="p">),</span>
+                <span class="n">show_persistence</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_persistence</span><span class="p">),</span>
+                <span class="n">show_rounding_distance</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="n">show_rounding_distance</span><span class="p">),</span>
             <span class="p">)</span>
 
-        <span class="c1"># invalidate downstream caches</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_global_F</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_global_meta</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -1512,11 +1464,10 @@
 
         <span class="k">if</span> <span class="n">show_summary</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">rounding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ROUNDING</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_bundle_map_summary</span><span class="o">.</span><span class="n">show_summary</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">rounding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ROUNDING</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">show_bundle_map_summary</span><span class="p">(</span>
                     <span class="n">bm</span><span class="o">.</span><span class="n">report</span><span class="p">,</span>
-                    <span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
                     <span class="n">rounding</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ROUNDING</span><span class="p">),</span>
                     <span class="n">extra_rows</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1951,8 +1902,131 @@
 
 
     <span class="c1"># ----------------------------</span>
-    <span class="c1"># Accessors (NO auto-running)</span>
+    <span class="c1"># Accessors </span>
     <span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="Bundle.get_simplices">
+<a class="viewcode-back" href="../../api/core.html#circle_bundles.Bundle.get_simplices">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_simplices</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">weight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">vertices_as_tuples</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">canonicalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">prefer_edge_weight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;rms&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return cached nerve simplices, optionally restricted by:</span>
+
+<span class="sd">        - a numeric edge-weight cutoff (float), or</span>
+<span class="sd">        - a named persistence stage (str): &quot;cocycle&quot; or &quot;coboundary&quot;.</span>
+
+<span class="sd">        Stage semantics</span>
+<span class="sd">        --------------</span>
+<span class="sd">        - &quot;cocycle&quot;: maximal stage where (by your persistence definition) both class reps are cocycles.</span>
+<span class="sd">        - &quot;coboundary&quot;: alias for the former &quot;max_trivial&quot; stage.</span>
+
+<span class="sd">        Filtration convention</span>
+<span class="sd">        ---------------------</span>
+<span class="sd">        Vertices (0-simplices) always have weight 0, so this method ALWAYS returns the full</span>
+<span class="sd">        vertex set {0,...,n_sets-1} (or tuples), regardless of `weight`.</span>
+<span class="sd">        Only edges/triangles/tetrahedra are filtered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ---- normalize dims argument ----</span>
+        <span class="n">single_dim</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dims_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">single_dim</span><span class="p">:</span>
+            <span class="n">dims_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">dims</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dims_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dims</span><span class="p">)]</span>
+
+        <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">}</span>
+        <span class="n">bad</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dims_list</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">bad</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;dims must be among </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">allowed</span><span class="p">)</span><span class="si">}</span><span class="s2">; got invalid </span><span class="si">{</span><span class="n">bad</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">max_cached</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;max_simp_dim&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)))</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_canon</span><span class="p">(</span><span class="n">sig</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">canonicalize</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">))</span>
+
+        <span class="c1"># ---- full cached simplices ----</span>
+        <span class="n">edges_all</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">_canon</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_edges_U&quot;</span><span class="p">,</span> <span class="p">[])})</span> <span class="k">if</span> <span class="n">max_cached</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">tris_all</span>  <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">_canon</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_tris_U&quot;</span><span class="p">,</span> <span class="p">[])})</span> <span class="k">if</span> <span class="n">max_cached</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">tets_all</span>  <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">_canon</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_tets_U&quot;</span><span class="p">,</span> <span class="p">[])})</span> <span class="k">if</span> <span class="n">max_cached</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">[]</span>
+
+        <span class="c1"># ---- vertices are ALWAYS full (weight 0) ----</span>
+        <span class="n">verts_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_sets</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">vertices_as_tuples</span><span class="p">:</span>
+            <span class="n">verts_out</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">),)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">verts_list</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">verts_out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">verts_list</span><span class="p">]</span>
+
+        <span class="c1"># helpers: induced higher simplices from kept edges</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_tri_edges</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">t</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))),</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))),</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">)))]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_tet_edges</span><span class="p">(</span><span class="n">tt</span><span class="p">):</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">tt</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))),</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">c</span><span class="p">))),</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">d</span><span class="p">))),</span>
+                <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">))),</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">))),</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">))),</span>
+            <span class="p">]</span>
+
+        <span class="c1"># ---- compute kept edges according to restriction ----</span>
+        <span class="k">if</span> <span class="n">weight</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kept_edges</span> <span class="o">=</span> <span class="n">edges_all</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">weight</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">stage</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;coboundary&quot;</span><span class="p">:</span>
+                <span class="n">stage</span> <span class="o">=</span> <span class="s2">&quot;max_trivial&quot;</span>
+            <span class="k">if</span> <span class="n">stage</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;cocycle&quot;</span><span class="p">,</span> <span class="s2">&quot;max_trivial&quot;</span><span class="p">}:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weight stage must be one of {&#39;cocycle&#39;,&#39;coboundary&#39;} (or a float).&quot;</span><span class="p">)</span>
+
+            <span class="n">p</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_class_persistence&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;weight=&#39;</span><span class="si">{</span><span class="n">weight</span><span class="si">}</span><span class="s2">&#39; requires persistence. Run bundle.get_classes(...) first.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">kept</span> <span class="o">=</span> <span class="n">_edges_for_subcomplex_from_persistence</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">stage</span><span class="p">)</span>  <span class="c1"># stage is &#39;cocycle&#39; or &#39;max_trivial&#39;</span>
+            <span class="n">kept_edges</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">_canon</span><span class="p">((</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">))</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="n">kept</span><span class="p">})</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+            <span class="n">ew</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_latest_edge_weights</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">prefer</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">prefer_edge_weight</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ew</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                    <span class="s2">&quot;No edge weights available for numeric cutoff.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;Run bundle.get_local_trivs(...) or bundle.get_classes(...) first.&quot;</span>
+                <span class="p">)</span>
+            <span class="n">ew_c</span> <span class="o">=</span> <span class="p">{</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">)))):</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">),</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">ew</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">kept_edges</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">edges_all</span> <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">ew_c</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">w</span><span class="p">]</span>
+
+        <span class="n">kept_edge_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">kept_edges</span><span class="p">)</span>
+
+        <span class="n">kept_tris</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tris_all</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">e</span> <span class="ow">in</span> <span class="n">kept_edge_set</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_tri_edges</span><span class="p">(</span><span class="n">t</span><span class="p">))]</span>
+        <span class="n">kept_tets</span> <span class="o">=</span> <span class="p">[</span><span class="n">tt</span> <span class="k">for</span> <span class="n">tt</span> <span class="ow">in</span> <span class="n">tets_all</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">e</span> <span class="ow">in</span> <span class="n">kept_edge_set</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">_tet_edges</span><span class="p">(</span><span class="n">tt</span><span class="p">))]</span>
+
+        <span class="c1"># ---- assemble output ----</span>
+        <span class="n">out</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">dims_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">verts_out</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">dims_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">kept_edges</span> <span class="k">if</span> <span class="n">max_cached</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="mi">2</span> <span class="ow">in</span> <span class="n">dims_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">kept_tris</span> <span class="k">if</span> <span class="n">max_cached</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="mi">3</span> <span class="ow">in</span> <span class="n">dims_list</span><span class="p">:</span>
+            <span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">kept_tets</span> <span class="k">if</span> <span class="n">max_cached</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="k">else</span> <span class="p">[]</span>
+
+        <span class="k">return</span> <span class="n">out</span><span class="p">[</span><span class="n">dims_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="k">if</span> <span class="n">single_dim</span> <span class="k">else</span> <span class="n">out</span></div>
+
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_quality</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleQualityReport</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

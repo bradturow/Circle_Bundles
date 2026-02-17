@@ -102,7 +102,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -128,12 +127,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -151,6 +150,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -184,6 +187,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -450,6 +454,64 @@
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">_get_dist_mat</span><span class="p">(</span><span class="n">bp</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">base_metric</span><span class="p">))</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_fig_to_png_bytes</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scale</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a plotly figure to PNG bytes (requires kaleido).</span>
+<span class="sd">    - scale=1 is much faster than scale=2 for 3D.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.io</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pio</span>
+        <span class="c1"># Avoid any attempt to fetch mathjax in headless chrome (can stall on some setups)</span>
+        <span class="n">pio</span><span class="o">.</span><span class="n">defaults</span><span class="o">.</span><span class="n">mathjax</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">fig</span><span class="o">.</span><span class="n">to_image</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;kaleido&quot;</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;not compatible with this version of Kaleido&quot;</span> <span class="ow">in</span> <span class="n">msg</span> <span class="ow">or</span> <span class="s2">&quot;compatible with this version of Kaleido&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Plotly/Kaleido version mismatch.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Fix by either:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;  pip install -U &#39;plotly&gt;=6.1.1&#39;   (recommended)</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;or</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;  pip install -U &#39;kaleido==0.2.1&#39;  (for Plotly 5.x)</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">if</span> <span class="s2">&quot;requires the kaleido package&quot;</span> <span class="ow">in</span> <span class="n">msg</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Static export requires kaleido. Install with `pip install -U kaleido`.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">raise</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_combine_pngs_to_pdf_bytes</span><span class="p">(</span>
+    <span class="n">png_left</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="n">png_right</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">gap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span><span class="p">,</span>   <span class="c1"># pixels between panels</span>
+    <span class="n">pad</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>    <span class="c1"># outer padding</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Combine two PNGs side-by-side into ONE tight PDF (no extra whitespace).</span>
+<span class="sd">    Requires pillow: pip install pillow</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+    <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s2">&quot;Combining snapshots requires pillow. Install with `pip install pillow`.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">png_left</span><span class="p">))</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">png_right</span><span class="p">))</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+
+    <span class="n">W</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">gap</span><span class="p">)</span> <span class="o">+</span> <span class="n">R</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">L</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="n">R</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">H</span><span class="p">),</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+
+    <span class="n">yL</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">H</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span> <span class="o">-</span> <span class="n">L</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">yR</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">H</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span> <span class="o">-</span> <span class="n">R</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">),</span> <span class="n">yL</span><span class="p">))</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">pad</span><span class="p">)</span> <span class="o">+</span> <span class="n">L</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">gap</span><span class="p">),</span> <span class="n">yR</span><span class="p">))</span>
+
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;PDF&quot;</span><span class="p">)</span>  <span class="c1"># tight to the composed image bounds</span>
+    <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+
+
 <span class="c1"># ----------------------------</span>
 <span class="c1"># Prep (pure)</span>
 <span class="c1"># ----------------------------</span>
@@ -479,7 +541,7 @@
 
 <span class="sd">    If full_dist_mat is provided and same_metric=True, we will:</span>
 <span class="sd">      - use it directly if no downsampling happened</span>
-<span class="sd">      - otherwise subset it via dist_mat = full_dist_mat[sample_inds][:, sample_inds]</span>
+<span class="sd">      - otherwise subset it via dist_mat = full_dist_mat[np.ix_(sample_inds, sample_inds)]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">base_points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">)</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
@@ -870,22 +932,39 @@
                     <span class="p">)</span>
                 <span class="p">)</span>
 
+    <span class="c1"># Show the 3D axes box/grid/backdrop, but hide tick labels (numbers).</span>
+    <span class="n">_axis_style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">showbackground</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">showgrid</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">zeroline</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">showticklabels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># no axis label text</span>
+    <span class="p">)</span>
+    <span class="n">_scene_style</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">xaxis</span><span class="o">=</span><span class="n">_axis_style</span><span class="p">,</span>
+        <span class="n">yaxis</span><span class="o">=</span><span class="n">_axis_style</span><span class="p">,</span>
+        <span class="n">zaxis</span><span class="o">=</span><span class="n">_axis_style</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="n">fig_base</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Base Points&quot;</span><span class="p">,</span>
-        <span class="n">scene</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">zaxis_title</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span><span class="p">),</span>
-        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="n">scene</span><span class="o">=</span><span class="n">_scene_style</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">uirevision</span><span class="o">=</span><span class="s2">&quot;bundle-viewer&quot;</span><span class="p">,</span>   <span class="c1"># ✅ preserve camera</span>
+        <span class="n">uirevision</span><span class="o">=</span><span class="s2">&quot;bundle-viewer&quot;</span><span class="p">,</span>  <span class="c1"># preserve camera between updates</span>
+        <span class="n">width</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">fig_data</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span>
         <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Fiber Data&quot;</span><span class="p">,</span>
-        <span class="n">scene</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">zaxis_title</span><span class="o">=</span><span class="s2">&quot;Z&quot;</span><span class="p">),</span>
-        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+        <span class="n">scene</span><span class="o">=</span><span class="n">_scene_style</span><span class="p">,</span>
+        <span class="n">margin</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">l</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
         <span class="n">showlegend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">uirevision</span><span class="o">=</span><span class="s2">&quot;bundle-viewer&quot;</span><span class="p">,</span>   <span class="c1"># ✅ preserve camera</span>
+        <span class="n">uirevision</span><span class="o">=</span><span class="s2">&quot;bundle-viewer&quot;</span><span class="p">,</span>  <span class="c1"># preserve camera between updates</span>
+        <span class="n">width</span><span class="o">=</span><span class="mi">650</span><span class="p">,</span>
+        <span class="n">height</span><span class="o">=</span><span class="mi">450</span><span class="p">,</span>
     <span class="p">)</span>
-    
-    
+
     <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">variance_text</span>
 
 
@@ -907,11 +986,10 @@
 <span class="sd">    - Imports dash lazily (only when this is called).</span>
 <span class="sd">    - Plotly/sklearn are also lazy via helper functions called here.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Local imports so importing this module doesn&#39;t require dash</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">dash</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">dash</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">dash.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dash.dependencies</span><span class="w"> </span><span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">State</span>
     <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;make_bundle_app requires dash. Install with `pip install dash`.&quot;</span>
@@ -947,6 +1025,20 @@
     <span class="n">app</span> <span class="o">=</span> <span class="n">dash</span><span class="o">.</span><span class="n">Dash</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
     <span class="n">layout_children</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># persistent selection + download</span>
+        <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
+        <span class="n">dcc</span><span class="o">.</span><span class="n">Download</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;download-pdf&quot;</span><span class="p">),</span>
+        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span>
+                    <span class="s2">&quot;Save snapshot (PDF)&quot;</span><span class="p">,</span>
+                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;save-snapshot-btn&quot;</span><span class="p">,</span>
+                    <span class="n">n_clicks</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s2">&quot;padding&quot;</span><span class="p">:</span> <span class="s2">&quot;8px 14px&quot;</span><span class="p">},</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;8px&quot;</span><span class="p">,</span> <span class="s2">&quot;marginBottom&quot;</span><span class="p">:</span> <span class="s2">&quot;8px&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
         <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
@@ -955,10 +1047,6 @@
                             <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span>
                             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="s2">&quot;400px&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-bottom&quot;</span><span class="p">:</span> <span class="s2">&quot;25px&quot;</span><span class="p">},</span>
                             <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;displayModeBar&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-                        <span class="p">),</span>
-                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
-                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;selected-point&quot;</span><span class="p">,</span>
-                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;10px&quot;</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
                         <span class="p">),</span>
                     <span class="p">],</span>
                     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;50%&quot;</span><span class="p">,</span> <span class="s2">&quot;display&quot;</span><span class="p">:</span> <span class="s2">&quot;inline-block&quot;</span><span class="p">,</span> <span class="s2">&quot;verticalAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">},</span>
@@ -969,10 +1057,6 @@
                             <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;data-plot&quot;</span><span class="p">,</span>
                             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;100%&quot;</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="s2">&quot;400px&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-bottom&quot;</span><span class="p">:</span> <span class="s2">&quot;25px&quot;</span><span class="p">},</span>
                             <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;displayModeBar&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
-                        <span class="p">),</span>
-                        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
-                            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;pca-variance&quot;</span><span class="p">,</span>
-                            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;10px&quot;</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
                         <span class="p">),</span>
                     <span class="p">],</span>
                     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;50%&quot;</span><span class="p">,</span> <span class="s2">&quot;display&quot;</span><span class="p">:</span> <span class="s2">&quot;inline-block&quot;</span><span class="p">,</span> <span class="s2">&quot;verticalAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;top&quot;</span><span class="p">},</span>
@@ -995,10 +1079,6 @@
             <span class="p">],</span>
             <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;80%&quot;</span><span class="p">,</span> <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-top&quot;</span><span class="p">:</span> <span class="s2">&quot;20px&quot;</span><span class="p">},</span>
         <span class="p">),</span>
-        <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
-            <span class="s2">&quot;Adjust the neighborhood radius (r):&quot;</span><span class="p">,</span>
-            <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;marginTop&quot;</span><span class="p">:</span> <span class="s2">&quot;-10px&quot;</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
-        <span class="p">),</span>
     <span class="p">]</span>
 
     <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1017,10 +1097,6 @@
                         <span class="n">tooltip</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;placement&quot;</span><span class="p">:</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;always_visible&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
                         <span class="n">updatemode</span><span class="o">=</span><span class="s2">&quot;drag&quot;</span><span class="p">,</span>
                     <span class="p">),</span>
-                    <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
-                        <span class="s2">&quot;Density threshold: show points with density &gt; d&quot;</span><span class="p">,</span>
-                        <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fontSize&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s2">&quot;textAlign&quot;</span><span class="p">:</span> <span class="s2">&quot;center&quot;</span><span class="p">},</span>
-                    <span class="p">),</span>
                 <span class="p">],</span>
                 <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="s2">&quot;80%&quot;</span><span class="p">,</span> <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;margin-top&quot;</span><span class="p">:</span> <span class="s2">&quot;20px&quot;</span><span class="p">},</span>
             <span class="p">)</span>
@@ -1028,40 +1104,141 @@
 
     <span class="n">app</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="n">layout_children</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;maxWidth&quot;</span><span class="p">:</span> <span class="s2">&quot;95vw&quot;</span><span class="p">})</span>
 
-    <span class="n">callback_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;clickData&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">callback_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;density-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">))</span>
-
+    <span class="c1"># Persist selection</span>
     <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span> <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;data-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span>
-         <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;selected-point&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span> <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;pca-variance&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">)],</span>
-        <span class="n">callback_inputs</span><span class="p">,</span>
+        <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+        <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;clickData&quot;</span><span class="p">),</span>
+        <span class="n">State</span><span class="p">(</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update_figures</span><span class="p">(</span><span class="n">clickData</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">selected_index</span> <span class="o">=</span> <span class="n">_parse_click_index</span><span class="p">(</span><span class="n">clickData</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remember_selected_index</span><span class="p">(</span><span class="n">clickData</span><span class="p">,</span> <span class="n">current</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">_parse_click_index</span><span class="p">(</span><span class="n">clickData</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">current</span> <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
 
-        <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">variance_text</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
-            <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
-            <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
-            <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
-            <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
-            <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
-            <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-            <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
-            <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
-            <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
-            <span class="n">selected_index</span><span class="o">=</span><span class="n">selected_index</span><span class="p">,</span>
-            <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
-            <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">density_threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">),</span>
+    <span class="c1"># Update figures (use stored selection)</span>
+    <span class="k">if</span> <span class="n">densities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span> <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;data-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;density-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)],</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">variance_text</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">update_figures</span><span class="p">(</span><span class="n">selected_index_store</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">density_threshold</span><span class="p">):</span>
+            <span class="n">selected_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selected_index_store</span><span class="p">)</span> <span class="k">if</span> <span class="n">selected_index_store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
+                <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
+                <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
+                <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
+                <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+                <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
+                <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
+                <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
+                <span class="n">selected_index</span><span class="o">=</span><span class="n">selected_index</span><span class="p">,</span>
+                <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+                <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">density_threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span>
+
+        <span class="c1"># Download combined PDF snapshot (side-by-side)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+            <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;download-pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+            <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;save-snapshot-btn&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span>
+            <span class="n">State</span><span class="p">(</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+            <span class="n">State</span><span class="p">(</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+            <span class="n">State</span><span class="p">(</span><span class="s2">&quot;density-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+            <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_download_snapshot_pdf</span><span class="p">(</span><span class="n">n_clicks</span><span class="p">,</span> <span class="n">selected_index_store</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">density_threshold</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">selected_index_store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">dash</span><span class="o">.</span><span class="n">no_update</span>
+
+            <span class="n">selected_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selected_index_store</span><span class="p">)</span>
+            <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
+                <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
+                <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
+                <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
+                <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+                <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
+                <span class="n">densities</span><span class="o">=</span><span class="n">densities</span><span class="p">,</span>
+                <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
+                <span class="n">selected_index</span><span class="o">=</span><span class="n">selected_index</span><span class="p">,</span>
+                <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+                <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">density_threshold</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="n">png_left</span> <span class="o">=</span> <span class="n">_fig_to_png_bytes</span><span class="p">(</span><span class="n">fig_base</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">png_right</span> <span class="o">=</span> <span class="n">_fig_to_png_bytes</span><span class="p">(</span><span class="n">fig_data</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">pdf_bytes</span> <span class="o">=</span> <span class="n">_combine_pngs_to_pdf_bytes</span><span class="p">(</span><span class="n">png_left</span><span class="p">,</span> <span class="n">png_right</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;bundle_snapshot_i</span><span class="si">{</span><span class="n">selected_index</span><span class="si">}</span><span class="s2">_r</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">_d</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">density_threshold</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+            <span class="k">return</span> <span class="n">dcc</span><span class="o">.</span><span class="n">send_bytes</span><span class="p">(</span><span class="n">pdf_bytes</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;base-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">),</span> <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;data-plot&quot;</span><span class="p">,</span> <span class="s2">&quot;figure&quot;</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span> <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">)],</span>
+        <span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">update_figures</span><span class="p">(</span><span class="n">selected_index_store</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+            <span class="n">selected_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selected_index_store</span><span class="p">)</span> <span class="k">if</span> <span class="n">selected_index_store</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
+                <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
+                <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
+                <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
+                <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+                <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
+                <span class="n">densities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
+                <span class="n">selected_index</span><span class="o">=</span><span class="n">selected_index</span><span class="p">,</span>
+                <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+                <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+            <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;download-pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+            <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;save-snapshot-btn&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">),</span>
+            <span class="n">State</span><span class="p">(</span><span class="s2">&quot;selected-index-store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+            <span class="n">State</span><span class="p">(</span><span class="s2">&quot;radius-slider&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+            <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">_download_snapshot_pdf</span><span class="p">(</span><span class="n">n_clicks</span><span class="p">,</span> <span class="n">selected_index_store</span><span class="p">,</span> <span class="n">r</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">selected_index_store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">dash</span><span class="o">.</span><span class="n">no_update</span>
+
+            <span class="n">selected_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">selected_index_store</span><span class="p">)</span>
+            <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_make_figures</span><span class="p">(</span>
+                <span class="n">base_embedded</span><span class="o">=</span><span class="n">base_embedded</span><span class="p">,</span>
+                <span class="n">explained_variance</span><span class="o">=</span><span class="n">explained_variance</span><span class="p">,</span>
+                <span class="n">base_landmark_masks</span><span class="o">=</span><span class="n">base_landmark_masks</span><span class="p">,</span>
+                <span class="n">base_landmarks_embedded</span><span class="o">=</span><span class="n">base_landmarks_embedded</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                <span class="n">dist_mat</span><span class="o">=</span><span class="n">dist_mat</span><span class="p">,</span>
+                <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                <span class="n">normalized_colors</span><span class="o">=</span><span class="n">normalized_colors</span><span class="p">,</span>
+                <span class="n">densities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">data_landmark_masks</span><span class="o">=</span><span class="n">data_landmark_masks</span><span class="p">,</span>
+                <span class="n">selected_index</span><span class="o">=</span><span class="n">selected_index</span><span class="p">,</span>
+                <span class="n">r</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">),</span>
+                <span class="n">density_threshold</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">png_left</span> <span class="o">=</span> <span class="n">_fig_to_png_bytes</span><span class="p">(</span><span class="n">fig_base</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">png_right</span> <span class="o">=</span> <span class="n">_fig_to_png_bytes</span><span class="p">(</span><span class="n">fig_data</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">pdf_bytes</span> <span class="o">=</span> <span class="n">_combine_pngs_to_pdf_bytes</span><span class="p">(</span><span class="n">png_left</span><span class="p">,</span> <span class="n">png_right</span><span class="p">,</span> <span class="n">gap</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;bundle_snapshot_i</span><span class="si">{</span><span class="n">selected_index</span><span class="si">}</span><span class="s2">_r</span><span class="si">{</span><span class="nb">float</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">.pdf&quot;</span>
+            <span class="k">return</span> <span class="n">dcc</span><span class="o">.</span><span class="n">send_bytes</span><span class="p">(</span><span class="n">pdf_bytes</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">app</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">run_bundle_app</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">port</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
-    <span class="c1"># local import (dash is optional until you run)</span>
     <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">port</span> <span class="o">=</span> <span class="n">find_free_port</span><span class="p">()</span>
     <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://127.0.0.1:</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">port</span><span class="p">)</span><span class="si">}</span><span class="s2">/&quot;</span>
@@ -1100,8 +1277,16 @@
 <span class="sd">    - Neighborhoods come from dist_mat computed on base_points (via get_dist_mat/base_metric).</span>
 <span class="sd">    - &quot;Fiber Data&quot; shows PCA of data restricted to the selected neighborhood.</span>
 
-<span class="sd">    This function only requires Dash/Plotly/sklearn if it is actually called.</span>
+<span class="sd">    Snapshots</span>
+<span class="sd">    ---------</span>
+<span class="sd">    The save button downloads a combined PDF (side-by-side) containing ONLY the two Plotly figures</span>
+<span class="sd">    (no sliders, no UI).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">dash</span><span class="w"> </span><span class="kn">import</span> <span class="n">dcc</span>  <span class="c1"># noqa: F401</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+
     <span class="n">viz</span> <span class="o">=</span> <span class="n">prepare_bundle_viz_inputs</span><span class="p">(</span>
         <span class="n">base_points</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">base_points</span><span class="p">),</span>
         <span class="n">data</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">),</span>
@@ -1126,8 +1311,6 @@
 <span class="c1"># Snapshot saving (offline, no Dash required)</span>
 <span class="c1"># ----------------------------</span>
 
-<div class="viewcode-block" id="save_bundle_snapshot">
-<a class="viewcode-back" href="../../../api/generated/circle_bundles.viz.html#circle_bundles.viz.save_bundle_snapshot">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">save_bundle_snapshot</span><span class="p">(</span>
     <span class="n">viz</span><span class="p">:</span> <span class="n">BundleVizInputs</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
@@ -1148,7 +1331,7 @@
 <span class="sd">          pip install -U kaleido</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>  <span class="c1"># noqa: F401  (for return type at runtime)</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>  <span class="c1"># noqa: F401</span>
     <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
             <span class="s2">&quot;save_bundle_snapshot requires plotly. Install with `pip install plotly`.&quot;</span>
@@ -1203,8 +1386,7 @@
     <span class="k">if</span> <span class="n">data_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">fig_data</span><span class="o">.</span><span class="n">write_image</span><span class="p">(</span><span class="n">data_image</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span></div>
-
+    <span class="k">return</span> <span class="n">fig_base</span><span class="p">,</span> <span class="n">fig_data</span>
 </pre></div>
 
            </div>

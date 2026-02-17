@@ -107,7 +107,6 @@
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -133,12 +132,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -156,6 +155,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
 </ul>
 
         </div>
@@ -189,7 +192,7 @@ datasets which approximately arise as noisy samples from the total spaces of
 circle bundles.</p>
 <p>This page provides a brief overview of the underlying theory and the algorithms
 implemented in the package. For a complete theoretical development and proofs,
-see the accompanying paper [1].</p>
+see the accompanying paper <span id="id1">[<a class="reference internal" href="../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html#id4" title="Brad Turow and Jose A. Perea. Discrete approximate circle bundles. arXiv preprint arXiv:2508.12914, 2025. arXiv:2508.12914. URL: https://arxiv.org/abs/2508.12914.">TP25</a>]</span>.</p>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>We use the term <em>circle bundle</em> to refer to any fiber bundle whose fiber is the
@@ -216,10 +219,10 @@ low-dimensional manifold embedded in <span class="math notranslate nohighlight">
 it is often possible to choose <span class="math notranslate nohighlight">\(d\)</span> such that <span class="math notranslate nohighlight">\(2d \ll D\)</span>. This
 perspective underlies the topology-respecting dimensionality reduction methods
 implemented in <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code>.</p>
-<p>In [1], the authors introduce the notion of a <em>discrete approximate circle
-bundle</em>, together with algorithms for estimating characteristic classes and for
-constructing global coordinate systems that respect the inferred topology. The
-<code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> package implements several of these algorithms.</p>
+<p>In <span id="id2">[<a class="reference internal" href="../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html#id4" title="Brad Turow and Jose A. Perea. Discrete approximate circle bundles. arXiv preprint arXiv:2508.12914, 2025. arXiv:2508.12914. URL: https://arxiv.org/abs/2508.12914.">TP25</a>]</span>, the authors introduce
+the notion of a <em>discrete approximate circle bundle</em>, together with algorithms
+for estimating characteristic classes and for constructing global coordinate
+systems that respect the inferred topology. The <code class="docutils literal notranslate"><span class="pre">circle_bundles</span></code> package implements several of these algorithms.</p>
 </section>
 <section id="algorithms">
 <h2>Algorithms<a class="headerlink" href="#algorithms" title="Link to this heading"></a></h2>
@@ -353,14 +356,23 @@ overlaps to produce a modified space <span class="math notranslate nohighlight">
 </section>
 <section id="references">
 <h2>References<a class="headerlink" href="#references" title="Link to this heading"></a></h2>
-<aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id1" role="doc-footnote">
-<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<p><em>Discrete Approximate Circle Bundles</em>.
-arXiv:2508.12914 [math.AT], 2025.
-https://doi.org/10.48550/arXiv.2508.12914</p>
-</aside>
-</aside>
+<div class="docutils container" id="id3">
+<div role="list" class="citation-list">
+<div class="citation" id="id5" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>CIdSZ08<span class="fn-bracket">]</span></span>
+<p>Gunnar Carlsson, Tigran Ishkhanov, Vin de Silva, and Afra Zomorodian. On the local behavior of spaces of natural images. <em>International Journal of Computer Vision</em>, 76(1):1–12, 2008. URL: <a class="reference external" href="https://link.springer.com/article/10.1007/s11263-007-0056-x">https://link.springer.com/article/10.1007/s11263-007-0056-x</a>, <a class="reference external" href="https://doi.org/10.1007/s11263-007-0056-x">doi:10.1007/s11263-007-0056-x</a>.</p>
+</div>
+<div class="citation" id="id6" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>PST23<span class="fn-bracket">]</span></span>
+<p>Jose A. Perea, Luis Scoccola, and Christopher J. Tralie. Dreimac: dimensionality reduction with eilenberg–maclane coordinates. <em>Journal of Open Source Software</em>, 8(91):5791, 2023. URL: <a class="reference external" href="https://doi.org/10.21105/joss.05791">https://doi.org/10.21105/joss.05791</a>, <a class="reference external" href="https://doi.org/10.21105/joss.05791">doi:10.21105/joss.05791</a>.</p>
+</div>
+<div class="citation" id="id4" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>TP25<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>)</span>
+<p>Brad Turow and Jose A. Perea. Discrete approximate circle bundles. <em>arXiv preprint arXiv:2508.12914</em>, 2025. arXiv:2508.12914. URL: <a class="reference external" href="https://arxiv.org/abs/2508.12914">https://arxiv.org/abs/2508.12914</a>.</p>
+</div>
+</div>
+</div>
 </section>
 </section>
 

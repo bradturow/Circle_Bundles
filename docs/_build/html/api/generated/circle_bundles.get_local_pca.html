@@ -23,7 +23,7 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="circle_bundles.plot_local_pca" href="circle_bundles.plot_local_pca.html" />
+    <link rel="next" title="circle_bundles.get_local_rips" href="circle_bundles.get_local_rips.html" />
     <link rel="prev" title="circle_bundles.plot_fiberwise_summary_bars" href="circle_bundles.plot_fiberwise_summary_bars.html" /> 
 </head>
 
@@ -105,7 +105,6 @@
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_pca_grid.html">circle_bundles.plot_fiberwise_pca_grid</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_fiberwise_summary_bars.html">circle_bundles.plot_fiberwise_summary_bars</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">circle_bundles.get_local_pca</a></li>
-<li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_pca.html">circle_bundles.plot_local_pca</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
 <li class="toctree-l3"><a class="reference internal" href="circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
@@ -131,12 +130,12 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../tutorials/auto_examples/index.html">Tutorials</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/core/index.html">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/01_product_torus.html">Product Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/04_triangle_meshes.html">Star Pyramid Meshes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/05_star_density_unwrapping.html">Star Density Unwrapping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/05_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../tutorials/auto_examples/core/06_star_density_unwrapping.html">Star Density Unwrapping</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/optical_flow/index.html">Optical Flow</a><ul>
@@ -154,6 +153,10 @@
 <li class="toctree-l2"><a class="reference internal" href="../../tutorials/auto_examples/index.html#quotients">Quotients</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../references.html">References</a></li>
 </ul>
 
         </div>
@@ -186,49 +189,35 @@
 <h1>circle_bundles.get_local_pca<a class="headerlink" href="#circle-bundles-get-local-pca" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="circle_bundles.get_local_pca">
-<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_local_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/analysis/local_analysis.html#get_local_pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_local_pca" title="Link to this definition"></a></dt>
-<dd><p>Compute PCA embeddings separately on each fiber of a cover.</p>
-<p>This is a lightweight diagnostic tool: for each fiber (row of <code class="docutils literal notranslate"><span class="pre">U</span></code>), we take the
-subset of samples belonging to that fiber, optionally subsample it, and run PCA on
-those points only. The result is a per-fiber low-dimensional embedding that can be
-visualized with <a class="reference internal" href="circle_bundles.plot_local_pca.html#circle_bundles.plot_local_pca" title="circle_bundles.plot_local_pca"><code class="xref py py-func docutils literal notranslate"><span class="pre">plot_local_pca()</span></code></a>.</p>
+<span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">get_local_pca</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_view</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_components</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">titles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hsv'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/circle_bundles/analysis/local_analysis.html#get_local_pca"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.get_local_pca" title="Link to this definition"></a></dt>
+<dd><p>Compute and plot local PCA embeddings for fibers of a cover.</p>
+<dl class="simple">
+<dt>Each fiber j is plotted using:</dt><dd><p>data[U[j]]          (points)
+f[j, U[j]]          (colors, if provided)</p>
+</dd>
+</dl>
+<p>No subsampling. No index ambiguity. If dimensions don’t match, this errors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_points,</span> <span class="pre">d)</span></code> containing the ambient data vectors.</p></li>
-<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>) – Boolean indicator matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_fibers,</span> <span class="pre">n_points)</span></code>. Entry <code class="docutils literal notranslate"><span class="pre">U[r,</span> <span class="pre">i]</span></code>
-should be True exactly when point <code class="docutils literal notranslate"><span class="pre">i</span></code> lies in fiber/patch <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p></li>
-<li><p><strong>p_values</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Optional per-fiber sampling fractions in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>. If provided, must have
-length <code class="docutils literal notranslate"><span class="pre">n_fibers</span></code>. A value <code class="docutils literal notranslate"><span class="pre">p_values[r]</span> <span class="pre">=</span> <span class="pre">p</span></code> means “use approximately
-<code class="docutils literal notranslate"><span class="pre">floor(p</span> <span class="pre">*</span> <span class="pre">m_r)</span></code> points from fiber <code class="docutils literal notranslate"><span class="pre">r</span></code>”, where <code class="docutils literal notranslate"><span class="pre">m_r</span></code> is that fiber’s
-membership size. If None, uses all points in each fiber.</p></li>
-<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>) – Optional list of fiber indices to process. If None, processes all fibers.</p></li>
-<li><p><strong>n_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of PCA components to compute per fiber.</p></li>
-<li><p><strong>random_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>) – Seed used for subsampling and passed to PCA (for reproducibility).</p></li>
+<li><p><strong>data</strong> (<em>(</em><em>n_points</em><em>, </em><em>d</em><em>) </em><em>array</em>) – Ambient data.</p></li>
+<li><p><strong>U</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_points</em><em>) </em><em>bool array</em>) – Cover membership matrix.</p></li>
+<li><p><strong>f</strong> (<em>(</em><em>n_fibers</em><em>, </em><em>n_points</em><em>) </em><em>array</em><em>, </em><em>optional</em>) – Local circular coordinates. Used for coloring if provided.</p></li>
+<li><p><strong>to_view</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Fibers to plot. Default: all.</p></li>
+<li><p><strong>n_components</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – PCA dimension (must be &gt;= 2 for plotting).</p></li>
+<li><p><strong>n_cols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Number of subplot columns.</p></li>
+<li><p><strong>titles</strong> (<em>&quot;default&quot;</em><em>, </em><em>None</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – Title style.</p></li>
+<li><p><strong>cmap</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Matplotlib colormap for angle coloring.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Save figure path.</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to display the figure.</p></li>
+<li><p><strong>font_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>point_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><ul class="simple">
-<li><p><em>fiber_ids</em> – The list of fiber indices actually processed (either all fibers, or <code class="docutils literal notranslate"><span class="pre">to_view</span></code>).</p></li>
-<li><p><em>idx_list</em> – List of integer index arrays, one per processed fiber. These are the point indices
-used for PCA in that fiber (after subsampling, if any).</p></li>
-<li><p><em>proj_list</em> – List of PCA projections, one per processed fiber. Entry <code class="docutils literal notranslate"><span class="pre">proj_list[k]</span></code> is an
-array of shape <code class="docutils literal notranslate"><span class="pre">(m_k,</span> <span class="pre">n_components)</span></code> for fiber <code class="docutils literal notranslate"><span class="pre">fiber_ids[k]</span></code>, or None if that
-fiber contained fewer than 2 usable points.</p></li>
-</ul>
-</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a> | None]]</p>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>fig, axes</p>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><p>This function lazily imports scikit-learn so importing this module does not require
-scikit-learn unless you call it.</p></li>
-<li><p>If you want to control the subsampling behavior directly, see
-<code class="docutils literal notranslate"><span class="pre">get_dense_fiber_indices</span></code> (currently not exported).</p></li>
-</ul>
 </dd></dl>
 
 </section>
@@ -238,7 +227,7 @@ scikit-learn unless you call it.</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="circle_bundles.plot_fiberwise_summary_bars.html" class="btn btn-neutral float-left" title="circle_bundles.plot_fiberwise_summary_bars" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="circle_bundles.plot_local_pca.html" class="btn btn-neutral float-right" title="circle_bundles.plot_local_pca" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="circle_bundles.get_local_rips.html" class="btn btn-neutral float-right" title="circle_bundles.get_local_rips" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

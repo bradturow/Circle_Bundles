@@ -38,3 +38,9 @@ The recommended usage is:
    :caption: Tutorials
 
    tutorials/auto_examples/index
+
+.. toctree::
+   :maxdepth: 1
+   :caption: References
+
+   references
