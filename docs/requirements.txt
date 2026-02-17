@@ -6,3 +6,4 @@ sphinxcontrib-bibtex
 numpy
 scipy
 scikit-learn
+sphinx-exec-code

@@ -34,7 +34,9 @@ extensions = [
     # Notebook support + notebook-native gallery
     "myst_nb",
     "myst_sphinx_gallery",
-    "sphinxcontrib.bibtex", 
+    "sphinxcontrib.bibtex",
+    "sphinx_exec_code",  
+
 ]
 
 bibtex_bibfiles = ["references.bib"]

@@ -56,7 +56,7 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quickstart</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#minimal-working-example">Minimal working example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#minimal-working-example">Minimal Working Example</a></li>
 </ul>
 </li>
 </ul>
@@ -174,12 +174,12 @@
 <p>This page demonstrates a minimal end-to-end example using a classical circle bundle:
 the Hopf fibration <span class="math notranslate nohighlight">\(S^3 \to S^2\)</span>. The Hopf fibration is a non-trivial orientable circle bundle with Euler number <span class="math notranslate nohighlight">\(\pm 1\)</span>.</p>
 <section id="minimal-working-example">
-<h2>Minimal working example<a class="headerlink" href="#minimal-working-example" title="Link to this heading"></a></h2>
+<h2>Minimal Working Example<a class="headerlink" href="#minimal-working-example" title="Link to this heading"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">circle_bundles</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cb</span>
 
 <span class="c1"># Sample points on S^3</span>
-<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="mi">3000</span>
 <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="n">s3_data</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">sample_sphere</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
 
@@ -193,9 +193,16 @@ the Hopf fibration <span class="math notranslate nohighlight">\(S^3 \to S^2\)</s
     <span class="n">n_vertices</span><span class="o">=</span><span class="n">n_landmarks</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">Bundle</span><span class="p">(</span><span class="n">X</span> <span class="o">=</span> <span class="n">s3_data</span><span class="p">,</span> <span class="n">U</span> <span class="o">=</span> <span class="n">s2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
-<span class="n">triv_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_local_trivs</span><span class="p">()</span>
-<span class="n">class_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_classes</span><span class="p">(</span><span class="n">show_classes</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">bundle</span> <span class="o">=</span> <span class="n">cb</span><span class="o">.</span><span class="n">Bundle</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">s3_data</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">s2_cover</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+<span class="n">triv_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_local_trivs</span><span class="p">(</span><span class="n">verbose</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="n">class_result</span> <span class="o">=</span> <span class="n">bundle</span><span class="o">.</span><span class="n">get_classes</span><span class="p">(</span><span class="n">show_classes</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">class_result</span><span class="o">.</span><span class="n">summary_text</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;IPython.core.display.Math object&gt;
+=== Characteristic Classes ===
+  Stiefel–Whitney:             w₁ = 0 (orientable)
+  Euler number:                ±1 (not spin)
 </pre></div>
 </div>
 </section>
