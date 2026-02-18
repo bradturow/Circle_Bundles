@@ -28,7 +28,7 @@ All Tutorials
         :link: example_01_product_torus
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -44,7 +44,7 @@ All Tutorials
         :link: example_02_foldy_klein_bottle
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -60,7 +60,7 @@ All Tutorials
         :link: example_03_synthetic_natural_image_patches
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -76,7 +76,7 @@ All Tutorials
         :link: example_04_optical_flow_torus
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -92,7 +92,7 @@ All Tutorials
         :link: example_05_triangle_meshes
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -108,7 +108,7 @@ All Tutorials
         :link: example_06_tri_prism_densities
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -124,7 +124,7 @@ All Tutorials
         :link: example_07_star_density_unwrapping
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
@@ -140,7 +140,7 @@ All Tutorials
         :link: example_08_quotients_of_s2_trivial
         :link-type: ref
         :shadow: md
-        :class-card: msg-sd-card sd-rounded-2 sd-border-0
+        :class-card: sd-border-0 sd-rounded-2 msg-sd-card
         :class-item: msg-sd-card-hover
         :class-title: msg-sd-card-title
         :class-img-top: msg-sd-card-img-top
