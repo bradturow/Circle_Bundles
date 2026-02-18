@@ -1,0 +1,871 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.reduction.frame_reduction &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal Working Example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#configuration-objects">Configuration Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.reduction.frame_reduction</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.reduction.frame_reduction</h1><div class="highlight"><pre>
+<span></span><span class="c1"># circle_bundles/frame_reduction.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">O(2)-equivariant frame reduction for Stiefel frames Y ∈ V(2, D).</span>
+
+<span class="sd">This module provides optional dimensionality reduction for collections of 2-frames</span>
+<span class="sd">(`(D,2)` matrices with orthonormal columns), used in the bundle pipeline when the</span>
+<span class="sd">ambient feature dimension D is large.</span>
+
+<span class="sd">Design goals</span>
+<span class="sd">------------</span>
+<span class="sd">- Keep bundle/gluing logic out of this file (this is a preprocessing utility).</span>
+<span class="sd">- Preserve the right O(2)-action: Y ↦ YQ for Q ∈ O(2) (i.e., equivariant reduction).</span>
+<span class="sd">- Provide two reducers:</span>
+<span class="sd">    * subspace_pca : always available, fast, deterministic baseline</span>
+<span class="sd">    * psc          : optional dependency (HarlinLee/PSC), higher-quality but heavier</span>
+
+<span class="sd">Conventions</span>
+<span class="sd">-----------</span>
+<span class="sd">- Frames are represented as real arrays of shape (D,2).</span>
+<span class="sd">- A &quot;projection&quot; Π(Y) refers to projecting Y into a learned d-dimensional subspace:</span>
+<span class="sd">      Π(Y) = B B^T Y   or   Π(Y) = α α^T Y</span>
+<span class="sd">  with B/α having orthonormal columns in R^D.</span>
+<span class="sd">- After projecting, we re-orthonormalize columns via the polar factor to return to V(2,d).</span>
+
+<span class="sd">Where it is used</span>
+<span class="sd">----------------</span>
+<span class="sd">This is intended to be called either:</span>
+<span class="sd">- &quot;pre_classifying&quot;: reduce raw Stiefel frames before building the classifying map</span>
+<span class="sd">  (paper-faithful), or</span>
+<span class="sd">- &quot;post_stiefel&quot;: reduce after a Stiefel projection step (legacy / experimental).</span>
+
+<span class="sd">Optional dependency</span>
+<span class="sd">-------------------</span>
+<span class="sd">The PSC reducer imports PSC lazily inside PSC functions so that PSC is not required</span>
+<span class="sd">for the rest of the package.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Literal</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.status_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_status</span><span class="p">,</span> <span class="n">_status_clear</span>  <span class="c1"># shared status helpers</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..trivializations.gauge_canon</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaugeCanonConfig</span><span class="p">,</span> <span class="n">compute_samplewise_gauge_from_o2_cocycle</span><span class="p">,</span> <span class="n">apply_gauge_to_frames</span><span class="p">,</span> <span class="n">GaugeCanonReport</span>  <span class="c1"># noqa</span>
+
+
+<span class="n">ReduceMethod</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;subspace_pca&quot;</span><span class="p">,</span> <span class="s2">&quot;psc&quot;</span><span class="p">]</span>
+
+
+<span class="n">ReduceStage</span> <span class="o">=</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;pre_classifying&quot;</span><span class="p">,</span> <span class="s2">&quot;post_stiefel&quot;</span><span class="p">]</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;FrameReducerConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;FrameReductionReport&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">canonicalize_frames_before_reduction</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">Phi_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">Omega_true</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">pou</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cfg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GaugeCanonConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">GaugeCanonReport</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience: compute gauge from Omega_true, apply it to Phi_true.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Phi_star: (n_sets,n_samples,D,2)</span>
+<span class="sd">      report: GaugeCanonReport</span>
+<span class="sd">      gauge: (n_sets,n_samples,2,2)</span>
+<span class="sd">      Omega_star: dict edges -&gt; (n_samples,2,2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cfg</span> <span class="o">=</span> <span class="n">GaugeCanonConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">gauge</span><span class="p">,</span> <span class="n">Omega_star</span><span class="p">,</span> <span class="n">rep</span> <span class="o">=</span> <span class="n">compute_samplewise_gauge_from_o2_cocycle</span><span class="p">(</span>
+        <span class="n">Omega_true</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span> <span class="n">pou</span><span class="o">=</span><span class="n">pou</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="n">edges</span><span class="p">,</span> <span class="n">cfg</span><span class="o">=</span><span class="n">cfg</span>
+    <span class="p">)</span>
+    <span class="n">Phi_star</span> <span class="o">=</span> <span class="n">apply_gauge_to_frames</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">gauge</span><span class="p">,</span> <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Phi_star</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">gauge</span><span class="p">,</span> <span class="n">Omega_star</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Reports / config</span>
+<span class="c1"># ============================================================</span>
+
+<div class="viewcode-block" id="FrameReducerConfig">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.FrameReducerConfig.html#circle_bundles.FrameReducerConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FrameReducerConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Configuration for O(2)-equivariant dimensionality reduction of Stiefel frames.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : ReduceMethod</span>
+<span class="sd">        - &quot;none&quot;        : no reduction</span>
+<span class="sd">        - &quot;subspace_pca&quot;: always-available, O(2)-equivariant baseline</span>
+<span class="sd">        - &quot;psc&quot;         : PSC-based reducer (optional dependency)</span>
+<span class="sd">    stage : ReduceStage</span>
+<span class="sd">        - &quot;pre_classifying&quot;: reduce the raw Stiefel point cloud before building the classifying map</span>
+<span class="sd">        - &quot;post_stiefel&quot;   : reduce after a Stiefel projection step (legacy / experimental)</span>
+<span class="sd">    d : int</span>
+<span class="sd">        Target ambient dimension after reduction (must satisfy 2 &lt;= d &lt;= D at runtime).</span>
+<span class="sd">        A value of 0 is treated as &quot;unset&quot; by callers (i.e., no reduction unless set).</span>
+<span class="sd">    max_frames : Optional[int]</span>
+<span class="sd">        Optional subsampling cap for fitting the reducer (speed control).</span>
+<span class="sd">    rng_seed : int</span>
+<span class="sd">        RNG seed used for subsampling.</span>
+<span class="sd">    psc_verbosity : int</span>
+<span class="sd">        Verbosity forwarded to PSC&#39;s optimization routine (if method=&quot;psc&quot;).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ReduceMethod</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+    <span class="n">stage</span><span class="p">:</span> <span class="n">ReduceStage</span> <span class="o">=</span> <span class="s2">&quot;pre_classifying&quot;</span>
+    <span class="n">d</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">psc_verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FrameReductionReport</span><span class="p">:</span>    
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Summary statistics for a fitted frame reduction map Π : V(2,D) -&gt; V(2,d).</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    method : ReduceMethod</span>
+<span class="sd">        Reduction method used.</span>
+<span class="sd">    D_in : int</span>
+<span class="sd">        Original ambient dimension D.</span>
+<span class="sd">    d_out : int</span>
+<span class="sd">        Reduced ambient dimension d.</span>
+<span class="sd">    sup_proj_err : float</span>
+<span class="sd">        Supremum (over processed frames) of the ambient projection error:</span>
+<span class="sd">            sup ||Y - Π(Y)||_F</span>
+<span class="sd">    mean_proj_err : float</span>
+<span class="sd">        Mean (over processed frames) of the ambient projection error:</span>
+<span class="sd">            mean ||Y - Π(Y)||_F</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">ReduceMethod</span>
+    <span class="n">D_in</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">d_out</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">sup_proj_err</span><span class="p">:</span> <span class="nb">float</span>   <span class="c1"># sup ||Y - Π(Y)||_F   (ε_red)</span>
+    <span class="n">mean_proj_err</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># mean ||Y - Π(Y)||_F  (\bar{ε}_red)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">decimals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render a human-readable multi-line summary (for notebooks/logging).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        decimals : int</span>
+<span class="sd">            Number of decimal places used for numeric fields.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A formatted text block describing the fitted reduction and its errors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">decimals</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">12</span>
+            <span class="o">+</span> <span class="s2">&quot; Frame Reduction &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">12</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Method: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Ambient dim: D=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">D_in</span><span class="si">}</span><span class="s2"> → d=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">d_out</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Sup projection error (||Y - Π(Y)||_F): </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sup_proj_err</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;Mean projection error (||Y - Π(Y)||_F): </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_proj_err</span><span class="si">:</span><span class="s2">.</span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">f</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span>
+            <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Progress helpers</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">_status</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">progress</span><span class="p">:</span>
+        <span class="n">_status_clear</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_auto_every</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">target_updates</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span> <span class="n">min_every</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Choose an update frequency that doesn&#39;t spam clear_output in notebooks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">every</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">min_every</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_updates</span><span class="p">)))))</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">every</span><span class="p">)</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Helpers</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_polar_orthonormalize_2cols</span><span class="p">(</span><span class="n">Yd</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Nearest Stiefel frame to Yd (d,2) via polar factor.&quot;&quot;&quot;</span>
+    <span class="n">Yd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Yd</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Yd</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">Yd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Yd must have shape (d,2).&quot;</span><span class="p">)</span>
+    <span class="n">AtA</span> <span class="o">=</span> <span class="n">Yd</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Yd</span>
+    <span class="n">eigvals</span><span class="p">,</span> <span class="n">eigvecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">AtA</span><span class="p">)</span>
+    <span class="n">eigvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">eigvals</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">inv_sqrt</span> <span class="o">=</span> <span class="n">eigvecs</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">eigvals</span><span class="p">))</span> <span class="o">@</span> <span class="n">eigvecs</span><span class="o">.</span><span class="n">T</span>
+    <span class="k">return</span> <span class="n">Yd</span> <span class="o">@</span> <span class="n">inv_sqrt</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_collect_frames_as_list</span><span class="p">(</span>
+    <span class="n">Phi_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collect frames as a Python list of (D,2) arrays.</span>
+
+<span class="sd">    Accepts either:</span>
+<span class="sd">      - Phi_true with shape (n_sets,n_samples,D,2) plus U (n_sets,n_samples), OR</span>
+<span class="sd">      - Phi_true with shape (m,D,2) (packed dataset), in which case U is ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Phi_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Case A: packed dataset (m,D,2)</span>
+    <span class="k">if</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">m</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">two</span> <span class="o">=</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">two</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Packed frames must have shape (m,D,2).&quot;</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phi_true</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">)]</span>
+
+    <span class="c1"># Case B: grid of frames (n_sets,n_samples,D,2)</span>
+    <span class="k">elif</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">U</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;U must be provided when Phi_true has shape (n_sets,n_samples,D,2).&quot;</span><span class="p">)</span>
+        <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">two</span> <span class="o">=</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">if</span> <span class="n">two</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected frames in V(2,D): last dim must be 2.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;U shape mismatch with Phi_true.&quot;</span><span class="p">)</span>
+
+        <span class="n">Js</span><span class="p">,</span> <span class="n">Ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">Phi_true</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)]</span> <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">Js</span><span class="p">,</span> <span class="n">Ss</span><span class="p">)]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Phi_true must have ndim 3 or 4. Got shape </span><span class="si">{</span><span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">max_frames</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_frames</span><span class="p">):</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">rng_seed</span><span class="p">))</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_frames</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="n">frames</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">frames</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># Subspace PCA (equivariant baseline)</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">subspace_pca_fit</span><span class="p">(</span><span class="n">frames</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit O(2)-equivariant subspace PCA on frames in V(2,D).</span>
+
+<span class="sd">    Mean projector M = avg(Y Y^T) is invariant under Y -&gt; YQ for Q∈O(2).</span>
+<span class="sd">    Take top-d eigenspace of M.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      B: (D,d) orthonormal basis</span>
+<span class="sd">      evals: (d,) top eigenvalues</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Need at least one frame to fit a reducer.&quot;</span><span class="p">)</span>
+    <span class="n">Y0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Y0</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">Y0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Each frame must have shape (D,2).&quot;</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Y0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="n">D</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need 2 &lt;= d &lt;= D. Got d=</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">, D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">D</span><span class="p">,</span> <span class="n">D</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">Y</span> <span class="ow">in</span> <span class="n">frames</span><span class="p">:</span>
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All frames must share the same ambient dimension D and have shape (D,2).&quot;</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">+=</span> <span class="n">Y</span> <span class="o">@</span> <span class="n">Y</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">M</span> <span class="o">/=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">))</span>
+
+    <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">+</span> <span class="n">M</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">vals</span><span class="p">)[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">vecs</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">order</span><span class="p">]</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="p">:</span><span class="n">d</span><span class="p">]</span>
+    <span class="n">evals</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[:</span><span class="n">d</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">B</span><span class="p">,</span> <span class="n">evals</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">subspace_pca_transform_frame</span><span class="p">(</span><span class="n">B</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Y (D,2) -&gt; (d,2): B^T Y, then polar re-orthonormalize.&quot;&quot;&quot;</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">Y</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Y must have shape (D,2).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">B</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;B must be (D,d).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;B and Y have incompatible ambient dimensions.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_polar_orthonormalize_2cols</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Y</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reduce_frames_subspace_pca</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">Phi_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">FrameReductionReport</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reduce all frames Phi_true[j,s] (D,2) -&gt; Phi_red[j,s] (d,2) using subspace PCA.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Phi_red: (n_sets, n_samples, d, 2)</span>
+<span class="sd">      report</span>
+<span class="sd">      B: (D,d)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Phi_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Phi_true with shape (n_sets,n_samples,D,2). Got </span><span class="si">{</span><span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">two</span> <span class="o">=</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">two</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Phi_true last dim must be 2.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;U shape mismatch with Phi_true.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="n">D</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need 2 &lt;= d &lt;= D. Got d=</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">, D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] collecting frames (max_frames=</span><span class="si">{</span><span class="n">max_frames</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+    <span class="n">frames_fit</span> <span class="o">=</span> <span class="n">_collect_frames_as_list</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No frames were available to reduce (U has no True entries?).&quot;</span><span class="p">)</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] fitting basis B (D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2"> → d=</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">) on </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames...&quot;</span><span class="p">)</span>
+    <span class="n">B</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">subspace_pca_fit</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+
+    <span class="n">Phi_red</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">recon_errs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">U</span><span class="p">))</span>
+    <span class="n">every</span> <span class="o">=</span> <span class="n">_auto_every</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">target_updates</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">min_every</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] transforming frames: 0/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_sets</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">U</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">Phi_true</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span>
+            <span class="n">Yproj</span> <span class="o">=</span> <span class="n">B</span> <span class="o">@</span> <span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Y</span><span class="p">)</span>  <span class="c1"># Π(Y) in ambient space</span>
+            <span class="n">recon_errs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">Yproj</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)))</span>
+            <span class="n">Phi_red</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">subspace_pca_transform_frame</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+
+            <span class="n">done</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="p">(</span><span class="n">done</span> <span class="o">%</span> <span class="n">every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">done</span> <span class="o">==</span> <span class="n">total</span><span class="p">):</span>
+                <span class="n">_status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] transforming frames: </span><span class="si">{</span><span class="n">done</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">errs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">recon_errs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">sup_err</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">errs</span><span class="p">))</span> <span class="k">if</span> <span class="n">errs</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">mean_err</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">errs</span><span class="p">))</span> <span class="k">if</span> <span class="n">errs</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+    <span class="n">rep</span> <span class="o">=</span> <span class="n">FrameReductionReport</span><span class="p">(</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;subspace_pca&quot;</span><span class="p">,</span>
+        <span class="n">D_in</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">D</span><span class="p">),</span>
+        <span class="n">d_out</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">),</span>
+        <span class="n">sup_proj_err</span><span class="o">=</span><span class="n">sup_err</span><span class="p">,</span>
+        <span class="n">mean_proj_err</span><span class="o">=</span><span class="n">mean_err</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Phi_red</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">B</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reduction_curve_subspace_pca</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">Phi_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute a subspace PCA reconstruction-error curve across multiple target dimensions.</span>
+
+<span class="sd">    For each d in `dims`, this fits a subspace basis B_d (using the same sampled frames)</span>
+<span class="sd">    and reports the mean squared reconstruction error:</span>
+<span class="sd">        mean ||Y - B_d B_d^T Y||_F^2.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dims_arr : np.ndarray</span>
+<span class="sd">        Target dimensions as an int array.</span>
+<span class="sd">    mean_sq_err : np.ndarray</span>
+<span class="sd">        Mean squared reconstruction errors corresponding to dims_arr.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Phi_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] collecting frames for curve (max_frames=</span><span class="si">{</span><span class="n">max_frames</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+    <span class="n">frames_fit</span> <span class="o">=</span> <span class="n">_collect_frames_as_list</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No frames available for curve computation.&quot;</span><span class="p">)</span>
+
+    <span class="n">D</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dims_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dims</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dims_arr</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dims_arr</span> <span class="o">&gt;</span> <span class="n">D</span><span class="p">):</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All dims must satisfy 2 &lt;= d &lt;= D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">mean_sq_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">every</span> <span class="o">=</span> <span class="n">_auto_every</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">),</span> <span class="n">target_updates</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">min_every</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] curve: 0/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">dd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">):</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">subspace_pca_fit</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">dd</span><span class="p">))</span>
+        <span class="n">se</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">Y</span> <span class="ow">in</span> <span class="n">frames_fit</span><span class="p">:</span>
+            <span class="n">Yproj</span> <span class="o">=</span> <span class="n">B</span> <span class="o">@</span> <span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Y</span><span class="p">)</span>
+            <span class="n">se</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">Yproj</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">mean_sq_err</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">se</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">se</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="p">((</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">)):</span>
+            <span class="n">_status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[frame reduction | subspace_pca] curve: </span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dims_arr</span><span class="p">,</span> <span class="n">mean_sq_err</span>
+
+
+<span class="c1"># ============================================================</span>
+<span class="c1"># PSC (optional dependency)</span>
+<span class="c1"># ============================================================</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reduce_frames_psc</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">Phi_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">d</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">FrameReductionReport</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reduce frames using the PSC package (HarlinLee/PSC).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      Phi_red: (n_sets,n_samples,d,2)</span>
+<span class="sd">      report</span>
+<span class="sd">      alpha: (D,d)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Phi_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected Phi_true with shape (n_sets,n_samples,D,2). Got </span><span class="si">{</span><span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="n">D</span><span class="p">,</span> <span class="n">two</span> <span class="o">=</span> <span class="n">Phi_true</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">two</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;PSC reducer expects k=2 frames (last dim must be 2).&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">U</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;U shape mismatch with Phi_true.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="n">D</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Need 2 &lt;= d &lt;= D. Got d=</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">, D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] collecting frames (max_frames=</span><span class="si">{</span><span class="n">max_frames</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+    <span class="n">frames_fit</span> <span class="o">=</span> <span class="n">_collect_frames_as_list</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No frames available to fit PSC reducer (U has no True entries?).&quot;</span><span class="p">)</span>
+
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (s, D, 2)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PSC.projections</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span> <span class="k">as</span> <span class="n">PSC_PCA</span><span class="p">,</span> <span class="n">manopt_alpha</span>  <span class="c1"># type: ignore</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;PSC package not importable. Install it so that &quot;</span>
+            <span class="s2">&quot;`from PSC.projections import PCA, manopt_alpha` works.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] PSC_PCA init (D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2"> → d=</span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">) on </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames...&quot;</span><span class="p">)</span>
+    <span class="n">alpha_init</span> <span class="o">=</span> <span class="n">PSC_PCA</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>  <span class="c1"># (D,d)</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] manopt_alpha (verbosity=</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">verbosity</span><span class="p">)</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">manopt_alpha</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">alpha_init</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">verbosity</span><span class="p">))</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">alpha</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)):</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;PSC returned alpha with shape </span><span class="si">{</span><span class="n">alpha</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, expected </span><span class="si">{</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">))</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">Phi_red</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_sets</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">recon_errs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">total</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">U</span><span class="p">))</span>
+    <span class="n">every</span> <span class="o">=</span> <span class="n">_auto_every</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">target_updates</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">min_every</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] transforming frames: 0/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_sets</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">U</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">]:</span>
+                <span class="k">continue</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">Phi_true</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span>                      <span class="c1"># (D,2)</span>
+            <span class="n">Yproj</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">@</span> <span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Y</span><span class="p">)</span>           <span class="c1"># Π(Y) in ambient space</span>
+            <span class="n">recon_errs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">Yproj</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)))</span>
+            <span class="n">Phi_red</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">_polar_orthonormalize_2cols</span><span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Y</span><span class="p">)</span>
+
+            <span class="n">done</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="p">(</span><span class="n">done</span> <span class="o">%</span> <span class="n">every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">done</span> <span class="o">==</span> <span class="n">total</span><span class="p">):</span>
+                <span class="n">_status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] transforming frames: </span><span class="si">{</span><span class="n">done</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">errs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">recon_errs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">sup_err</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">errs</span><span class="p">))</span> <span class="k">if</span> <span class="n">errs</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
+    <span class="n">mean_err</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">errs</span><span class="p">))</span> <span class="k">if</span> <span class="n">errs</span><span class="o">.</span><span class="n">size</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+    <span class="n">rep</span> <span class="o">=</span> <span class="n">FrameReductionReport</span><span class="p">(</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;psc&quot;</span><span class="p">,</span>
+        <span class="n">D_in</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">D</span><span class="p">),</span>
+        <span class="n">d_out</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">),</span>
+        <span class="n">sup_proj_err</span><span class="o">=</span><span class="n">sup_err</span><span class="p">,</span>
+        <span class="n">mean_proj_err</span><span class="o">=</span><span class="n">mean_err</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Phi_red</span><span class="p">,</span> <span class="n">rep</span><span class="p">,</span> <span class="n">alpha</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reduction_curve_psc</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">Phi_true</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">dims</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">max_frames</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">rng_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">psc_verbosity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">use_manopt</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">plot</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute a PSC reconstruction-error curve across multiple target dimensions.</span>
+
+<span class="sd">    For each d in `dims`, this fits α_d via PSC (optionally refined with manopt) and reports:</span>
+<span class="sd">        mean ||Y - α_d α_d^T Y||_F^2.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    use_manopt : bool</span>
+<span class="sd">        If True, refine the PCA initializer with PSC&#39;s manifold optimization routine.</span>
+<span class="sd">    plot : bool</span>
+<span class="sd">        If True, display a simple matplotlib curve in the current environment.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dims_arr : np.ndarray</span>
+<span class="sd">        Target dimensions as an int array.</span>
+<span class="sd">    mean_sq_err : np.ndarray</span>
+<span class="sd">        Mean squared reconstruction errors corresponding to dims_arr.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ImportError</span>
+<span class="sd">        If PSC is not importable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Phi_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] collecting frames for curve (max_frames=</span><span class="si">{</span><span class="n">max_frames</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+    <span class="n">frames_fit</span> <span class="o">=</span> <span class="n">_collect_frames_as_list</span><span class="p">(</span><span class="n">Phi_true</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">max_frames</span><span class="o">=</span><span class="n">max_frames</span><span class="p">,</span> <span class="n">rng_seed</span><span class="o">=</span><span class="n">rng_seed</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No frames available for PSC curve computation.&quot;</span><span class="p">)</span>
+
+    <span class="n">D</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">dims_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dims</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dims_arr</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">dims_arr</span> <span class="o">&gt;</span> <span class="n">D</span><span class="p">):</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All dims must satisfy 2 &lt;= d &lt;= D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">ys</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">frames_fit</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (s, D, 2)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">PSC.projections</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span> <span class="k">as</span> <span class="n">PSC_PCA</span><span class="p">,</span> <span class="n">manopt_alpha</span>  <span class="c1"># type: ignore</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+            <span class="s2">&quot;PSC package not importable. Install it so that &quot;</span>
+            <span class="s2">&quot;`from PSC.projections import PCA, manopt_alpha` works.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">mean_sq_err</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">every</span> <span class="o">=</span> <span class="n">_auto_every</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">),</span> <span class="n">target_updates</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">min_every</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">_maybe_status</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] curve: 0/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">dd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">):</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">PSC_PCA</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">dd</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">use_manopt</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">manopt_alpha</span><span class="p">(</span><span class="n">ys</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">psc_verbosity</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="n">se</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">Y</span> <span class="ow">in</span> <span class="n">frames_fit</span><span class="p">:</span>
+            <span class="n">Yproj</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">@</span> <span class="p">(</span><span class="n">alpha</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">Y</span><span class="p">)</span>
+            <span class="n">se</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Y</span> <span class="o">-</span> <span class="n">Yproj</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">mean_sq_err</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">se</span><span class="p">))</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">se</span><span class="p">)</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="n">progress</span> <span class="ow">and</span> <span class="p">((</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">every</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">t</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">)):</span>
+            <span class="n">_status</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[frame reduction | psc] curve: </span><span class="si">{</span><span class="n">t</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dims_arr</span><span class="p">,</span> <span class="n">mean_sq_err</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Target dimension d&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Mean squared projection error&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;PSC projection error curve&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="n">_maybe_clear</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dims_arr</span><span class="p">,</span> <span class="n">mean_sq_err</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

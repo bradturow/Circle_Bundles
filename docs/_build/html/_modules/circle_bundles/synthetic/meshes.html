@@ -1,0 +1,463 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.synthetic.meshes &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal Working Example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#configuration-objects">Configuration Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.synthetic.meshes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.synthetic.meshes</h1><div class="highlight"><pre>
+<span></span><span class="c1"># synthetic/meshes.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">trimesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">Polygon</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trimesh.creation</span><span class="w"> </span><span class="kn">import</span> <span class="n">triangulate_polygon</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;make_tri_prism&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_star_pyramid&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mesh_vertex_normals&quot;</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="make_tri_prism">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.make_tri_prism">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_tri_prism</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">radius</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">trimesh</span><span class="o">.</span><span class="n">Trimesh</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a triangular prism with base an equilateral triangle in the (y,z)-plane</span>
+<span class="sd">    and extrusion along the x-axis.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mesh : trimesh.Trimesh</span>
+<span class="sd">    face_groups : list[(start, end_exclusive)]</span>
+<span class="sd">        Ranges of triangle faces belonging to the 5 prism faces, in order:</span>
+<span class="sd">          0: bottom triangle</span>
+<span class="sd">          1: top triangle</span>
+<span class="sd">          2: side face between vertices 0-1</span>
+<span class="sd">          3: side face between vertices 1-2</span>
+<span class="sd">          4: side face between vertices 2-0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">height</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+
+    <span class="c1"># Equilateral triangle in yz-plane</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+
+    <span class="c1"># 6 vertices: 3 at x=-h/2, 3 at x=+h/2</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>  <span class="c1"># 0,1,2</span>
+    <span class="n">top</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>    <span class="c1"># 3,4,5</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">base</span><span class="p">,</span> <span class="n">top</span><span class="p">])</span>
+
+    <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+    <span class="n">A_</span><span class="p">,</span> <span class="n">B_</span><span class="p">,</span> <span class="n">C_</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span>
+
+    <span class="n">faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">face_groups</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_face</span><span class="p">(</span><span class="n">tris</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+        <span class="n">faces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">tris</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span>
+        <span class="n">face_groups</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
+
+    <span class="n">add_face</span><span class="p">([[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">]])</span>          <span class="c1"># bottom</span>
+    <span class="n">add_face</span><span class="p">([[</span><span class="n">A_</span><span class="p">,</span> <span class="n">C_</span><span class="p">,</span> <span class="n">B_</span><span class="p">]])</span>       <span class="c1"># top (flip winding)</span>
+
+    <span class="n">add_face</span><span class="p">([[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">B_</span><span class="p">],</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B_</span><span class="p">,</span> <span class="n">A_</span><span class="p">]])</span>  <span class="c1"># side AB</span>
+    <span class="n">add_face</span><span class="p">([[</span><span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">,</span> <span class="n">C_</span><span class="p">],</span> <span class="p">[</span><span class="n">B</span><span class="p">,</span> <span class="n">C_</span><span class="p">,</span> <span class="n">B_</span><span class="p">]])</span>  <span class="c1"># side BC</span>
+    <span class="n">add_face</span><span class="p">([[</span><span class="n">C</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">A_</span><span class="p">],</span> <span class="p">[</span><span class="n">C</span><span class="p">,</span> <span class="n">A_</span><span class="p">,</span> <span class="n">C_</span><span class="p">]])</span>  <span class="c1"># side CA</span>
+
+    <span class="n">mesh</span> <span class="o">=</span> <span class="n">trimesh</span><span class="o">.</span><span class="n">Trimesh</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span> <span class="n">process</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">face_groups</span></div>
+
+
+
+<div class="viewcode-block" id="make_star_pyramid">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.make_star_pyramid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_star_pyramid</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">radius_outer</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">radius_inner</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">trimesh</span><span class="o">.</span><span class="n">Trimesh</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a star-based pyramid mesh:</span>
+<span class="sd">      - base is a 2D star polygon in the yz-plane at x=0</span>
+<span class="sd">      - apex at (height, 0, 0)</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Triangulates the base polygon using trimesh.creation.triangulate_polygon.</span>
+<span class="sd">    - Then connects the apex to the boundary cycle (2*n_points edges).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mesh : trimesh.Trimesh</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_points</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_points must be odd and &gt;= 3.&quot;</span><span class="p">)</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_points</span>
+
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">m</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">radii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">radii</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius_outer</span><span class="p">)</span>
+    <span class="n">radii</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">radius_inner</span><span class="p">)</span>
+
+    <span class="c1"># star boundary vertices in (y,z)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">radii</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">radii</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span>
+    <span class="n">boundary_yz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>  <span class="c1"># (m,2)</span>
+
+    <span class="n">polygon</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">boundary_yz</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">polygon</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+        <span class="n">polygon</span> <span class="o">=</span> <span class="n">polygon</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">tri_vertices_2d</span><span class="p">,</span> <span class="n">tri_faces_2d</span> <span class="o">=</span> <span class="n">triangulate_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+
+    <span class="c1"># Lift triangulated base into 3D at x=0  -&gt; (x=0, y, z)</span>
+    <span class="n">base_vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tri_vertices_2d</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
+            <span class="n">tri_vertices_2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="n">tri_vertices_2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Add apex</span>
+    <span class="n">apex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="nb">float</span><span class="p">(</span><span class="n">height</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">base_vertices</span><span class="p">,</span> <span class="n">apex</span><span class="p">])</span>
+    <span class="n">apex_idx</span> <span class="o">=</span> <span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="n">base_faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">tri_faces_2d</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Match boundary vertices to indices in tri_vertices_2d (robust via NN + tol)</span>
+    <span class="n">tol</span> <span class="o">=</span> <span class="mf">1e-8</span>
+    <span class="n">boundary_indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">yz</span> <span class="ow">in</span> <span class="n">boundary_yz</span><span class="p">:</span>
+        <span class="n">diffs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tri_vertices_2d</span> <span class="o">-</span> <span class="n">yz</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">diffs</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">diffs</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not match boundary vertex in triangulated vertex list &quot;</span>
+                <span class="s2">&quot;(tolerance too small or triangulation changed).&quot;</span>
+            <span class="p">)</span>
+        <span class="n">boundary_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+    <span class="n">boundary_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">boundary_indices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Side faces: connect apex to each boundary edge (i -&gt; i+1)</span>
+    <span class="n">side_faces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">m</span>
+        <span class="n">vi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">boundary_indices</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">vj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">boundary_indices</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+        <span class="n">side_faces</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">apex_idx</span><span class="p">,</span> <span class="n">vj</span><span class="p">,</span> <span class="n">vi</span><span class="p">])</span>
+
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">base_faces</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">side_faces</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">trimesh</span><span class="o">.</span><span class="n">Trimesh</span><span class="p">(</span><span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">,</span> <span class="n">process</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="mesh_vertex_normals">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.mesh_vertex_normals">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mesh_vertex_normals</span><span class="p">(</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">n_vertices</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">vertex_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">idx</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the oriented unit normal determined by three vertices</span>
+<span class="sd">    from flattened mesh-vertex data.</span>
+
+<span class="sd">    Raises a ValueError if any triple is colinear or degenerate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X:</span>
+<span class="sd">        Shape (D,) for one mesh or (N, D) for batch.</span>
+<span class="sd">    n_vertices:</span>
+<span class="sd">        Optional expected vertex count.</span>
+<span class="sd">    vertex_dim:</span>
+<span class="sd">        Usually 3.</span>
+<span class="sd">    idx:</span>
+<span class="sd">        (i, j, k) vertex indices used.</span>
+<span class="sd">        Orientation follows cross(vj-vi, vk-vi).</span>
+<span class="sd">    eps:</span>
+<span class="sd">        Tolerance for detecting degeneracy.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    normals:</span>
+<span class="sd">        Shape (3,) or (N,3) of unit normals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">single</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
+        <span class="n">Xb</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">elif</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">Xb</span> <span class="o">=</span> <span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X must be 1D or 2D. Got shape </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">N</span><span class="p">,</span> <span class="n">D</span> <span class="o">=</span> <span class="n">Xb</span><span class="o">.</span><span class="n">shape</span>
+
+    <span class="k">if</span> <span class="n">D</span> <span class="o">%</span> <span class="n">vertex_dim</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;D=</span><span class="si">{</span><span class="n">D</span><span class="si">}</span><span class="s2"> not divisible by vertex_dim=</span><span class="si">{</span><span class="n">vertex_dim</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">nv</span> <span class="o">=</span> <span class="n">D</span> <span class="o">//</span> <span class="n">vertex_dim</span>
+    <span class="k">if</span> <span class="n">n_vertices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nv</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_vertices</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">n_vertices</span><span class="si">}</span><span class="s2"> vertices, got </span><span class="si">{</span><span class="n">nv</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">nv</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="n">nv</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">nv</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;indices </span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="s2"> out of range for nv=</span><span class="si">{</span><span class="n">nv</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">V</span> <span class="o">=</span> <span class="n">Xb</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">nv</span><span class="p">,</span> <span class="n">vertex_dim</span><span class="p">)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">V</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">V</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">V</span><span class="p">[:,</span> <span class="n">k</span><span class="p">]</span>
+
+    <span class="n">u</span> <span class="o">=</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span>
+    <span class="n">v</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="n">a</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Strict check</span>
+    <span class="n">bad</span> <span class="o">=</span> <span class="n">norm</span> <span class="o">&lt;=</span> <span class="n">eps</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">bad</span><span class="p">):</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">bad</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Colinear or degenerate vertex triples encountered at indices: </span><span class="si">{</span><span class="n">inds</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="p">(</span><span class="s2">&quot; ...&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">inds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">normals</span> <span class="o">=</span> <span class="n">n</span> <span class="o">/</span> <span class="n">norm</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">single</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">normals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">normals</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

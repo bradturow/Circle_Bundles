@@ -1,0 +1,828 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.analysis.quality &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal Working Example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#configuration-objects">Configuration Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.analysis.quality</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.analysis.quality</h1><div class="highlight"><pre>
+<span></span><span class="c1"># analysis/quality.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..nerve.combinatorics</span><span class="w"> </span><span class="kn">import</span> <span class="n">Edge</span><span class="p">,</span> <span class="n">Tri</span>
+
+
+<div class="viewcode-block" id="BundleQualityReport">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.BundleQualityReport.html#circle_bundles.BundleQualityReport">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BundleQualityReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Summary of diagnostic and quality metrics for a reconstructed bundle.</span>
+
+<span class="sd">    This object is intended for *inspection and reporting*, not as an input to</span>
+<span class="sd">    downstream algorithms. It aggregates several geometric, cohomological,</span>
+<span class="sd">    and numerical indicators that help assess how well the data supports a</span>
+<span class="sd">    coherent circle- (or O(2)-) bundle structure.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    - Users typically obtain this object via a bundle method (e.g. ``get_quality()``),</span>
+<span class="sd">      rather than constructing it directly.</span>
+<span class="sd">    - Individual fields may be None if the corresponding diagnostic was not</span>
+<span class="sd">      computed or not applicable to the current bundle model.</span>
+
+<span class="sd">    Fields</span>
+<span class="sd">    ------</span>
+<span class="sd">    delta:</span>
+<span class="sd">        Global transition inconsistency measure (smaller is better).</span>
+<span class="sd">    cocycle_defect:</span>
+<span class="sd">        Deviation of the recovered cocycle from being exactly closed.</span>
+
+<span class="sd">    max_edge_rms, mean_edge_rms:</span>
+<span class="sd">        Maximum and mean RMS angular transition error over edges.</span>
+
+<span class="sd">    rms_angle_err:</span>
+<span class="sd">        Per-edge RMS angular transition error map. Keys are canonicalized edges (i,j)</span>
+<span class="sd">        with i&lt;j and values are nonnegative floats. This is useful for weighting edges</span>
+<span class="sd">        in visualizations/filtrations when a full TransitionReport is not retained.</span>
+
+<span class="sd">    eps_align_geo, eps_align_euc:</span>
+<span class="sd">        Worst-case alignment error (geodesic / Euclidean) for local trivializations.</span>
+
+<span class="sd">    eps_align_geo_mean, eps_align_euc_mean:</span>
+<span class="sd">        Mean alignment error (geodesic / Euclidean).</span>
+
+<span class="sd">    alpha:</span>
+<span class="sd">        Global scaling or regularization parameter used in alignment (if applicable).</span>
+
+<span class="sd">    n_edges_estimated:</span>
+<span class="sd">        Number of edges actually used for estimation.</span>
+<span class="sd">    n_edges_requested:</span>
+<span class="sd">        Number of edges originally requested.</span>
+<span class="sd">    n_triangles:</span>
+<span class="sd">        Number of triangles used in consistency checks.</span>
+
+<span class="sd">    witness_err, witness_err_geo:</span>
+<span class="sd">        Supremum witness error (chordal / geodesic).</span>
+<span class="sd">    witness_err_mean, witness_err_geo_mean:</span>
+<span class="sd">        Mean witness error (chordal / geodesic).</span>
+
+<span class="sd">    cocycle_proj_dist:</span>
+<span class="sd">        Distance from the cocycle to the nearest projected cocycle representative.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">cocycle_defect</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="n">max_edge_rms</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">mean_edge_rms</span><span class="p">:</span> <span class="nb">float</span>
+
+    <span class="c1"># NEW: keep per-edge RMS for downstream weights/visualizations</span>
+    <span class="n">rms_angle_err</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">eps_align_geo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">eps_align_euc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">eps_align_geo_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">eps_align_euc_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">n_edges_estimated</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_edges_requested</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_triangles</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">witness_err</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>          <span class="c1"># chordal sup</span>
+    <span class="n">witness_err_geo</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>      <span class="c1"># geodesic sup (radians)</span>
+    <span class="n">witness_err_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>     <span class="c1"># chordal mean</span>
+    <span class="n">witness_err_geo_mean</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># geodesic mean (radians)</span>
+
+    <span class="n">cocycle_proj_dist</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Circle helpers</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="n">_TWO_PI</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">h_dist_S1</span><span class="p">(</span><span class="n">angle_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns (h_euc, h_geo) where:</span>
+<span class="sd">      h_geo = half the maximum gap on the circle (radians)</span>
+<span class="sd">      h_euc = chordal version: 2 sin(h_geo/2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">angle_array</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">a</span> <span class="o">%</span> <span class="n">_TWO_PI</span><span class="p">)</span>
+    <span class="n">gaps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+    <span class="n">gaps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gaps</span><span class="p">,</span> <span class="n">_TWO_PI</span> <span class="o">-</span> <span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">h_geo</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">gaps</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>  <span class="c1"># in [0, pi]</span>
+    <span class="n">h_euc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">h_geo</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">h_euc</span><span class="p">,</span> <span class="n">h_geo</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_s1_geodesic_from_unit_vectors</span><span class="p">(</span><span class="n">u</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;u,v: (...,2) unit vectors. Return geodesic distance (radians) in [0, pi].&quot;&quot;&quot;</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">u</span> <span class="o">*</span> <span class="n">v</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">dot</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">dot</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_eps_geo_to_euc</span><span class="p">(</span><span class="n">eps_geo</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert geodesic angle (radians) to chordal distance in R^2.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">eps_geo</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">))</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_canon_edge_weight_map</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">object</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Best-effort conversion of an edge-&gt;weight mapping into canonical form.</span>
+
+<span class="sd">    Accepts mappings whose keys are (i,j) pairs in any order, possibly as lists/tuples.</span>
+<span class="sd">    Produces a dict keyed by Edge = (min(i,j), max(i,j)).</span>
+<span class="sd">    Returns None if input is None or cannot be interpreted as a mapping.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="n">out</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">k</span>
+            <span class="n">e</span><span class="p">:</span> <span class="n">Edge</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">else</span> <span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+    <span class="k">return</span> <span class="n">out</span> <span class="ow">or</span> <span class="kc">None</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Paper-consistent delta (existing, unchanged)</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_delta_from_triples</span><span class="p">(</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">triangles</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tri</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">use_euclidean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For each triangle (i,j,k):</span>
+<span class="sd">      - compute h_dist_S1 on each vertex image set over the triple overlap</span>
+<span class="sd">      - take MIN over vertices</span>
+<span class="sd">    Then take MAX over triangles.</span>
+
+<span class="sd">    This is the &#39;best-chart&#39; triple-overlap surjectivity proxy used in your paper.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">triangles</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">t</span><span class="p">)))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">triangles</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">vals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">U</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="n">min_points</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fail_fast</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Triple intersection too small for triangle </span><span class="si">{</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">,</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2">: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2"> points &lt; min_points=</span><span class="si">{</span><span class="n">min_points</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="n">per_vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+            <span class="n">h_euc</span><span class="p">,</span> <span class="n">h_geo</span> <span class="o">=</span> <span class="n">h_dist_S1</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">v</span><span class="p">,</span> <span class="n">idx</span><span class="p">])</span>
+            <span class="n">per_vertex</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">h_euc</span> <span class="k">if</span> <span class="n">use_euclidean</span> <span class="k">else</span> <span class="n">h_geo</span><span class="p">)</span>
+
+        <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">per_vertex</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">vals</span><span class="p">))</span> <span class="k">if</span> <span class="n">vals</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Cocycle defect (existing)</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_O2_cocycle_defect</span><span class="p">(</span>
+    <span class="n">cocycle</span><span class="p">,</span>
+    <span class="n">triangles</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tri</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">matrix_norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fro&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="n">triangles</span> <span class="o">=</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">t</span><span class="p">)))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">triangles</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">coc</span> <span class="o">=</span> <span class="n">cocycle</span><span class="o">.</span><span class="n">complete_orientations</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">norm</span><span class="p">(</span><span class="n">M</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">matrix_norm</span> <span class="o">==</span> <span class="s2">&quot;fro&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="s2">&quot;fro&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">matrix_norm</span> <span class="o">==</span> <span class="s2">&quot;op&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="nb">ord</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;matrix_norm must be &#39;fro&#39; or &#39;op&#39;.&quot;</span><span class="p">)</span>
+
+    <span class="n">worst</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">triangles</span><span class="p">:</span>
+        <span class="n">Oij</span> <span class="o">=</span> <span class="n">coc</span><span class="o">.</span><span class="n">Omega</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span>
+        <span class="n">Ojk</span> <span class="o">=</span> <span class="n">coc</span><span class="o">.</span><span class="n">Omega</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span>
+        <span class="n">Oki</span> <span class="o">=</span> <span class="n">coc</span><span class="o">.</span><span class="n">Omega</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">Oij</span> <span class="o">@</span> <span class="n">Ojk</span> <span class="o">@</span> <span class="n">Oki</span>
+        <span class="n">worst</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">worst</span><span class="p">,</span> <span class="n">norm</span><span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">worst</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># epsilon alignment sup (geodesic), plus chordal conversion</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_eps_alignment_stats</span><span class="p">(</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">cocycle</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns (eps_geo_sup, eps_geo_mean, eps_euc_sup, eps_euc_mean)</span>
+
+<span class="sd">    geo: geodesic angle in radians in [0, pi]</span>
+<span class="sd">    euc: chordal distance in R^2, 2 sin(geo/2) in [0, 2]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">coc</span> <span class="o">=</span> <span class="n">cocycle</span><span class="o">.</span><span class="n">complete_orientations</span><span class="p">()</span>
+    <span class="n">edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+
+    <span class="n">geo_worst</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">euc_worst</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">got_any</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">geo_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">euc_sum</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">coc</span><span class="o">.</span><span class="n">Omega</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">idx</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="n">min_points</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">O</span> <span class="o">=</span> <span class="n">coc</span><span class="o">.</span><span class="n">Omega</span><span class="p">[(</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">)]</span>  <span class="c1"># maps k -&gt; j</span>
+        <span class="n">vj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">idx</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">idx</span><span class="p">])],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">vk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">idx</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">idx</span><span class="p">])],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">vk_trans</span> <span class="o">=</span> <span class="p">(</span><span class="n">O</span> <span class="o">@</span> <span class="n">vk</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="n">dgeo</span> <span class="o">=</span> <span class="n">_s1_geodesic_from_unit_vectors</span><span class="p">(</span><span class="n">vj</span><span class="p">,</span> <span class="n">vk_trans</span><span class="p">)</span>          <span class="c1"># [0, pi]</span>
+        <span class="n">deuc</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dgeo</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>                              <span class="c1"># [0, 2]</span>
+
+        <span class="n">geo_worst</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">geo_worst</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dgeo</span><span class="p">)))</span>
+        <span class="n">euc_worst</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">euc_worst</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">deuc</span><span class="p">)))</span>
+
+        <span class="n">geo_sum</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dgeo</span><span class="p">))</span>
+        <span class="n">euc_sum</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">deuc</span><span class="p">))</span>
+        <span class="n">n</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dgeo</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="n">got_any</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">got_any</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">geo_worst</span><span class="p">),</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">geo_sum</span> <span class="o">/</span> <span class="n">n</span><span class="p">),</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">euc_worst</span><span class="p">),</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">euc_sum</span> <span class="o">/</span> <span class="n">n</span><span class="p">),</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_alpha_from_eps_delta_euc</span><span class="p">(</span>
+    <span class="n">eps_euc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span>
+    <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    α = ε/(1-δ) where ε is the *Euclidean/chordal* alignment error in [0,2].</span>
+<span class="sd">    α=+inf if δ&gt;=1. If eps_euc is None, returns None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">eps_euc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps_euc</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Main entry point</span>
+<span class="c1"># ----------------------------</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bundle_quality</span><span class="p">(</span>
+    <span class="n">cover</span><span class="p">,</span>
+    <span class="n">local_triv</span><span class="p">,</span>
+    <span class="n">cocycle</span><span class="p">,</span>
+    <span class="n">transitions_report</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Edge</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">triangles</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Tri</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="c1"># delta settings (paper delta)</span>
+    <span class="n">delta_min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">delta_use_euclidean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">delta_fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># cocycle defect settings</span>
+    <span class="n">cocycle_matrix_norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fro&quot;</span><span class="p">,</span>
+    <span class="c1"># epsilon settings</span>
+    <span class="n">eps_min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">compute_witness</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleQualityReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute standard diagnostics for a bundle pipeline run.</span>
+
+<span class="sd">    Conventions</span>
+<span class="sd">    ----------</span>
+<span class="sd">    - delta is computed either in chordal (Euclidean in R^2) or geodesic (radians),</span>
+<span class="sd">      depending on delta_use_euclidean (default True =&gt; chordal).</span>
+<span class="sd">    - eps alignment is computed in BOTH:</span>
+<span class="sd">        * eps_align_euc / eps_align_euc_mean : chordal in [0,2]</span>
+<span class="sd">        * eps_align_geo / eps_align_geo_mean : radians in [0,pi]</span>
+<span class="sd">    - alpha is computed using the Euclidean/chordal epsilon:</span>
+<span class="sd">        alpha = eps_align_euc / (1 - delta)</span>
+<span class="sd">      (so if you set delta_use_euclidean=True, numerator/denominator are in the same style)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">edges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">edges_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cover</span><span class="o">.</span><span class="n">nerve_edges</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">edges_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">triangles</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">triangles_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cover</span><span class="o">.</span><span class="n">nerve_triangles</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">triangles_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">triangles</span><span class="p">)</span>
+
+    <span class="c1"># paper delta</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">compute_delta_from_triples</span><span class="p">(</span>
+        <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+        <span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+        <span class="n">triangles_list</span><span class="p">,</span>
+        <span class="n">min_points</span><span class="o">=</span><span class="n">delta_min_points</span><span class="p">,</span>
+        <span class="n">use_euclidean</span><span class="o">=</span><span class="n">delta_use_euclidean</span><span class="p">,</span>
+        <span class="n">fail_fast</span><span class="o">=</span><span class="n">delta_fail_fast</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># cocycle triangle defect</span>
+    <span class="n">cocycle_defect</span> <span class="o">=</span> <span class="n">compute_O2_cocycle_defect</span><span class="p">(</span>
+        <span class="n">cocycle</span><span class="p">,</span>
+        <span class="n">triangles_list</span><span class="p">,</span>
+        <span class="n">matrix_norm</span><span class="o">=</span><span class="n">cocycle_matrix_norm</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># edge RMS summaries (from transitions_report)</span>
+    <span class="n">max_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;max_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">mean_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;mean_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">rms_angle_err</span> <span class="o">=</span> <span class="n">_canon_edge_weight_map</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+    <span class="c1"># epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)</span>
+    <span class="n">eps_geo</span><span class="p">,</span> <span class="n">eps_geo_mean</span><span class="p">,</span> <span class="n">eps_euc</span><span class="p">,</span> <span class="n">eps_euc_mean</span> <span class="o">=</span> <span class="n">compute_eps_alignment_stats</span><span class="p">(</span>
+        <span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+        <span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+        <span class="n">cocycle</span><span class="p">,</span>
+        <span class="n">edges_list</span><span class="p">,</span>
+        <span class="n">min_points</span><span class="o">=</span><span class="n">eps_min_points</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># alpha computed using Euclidean epsilon</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">compute_alpha_from_eps_delta_euc</span><span class="p">(</span><span class="n">eps_euc</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span>
+
+    <span class="n">n_edges_requested</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;n_edges_requested&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges_list</span><span class="p">)))</span>
+    <span class="n">n_edges_estimated</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;n_edges_estimated&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cocycle</span><span class="p">,</span> <span class="s2">&quot;Omega&quot;</span><span class="p">,</span> <span class="p">{}))))</span>
+
+    <span class="c1"># ------------------------------------------</span>
+    <span class="c1"># Optional witness diagnostics (Π(Ω) based)</span>
+    <span class="c1"># ------------------------------------------</span>
+    <span class="n">witness_err</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">witness_err_geo</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">witness_err_mean</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">witness_err_geo_mean</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cocycle_proj_dist</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">compute_witness</span><span class="p">:</span>
+        <span class="c1"># local import to avoid any import-cycle surprises</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">..trivializations.bundle_map</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">build_true_frames</span><span class="p">,</span>
+            <span class="n">witness_error_stats</span><span class="p">,</span>
+            <span class="n">cocycle_projection_distance</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">Omega</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cocycle</span><span class="p">,</span> <span class="s2">&quot;Omega&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Omega</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;cocycle.Omega is missing; cannot compute witness diagnostics.&quot;</span><span class="p">)</span>
+
+        <span class="n">tf</span> <span class="o">=</span> <span class="n">build_true_frames</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">pou</span><span class="o">=</span><span class="n">cover</span><span class="o">.</span><span class="n">pou</span><span class="p">,</span>
+            <span class="n">Omega</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">w_geo</span><span class="p">,</span> <span class="n">w_geo_mean</span><span class="p">,</span> <span class="n">w_c</span><span class="p">,</span> <span class="n">w_c_mean</span> <span class="o">=</span> <span class="n">witness_error_stats</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">f</span><span class="o">=</span><span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+            <span class="n">Omega_true</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">Omega_true</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">witness_err_geo</span> <span class="o">=</span> <span class="n">w_geo</span>
+        <span class="n">witness_err_geo_mean</span> <span class="o">=</span> <span class="n">w_geo_mean</span>
+        <span class="n">witness_err</span> <span class="o">=</span> <span class="n">w_c</span>
+        <span class="n">witness_err_mean</span> <span class="o">=</span> <span class="n">w_c_mean</span>
+
+        <span class="n">cocycle_proj_dist</span> <span class="o">=</span> <span class="n">cocycle_projection_distance</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">cover</span><span class="o">.</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">Omega_simplicial</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span>
+            <span class="n">Omega_true</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">Omega_true</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">BundleQualityReport</span><span class="p">(</span>
+        <span class="n">delta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">),</span>
+        <span class="n">cocycle_defect</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">cocycle_defect</span><span class="p">),</span>
+        <span class="n">max_edge_rms</span><span class="o">=</span><span class="n">max_edge_rms</span><span class="p">,</span>
+        <span class="n">mean_edge_rms</span><span class="o">=</span><span class="n">mean_edge_rms</span><span class="p">,</span>
+        <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms_angle_err</span><span class="p">,</span>
+        <span class="n">eps_align_geo</span><span class="o">=</span><span class="n">eps_geo</span><span class="p">,</span>
+        <span class="n">eps_align_euc</span><span class="o">=</span><span class="n">eps_euc</span><span class="p">,</span>
+        <span class="n">eps_align_geo_mean</span><span class="o">=</span><span class="n">eps_geo_mean</span><span class="p">,</span>
+        <span class="n">eps_align_euc_mean</span><span class="o">=</span><span class="n">eps_euc_mean</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="n">n_edges_estimated</span><span class="o">=</span><span class="n">n_edges_estimated</span><span class="p">,</span>
+        <span class="n">n_edges_requested</span><span class="o">=</span><span class="n">n_edges_requested</span><span class="p">,</span>
+        <span class="n">n_triangles</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">triangles_list</span><span class="p">)),</span>
+        <span class="n">witness_err</span><span class="o">=</span><span class="n">witness_err</span><span class="p">,</span>
+        <span class="n">witness_err_geo</span><span class="o">=</span><span class="n">witness_err_geo</span><span class="p">,</span>
+        <span class="n">witness_err_mean</span><span class="o">=</span><span class="n">witness_err_mean</span><span class="p">,</span>
+        <span class="n">witness_err_geo_mean</span><span class="o">=</span><span class="n">witness_err_geo_mean</span><span class="p">,</span>
+        <span class="n">cocycle_proj_dist</span><span class="o">=</span><span class="n">cocycle_proj_dist</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_bundle_quality_from_U</span><span class="p">(</span>
+    <span class="n">U</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">pou</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">local_triv</span><span class="p">,</span>
+    <span class="n">cocycle</span><span class="p">,</span>
+    <span class="n">transitions_report</span><span class="p">,</span>
+    <span class="n">edges</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Edge</span><span class="p">],</span>
+    <span class="n">triangles</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tri</span><span class="p">],</span>
+    <span class="c1"># delta settings (paper delta)</span>
+    <span class="n">delta_min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="n">delta_use_euclidean</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">delta_fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># cocycle defect settings</span>
+    <span class="n">cocycle_matrix_norm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;fro&quot;</span><span class="p">,</span>
+    <span class="c1"># epsilon settings</span>
+    <span class="n">eps_min_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">compute_witness</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BundleQualityReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cover-free version of compute_bundle_quality.</span>
+
+<span class="sd">    You supply:</span>
+<span class="sd">      - U (n_sets, n_samples) boolean matrix</span>
+<span class="sd">      - pou (optional, for witness diagnostics)</span>
+<span class="sd">      - local_triv.f (angles per patch per sample)</span>
+<span class="sd">      - cocycle + transitions_report</span>
+<span class="sd">      - explicit edges, triangles (as lists/iterables)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">edges_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">edges</span><span class="p">)</span>
+    <span class="n">triangles_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">triangles</span><span class="p">)</span>
+
+    <span class="c1"># paper delta</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">compute_delta_from_triples</span><span class="p">(</span>
+        <span class="n">U</span><span class="p">,</span>
+        <span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+        <span class="n">triangles_list</span><span class="p">,</span>
+        <span class="n">min_points</span><span class="o">=</span><span class="n">delta_min_points</span><span class="p">,</span>
+        <span class="n">use_euclidean</span><span class="o">=</span><span class="n">delta_use_euclidean</span><span class="p">,</span>
+        <span class="n">fail_fast</span><span class="o">=</span><span class="n">delta_fail_fast</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># cocycle triangle defect</span>
+    <span class="n">cocycle_defect</span> <span class="o">=</span> <span class="n">compute_O2_cocycle_defect</span><span class="p">(</span>
+        <span class="n">cocycle</span><span class="p">,</span>
+        <span class="n">triangles_list</span><span class="p">,</span>
+        <span class="n">matrix_norm</span><span class="o">=</span><span class="n">cocycle_matrix_norm</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># edge RMS summaries (from transitions_report)</span>
+    <span class="n">max_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;max_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">mean_edge_rms</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;mean_rms_angle_err&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+    <span class="n">rms_angle_err</span> <span class="o">=</span> <span class="n">_canon_edge_weight_map</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;rms_angle_err&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+
+    <span class="c1"># epsilon alignment stats: (geo sup, geo mean, euc sup, euc mean)</span>
+    <span class="n">eps_geo</span><span class="p">,</span> <span class="n">eps_geo_mean</span><span class="p">,</span> <span class="n">eps_euc</span><span class="p">,</span> <span class="n">eps_euc_mean</span> <span class="o">=</span> <span class="n">compute_eps_alignment_stats</span><span class="p">(</span>
+        <span class="n">U</span><span class="p">,</span>
+        <span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+        <span class="n">cocycle</span><span class="p">,</span>
+        <span class="n">edges_list</span><span class="p">,</span>
+        <span class="n">min_points</span><span class="o">=</span><span class="n">eps_min_points</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># alpha computed using Euclidean epsilon</span>
+    <span class="n">alpha</span> <span class="o">=</span> <span class="n">compute_alpha_from_eps_delta_euc</span><span class="p">(</span><span class="n">eps_euc</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">))</span>
+
+    <span class="n">n_edges_requested</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;n_edges_requested&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">edges_list</span><span class="p">)))</span>
+    <span class="n">n_edges_estimated</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">transitions_report</span><span class="p">,</span> <span class="s2">&quot;n_edges_estimated&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">cocycle</span><span class="p">,</span> <span class="s2">&quot;Omega&quot;</span><span class="p">,</span> <span class="p">{}))))</span>
+
+    <span class="c1"># Optional witness diagnostics</span>
+    <span class="n">witness_err</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">witness_err_geo</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">witness_err_mean</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">witness_err_geo_mean</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">cocycle_proj_dist</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">compute_witness</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">..trivializations.bundle_map</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">build_true_frames</span><span class="p">,</span>
+            <span class="n">witness_error_stats</span><span class="p">,</span>
+            <span class="n">cocycle_projection_distance</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">Omega</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cocycle</span><span class="p">,</span> <span class="s2">&quot;Omega&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Omega</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;cocycle.Omega is missing; cannot compute witness diagnostics.&quot;</span><span class="p">)</span>
+
+        <span class="n">tf</span> <span class="o">=</span> <span class="n">build_true_frames</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">pou</span><span class="o">=</span><span class="n">pou</span><span class="p">,</span>
+            <span class="n">Omega</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">w_geo</span><span class="p">,</span> <span class="n">w_geo_mean</span><span class="p">,</span> <span class="n">w_c</span><span class="p">,</span> <span class="n">w_c_mean</span> <span class="o">=</span> <span class="n">witness_error_stats</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">f</span><span class="o">=</span><span class="n">local_triv</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+            <span class="n">Omega_true</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">Omega_true</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">witness_err_geo</span> <span class="o">=</span> <span class="n">w_geo</span>
+        <span class="n">witness_err_geo_mean</span> <span class="o">=</span> <span class="n">w_geo_mean</span>
+        <span class="n">witness_err</span> <span class="o">=</span> <span class="n">w_c</span>
+        <span class="n">witness_err_mean</span> <span class="o">=</span> <span class="n">w_c_mean</span>
+
+        <span class="n">cocycle_proj_dist</span> <span class="o">=</span> <span class="n">cocycle_projection_distance</span><span class="p">(</span>
+            <span class="n">U</span><span class="o">=</span><span class="n">U</span><span class="p">,</span>
+            <span class="n">Omega_simplicial</span><span class="o">=</span><span class="n">Omega</span><span class="p">,</span>
+            <span class="n">Omega_true</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">Omega_true</span><span class="p">,</span>
+            <span class="n">edges</span><span class="o">=</span><span class="n">edges_list</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">BundleQualityReport</span><span class="p">(</span>
+        <span class="n">delta</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">),</span>
+        <span class="n">cocycle_defect</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">cocycle_defect</span><span class="p">),</span>
+        <span class="n">max_edge_rms</span><span class="o">=</span><span class="n">max_edge_rms</span><span class="p">,</span>
+        <span class="n">mean_edge_rms</span><span class="o">=</span><span class="n">mean_edge_rms</span><span class="p">,</span>
+        <span class="n">rms_angle_err</span><span class="o">=</span><span class="n">rms_angle_err</span><span class="p">,</span>
+        <span class="n">eps_align_geo</span><span class="o">=</span><span class="n">eps_geo</span><span class="p">,</span>
+        <span class="n">eps_align_euc</span><span class="o">=</span><span class="n">eps_euc</span><span class="p">,</span>
+        <span class="n">eps_align_geo_mean</span><span class="o">=</span><span class="n">eps_geo_mean</span><span class="p">,</span>
+        <span class="n">eps_align_euc_mean</span><span class="o">=</span><span class="n">eps_euc_mean</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="n">n_edges_estimated</span><span class="o">=</span><span class="n">n_edges_estimated</span><span class="p">,</span>
+        <span class="n">n_edges_requested</span><span class="o">=</span><span class="n">n_edges_requested</span><span class="p">,</span>
+        <span class="n">n_triangles</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">triangles_list</span><span class="p">)),</span>
+        <span class="n">witness_err</span><span class="o">=</span><span class="n">witness_err</span><span class="p">,</span>
+        <span class="n">witness_err_geo</span><span class="o">=</span><span class="n">witness_err_geo</span><span class="p">,</span>
+        <span class="n">witness_err_mean</span><span class="o">=</span><span class="n">witness_err_mean</span><span class="p">,</span>
+        <span class="n">witness_err_geo_mean</span><span class="o">=</span><span class="n">witness_err_geo_mean</span><span class="p">,</span>
+        <span class="n">cocycle_proj_dist</span><span class="o">=</span><span class="n">cocycle_proj_dist</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

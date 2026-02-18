@@ -1,0 +1,589 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>circle_bundles.synthetic.step_edges &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#basic-installation">Basic installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../quickstart.html#minimal-working-example">Minimal Working Example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/core.html">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/core.html#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/results.html#configuration-objects">Configuration Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../tutorials/auto_examples/all/08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">circle_bundles.synthetic.step_edges</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for circle_bundles.synthetic.step_edges</h1><div class="highlight"><pre>
+<span></span><span class="c1"># synthetic/step_edges.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;get_patch_types_list&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_step_edges&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;make_all_step_edges&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sample_binary_step_edges&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mean_center&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sample_step_edge_torus&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Legacy filament patterns (3x3)</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="get_patch_types_list">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.get_patch_types_list">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_patch_types_list</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate the 28 possible filament patch types (legacy convention).</span>
+
+<span class="sd">    Each patch type is a list of [i,j] pixel coordinates (0..2) where a vector arrow lives.</span>
+<span class="sd">    For a 3x3 patch, there are 28 &quot;filament&quot; patterns; we later include sign flips to get 56.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">corners</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>
+
+    <span class="n">ones_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">twos_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">threes_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">fours_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+        <span class="n">ones_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+        <span class="n">twos_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">[</span><span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]])</span>
+        <span class="n">twos_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]]])</span>
+        <span class="n">threes_list</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">[</span><span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]]])</span>
+
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">corners</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">corners</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">[</span><span class="n">corners</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">]]</span>
+                <span class="n">threes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span>
+
+                <span class="n">nl</span> <span class="o">=</span> <span class="n">new_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">nl</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                <span class="n">fours_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span>
+
+                <span class="n">nl</span> <span class="o">=</span> <span class="n">new_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">nl</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                <span class="n">fours_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">corners</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">corners</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">corners</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">corners</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]]]</span>
+                <span class="n">threes_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span>
+
+                <span class="n">nl</span> <span class="o">=</span> <span class="n">new_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">nl</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">fours_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span>
+
+                <span class="n">nl</span> <span class="o">=</span> <span class="n">new_list</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">nl</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="n">fours_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nl</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">ones_list</span> <span class="o">+</span> <span class="n">twos_list</span> <span class="o">+</span> <span class="n">threes_list</span> <span class="o">+</span> <span class="n">fours_list</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Step-edge flow patches</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="make_step_edges">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.make_step_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_step_edges</span><span class="p">(</span>
+    <span class="n">n_patches</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">spots</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">angle_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate optical-flow step edge patches as flattened vectors of length 18 (3x3x2).</span>
+
+<span class="sd">    Conventions</span>
+<span class="sd">    ----------</span>
+<span class="sd">    - Patch array shaped (n, 3, 3, 2) with last axis = (u,v).</span>
+<span class="sd">    - Flattening order is &#39;F&#39; to match legacy notebooks.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_patches : int</span>
+<span class="sd">        Number of patches to generate.</span>
+<span class="sd">    spots : sequence of (i,j)</span>
+<span class="sd">        Pixel coordinates where the flow vector is placed.</span>
+<span class="sd">    angle_range : (float, float)</span>
+<span class="sd">        Sample directions uniformly from [a_min, a_max].</span>
+<span class="sd">        If a_min == a_max, all patches use that fixed angle.</span>
+<span class="sd">    normalize : bool</span>
+<span class="sd">        If True, contrast-normalize using get_contrast_norms and mean-center each channel.</span>
+<span class="sd">    rng : np.random.Generator, optional</span>
+<span class="sd">        Random generator for reproducibility.</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Stability floor for normalization.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    patch_vectors : (n_patches, 18)</span>
+<span class="sd">    angles : (n_patches,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_patches</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_patches</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_patches</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_patches must be positive. Got </span><span class="si">{</span><span class="n">n_patches</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+
+    <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">angle_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">angle_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">a1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;angle_range must be finite. Got </span><span class="si">{</span><span class="n">angle_range</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">a0</span> <span class="o">==</span> <span class="n">a1</span><span class="p">:</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">n_patches</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">angles</span> <span class="o">=</span> <span class="n">a0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a1</span> <span class="o">-</span> <span class="n">a0</span><span class="p">)</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n_patches</span><span class="p">)</span>
+
+    <span class="n">long_vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angles</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angles</span><span class="p">)])</span>  <span class="c1"># (n,2)</span>
+
+    <span class="n">patch_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_patches</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">:</span>
+        <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">ii</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">jj</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Spot </span><span class="si">{</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="si">}</span><span class="s2"> out of bounds for 3x3 patch.&quot;</span><span class="p">)</span>
+        <span class="n">patch_array</span><span class="p">[:,</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">long_vecs</span>
+
+    <span class="c1"># Legacy flattening convention</span>
+    <span class="n">patch_vectors</span> <span class="o">=</span> <span class="n">patch_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_patches</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>  <span class="c1"># (n,18)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">..optical_flow.contrast</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_contrast_norms</span>
+        <span class="n">norms</span> <span class="o">=</span> <span class="n">get_contrast_norms</span><span class="p">(</span><span class="n">patch_vectors</span><span class="p">)</span>
+        <span class="n">norms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">norms</span><span class="p">,</span> <span class="n">eps</span><span class="p">)</span>
+        <span class="n">patch_vectors</span> <span class="o">=</span> <span class="n">patch_vectors</span> <span class="o">/</span> <span class="n">norms</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+        <span class="c1"># Mean-center each channel separately (first 9 = u, last 9 = v)</span>
+        <span class="n">patch_vectors</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">9</span><span class="p">]</span> <span class="o">-=</span> <span class="n">patch_vectors</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">patch_vectors</span><span class="p">[:,</span> <span class="mi">9</span><span class="p">:]</span> <span class="o">-=</span> <span class="n">patch_vectors</span><span class="p">[:,</span> <span class="mi">9</span><span class="p">:]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">patch_vectors</span><span class="p">,</span> <span class="n">angles</span></div>
+
+
+
+<div class="viewcode-block" id="make_all_step_edges">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.make_all_step_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_all_step_edges</span><span class="p">(</span>
+    <span class="n">angle</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">normalize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the 56 canonical step-edge patterns (28 types + sign flips).</span>
+
+<span class="sd">    If angle is None:</span>
+<span class="sd">        Returns scalar +/-1 edge patterns as (56, 9) using legacy &#39;F&#39; convention.</span>
+<span class="sd">    If angle is not None:</span>
+<span class="sd">        Returns flow vectors (56, 18) at that fixed direction (cos(angle), sin(angle)).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">types_list</span> <span class="o">=</span> <span class="n">get_patch_types_list</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">angle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">patch_array</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">56</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">28</span><span class="p">):</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">in</span> <span class="n">types_list</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+                <span class="n">patch_array</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">patch_array</span><span class="p">[</span><span class="mi">28</span><span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">patch_array</span><span class="p">[:</span><span class="mi">28</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">patch_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">56</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;F&quot;</span><span class="p">)</span>
+
+    <span class="n">ang</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+    <span class="n">patch_vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">56</span><span class="p">,</span> <span class="mi">18</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">spots</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">types_list</span><span class="p">):</span>
+        <span class="n">patch_vectors</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_step_edges</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="n">spots</span><span class="p">,</span>
+            <span class="n">angle_range</span><span class="o">=</span><span class="p">(</span><span class="n">ang</span><span class="p">,</span> <span class="n">ang</span><span class="p">),</span>
+            <span class="n">normalize</span><span class="o">=</span><span class="n">normalize</span><span class="p">,</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">patch_vectors</span><span class="p">[</span><span class="mi">28</span><span class="p">:]</span> <span class="o">=</span> <span class="o">-</span><span class="n">patch_vectors</span><span class="p">[:</span><span class="mi">28</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">patch_vectors</span></div>
+
+
+
+<div class="viewcode-block" id="sample_binary_step_edges">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.sample_binary_step_edges">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_binary_step_edges</span><span class="p">(</span>
+    <span class="n">samples_per_filament</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sample step-edge patches across all 28 filament types.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    patches : (28*samples_per_filament, 18)</span>
+<span class="sd">    angles : (28*samples_per_filament,)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">samples_per_filament</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">samples_per_filament</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">samples_per_filament</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;samples_per_filament must be positive. Got </span><span class="si">{</span><span class="n">samples_per_filament</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+
+    <span class="n">types_list</span> <span class="o">=</span> <span class="n">get_patch_types_list</span><span class="p">()</span>
+    <span class="n">patches_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">angles_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">spots</span> <span class="ow">in</span> <span class="n">types_list</span><span class="p">:</span>
+        <span class="n">pv</span><span class="p">,</span> <span class="n">ang</span> <span class="o">=</span> <span class="n">make_step_edges</span><span class="p">(</span><span class="n">samples_per_filament</span><span class="p">,</span> <span class="n">spots</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">patches_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span>
+        <span class="n">angles_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ang</span><span class="p">)</span>
+
+    <span class="n">patches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">patches_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">angles_list</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">patches</span><span class="p">,</span> <span class="n">angles</span></div>
+
+
+
+<div class="viewcode-block" id="mean_center">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.mean_center">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">mean_center</span><span class="p">(</span><span class="n">patch_vector</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mean-center a single patch vector (length 9 or 18).</span>
+
+<span class="sd">    For length 18 (flow):</span>
+<span class="sd">      - mean-center u-channel entries (first 9)</span>
+<span class="sd">      - mean-center v-channel entries (last 9)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">patch_vector</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patch_vector must be 1D. Got shape </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">18</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;patch_vector must have length 9 or 18. Got </span><span class="si">{</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">copy</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">x</span><span class="p">[:</span><span class="mi">9</span><span class="p">]</span> <span class="o">-=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[:</span><span class="mi">9</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">18</span><span class="p">:</span>
+        <span class="n">x</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span> <span class="o">-=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">9</span><span class="p">:]</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+
+<span class="c1"># ----------------------------</span>
+<span class="c1"># Legacy step-edge torus sampler</span>
+<span class="c1"># ----------------------------</span>
+
+<div class="viewcode-block" id="sample_step_edge_torus">
+<a class="viewcode-back" href="../../../api/generated/circle_bundles.synthetic.html#circle_bundles.synthetic.sample_step_edge_torus">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_step_edge_torus</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">d</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">m</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="n">thresh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+    <span class="n">rng</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-12</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate step-edge torus samples.</span>
+
+<span class="sd">    Construction (legacy):</span>
+<span class="sd">      - sample half-planes parameterized by (offset r, direction phi) inside a disk</span>
+<span class="sd">      - build range patches by averaging sign over m×m subgrid per pixel</span>
+<span class="sd">      - create flow patches by multiplying by (cos theta, sin theta)</span>
+<span class="sd">      - keep high-contrast patches (contrast norm &gt; thresh)</span>
+<span class="sd">      - mean-center &amp; contrast normalize</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_samples : int</span>
+<span class="sd">        Number of candidate samples before thresholding.</span>
+<span class="sd">    d : int</span>
+<span class="sd">        Patch width/height (typically 3).</span>
+<span class="sd">    m : int</span>
+<span class="sd">        Subgrid resolution per pixel for averaging.</span>
+<span class="sd">    thresh : float</span>
+<span class="sd">        Keep only samples with contrast norm &gt; thresh.</span>
+<span class="sd">    rng : np.random.Generator, optional</span>
+<span class="sd">    eps : float</span>
+<span class="sd">        Stability floor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    flow_patches : (N_kept, 2*d^2)</span>
+<span class="sd">    coords : (N_kept, 3) where columns are (offset, phi, theta)</span>
+<span class="sd">    range_patches : (N_kept, d^2)</span>
+<span class="sd">    norms : (N_kept,) contrast norms (pre-normalization)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_samples</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_samples must be positive. Got </span><span class="si">{</span><span class="n">n_samples</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;d must be positive. Got </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;m must be &gt;= 2. Got </span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">thresh</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;thresh must be &gt;= 0. Got </span><span class="si">{</span><span class="n">thresh</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
+    <span class="n">eps</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span>
+
+    <span class="n">range_patches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="c1"># Sample points in disk of radius sqrt(2)</span>
+    <span class="n">Rdisc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">))</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n_samples</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Rdisc</span> <span class="o">*</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">Rdisc</span><span class="p">:</span>
+            <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]))</span>  <span class="c1"># signed offset</span>
+            <span class="n">coords</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">))</span>  <span class="c1"># phi</span>
+            <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># Build range patch per sample</span>
+    <span class="c1"># NOTE: This loop is intentionally &quot;simple/legacy&quot; (not optimized).</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+        <span class="n">n_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+            <span class="n">x_vals</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">ii</span> <span class="o">/</span> <span class="n">d</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+                <span class="n">y_vals</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">jj</span> <span class="o">/</span> <span class="n">d</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">d</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+                <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_vals</span><span class="p">,</span> <span class="n">y_vals</span><span class="p">,</span> <span class="n">indexing</span><span class="o">=</span><span class="s2">&quot;xy&quot;</span><span class="p">)</span>
+                <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">a</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">ravel</span><span class="p">()])</span>
+                <span class="n">inds</span> <span class="o">=</span> <span class="p">(</span><span class="n">pts</span> <span class="o">@</span> <span class="n">n_vec</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span>
+                <span class="n">avg_val</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">inds</span><span class="p">))</span> <span class="o">-</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">))</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">m</span><span class="p">)</span>
+                <span class="n">range_patches</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">d</span> <span class="o">*</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="n">avg_val</span>
+
+    <span class="c1"># Flow patches</span>
+    <span class="n">theta</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">coords3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">coords</span><span class="p">,</span> <span class="n">theta</span><span class="p">])</span>
+
+    <span class="n">flow_patches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">flow_patches</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">range_patches</span>
+    <span class="n">flow_patches</span><span class="p">[:,</span> <span class="n">d</span> <span class="o">*</span> <span class="n">d</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">range_patches</span>
+    
+    <span class="kn">from</span><span class="w"> </span><span class="nn">optical_flow.contrast</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_contrast_norms</span>
+
+    <span class="n">norms</span> <span class="o">=</span> <span class="n">get_contrast_norms</span><span class="p">(</span><span class="n">flow_patches</span><span class="p">)</span>
+    <span class="n">keep</span> <span class="o">=</span> <span class="n">norms</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">thresh</span><span class="p">)</span>
+
+    <span class="n">flow_kept</span> <span class="o">=</span> <span class="n">flow_patches</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+    <span class="n">range_kept</span> <span class="o">=</span> <span class="n">range_patches</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+    <span class="n">coords_kept</span> <span class="o">=</span> <span class="n">coords3</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+    <span class="n">norms_kept</span> <span class="o">=</span> <span class="n">norms</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
+
+    <span class="c1"># Mean-center and contrast normalize</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">flow_kept</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">flow_kept</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">mean_center</span><span class="p">(</span><span class="n">flow_kept</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">norms_kept</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">eps</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out</span><span class="p">,</span> <span class="n">coords_kept</span><span class="p">,</span> <span class="n">range_kept</span><span class="p">,</span> <span class="n">norms_kept</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

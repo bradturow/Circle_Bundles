@@ -1,0 +1,721 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core pipeline &mdash; circle_bundles 0+unknown documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" type="text/css" href="../_static/myst_sphinx_gallery.css?v=92de7a9e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=27db1736"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Result and Configuration Dataclasses" href="results.html" />
+    <link rel="prev" title="API Reference" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            circle_bundles
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../installation.html#basic-installation">Basic installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quickstart</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quickstart.html#minimal-working-example">Minimal Working Example</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Theory</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../theory/index.html">Theory</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../theory/index.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/index.html#algorithms">Algorithms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../theory/index.html#overview">Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../theory/index.html#cocycle-fitting">Cocycle Fitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../theory/index.html#classification">Classification</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../theory/index.html#coordinatization">Coordinatization</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/index.html#algorithm-1-local-trivializations-and-transition-matrices">Algorithm 1: Local Trivializations and Transition Matrices</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/index.html#algorithm-2-characteristic-classes">Algorithm 2: Characteristic Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../theory/index.html#algorithm-3-pullback-bundle-coordinates">Algorithm 3: Pullback Bundle Coordinates</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Core pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#circle_bundles.Bundle"><code class="docutils literal notranslate"><span class="pre">Bundle</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="results.html">Result and Configuration Dataclasses</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="results.html#main-result-containers">Main Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results.html#lower-level-result-containers">Lower-Level Result Containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="results.html#configuration-objects">Configuration Objects</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="covers.html">Covers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.CoverData.html">circle_bundles.CoverData</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.get_metric_ball_cover.html">circle_bundles.get_metric_ball_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.get_s2_fibonacci_cover.html">circle_bundles.get_s2_fibonacci_cover</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.get_rp2_fibonacci_cover.html">circle_bundles.get_rp2_fibonacci_cover</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="metrics.html">Metrics</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.EuclideanMetric.html">circle_bundles.EuclideanMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.S1AngleMetric.html">circle_bundles.S1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.RP1AngleMetric.html">circle_bundles.RP1AngleMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.S1UnitVectorMetric.html">circle_bundles.S1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.RP1UnitVectorMetric.html">circle_bundles.RP1UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.RP2UnitVectorMetric.html">circle_bundles.RP2UnitVectorMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.T2FlatMetric.html">circle_bundles.T2FlatMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.Torus_DiagQuotientMetric_R4.html">circle_bundles.Torus_DiagQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.Torus_KleinQuotientMetric_R4.html">circle_bundles.Torus_KleinQuotientMetric_R4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.RP2_TrivialMetric.html">circle_bundles.RP2_TrivialMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.RP2_TwistMetric.html">circle_bundles.RP2_TwistMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.RP2_FlipMetric.html">circle_bundles.RP2_FlipMetric</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.S3QuotientMetric.html">circle_bundles.S3QuotientMetric</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities_analysis.html">Analysis utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.fiberwise_clustering.html">circle_bundles.fiberwise_clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.get_local_pca.html">circle_bundles.get_local_pca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.get_local_rips.html">circle_bundles.get_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.plot_local_rips.html">circle_bundles.plot_local_rips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.get_cocycle_dict.html">circle_bundles.get_cocycle_dict</a></li>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.lift_base_points.html">circle_bundles.lift_base_points</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities_viz.html">Visualization utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.viz.html">circle_bundles.viz</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities_synthetic.html">Synthetic datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.synthetic.html">circle_bundles.synthetic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utilities_optical_flow.html">Optical flow utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="generated/circle_bundles.optical_flow.html">circle_bundles.optical_flow</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/auto_examples/index.html">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/all/index.html">All Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/01_product_torus.html">Torus With Varying Fiber Radius</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/02_foldy_klein_bottle.html">Folded Klein Bottle</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/03_synthetic_natural_image_patches.html">Synthetic Natural Image Patches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/04_optical_flow_torus.html">Sintel Optical Flow Dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/05_triangle_meshes.html">Star Pyramid Meshes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/06_tri_prism_densities.html">Triangle Prism Densities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/07_star_density_unwrapping.html">Star Density Unwrapping</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tutorials/auto_examples/all/08_quotients_of_s2_trivial.html">Quotient Bundles</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../tutorials/auto_examples/index.html#all-tutorials">All Tutorials</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">References</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">circle_bundles</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Core pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="core-pipeline">
+<h1>Core pipeline<a class="headerlink" href="#core-pipeline" title="Link to this heading"></a></h1>
+<p>The main entry point is <a class="reference internal" href="#circle_bundles.Bundle" title="circle_bundles.Bundle"><code class="xref py py-class docutils literal notranslate"><span class="pre">circle_bundles.Bundle</span></code></a>.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="circle_bundles.Bundle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">circle_bundles.</span></span><span class="sig-name descname"><span class="pre">Bundle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cover</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pou</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_simp_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_summary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Primary bundle analysis driver.</p>
+<p>This class takes either</p>
+<ul class="simple">
+<li><p>a minimal <code class="xref py py-class docutils literal notranslate"><span class="pre">Cover</span></code> object (holding <code class="docutils literal notranslate"><span class="pre">U</span></code>, optional <code class="docutils literal notranslate"><span class="pre">pou</span></code>,
+and optional <code class="docutils literal notranslate"><span class="pre">landmarks</span></code>), <strong>or</strong></p></li>
+<li><p>a raw membership matrix <code class="docutils literal notranslate"><span class="pre">U</span></code>,</p></li>
+</ul>
+<p>together with total-space data <code class="docutils literal notranslate"><span class="pre">X</span></code> (either a point cloud or a distance matrix). It then:</p>
+<ol class="arabic simple">
+<li><p>Builds the nerve simplices (edges/triangles/tetrahedra) <strong>directly from</strong> <code class="docutils literal notranslate"><span class="pre">U</span></code>.</p></li>
+<li><p>Computes local trivializations and an O(2) cocycle on overlaps.</p></li>
+<li><p>Computes characteristic-class representatives and edge-driven persistence.</p></li>
+<li><p>Optionally computes global bundle-map coordinates and solver summaries.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – Either a point cloud of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">D)</span></code> (if <code class="docutils literal notranslate"><span class="pre">distance_matrix=False</span></code>),
+or a distance matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_samples)</span></code> (if <code class="docutils literal notranslate"><span class="pre">distance_matrix=True</span></code>).</p></li>
+<li><p><strong>U</strong> (<em>Optional</em><em>[</em><em>np.ndarray</em><em>]</em>) – Boolean membership matrix of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">n_samples)</span></code>. Entry <code class="docutils literal notranslate"><span class="pre">U[j,</span> <span class="pre">i]</span></code>
+indicates whether sample <code class="docutils literal notranslate"><span class="pre">i</span></code> belongs to chart/set <code class="docutils literal notranslate"><span class="pre">j</span></code>.
+Provide exactly one of <code class="docutils literal notranslate"><span class="pre">U</span></code> or <code class="docutils literal notranslate"><span class="pre">cover</span></code>.</p></li>
+<li><p><strong>cover</strong> (<em>Optional</em><em>[</em><em>'Cover'</em><em>]</em>) – Optional <code class="xref py py-class docutils literal notranslate"><span class="pre">Cover</span></code> object holding <code class="docutils literal notranslate"><span class="pre">U</span></code> and (optionally)
+<code class="docutils literal notranslate"><span class="pre">pou</span></code> and <code class="docutils literal notranslate"><span class="pre">landmarks</span></code>. If provided, its fields are used as defaults.
+Provide exactly one of <code class="docutils literal notranslate"><span class="pre">U</span></code> or <code class="docutils literal notranslate"><span class="pre">cover</span></code>.</p></li>
+<li><p><strong>distance_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, interpret <code class="docutils literal notranslate"><span class="pre">X</span></code> as a distance matrix. If False, interpret <code class="docutils literal notranslate"><span class="pre">X</span></code> as a point cloud.</p></li>
+<li><p><strong>pou</strong> (<em>Optional</em><em>[</em><em>np.ndarray</em><em>]</em>) – Optional partition of unity of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">n_samples)</span></code>. If <code class="docutils literal notranslate"><span class="pre">cover</span></code> is provided,
+this overrides <code class="docutils literal notranslate"><span class="pre">cover.pou</span></code> for this Bundle (and does not mutate the cover).</p></li>
+<li><p><strong>landmarks</strong> (<em>Optional</em><em>[</em><em>np.ndarray</em><em>]</em>) – Optional landmark coordinates of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">dB)</span></code> used by visualization helpers.
+If <code class="docutils literal notranslate"><span class="pre">cover</span></code> is provided, this overrides <code class="docutils literal notranslate"><span class="pre">cover.landmarks</span></code> for this Bundle.</p></li>
+<li><p><strong>total_metric</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>]</em>) – Optional metric object passed through to local-trivialization computations.
+Only used when <code class="docutils literal notranslate"><span class="pre">distance_matrix=False</span></code>.</p></li>
+<li><p><strong>max_simp_dim</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum simplex dimension to precompute from <code class="docutils literal notranslate"><span class="pre">U</span></code>. Common values are 1, 2, or 3.</p></li>
+<li><p><strong>show_summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This object caches intermediate results. Any method that changes upstream state
+invalidates downstream caches (e.g., computing new local trivializations clears
+class/persistence caches).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.summary">
+<span class="sig-name descname"><span class="pre">summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.summary" title="Link to this definition"></a></dt>
+<dd><p>Display any summaries that are currently available and return them in a dict.</p>
+<p>By default (<code class="docutils literal notranslate"><span class="pre">modes=None</span></code>), this displays:
+- <code class="docutils literal notranslate"><span class="pre">&quot;nerve&quot;</span></code> (always available),
+- <code class="docutils literal notranslate"><span class="pre">&quot;local_triv&quot;</span></code> if <a class="reference internal" href="#circle_bundles.Bundle.get_local_trivs" title="circle_bundles.Bundle.get_local_trivs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_local_trivs()</span></code></a> has been run,
+- <code class="docutils literal notranslate"><span class="pre">&quot;classes&quot;</span></code> if <a class="reference internal" href="#circle_bundles.Bundle.get_classes" title="circle_bundles.Bundle.get_classes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_classes()</span></code></a> has been run,
+- <code class="docutils literal notranslate"><span class="pre">&quot;bundle_map&quot;</span></code> if <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_bundle_map()</span></code> has been run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>modes</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.14)"><em>Iterable</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'nerve'</em><em>, </em><em>'local_triv'</em><em>, </em><em>'classes'</em><em>, </em><em>'bundle_map'</em><em>]</em><em>] </em><em>| </em><em>None</em>) – Iterable selecting which summaries to display. If None, uses the default policy above.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mapping from summary name to summary object (some entries may be <code class="docutils literal notranslate"><span class="pre">None</span></code> if unavailable).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.get_local_trivs">
+<span class="sig-name descname"><span class="pre">get_local_trivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pca2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_patch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pou</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_summary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.get_local_trivs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.get_local_trivs" title="Link to this definition"></a></dt>
+<dd><p>Compute local trivializations, estimate an O(2) cocycle, and compute diagnostics.</p>
+<p>This is the upstream computation needed by most later steps:
+transitions/cocycle estimation and bundle-quality diagnostics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a>) – Local coordinate constructor / charting method passed to
+<code class="xref py py-func docutils literal notranslate"><span class="pre">compute_local_triv()</span></code>
+(e.g. <code class="docutils literal notranslate"><span class="pre">&quot;pca2&quot;</span></code>).</p></li>
+<li><p><strong>min_patch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum number of samples required to compute a local trivialization on a chart.</p></li>
+<li><p><strong>min_points_edge</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum overlap size <code class="docutils literal notranslate"><span class="pre">|U_j</span> <span class="pre">∩</span> <span class="pre">U_k|</span></code> required to include an edge (j,k) in cocycle estimation.</p></li>
+<li><p><strong>pou</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional partition-of-unity override used for computing quality diagnostics.
+If omitted, uses <code class="docutils literal notranslate"><span class="pre">self.pou</span></code> when available. This does not overwrite <code class="docutils literal notranslate"><span class="pre">self.pou</span></code>.</p></li>
+<li><p><strong>show_summary</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, display the local-trivialization summary after computing (auto rendering).</p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Verbosity forwarded to the local trivialization routine.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Container holding local trivializations, cocycle, and a quality report.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="generated/circle_bundles.LocalTrivsResult.html#circle_bundles.LocalTrivsResult" title="circle_bundles.LocalTrivsResult">LocalTrivsResult</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If shapes are inconsistent (e.g. invalid <code class="docutils literal notranslate"><span class="pre">pou</span></code> shape).</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Calling this method invalidates downstream caches (classes, global trivialization, bundle map).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.get_classes">
+<span class="sig-name descname"><span class="pre">get_classes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_persistence</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_rounding_distance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.get_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.get_classes" title="Link to this definition"></a></dt>
+<dd><p>Compute characteristic-class representatives and their persistence.</p>
+<p>This method computes discrete representatives of the characteristic classes
+associated to the estimated bundle cocycle (e.g. Euler class, orientation data),
+and studies their stability under a filtration of the nerve of the cover.</p>
+<p>The filtration is induced by assigning weights to edges of the nerve, typically
+derived from local trivialization quality (e.g. RMS angular error). Persistent
+cohomology is then used to identify robust class representatives and to restrict
+the computation to a well-supported subcomplex.</p>
+<dl class="simple">
+<dt>The result includes:</dt><dd><ul class="simple">
+<li><p>raw characteristic-class representatives on the full nerve,</p></li>
+<li><p>persistent cocycle data with respect to the edge-weight filtration,</p></li>
+<li><p>restricted class data computed on the induced persistent subcomplex,</p></li>
+<li><p>a concise human-readable summary.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Local trivializations and an O(2)-valued cocycle must already be available;
+these are computed automatically by <a class="reference internal" href="#circle_bundles.Bundle.get_local_trivs" title="circle_bundles.Bundle.get_local_trivs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_local_trivs()</span></code></a> if needed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>edge_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>)</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>optional</em>) – Explicit edge weights for the nerve filtration. Keys should be unordered
+vertex pairs <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code>. If not provided, weights are inferred from bundle
+quality metrics (see <code class="docutils literal notranslate"><span class="pre">prefer_edge_weight</span></code>).</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<em>{&quot;rms&quot;}</em><em>, </em><em>default=&quot;rms&quot;</em>) – Which quality-derived edge weight to use when <code class="docutils literal notranslate"><span class="pre">edge_weights</span></code> is not
+provided. Currently only RMS angular error is supported.</p></li>
+<li><p><strong>show_classes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True, display the computed characteristic-class representatives.</p></li>
+<li><p><strong>show_persistence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True, display class persistence information</p></li>
+<li><p><strong>show_rounding_distance</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True, include rounding-distance diagnostic when displaying summaries.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>An object containing:</dt><dd><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">reps</span></code>: characteristic-class representatives on the full nerve,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">persistence</span></code>: persistence data for cocycles under the filtration,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">restricted</span></code>: class data recomputed on the persistent subcomplex,</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">summary_text</span></code>: a concise textual summary suitable for logging
+or documentation output.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="generated/circle_bundles.ClassesAndPersistence.html#circle_bundles.ClassesAndPersistence" title="circle_bundles.ClassesAndPersistence">ClassesAndPersistence</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This method resets any cached global trivialization or bundle map, since
+class computation may change the effective subcomplex used for downstream
+constructions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.get_global_trivialization">
+<span class="sig-name descname"><span class="pre">get_global_trivialization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pou</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.get_global_trivialization"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.get_global_trivialization" title="Link to this definition"></a></dt>
+<dd><p>Compute a global circle-valued coordinate using the Singer construction.</p>
+<p>This method produces a <em>global</em> fiber coordinate (an <span class="math notranslate nohighlight">\(\mathbb{S}^1\)</span>-valued
+coordinatization) by solving a Singer-type global alignment problem on a certified
+orientable 1-skeleton, and then blending local angles using a partition of unity.</p>
+<p>The returned array <code class="docutils literal notranslate"><span class="pre">F</span></code> is a global coordinate representation in <span class="math notranslate nohighlight">\(\mathbb{R}^2\)</span>
+(e.g., cosine/sine embedding), suitable for downstream visualization or learning.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>) – Optional edge-weight threshold used to further restrict the certified max-trivial
+subcomplex. If None, the maximal-trivial cutoff is used.
+If provided, it must be less than or equal to the maximal-trivial threshold;
+otherwise an error is raised.</p></li>
+<li><p><strong>pou</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional partition-of-unity override of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">n_samples)</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Global fiber coordinate array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">2)</span></code> (degree-normalized).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)">numpy.ndarray</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If prerequisites have not been computed (see above), or if no partition of unity
+    is available via <code class="docutils literal notranslate"><span class="pre">pou</span></code> or <code class="docutils literal notranslate"><span class="pre">self.pou</span></code>.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the maximal-trivial certified subcomplex is empty, if the chosen threshold yields
+    no usable edges, if the cocycle is non-orientable on the selected subcomplex, or if
+    <code class="docutils literal notranslate"><span class="pre">weight</span></code> exceeds the maximal-trivial threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.get_frame_dataset">
+<span class="sig-name descname"><span class="pre">get_frame_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pou</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">packing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'coloring2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.get_frame_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.get_frame_dataset" title="Link to this definition"></a></dt>
+<dd><p>Build the pre-projection frame dataset used by the bundle-map solver.</p>
+<p>This method constructs the intermediate “frame” representation used by the
+bundle-map pipeline <em>before</em> any projection/reduction step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pou</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>) – Optional partition-of-unity override of shape <code class="docutils literal notranslate"><span class="pre">(n_sets,</span> <span class="pre">n_samples)</span></code>.
+If omitted, uses <code class="docutils literal notranslate"><span class="pre">self.pou</span></code>. The override does not overwrite <code class="docutils literal notranslate"><span class="pre">self.pou</span></code>.</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>) – Optional edge-weight threshold used to restrict the cocycle-certified subcomplex.
+If None, the full cocycle-certified subcomplex is used.
+If provided, it must be &lt;= the cocycle-certification threshold (the largest weight
+at which the class representatives still certify as cocycles).</p></li>
+<li><p><strong>packing</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'none'</em><em>, </em><em>'coloring'</em><em>, </em><em>'coloring2'</em><em>]</em>) – Frame-packing strategy used when assembling the frame dataset (implementation-defined).
+Typical values include <code class="docutils literal notranslate"><span class="pre">&quot;coloring2&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A frame dataset object produced by the internal v2 pipeline (implementation-defined type).
+The returned dataset corresponds to <code class="docutils literal notranslate"><span class="pre">stage=&quot;pre_projection&quot;</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)">object</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If prerequisites have not been computed, or if no partition of unity is available.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the cocycle-certified subcomplex is empty, or if <code class="docutils literal notranslate"><span class="pre">weight</span></code> exceeds the cocycle
+    certification threshold, or if thresholding yields no edges.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.compare_trivs">
+<span class="sig-name descname"><span class="pre">compare_trivs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncols</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_selected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_points_edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.compare_trivs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.compare_trivs" title="Link to this definition"></a></dt>
+<dd><p>Compare local circular coordinates on overlaps.</p>
+<p>This method produces a <strong>static matplotlib diagnostic figure</strong> showing pairs of
+local fiber coordinates on chart overlaps, optionally aligning the second chart
+to the first by an O(2) fit.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>If there are more than <code class="docutils literal notranslate"><span class="pre">max_pairs</span></code> overlaps, the visualizer selects a subset
+according to <code class="docutils literal notranslate"><span class="pre">metric</span></code> (typically WORST / MEDIAN / BEST).</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ncols</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Number of columns in the comparison grid, or <code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> for an automatic layout.</p></li>
+<li><p><strong>title_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font size for subplot titles.</p></li>
+<li><p><strong>align</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, align the second chart to the first on each overlap using an O(2) fit
+(useful when comparing angles up to a global reflection/rotation on overlaps).</p></li>
+<li><p><strong>s</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Marker size scaling for scatter plots.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Optional path to save the figure (e.g., <code class="docutils literal notranslate"><span class="pre">&quot;compare_trivs.png&quot;</span></code>).</p></li>
+<li><p><strong>max_pairs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Maximum number of overlap pairs to display.</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – <p>Overlap scoring metric used to rank/select pairs. Common values are:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code>: mean circle-fit / angle disagreement on the overlap</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code>: RMS circle-fit / angle disagreement on the overlap</p></li>
+</ul>
+</p></li>
+<li><p><strong>show</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, display the figure (matplotlib). If False, return the figure without display.</p></li>
+<li><p><strong>return_selected</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – If True, also return diagnostics about which overlaps were displayed.</p></li>
+<li><p><strong>min_points_edge</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Minimum overlap size required to include an edge when <code class="docutils literal notranslate"><span class="pre">edges</span></code> is not provided.</p></li>
+<li><p><strong>edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>) – Optional explicit list of chart-index edges <code class="docutils literal notranslate"><span class="pre">[(j,</span> <span class="pre">k),</span> <span class="pre">...]</span></code> to consider. If provided,
+this overrides <code class="docutils literal notranslate"><span class="pre">min_points_edge</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>If <code class="docutils literal notranslate"><span class="pre">return_selected=False</span></code> (default), returns the matplotlib figure.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">return_selected=True</span></code>, returns <code class="docutils literal notranslate"><span class="pre">(fig,</span> <span class="pre">selected_edges,</span> <span class="pre">err_by_edge)</span></code>, where:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">selected_edges</span></code> is the list of overlaps actually displayed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">err_by_edge</span></code> maps each overlap edge to its diagnostic error value</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If local trivializations have not been computed (call <a class="reference internal" href="#circle_bundles.Bundle.get_local_trivs" title="circle_bundles.Bundle.get_local_trivs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_local_trivs()</span></code></a> first).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.show_nerve">
+<span class="sig-name descname"><span class="pre">show_nerve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">landmarks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri_opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tri_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'pink'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cochains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_edges</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">highlight_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_local_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_slider</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mark_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_title_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.show_nerve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.show_nerve" title="Link to this definition"></a></dt>
+<dd><p>Visualize a single-cycle nerve in a canonical circle layout (matplotlib).</p>
+<p>This visualization is designed for the common case where the 1-skeleton of the
+nerve is a <strong>single cycle graph</strong>. The vertices are arranged evenly on a circle,
+and edge annotations (weights, orientation data) are displayed directly on the plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_max_trivial</strong> – If True and persistence results are available, highlight edges belonging to the
+max-trivial subcomplex (when meaningful). If False, draw all edges uniformly.</p></li>
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>] </em><em>| </em><em>None</em>) – Weight-label source selector: <code class="docutils literal notranslate"><span class="pre">&quot;rms&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;witness&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>.</p></li>
+<li><p><strong>omega</strong> – Optional explicit edge-sign dict mapping <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code> to <code class="docutils literal notranslate"><span class="pre">±1</span></code>. If None, an attempt is
+made to pull a default from cached class representatives.</p></li>
+<li><p><strong>phi</strong> – Optional explicit vertex-sign dict mapping vertex index to <code class="docutils literal notranslate"><span class="pre">±1</span></code>.</p></li>
+<li><p><strong>compute_phi</strong> – If True and <code class="docutils literal notranslate"><span class="pre">phi</span></code> is not provided, attempt to compute a consistent gauge from
+the cached cocycle. Requires local trivializations/cocycle to have been computed.</p></li>
+<li><p><strong>fail_if_not_cycle</strong> – If True (default), raise if the nerve graph is not a single cycle. If False,
+attempt to visualize “as-is” without canonical cycle reindexing.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – Optional plot title. Defaults to <code class="docutils literal notranslate"><span class="pre">&quot;Nerve</span> <span class="pre">Visualization&quot;</span></code>.</p></li>
+<li><p><strong>save_path</strong> – Optional path to save the figure.</p></li>
+<li><p><strong>ax</strong> – Optional matplotlib Axes to draw into. If None, a new figure/axes are created.</p></li>
+<li><p><strong>figsize</strong> – Figure size (inches) used only when <code class="docutils literal notranslate"><span class="pre">ax</span> <span class="pre">is</span> <span class="pre">None</span></code>.</p></li>
+<li><p><strong>dpi</strong> – Optional DPI used only when <code class="docutils literal notranslate"><span class="pre">ax</span> <span class="pre">is</span> <span class="pre">None</span></code>.</p></li>
+<li><p><strong>r</strong> – Radius of the circle layout.</p></li>
+<li><p><strong>node_size</strong> – Node styling options.</p></li>
+<li><p><strong>node_facecolor</strong> – Node styling options.</p></li>
+<li><p><strong>node_edgecolor</strong> – Node styling options.</p></li>
+<li><p><strong>node_label_color</strong> – Node styling options.</p></li>
+<li><p><strong>removed_edge_color</strong> – Styling for edges not in the highlighted/kept set.</p></li>
+<li><p><strong>removed_edge_lw</strong> – Styling for edges not in the highlighted/kept set.</p></li>
+<li><p><strong>kept_edge_color</strong> – Styling for highlighted/kept edges.</p></li>
+<li><p><strong>kept_edge_lw</strong> – Styling for highlighted/kept edges.</p></li>
+<li><p><strong>omega_color</strong> – Text colors for omega/phi/weight annotations.</p></li>
+<li><p><strong>phi_color</strong> – Text colors for omega/phi/weight annotations.</p></li>
+<li><p><strong>weights_color</strong> – Text colors for omega/phi/weight annotations.</p></li>
+<li><p><strong>fontsize_node</strong> – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>fontsize_omega</strong> – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>fontsize_phi</strong> – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>fontsize_weights</strong> – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>omega_offset</strong> – Radial offsets used to place text annotations without overlapping edges.</p></li>
+<li><p><strong>weights_offset</strong> – Radial offsets used to place text annotations without overlapping edges.</p></li>
+<li><p><strong>phi_offset</strong> – Radial offsets used to place text annotations without overlapping edges.</p></li>
+<li><p><strong>landmarks</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>ndarray</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>show_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>show_axes</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>tri_opacity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>tri_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>cochains</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>...</em><em>]</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>edge_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>highlight_edges</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.14)"><em>Set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>highlight_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
+<li><p><strong>prefer_local_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><em>Literal</em></a><em>[</em><em>'rms'</em><em>, </em><em>'none'</em><em>]</em>)</p></li>
+<li><p><strong>use_slider</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>mark_cutoff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>show_title_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The matplotlib figure.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If the Bundle has no cached nerve edges.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">fail_if_not_cycle=True</span></code> and the nerve graph is not a single cycle.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">compute_phi=True</span></code> but no cocycle is available (call <a class="reference internal" href="#circle_bundles.Bundle.get_local_trivs" title="circle_bundles.Bundle.get_local_trivs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_local_trivs()</span></code></a> first).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.show_circle_nerve">
+<span class="sig-name descname"><span class="pre">show_circle_nerve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_max_trivial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_if_not_cycle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(5.0,</span> <span class="pre">5.0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_facecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lightblue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_edgecolor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_label_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'lightgray'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removed_edge_lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_edge_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kept_edge_lw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'blue'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'red'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_omega</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fontsize_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.09</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.14</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.show_circle_nerve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.show_circle_nerve" title="Link to this definition"></a></dt>
+<dd><p>Visualize the nerve when it is a single cycle.</p>
+<p>This helper draws the 1-skeleton of the cover nerve in a canonical circular
+layout and can optionally annotate it with:</p>
+<ul class="simple">
+<li><p><strong>kept edges</strong> from a persistence-derived “max trivial” subcomplex,</p></li>
+<li><p>an edge cochain <code class="docutils literal notranslate"><span class="pre">omega</span></code> (typically the orientation/monodromy data),</p></li>
+<li><p>a vertex cochain <code class="docutils literal notranslate"><span class="pre">phi</span></code> taking values in <code class="docutils literal notranslate"><span class="pre">{±1}</span></code> (an orientation gauge),</p></li>
+<li><p>edge weights used for the filtration (e.g. RMS transition error).</p></li>
+</ul>
+<p>The function is intended for the common situation where the nerve is a
+cycle graph (e.g. a good cover of a base circle), providing a compact
+diagnostic view of which edges are trusted and what twisting data is
+present.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_max_trivial</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=True</em>) – If True and persistence data is available (from <a class="reference internal" href="#circle_bundles.Bundle.get_classes" title="circle_bundles.Bundle.get_classes"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_classes()</span></code></a>),
+highlight the edges kept by the “max_trivial” persistent subcomplex.
+Kept edges are drawn with thicker styling.</p></li>
+<li><p><strong>weights</strong> (<em>{&quot;rms&quot;</em><em>, </em><em>&quot;witness&quot;</em><em>, </em><em>&quot;none&quot;}</em><em>, </em><em>default=&quot;rms&quot;</em>) – Which edge weights to display on the cycle. If “none”, no edge weights
+are shown. Otherwise, weights are pulled from the latest available
+source (persistence edge weights when available, else quality-derived).</p></li>
+<li><p><strong>omega</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>)</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Edge labels to display (e.g. values in <code class="docutils literal notranslate"><span class="pre">{0,1}</span></code> or <code class="docutils literal notranslate"><span class="pre">{±1}</span></code> depending
+on convention). Keys should be unordered pairs <code class="docutils literal notranslate"><span class="pre">(i,</span> <span class="pre">j)</span></code>.
+If not provided, the method attempts to use <code class="docutils literal notranslate"><span class="pre">reps.omega_O1_used</span></code> from
+the most recently computed class representatives.</p></li>
+<li><p><strong>phi</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>]</em><em>, </em><em>optional</em>) – Vertex labels (typically <code class="docutils literal notranslate"><span class="pre">±1</span></code>) to display. If not provided and
+<code class="docutils literal notranslate"><span class="pre">compute_phi=True</span></code>, an attempt is made to compute <code class="docutils literal notranslate"><span class="pre">phi</span></code> by orienting
+the current cocycle along either the kept edges (if available) or all
+cycle edges.</p></li>
+<li><p><strong>compute_phi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=True</em>) – Whether to attempt automatic computation of <code class="docutils literal notranslate"><span class="pre">phi</span></code> when <code class="docutils literal notranslate"><span class="pre">phi</span></code> is not
+provided. Requires that a cocycle has been computed via
+<a class="reference internal" href="#circle_bundles.Bundle.get_local_trivs" title="circle_bundles.Bundle.get_local_trivs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_local_trivs()</span></code></a>.</p></li>
+<li><p><strong>fail_if_not_cycle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=True</em>) – If True, raise a ValueError when the nerve is not a single cycle graph.
+If False, the method will still attempt a plot using the given edge set
+(without enforcing cycle ordering).</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Title for the plot. Defaults to “Nerve Visualization”.</p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – If provided, save the figure to this path.</p></li>
+<li><p><strong>ax</strong> (<em>matplotlib Axes</em><em>, </em><em>optional</em>) – Existing axes to draw into. If None, a new figure/axes are created.</p></li>
+<li><p><strong>figsize</strong> (<em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>)</em><em>, </em><em>default=</em><em>(</em><em>5.0</em><em>, </em><em>5.0</em><em>)</em>) – Matplotlib figure size in inches (used when <code class="docutils literal notranslate"><span class="pre">ax</span></code> is None).</p></li>
+<li><p><strong>dpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – DPI for the created figure (used when <code class="docutils literal notranslate"><span class="pre">ax</span></code> is None).</p></li>
+<li><p><strong>r</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>default=1.0</em>) – Radius of the circular layout.</p></li>
+<li><p><strong>node_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Styling options for vertices and their labels.</p></li>
+<li><p><strong>node_facecolor</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Styling options for vertices and their labels.</p></li>
+<li><p><strong>node_edgecolor</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Styling options for vertices and their labels.</p></li>
+<li><p><strong>node_label_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Styling options for vertices and their labels.</p></li>
+<li><p><strong>removed_edge_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Styling for edges not in <code class="docutils literal notranslate"><span class="pre">kept_edges</span></code> (when <code class="docutils literal notranslate"><span class="pre">use_max_trivial=True</span></code>).</p></li>
+<li><p><strong>removed_edge_lw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Styling for edges not in <code class="docutils literal notranslate"><span class="pre">kept_edges</span></code> (when <code class="docutils literal notranslate"><span class="pre">use_max_trivial=True</span></code>).</p></li>
+<li><p><strong>kept_edge_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Styling for kept edges.</p></li>
+<li><p><strong>kept_edge_lw</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Styling for kept edges.</p></li>
+<li><p><strong>omega_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Text colors for omega/phi/weight annotations.</p></li>
+<li><p><strong>phi_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Text colors for omega/phi/weight annotations.</p></li>
+<li><p><strong>weights_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Text colors for omega/phi/weight annotations.</p></li>
+<li><p><strong>fontsize_node</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>fontsize_omega</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>fontsize_phi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>fontsize_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – Font sizes for node labels and annotations.</p></li>
+<li><p><strong>omega_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Radial offsets for drawing omega/weights/phi text relative to the cycle.</p></li>
+<li><p><strong>weights_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Radial offsets for drawing omega/weights/phi text relative to the cycle.</p></li>
+<li><p><strong>phi_offset</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>) – Radial offsets for drawing omega/weights/phi text relative to the cycle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The created figure (or the figure associated with <code class="docutils literal notranslate"><span class="pre">ax</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>matplotlib.figure.Figure</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.14)"><strong>RuntimeError</strong></a> – If nerve edge data is missing (no stored nerve edges), or if <code class="docutils literal notranslate"><span class="pre">phi</span></code> is
+    requested to be computed but no cocycle is available.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the nerve is not a single cycle graph and <code class="docutils literal notranslate"><span class="pre">fail_if_not_cycle=True</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>When the nerve is a cycle, vertices and annotations are reindexed to follow
+the cyclic order for a clean, readable layout.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="circle_bundles.Bundle.get_simplices">
+<span class="sig-name descname"><span class="pre">get_simplices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertices_as_tuples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canonicalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefer_edge_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rms'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/circle_bundles/bundle2.html#Bundle.get_simplices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#circle_bundles.Bundle.get_simplices" title="Link to this definition"></a></dt>
+<dd><p>Return cached simplices of the nerve, optionally filtered by weight or persistence stage.</p>
+<p>This method provides access to the simplices of the nerve of the cover (vertices,
+edges, triangles, and tetrahedra) that were computed and cached during bundle
+construction. The returned simplices can be restricted either by an explicit
+edge-weight threshold or by a named persistence stage derived from class computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dims</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>iterable</em><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Which simplex dimensions to return. For example:
+<code class="docutils literal notranslate"><span class="pre">0</span></code> for vertices, <code class="docutils literal notranslate"><span class="pre">1</span></code> for edges, <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">2)</span></code> for edges and triangles.
+If None, simplices of all available dimensions are returned.</p></li>
+<li><p><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>{&quot;cocycle&quot;</em><em>, </em><em>&quot;coboundary&quot;}</em><em>, </em><em>optional</em>) – <p>Restrict simplices using either:</p>
+<ul>
+<li><p>a numeric edge-weight cutoff (float), keeping only simplices whose
+constituent edges have weight ≤ <code class="docutils literal notranslate"><span class="pre">weight</span></code>; or</p></li>
+<li><p>a named persistence stage (string), interpreted as:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;cocycle&quot;</span></code>: the maximal stage where the class representatives are cocycles;</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;coboundary&quot;</span></code>: alias for the former <code class="docutils literal notranslate"><span class="pre">&quot;max_trivial&quot;</span></code> persistence stage.</p></li>
+</ul>
+</li>
+</ul>
+<p>If None, no filtering is applied and the full cached nerve is returned.</p>
+</p></li>
+<li><p><strong>vertices_as_tuples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True, return vertices as singleton tuples <code class="docutils literal notranslate"><span class="pre">(i,)</span></code> rather than integers <code class="docutils literal notranslate"><span class="pre">i</span></code>.
+This can be useful for uniform handling of simplices across dimensions.</p></li>
+<li><p><strong>canonicalize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=True</em>) – If True, return simplices in canonical sorted order with unique orientation
+conventions. If False, preserve the internal ordering as stored.</p></li>
+<li><p><strong>prefer_edge_weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>default=&quot;rms&quot;</em>) – When <code class="docutils literal notranslate"><span class="pre">weight</span></code> is given as a string stage name, specifies which edge-weight
+source to prefer if multiple are available (e.g. RMS angular error).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary (or nested structure) mapping each requested dimension to the
+corresponding list of simplices, with the exact structure depending on
+<code class="docutils literal notranslate"><span class="pre">dims</span></code> and formatting options.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Any</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><strong>Filtration convention.</strong>
+Vertices (0-simplices) are always assigned weight 0. Consequently, this method
+always returns the full vertex set <code class="docutils literal notranslate"><span class="pre">{0,</span> <span class="pre">…,</span> <span class="pre">n_sets−1}</span></code> (or singleton tuples),
+regardless of the value of <code class="docutils literal notranslate"><span class="pre">weight</span></code>. Only edges, triangles, and higher simplices
+are subject to filtering.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="results.html" class="btn btn-neutral float-right" title="Result and Configuration Dataclasses" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Brad Turow.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
