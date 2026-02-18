@@ -82,16 +82,30 @@ from .analysis.local_analysis import (
 from .geometry.geometric_unwrapping import get_cocycle_dict, lift_base_points
 
 # ==========================
-# Additional helpers
+# Additional helpers (optional)
 # ==========================
 
-from .synthetic import *
-from .viz import *
-from .optical_flow import *
+_syn_all: list[str] = []
+_viz_all: list[str] = []
+_of_all: list[str] = []
 
-from .synthetic import __all__ as _syn_all
-from .viz import __all__ as _viz_all
-from .optical_flow import __all__ as _of_all
+try:
+    from .synthetic import *  # noqa: F401,F403
+    from .synthetic import __all__ as _syn_all  # type: ignore
+except Exception:
+    pass
+
+try:
+    from .viz import *  # noqa: F401,F403
+    from .viz import __all__ as _viz_all  # type: ignore
+except Exception:
+    pass
+
+try:
+    from .optical_flow import *  # noqa: F401,F403
+    from .optical_flow import __all__ as _of_all  # type: ignore
+except Exception:
+    pass
 
 
 
