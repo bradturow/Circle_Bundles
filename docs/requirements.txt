@@ -9,3 +9,5 @@ scikit-learn
 sphinx-exec-code
 sympy
 trimesh
+pandas
+shapely

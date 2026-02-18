@@ -109,6 +109,27 @@ except Exception:
 
 
 
+from typing import Optional
+import numpy as np
+
+def sample_sphere(n: int, *, dim: int = 2, rng: Optional[np.random.Generator] = None) -> np.ndarray:
+    """
+    Sample points uniformly from the unit sphere S^dim embedded in R^{dim+1}.
+    Lazy-imported from circle_bundles.synthetic.
+    """
+    from .synthetic import sample_sphere as _sample_sphere
+    return _sample_sphere(n, dim=dim, rng=rng)
+
+def hopf_projection(x: np.ndarray) -> np.ndarray:
+    """
+    Hopf projection S^3 -> S^2 (expects points in R^4).
+    Lazy-imported from circle_bundles.synthetic (or wherever your implementation lives).
+    """
+    from .synthetic import hopf_projection as _hopf_projection
+    return _hopf_projection(x)
+
+
+
 # =============================================================================
 # Public export list
 # =============================================================================
@@ -162,6 +183,10 @@ __all__ = [
     "plot_local_rips",
     "get_cocycle_dict",
     "lift_base_points",
+
+    "sample_sphere",
+    "hopf_projection",
+    
 ]
 
 __all__ += [*_syn_all, *_viz_all, *_of_all]
