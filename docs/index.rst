@@ -1,7 +1,7 @@
 circle_bundles
 ==============
 
-Tools for detecting, visualizing, and classifying circle-bundle structure in data.
+A Toolkit for detecting, classifying, coordinatizing and visualizing circle bundle structures in data.
 
 The recommended usage is:
 
