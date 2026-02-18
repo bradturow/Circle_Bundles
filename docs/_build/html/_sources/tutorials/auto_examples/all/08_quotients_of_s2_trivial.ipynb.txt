@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "markdown",
-   "id": "bf60a1cb",
+   "id": "01c2c369",
    "metadata": {},
    "source": [
     "(example_08_quotients_of_s2_trivial)="
