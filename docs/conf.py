@@ -76,14 +76,18 @@ autodoc_default_options = {
 
 # If you have optional deps (dash/plotly/etc), don't hard fail doc builds
 autodoc_mock_imports = [
-    "dash",
+    "sympy",
+    "matplotlib",
+    "mpl_toolkits",
     "plotly",
-    "sklearn",
-    "scipy",
+    "dash",
+    "PIL",
+    "networkx",
     "gudhi",
     "ripser",
     "dreimac",
 ]
+
 
 # -- MyST-NB settings --------------------------------------------------------
 # Treat notebooks/markdown as sources (useful if you also include .ipynb pages directly in toctrees)
