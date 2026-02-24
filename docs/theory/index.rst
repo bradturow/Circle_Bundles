@@ -22,17 +22,14 @@ classified by a pair of characteristic classes:
 - the **orientation class** :math:`\mathrm{sw}_1 \in H^1(B; \mathbb{Z}_2)`, and
 - the **(twisted) Euler class** :math:`\tilde e \in H^2(B; \widetilde{\mathbb{Z}})`,
 
-which encode global obstructions to orientability and triviality, respectively.
 Crucially, these invariants admit formulations that can be recovered from purely
-local data, making them well suited for data-analytic settings.
-
-A nonzero characteristic class indicates that the bundle is *non-trivial*, in the
+local data. A nonzero characteristic class indicates that the bundle is *non-trivial*, in the
 sense that its total space :math:`E` is not homeomorphic to the product
 :math:`B \times \mathbb{S}^1`. Only trivial bundles admit global circular
 coordinate systems.
 
 In general, any circle bundle over a compact metric space can be realized
-(non-uniquely) as the pullback of the tautological circle bundle
+as the pullback of the tautological circle bundle
 
 .. math::
 

@@ -28,22 +28,83 @@ def lattice_vis(
     clear_ax: bool = True,
 ):
     """
-    Plot thumbnails at (scaled) coordinates in [0,1]^2 while ensuring thumbnails
-    are fully visible (no clipping at borders).
+    Visualize a dataset by placing rendered thumbnails at 2D coordinates, using a
+    lattice-based nearest-neighbor selection to pick representative examples.
 
-    Selection:
-      - Nearest neighbors to a lattice of target points (per_row x per_col)
-      - No reuse of the same datum.
+    The input coordinates are first affine-rescaled to the unit square [0, 1]^2.
+    A regular lattice of target points (``per_row`` × ``per_col``) is created
+    inside the unit square (inset from the border by ``padding``). For each
+    lattice target, the nearest *unused* datum is selected (greedy, without
+    replacement). The selected thumbnails are then placed at their true rescaled
+    positions, but mapped into a "safe center region" so that each thumbnail
+    remains fully visible and is not clipped by the axes boundary.
 
-    Placement:
-      - Each selected point is placed at its *true* (scaled) position, but mapped
-        into a "safe center region" so thumbnails don't spill outside the axes.
+    Thumbnails are drawn by creating inset axes positioned in *figure-fraction*
+    coordinates corresponding to the provided axis' rectangle. This allows
+    consistent pixel-sized thumbnails (``thumb_px``) regardless of axis data
+    limits.
 
-    Notes on subplot usage:
-      - If `ax` is provided, thumbnails are placed inside that axis' bounding box.
-      - We overlay small inset axes positioned in *figure fraction* coordinates
-        corresponding to the provided axis' rectangle.
-      - `figsize`/`dpi` are only used if `ax is None`.
+    Parameters
+    ----------
+    data
+        Sequence of N objects to visualize (one per coordinate).
+    coords
+        Array of shape (N, 2) giving 2D coordinates for each datum.
+    vis_func
+        Callable mapping a single datum to either an image array or a Matplotlib
+        Figure. The output is converted to an RGBA image via ``render_to_rgba``.
+    per_row, per_col
+        Number of lattice targets in the x- and y-directions used for selecting
+        representative points.
+    padding
+        Inset margin (in [0, 0.49]) used when constructing lattice targets in
+        the rescaled coordinate system.
+    figsize
+        Figure size in inches if ``ax is None``. If a single number is given,
+        a square figure is created.
+    thumb_px
+        Desired thumbnail size in pixels (square). This is enforced in figure
+        pixel space; if too large relative to the figure/axis size, an error is
+        raised.
+    dpi
+        Dots-per-inch used when creating a new figure (``ax is None``) and when
+        saving to disk.
+    save_path
+        Optional path to save the resulting figure.
+    transparent_border
+        Passed to ``render_to_rgba``. If True, attempts to make background
+        whitespace transparent when trimming.
+    white_thresh
+        Passed to ``render_to_rgba``. Pixel intensity threshold for detecting
+        near-white background when trimming/making transparent.
+    ax
+        Optional Matplotlib axis to draw into. If provided, thumbnails are placed
+        within this axis' rectangle in figure coordinates.
+    clear_ax
+        If True, clears ``ax`` before drawing and turns the axis off.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        The figure containing the visualization.
+    ax : matplotlib.axes.Axes
+        The base axis used as the placement region (turned off).
+
+    Raises
+    ------
+    ValueError
+        If ``coords`` is not shape (N, 2), if ``len(data) != N`` or ``N == 0``,
+        if ``per_row``/``per_col`` are non-positive, or if ``thumb_px`` is too
+        large to fit within the figure or provided axis region.
+
+    Notes
+    -----
+    *Selection vs placement:* lattice targets are used only to choose which data
+    points to show; thumbnails are placed at the selected points' actual rescaled
+    coordinates (subject to the safe-center remapping that prevents clipping).
+
+    The selection procedure is greedy without replacement and may not produce a
+    globally optimal assignment between lattice targets and points.
     """
     coords = np.asarray(coords, dtype=float)
     if coords.ndim != 2 or coords.shape[1] != 2:
