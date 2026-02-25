@@ -1,13 +1,14 @@
 from __future__ import annotations
 
-from typing import Callable, Optional, Sequence, Tuple, Union
+from typing import Callable, Optional, Sequence, Tuple, Union, Iterable
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 from .image_utils import render_to_rgba
 
-__all__ = ["lattice_vis"]
+__all__ = ["lattice_vis",
+          "scatter_lattice_vis"]
 
 
 def lattice_vis(
@@ -237,3 +238,186 @@ def lattice_vis(
         fig.savefig(save_path, dpi=int(dpi), bbox_inches="tight")
 
     return fig, ax
+
+
+
+def scatter_lattice_vis(
+    data: Sequence,
+    coords: np.ndarray,
+    vis_func: Callable[[object], Union[np.ndarray, plt.Figure]],
+    *,
+    # selection
+    selected_indices: Optional[Sequence[int]] = None,
+    per_row: int = 7,
+    per_col: int = 7,
+    padding: float = 0.05,
+    # appearance
+    point_size: float = 3.0,
+    point_alpha: float = 0.1,
+    highlight_size: float = 50.0,
+    highlight_lw: float = 1.5,
+    thumb_px: int = 30,
+    thumb_offset_px: int = 5,     # gap between dot and thumbnail (pixels)
+    leader_line: bool = False,
+    leader_lw: float = 0.8,
+    # figure
+    figsize: float | Tuple[float, float] = 10,
+    dpi: int = 200,
+    save_path: Optional[str] = None,
+    transparent_border: bool = True,
+    white_thresh: int = 250,
+    ax=None,
+    clear_ax: bool = True,
+):
+    """
+    Scatter all points, highlight selected points, and draw each selected point's
+    thumbnail just to the left of its dot.
+
+    Selection:
+      - If selected_indices is provided, use it.
+      - Otherwise, select representatives via the same lattice-nearest-neighbor
+        scheme used by lattice_vis (per_row x per_col, no reuse).
+
+    Placement:
+      - All dots are plotted at their scaled coordinates in [0,1]^2.
+      - Each selected thumbnail is placed in *pixel space* using Matplotlib's
+        offsetbox machinery, so the thumbnail is consistently sized and sits
+        'thumb_offset_px' pixels left of the dot.
+
+    Returns
+    -------
+    fig, ax, selected_indices
+    """
+    coords = np.asarray(coords, dtype=float)
+    if coords.ndim != 2 or coords.shape[1] != 2:
+        raise ValueError(f"coords must be an (N,2) array. Got {coords.shape}.")
+
+    N = int(coords.shape[0])
+    if len(data) != N:
+        raise ValueError(f"data length must match coords rows. Got len(data)={len(data)} vs N={N}.")
+    if N == 0:
+        raise ValueError("Empty coords/data.")
+
+    # Normalize coords to [0,1]^2 for plotting (and selection)
+    min_vals = coords.min(axis=0)
+    max_vals = coords.max(axis=0)
+    denom = (max_vals - min_vals)
+    denom = np.where(np.abs(denom) < 1e-12, 1.0, denom)
+    scaled = (coords - min_vals) / denom
+
+    # --- choose indices ---
+    if selected_indices is None:
+        per_row = int(per_row)
+        per_col = int(per_col)
+        if per_row <= 0 or per_col <= 0:
+            raise ValueError("per_row and per_col must be positive.")
+
+        pad = float(np.clip(padding, 0.0, 0.49))
+        lin_x = np.linspace(pad, 1 - pad, per_row)
+        lin_y = np.linspace(pad, 1 - pad, per_col)
+        gx, gy = np.meshgrid(lin_x, lin_y, indexing="xy")
+        lattice_pts = np.column_stack([gx.ravel(), gy.ravel()])
+
+        chosen: list[int] = []
+        used: set[int] = set()
+        for lp in lattice_pts:
+            d = np.linalg.norm(scaled - lp[None, :], axis=1)
+            for idx in np.argsort(d):
+                idx = int(idx)
+                if idx not in used:
+                    chosen.append(idx)
+                    used.add(idx)
+                    break
+        selected_indices = chosen
+    else:
+        selected_indices = [int(i) for i in selected_indices]
+
+    # --- figure/axis ---
+    created_fig = False
+    if ax is None:
+        if isinstance(figsize, (int, float)):
+            figsize = (float(figsize), float(figsize))
+        fig, ax = plt.subplots(figsize=figsize, dpi=int(dpi))
+        created_fig = True
+    else:
+        fig = ax.figure
+
+    if clear_ax:
+        ax.cla()
+
+    ax.set_aspect("equal", adjustable="box")
+    ax.set_xlim(-0.02, 1.02)
+    ax.set_ylim(-0.02, 1.02)
+
+    # plot all points
+    ax.scatter(scaled[:, 0], scaled[:, 1], s=float(point_size), alpha=float(point_alpha))
+
+    # highlight selected points with red rings
+    sel = np.asarray(selected_indices, dtype=int)
+    ax.scatter(
+        scaled[sel, 0],
+        scaled[sel, 1],
+        s=float(highlight_size),
+        facecolors="none",
+        edgecolors="red",
+        linewidths=float(highlight_lw),
+        zorder=5,
+    )
+
+    # --- place thumbnails left of each selected point ---
+    from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+
+    # Convert pixel thumbnail size to zoom based on image array shape.
+    # We'll render to RGBA and then set zoom to hit approx thumb_px.
+    for idx in selected_indices:
+        rendered = vis_func(data[idx])
+        img = render_to_rgba(
+            rendered,
+            transparent_border=bool(transparent_border),
+            trim=True,
+            white_thresh=int(white_thresh),
+        )
+
+        # zoom so that max dimension ~ thumb_px in display pixels
+        h, w = img.shape[0], img.shape[1]
+        max_hw = max(h, w)
+        zoom = float(thumb_px) / float(max_hw)
+
+        oi = OffsetImage(img, zoom=zoom)
+
+        # place the image at an offset in pixels relative to the data point
+        # left by (thumb_px/2 + thumb_offset_px), no vertical offset
+        xy = (float(scaled[idx, 0]), float(scaled[idx, 1]))
+        dx = -(thumb_px / 2 + float(thumb_offset_px))
+        dy = 0.0
+
+        ab = AnnotationBbox(
+            oi,
+            xy=xy,
+            xybox=(dx, dy),
+            xycoords="data",
+            boxcoords="offset points",
+            frameon=False,
+            pad=0.0,
+            arrowprops=(
+                dict(arrowstyle="-", lw=float(leader_lw), alpha=0.8, color="black")
+                if leader_line
+                else None
+            ),
+            zorder=10,
+        )
+        ax.add_artist(ab)
+
+    #ax.set_xlabel("Base Angle")
+    #ax.set_ylabel("Fiber Angle")
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
+    ax.set_frame_on(False)    
+    if save_path is not None:
+        fig.savefig(save_path, dpi=int(dpi), bbox_inches="tight")
+
+    if created_fig:
+        plt.show()
+
+    return fig, ax, selected_indices

@@ -44,6 +44,7 @@ from .fiber_vis import (
 
 from .lattice_vis import (
     lattice_vis,
+    scatter_lattice_vis,
 )
 
 from .nerve_vis import (
@@ -81,6 +82,7 @@ __all__ = [
     "fiberwise_clustering_vis",
     "gudhi_graph_utils",
     "lattice_vis",
+    "scatter_lattice_vis",
     "nerve_circle",
     "nerve_plotly",
     "nerve_vis",

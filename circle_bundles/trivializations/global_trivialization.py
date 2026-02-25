@@ -160,6 +160,65 @@ def wrap_angle_rad(x: np.ndarray) -> np.ndarray:
     """Wrap radians to [0, 2π)."""
     return (x + 2 * np.pi) % (2 * np.pi)
 
+def _wrap_to_pi(x: np.ndarray) -> np.ndarray:
+    """Wrap real values to (-pi, pi]."""
+    return (x + np.pi) % (2 * np.pi) - np.pi
+
+
+def check_weighted_semicircle_per_sample(
+    *,
+    angles: np.ndarray,   # (n, M) radians
+    weights: np.ndarray,  # (n, M) nonnegative
+    tol: float = 1e-8,
+) -> np.ndarray:
+    """
+    Return a boolean mask good[m] indicating whether the positive-weight angles
+    in column m lie in an *open semicircle*.
+
+    We use an anchored test:
+      - anchor = angle with max weight in that column
+      - check max |wrap_to_pi(angle - anchor)| < pi - tol over positive weights
+    """
+    angles = np.asarray(angles, dtype=float)
+    weights = np.asarray(weights, dtype=float)
+    if angles.shape != weights.shape or angles.ndim != 2:
+        raise ValueError(f"angles/weights must be same shape (n,M); got {angles.shape} vs {weights.shape}")
+
+    # columns with any positive weight
+    pos = weights > 0
+    has = np.any(pos, axis=0)
+
+    # anchor index per column (argmax even if ties)
+    anchor_idx = np.argmax(weights, axis=0)  # (M,)
+    anchor = angles[anchor_idx, np.arange(angles.shape[1])]  # (M,)
+
+    # deviations in (-pi, pi]
+    dev = _wrap_to_pi(angles - anchor[None, :])
+
+    # ignore zero-weight entries
+    dev = np.where(pos, dev, 0.0)
+    maxdev = np.max(np.abs(dev), axis=0)  # (M,)
+
+    good = np.zeros((angles.shape[1],), dtype=bool)
+    good[has] = maxdev[has] < (np.pi - tol)
+    # if a column has no weights, leave it False (cover/pou issue)
+    return good
+
+
+def assert_weighted_semicircle_or_raise(
+    *,
+    angles: np.ndarray,
+    weights: np.ndarray,
+    tol: float = 1e-8,
+    max_bad_to_print: int = 10,
+) -> None:
+    """Raise ValueError if semicircle condition fails in any sample column."""
+    good = check_weighted_semicircle_per_sample(angles=angles, weights=weights, tol=tol)
+    if not np.all(good):
+        bad = np.where(~good)[0]
+        head = bad[:max_bad_to_print].tolist()
+        raise ValueError("Semicircle condition failed")
+
 
 def frechet_mean_circle(angles: np.ndarray, weights: np.ndarray) -> np.ndarray:
     """

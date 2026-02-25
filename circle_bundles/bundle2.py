@@ -30,10 +30,13 @@ from .characteristic_class import (
     compute_class_data_on_complex,
 )
 
-# global trivialization 
 from .trivializations.global_trivialization import (
     build_global_trivialization_singer,
     apply_orientation_gauge_to_f,
+    wrap_angle_rad,
+    theta_dict_to_edge_vector_radians,
+    _mu_vertices_from_singer_radians,
+    assert_weighted_semicircle_or_raise,
 )
 
 from .trivializations.bundle_map import (
@@ -988,7 +991,36 @@ class Bundle:
             U=U,
         )
 
+
+        
         theta_use = coc_oriented.theta
+        # --- semicircle safeguard: check the actual weighted blend ---
+        # Build mu (Singer vertex gauge), then g = f + mu and w = pou * U.
+        edges_c = [tuple(sorted((int(a), int(b)))) for (a, b) in edges_stage]
+
+        # theta_use is a dict keyed by canonical edges -> radians
+        theta_edge = theta_dict_to_edge_vector_radians(edges=edges_c, theta=theta_use)
+
+        mu_v = _mu_vertices_from_singer_radians(
+            edges=edges_c,
+            theta_edge=theta_edge,
+            n_vertices=self.n_sets,
+        )  # (n_sets,)
+
+        mu = mu_v[:, None] * np.ones_like(P, dtype=float)
+        mu *= (U > 0)
+
+        g = wrap_angle_rad(f + mu)                # (n_sets, n_samples)
+        wts = np.asarray(P, dtype=float) * (U > 0)
+
+        # Optional but usually a good idea: renormalize weights per sample
+        # so the "effective mean" is well-defined as a convex combination.
+        colsum = wts.sum(axis=0, keepdims=True)
+        good_cols = colsum > 1e-15
+        wts[:, good_cols[0]] /= colsum[:, good_cols[0]]
+
+        # Enforce semicircle condition; raise if it fails
+        assert_weighted_semicircle_or_raise(angles=g, weights=wts, tol=1e-8)
         F = build_global_trivialization_singer(
             edges=edges_stage,
             U=U,
