@@ -123,170 +123,6 @@ def get_dense_fiber_indices(
     return fiber_ids, idx_list
 
 
-def old_get_local_pca(
-    data: np.ndarray,
-    U: np.ndarray,
-    p_values: np.ndarray | Sequence[float] | None = None,
-    to_view: Sequence[int] | None = None,
-    n_components: int = 2,
-    random_state: int | None = None,
-) -> tuple[list[int], list[np.ndarray], list[np.ndarray | None]]:
-    """
-    Compute PCA embeddings separately on each fiber of a cover.
-
-    This is a lightweight diagnostic tool: for each fiber (row of ``U``), we take the
-    subset of samples belonging to that fiber, optionally subsample it, and run PCA on
-    those points only. The result is a per-fiber low-dimensional embedding that can be
-    visualized with :func:`plot_local_pca`.
-
-    Parameters
-    ----------
-    data:
-        Array of shape ``(n_points, d)`` containing the ambient data vectors.
-    U:
-        Boolean indicator matrix of shape ``(n_fibers, n_points)``. Entry ``U[r, i]``
-        should be True exactly when point ``i`` lies in fiber/patch ``r``.
-    p_values:
-        Optional per-fiber sampling fractions in ``[0, 1]``. If provided, must have
-        length ``n_fibers``. A value ``p_values[r] = p`` means “use approximately
-        ``floor(p * m_r)`` points from fiber ``r``”, where ``m_r`` is that fiber’s
-        membership size. If None, uses all points in each fiber.
-    to_view:
-        Optional list of fiber indices to process. If None, processes all fibers.
-    n_components:
-        Number of PCA components to compute per fiber.
-    random_state:
-        Seed used for subsampling and passed to PCA (for reproducibility).
-
-    Returns
-    -------
-    fiber_ids:
-        The list of fiber indices actually processed (either all fibers, or ``to_view``).
-    idx_list:
-        List of integer index arrays, one per processed fiber. These are the point indices
-        used for PCA in that fiber (after subsampling, if any).
-    proj_list:
-        List of PCA projections, one per processed fiber. Entry ``proj_list[k]`` is an
-        array of shape ``(m_k, n_components)`` for fiber ``fiber_ids[k]``, or None if that
-        fiber contained fewer than 2 usable points.
-
-    Notes
-    -----
-    - This function lazily imports scikit-learn so importing this module does not require
-      scikit-learn unless you call it.
-    - If you want to control the subsampling behavior directly, see
-      ``get_dense_fiber_indices`` (currently not exported).
-    """
-    # lazy import so this module doesn't require sklearn unless used
-    from sklearn.decomposition import PCA  # type: ignore
-
-    data = np.asarray(data)
-    U = _as_bool_U(U)
-
-    fiber_ids, idx_list = get_dense_fiber_indices(
-        U, p_values=p_values, to_view=to_view, random_state=random_state
-    )
-
-    proj_list: list[np.ndarray | None] = []
-    for idx in idx_list:
-        if idx.size < 2:
-            proj_list.append(None)
-            continue
-        fiber_pts = data[idx]
-        pca = PCA(n_components=int(n_components), random_state=random_state)
-        proj_list.append(pca.fit_transform(fiber_pts))
-
-    return fiber_ids, idx_list, proj_list
-
-
-def plot_local_pca(
-    fiber_ids: Sequence[int],
-    proj_list: Sequence[np.ndarray | None],
-    *,
-    n_cols: int = 4,
-    titles: str | Sequence[str] | None = "default",
-    font_size: int = 16,
-    point_size: float = 10.0,
-    save_path: str | None = None,
-):
-    """
-    Plot a grid of 2D PCA scatterplots for multiple fibers.
-
-    This function is typically used with the output of :func:`get_local_pca`.
-    Each subplot corresponds to one fiber; fibers whose PCA projection is missing
-    (None or too small) are hidden.
-
-    Parameters
-    ----------
-    fiber_ids:
-        Fiber indices (for labeling). Usually the first output of :func:`get_local_pca`.
-    proj_list:
-        Per-fiber PCA coordinates. Usually the third output of :func:`get_local_pca`.
-        Each entry should be an array of shape ``(m_i, 2)`` (at least 2 points),
-        or None to skip that fiber.
-    n_cols:
-        Number of columns in the subplot grid.
-    titles:
-        Title behavior:
-          - ``"default"``: uses LaTeX titles of the form ``\\pi^{-1}(U_j)``.
-          - None: no titles.
-          - sequence of strings: custom titles aligned with ``fiber_ids``.
-    font_size:
-        Title font size.
-    point_size:
-        Scatter marker size.
-    save_path:
-        If provided, save the figure to this path (any extension supported by matplotlib).
-
-    Returns
-    -------
-    fig, axes:
-        The matplotlib figure and a flat array of axes.
-    """
-    # lazy import
-    import matplotlib.pyplot as plt  # noqa: F401  # (used via axes methods)
-
-    fiber_ids = list(map(int, fiber_ids))
-    n_fibers = len(fiber_ids)
-
-    if titles == "default":
-        titles_list = _default_titles(fiber_ids)
-    elif titles is None:
-        titles_list = None
-    else:
-        titles_list = list(titles)
-
-    fig, axes = _subplots_grid(n_fibers, n_cols=int(n_cols), figsize_per=4.0)
-
-    last_k = -1
-    for k, (fiber_idx, proj) in enumerate(zip(fiber_ids, proj_list)):
-        last_k = k
-        ax = axes[k]
-        if proj is None or proj.shape[0] < 2:
-            ax.set_axis_off()
-            continue
-
-        ax.scatter(proj[:, 0], proj[:, 1], s=float(point_size))
-        ax.set_xlabel("PCA 1")
-        ax.set_ylabel("PCA 2")
-        ax.grid(True, alpha=0.3)
-
-        if titles_list is not None:
-            title = titles_list[k] if k < len(titles_list) else f"Fiber {fiber_idx}"
-            ax.set_title(title, fontsize=int(font_size))
-
-    for i in range(last_k + 1, len(axes)):
-        axes[i].set_axis_off()
-
-    fig.tight_layout()
-
-    if save_path is not None:
-        fig.savefig(save_path, bbox_inches="tight")
-        print(f"Saved local PCA figure to {save_path}")
-
-    return fig, axes
-
-
 def get_local_rips(
     data: np.ndarray,
     U: np.ndarray,
@@ -471,6 +307,7 @@ def get_local_pca(
     font_size: int = 16,
     point_size: float = 10.0,
     cmap: str = "hsv",
+    show_colorbar: bool = False,
     save_path: str | None = None,
     show: bool = True,
 ):
@@ -481,36 +318,18 @@ def get_local_pca(
         data[U[j]]          (points)
         f[j, U[j]]          (colors, if provided)
 
-    No subsampling. No index ambiguity. If dimensions don't match, this errors.
-
-    Parameters
-    ----------
-    data : (n_points, d) array
-        Ambient data.
-    U : (n_fibers, n_points) bool array
-        Cover membership matrix.
-    f : (n_fibers, n_points) array, optional
-        Local circular coordinates. Used for coloring if provided.
-    to_view : list[int], optional
-        Fibers to plot. Default: all.
-    n_components : int
-        PCA dimension (must be >= 2 for plotting).
-    n_cols : int
-        Number of subplot columns.
-    titles : "default", None, or list[str]
-        Title style.
-    cmap : str
-        Matplotlib colormap for angle coloring.
-    save_path : str, optional
-        Save figure path.
-    show : bool
-        Whether to display the figure.
+    If `f` is provided and `show_colorbar=True`, a single shared colorbar with
+    range [0, 2π] is added in a dedicated GridSpec column (so subplots don't
+    get squashed).
 
     Returns
     -------
     fig, axes
+        Matplotlib figure and flat list of axes.
     """
+    import numpy as np
     import matplotlib.pyplot as plt
+    import matplotlib as mpl
     from sklearn.decomposition import PCA
 
     data = np.asarray(data)
@@ -532,7 +351,39 @@ def get_local_pca(
     else:
         titles_list = list(titles)
 
-    fig, axes = _subplots_grid(len(fiber_ids), n_cols=int(n_cols))
+    n_plots = len(fiber_ids)
+    n_cols = int(n_cols)
+    n_rows = int(np.ceil(n_plots / max(1, n_cols)))
+
+    # Fixed angle coloring in [0, 2π]
+    norm = mpl.colors.Normalize(vmin=0.0, vmax=2.0 * np.pi) if (f is not None) else None
+
+    # ---- Layout: GridSpec with dedicated colorbar column ----
+    # If we show a colorbar, reserve a skinny last column for it.
+    if show_colorbar and (f is not None):
+        width_ratios = [1.0] * n_cols + [0.06]
+        fig = plt.figure(figsize=(4.2 * n_cols + 0.9, 4.2 * n_rows), dpi=200)
+        gs = fig.add_gridspec(
+            n_rows,
+            n_cols + 1,
+            width_ratios=width_ratios,
+            wspace=0.45,
+            hspace=0.45,
+        )
+        cax = fig.add_subplot(gs[:, -1])  # colorbar spans all rows
+        axes = [fig.add_subplot(gs[r, c]) for r in range(n_rows) for c in range(n_cols)]
+    else:
+        fig = plt.figure(figsize=(4.2 * n_cols, 4.2 * n_rows), dpi=200)
+        gs = fig.add_gridspec(
+            n_rows,
+            n_cols,
+            wspace=0.45,
+            hspace=0.45,
+        )
+        cax = None
+        axes = [fig.add_subplot(gs[r, c]) for r in range(n_rows) for c in range(n_cols)]
+
+    last_scatter = None
     last_k = -1
 
     for k, j in enumerate(fiber_ids):
@@ -546,7 +397,6 @@ def get_local_pca(
 
         Xj = data[idx]
         proj = PCA(n_components=int(n_components)).fit_transform(Xj)
-
         if proj.shape[1] < 2:
             raise ValueError("Need at least 2 PCA components to plot.")
 
@@ -560,20 +410,33 @@ def get_local_pca(
                 s=float(point_size),
                 c=angles,
                 cmap=cmap,
+                norm=norm,
             )
-#            fig.colorbar(sc, ax=ax, fraction=0.046, pad=0.04)
+            last_scatter = sc
 
         ax.set_xlabel("PCA 1")
         ax.set_ylabel("PCA 2")
         ax.grid(True, alpha=0.3)
 
+        # Keep panels square-ish
+        try:
+            ax.set_box_aspect(1)
+        except Exception:
+            ax.set_aspect("equal", adjustable="box")
+
         if titles_list is not None:
             ax.set_title(titles_list[k], fontsize=int(font_size))
 
+    # Turn off unused axes
     for i in range(last_k + 1, len(axes)):
         axes[i].set_axis_off()
 
-    fig.tight_layout()
+    # Shared colorbar (no tick options; always 0..2π)
+    if cax is not None and (last_scatter is not None):
+        cbar = fig.colorbar(last_scatter, cax=cax)
+        cbar.set_label("Angle (radians)")
+        cbar.set_ticks([0, np.pi, 2 * np.pi])
+        cbar.set_ticklabels(["0", r"$\pi$", r"$2\pi$"])
 
     if save_path is not None:
         fig.savefig(save_path, bbox_inches="tight")
