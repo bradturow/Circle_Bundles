@@ -111,7 +111,7 @@ class TestBundleEdgeCases:
         # The Bundle constructor should accept exactly one of U or cover.
         # This test documents the expected behavior.
         try:
-            b = cb.Bundle(X=data, U=U, cover=cover)
+            cb.Bundle(X=data, U=U, cover=cover)
             # If it doesn't raise, that's also a valid design choice
         except (ValueError, TypeError):
             pass  # expected

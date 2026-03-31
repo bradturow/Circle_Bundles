@@ -38,8 +38,21 @@ addopts = "-v --tb=short"
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
 select = ["E", "F", "W"]
-ignore = ["E501"]
+ignore = [
+  "E501",   # line too long (handled by formatter)
+  "E402",   # module-level import not at top (common in __init__.py / lazy imports)
+  "E741",   # ambiguous variable name (O, l, I are standard math notation)
+  "F401",   # unused import (many are intentional re-exports in __init__.py)
+  "F811",   # redefinition of unused name (intentional re-exports in viz/__init__.py)
+  "F821",   # undefined name (string-quoted type hints for optional deps)
+  "F841",   # local variable assigned but never used
+  "W605",   # invalid escape sequence (LaTeX in docstrings)
+  "E702",   # multiple statements on one line (semicolon)
+  "F541",   # f-string without placeholders
+]
 
 [tool.setuptools]
 include-package-data = true
