@@ -1,9 +1,11 @@
+LICENSE
 README.md
 pyproject.toml
 circle_bundles/__init__.py
 circle_bundles/api.py
 circle_bundles/base_covers.py
 circle_bundles/bundle.py
+circle_bundles/bundle2.py
 circle_bundles/characteristic_class.py
 circle_bundles/metrics.py
 circle_bundles/o2_cocycle.py
@@ -16,6 +18,8 @@ circle_bundles/analysis/class_persistence.py
 circle_bundles/analysis/fiberwise_clustering.py
 circle_bundles/analysis/local_analysis.py
 circle_bundles/analysis/quality.py
+circle_bundles/covers/covers.py
+circle_bundles/covers/fibonacci_covers.py
 circle_bundles/covers/metric_ball_cover_builders.py
 circle_bundles/covers/triangle_cover_builders.py
 circle_bundles/covers/triangle_cover_builders_fibonacci.py
@@ -31,6 +35,11 @@ circle_bundles/optical_flow/flow_frames.py
 circle_bundles/optical_flow/flow_processing.py
 circle_bundles/optical_flow/patch_viz.py
 circle_bundles/reduction/frame_reduction.py
+circle_bundles/summaries/bundle_map_summary.py
+circle_bundles/summaries/class_summary.py
+circle_bundles/summaries/local_triv_summary.py
+circle_bundles/summaries/nerve_summary.py
+circle_bundles/summaries/transition_summary.py
 circle_bundles/synthetic/__init__.py
 circle_bundles/synthetic/densities.py
 circle_bundles/synthetic/mesh_vis.py
@@ -44,6 +53,7 @@ circle_bundles/synthetic/tori_and_kb.py
 circle_bundles/trivializations/bundle_map.py
 circle_bundles/trivializations/coordinatization.py
 circle_bundles/trivializations/gauge_canon.py
+circle_bundles/trivializations/global_trivialization.py
 circle_bundles/trivializations/local_triv.py
 circle_bundles/utils/status_utils.py
 circle_bundles/viz/__init__.py
@@ -61,3 +71,9 @@ circle_bundles/viz/nerve_plotly.py
 circle_bundles/viz/nerve_vis.py
 circle_bundles/viz/pca_vis.py
 circle_bundles/viz/thumb_grids.py
+tests/test_bundle_pipeline.py
+tests/test_combinatorics.py
+tests/test_covers.py
+tests/test_metrics.py
+tests/test_o2_cocycle.py
+tests/test_synthetic.py

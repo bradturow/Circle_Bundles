@@ -24,12 +24,21 @@ dependencies = [
 
 [project.optional-dependencies]
 viz = ["plotly"]
-dev = ["pytest", "ruff"]
+dev = ["pytest", "ruff", "sympy"]
 
 [project.urls]
 Homepage = "https://github.com/bradturow/Circle_Bundles"
 Repository = "https://github.com/bradturow/Circle_Bundles"
 Documentation = "https://circle-bundles.readthedocs.io"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W"]
+ignore = ["E501"]
 
 [tool.setuptools]
 include-package-data = true

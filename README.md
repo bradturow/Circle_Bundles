@@ -1,6 +1,11 @@
 # circle_bundles
 
-`circle_bundles` is a Python package providing computational tools for constructing and analyzing  
+[![CI](https://github.com/bradturow/Circle_Bundles/actions/workflows/ci.yml/badge.svg)](https://github.com/bradturow/Circle_Bundles/actions/workflows/ci.yml)
+[![Documentation](https://readthedocs.org/projects/circle-bundles/badge/?version=latest)](https://circle-bundles.readthedocs.io)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
+
+`circle_bundles` is a Python package providing computational tools for constructing and analyzing
 **discrete approximate circle bundles** in data.
 
 The package implements an end-to-end pipeline for detecting circle-bundle structure in point
