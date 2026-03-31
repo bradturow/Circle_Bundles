@@ -20,11 +20,12 @@ dependencies = [
   "matplotlib",
   "networkx",
   "scikit-learn",
+  "sympy",
 ]
 
 [project.optional-dependencies]
 viz = ["plotly"]
-dev = ["pytest", "ruff", "sympy"]
+dev = ["pytest", "ruff"]
 
 [project.urls]
 Homepage = "https://github.com/bradturow/Circle_Bundles"

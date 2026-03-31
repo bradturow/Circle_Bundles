@@ -12,10 +12,6 @@ from __future__ import annotations
 # Core workflow (recommended entry points)
 # =============================================================================
 
-# =============================================================================
-# Core workflow (recommended entry points)
-# =============================================================================
-
 from .bundle2 import (
     Bundle,
     LocalTrivsResult,
@@ -123,7 +119,7 @@ def sample_sphere(n: int, *, dim: int = 2, rng: Optional[np.random.Generator] = 
 def hopf_projection(x: np.ndarray) -> np.ndarray:
     """
     Hopf projection S^3 -> S^2 (expects points in R^4).
-    Lazy-imported from circle_bundles.synthetic (or wherever your implementation lives).
+    Lazy-imported from circle_bundles.synthetic.
     """
     from .synthetic import hopf_projection as _hopf_projection
     return _hopf_projection(x)

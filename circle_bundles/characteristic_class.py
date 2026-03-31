@@ -2,28 +2,20 @@
 """
 Characteristic classes for O(2)-bundles on a nerve (supports up to 3-simplices).
 
-REFRACTOR (Feb 2026)
---------------------
-We split the old monolithic `compute_classes(...)` into two layers so Bundle.get_classes()
-can do:
+The computation is split into two layers so Bundle.get_classes() can:
 
   (1) compute reps only (fast, cochain-level): w1 (edge Z2 cochain) + twisted Euler rep on triangles
   (2) run persistence on reps (weights filtration)
   (3) restrict to a subcomplex where reps are cocycles
   (4) compute derived class data (coboundary tests, pairings, trivial/spin flags) on that subcomplex
 
-New public helpers:
+Public helpers:
   - compute_class_representatives_from_nerve(...)
   - compute_class_data_on_complex(...)
 
 Back-compat:
   - compute_classes(...) still returns a full ClassResult on the full complex (old behavior),
     implemented by calling the new helpers internally.
-
-Notes
------
-- We keep the exact same conventions as your old file.
-- We do NOT change the mathematics; this is purely a refactor.
 """
 
 from __future__ import annotations
