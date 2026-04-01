@@ -63,4 +63,5 @@ The recommended usage is:
    :maxdepth: 1
    :caption: References
 
+   citing
    references
