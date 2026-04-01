@@ -1391,7 +1391,7 @@ def show_bundle_map_summary(
     show: bool = True,
     mode: SummaryMode = "auto",
     rounding: int = 3,
-    extra_rows: Optional[List[Tuple[str, str]]] = None,  
+    extra_rows: Optional[List[Tuple[str, str]]] = None,
 ) -> str:
 
     """
@@ -1409,7 +1409,7 @@ def show_bundle_map_summary(
             rounding=rounding,
             extra_rows=extra_rows,
         )
-        
+
     if mode == "both" or mode == "text" or (mode == "auto" and not did_latex) or (mode == "latex" and not did_latex):
         print("\n" + text + "\n")
 
@@ -1421,7 +1421,7 @@ def _display_bundle_map_summary_latex(
     report: BundleMapReport,
     *,
     rounding: int = 3,
-    extra_rows: Optional[List[Tuple[str, str]]] = None,  
+    extra_rows: Optional[List[Tuple[str, str]]] = None,
 ) -> bool:
     try:
         from IPython.display import Math, display  # type: ignore
@@ -1441,7 +1441,7 @@ def _display_bundle_map_summary_latex(
             + r" = " + f"{float(report.cocycle_proj_dist):.{r}f}",
         )
     )
-    
+
     if report.eps_triv is not None:
         geo_pi = None if report.eps_triv_geo is None else float(report.eps_triv_geo) / np.pi
         rhs = f"{float(report.eps_triv):.{r}f}"
@@ -1505,8 +1505,8 @@ def _display_bundle_map_summary_latex(
             coord_rows.append((r"\text{Frame packing}", rf"\texttt{{{pack}}}"))
 
     if extra_rows:
-        coord_rows.extend(extra_rows)    
-            
+        coord_rows.extend(extra_rows)
+
     red_rows: List[Tuple[str, str]] = []
     if report.has_reduction():
         meth = report.reduction_method or "reduction"
@@ -1612,7 +1612,7 @@ def get_bundle_map(
     packing_used = str(tf.packing) if tf.packing is not None else None
     n_colors_used = tf.n_colors
 
-    
+
     # ------------------------------------------------------------
     # Optional reduction bookkeeping
     # ------------------------------------------------------------
@@ -1765,7 +1765,7 @@ def get_bundle_map_v2(
     # --- UX / diagnostics ---
     show_summary: bool = True,
     compute_chart_disagreement: bool = True,
-    strict_semicircle: bool = True,  
+    strict_semicircle: bool = True,
     # --- REQUIRED: info from get_classes() ---
     # These are expected to be precomputed & stored by get_classes().
     # Your Bundle.method wrapper will supply them.

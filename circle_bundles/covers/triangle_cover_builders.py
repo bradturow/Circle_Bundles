@@ -4,8 +4,8 @@ from __future__ import annotations
 from typing import Dict, Tuple
 import numpy as np
 
-from ..base_covers import TriangulationStarCover  
-from .triangle_covers import (              
+from ..base_covers import TriangulationStarCover
+from .triangle_covers import (
     initialize_octahedron,
     get_sd,
     build_rp2_simplex_tree,
@@ -84,8 +84,8 @@ def make_rp2_cover(base_points: np.ndarray, *, n_sd: int = 2, tol: float = 1e-8)
         K=K_rp2,
         vertex_coords_dict=vc_rp2_r6,
     )
-    
-    cover.vc_rp2_r3 = vc_rp2_r3  # store the R^3 reps for viz 
+
+    cover.vc_rp2_r3 = vc_rp2_r3  # store the R^3 reps for viz
 
     # Build flat vertex coordinates in a stable vertex-id order
     vids = sorted(vc_rp2_r3.keys())

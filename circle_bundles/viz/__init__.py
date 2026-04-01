@@ -28,7 +28,7 @@ from . import (
 )
 
 # ----------------------------
-# Always-available 
+# Always-available
 # ----------------------------
 from .angles import (
     compare_trivs,

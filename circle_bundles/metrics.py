@@ -355,8 +355,8 @@ class RP1UnitVectorMetric:
         dots = np.clip(Xn @ Yn.T, -1.0, 1.0)
         return np.arccos(np.abs(dots))
 
-    
-    
+
+
 @dataclass(frozen=True)
 class RP2UnitVectorMetric:
     r"""
@@ -569,8 +569,8 @@ class ProductMetricConcat:
         bw = float(self.base_weight)
         fw = float(self.fiber_weight)
         return np.sqrt((bw * DB) ** 2 + (fw * DF) ** 2)
-    
-    
+
+
 
 # ============================================================
 # Flat Z2 quotient metrics on angle-coordinates (base-first!)

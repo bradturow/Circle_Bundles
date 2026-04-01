@@ -27,7 +27,7 @@ from . import (
 from .densities import (
     mesh_to_density,
     get_density_axes,
-    make_rotated_density_dataset,    
+    make_rotated_density_dataset,
     get_mesh_sample,
 )
 
@@ -106,7 +106,7 @@ __all__ = [
     "mesh_to_density",
     "get_density_axes",
 #    "rotate_density",
-    "make_rotated_density_dataset",    
+    "make_rotated_density_dataset",
     "get_mesh_sample",
 
     # meshes + viz

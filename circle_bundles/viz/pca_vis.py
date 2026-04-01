@@ -130,13 +130,13 @@ def show_pca(
             ax3d.view_init(elev=elev, azim=azim)
         except Exception:
             pass
-    
+
         # Keep grid, but make it subtle
         try:
             ax.grid(True)
         except Exception:
             pass
-    
+
         # Light, visible panes (the "backdrop")
         for axis in (getattr(ax, "xaxis", None), getattr(ax, "yaxis", None), getattr(ax, "zaxis", None)):
             if axis is None:
@@ -146,7 +146,7 @@ def show_pca(
                 axis.pane.set_edgecolor((0, 0, 0, 0.15))
             except Exception:
                 pass
-    
+
         # Subtle grid line styling (works on most mpl versions)
         try:
             ax.xaxis._axinfo["grid"]["linewidth"] = 0.6

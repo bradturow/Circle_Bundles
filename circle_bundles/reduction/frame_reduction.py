@@ -125,7 +125,7 @@ class FrameReducerConfig:
 
 
 @dataclass
-class FrameReductionReport:    
+class FrameReductionReport:
     """
     Summary statistics for a fitted frame reduction map Π : V(2,D) -> V(2,d).
 
@@ -163,7 +163,7 @@ class FrameReductionReport:
         -------
         str
             A formatted text block describing the fitted reduction and its errors.
-        """        
+        """
         r = int(decimals)
         return (
             "\n"

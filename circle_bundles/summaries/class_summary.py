@@ -305,31 +305,31 @@ def summarize_edge_driven_persistence(
             from IPython.display import display, Math  # type: ignore
         except Exception:
             return False
-    
+
         def _fmt_r_tex(r_str: str) -> str:
             if r_str == "∞":
                 return r"\infty"
             if r_str == "-∞":
                 return r"-\infty"
             return r_str
-    
+
         # ---- Title (own display) ----
         display(Math(r"\textbf{Class Persistence}"))
-    
+
         # ---- Table (own display) ----
         body = []
         for stage, k, r_str, ne, nt, ntt in rows_for_tex:
             body.append(
                 rf"\text{{{stage}}} & {k} & {_fmt_r_tex(r_str)} & {ne} & {nt} & {ntt}"
             )
-    
+
         table = (
             r"\begin{array}{lrrrrr}"
             r"\textbf{Stage} & k & r & |W_r^{(1)}| & |W_r^{(2)}| & |W_r^{(3)}| \\ \hline "
             + r" \\ ".join(body)
             + r"\end{array}"
         )
-    
+
         display(Math(table))
         return True
 
@@ -693,7 +693,7 @@ def summarize_classes_and_persistence(*, reps: Any, restricted: Any, persistence
             lines.append(_tline("Spin:", "w₂ = 0 (spin)"))
         else:
             lines.append(_tline("Spin:", "w₂ ≠ 0 (not spin)"))
-    
+
     # --- requested warning ---
     if euler_not_cocycle_on_full is True:
         k_str = _fmt_int_or_dash(euler_cob_k)

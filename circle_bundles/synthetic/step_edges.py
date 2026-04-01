@@ -340,7 +340,7 @@ def sample_step_edge_torus(
     flow_patches = np.zeros((n_samples, 2 * d * d), dtype=float)
     flow_patches[:, : d * d] = np.cos(theta)[:, None] * range_patches
     flow_patches[:, d * d :] = np.sin(theta)[:, None] * range_patches
-    
+
     from optical_flow.contrast import get_contrast_norms
 
     norms = get_contrast_norms(flow_patches)

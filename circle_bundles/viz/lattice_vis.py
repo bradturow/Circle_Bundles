@@ -413,7 +413,7 @@ def scatter_lattice_vis(
     ax.set_xticks([])
     ax.set_yticks([])
     ax.tick_params(left=False, bottom=False, labelleft=False, labelbottom=False)
-    ax.set_frame_on(False)    
+    ax.set_frame_on(False)
     if save_path is not None:
         fig.savefig(save_path, dpi=int(dpi), bbox_inches="tight")
 

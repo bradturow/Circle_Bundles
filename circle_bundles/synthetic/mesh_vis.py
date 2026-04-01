@@ -166,7 +166,7 @@ def make_tri_prism_visualizer(
             '#9BB1FF'   # Rectangular Side 3 – pastel periwinkle
         ]
 
-    n_vertices = int(np.asarray(mesh.vertices).shape[0])        
+    n_vertices = int(np.asarray(mesh.vertices).shape[0])
     faces = np.asarray(mesh.faces, dtype=int)
     n_faces = int(faces.shape[0])
 
@@ -178,8 +178,8 @@ def make_tri_prism_visualizer(
             raise ValueError(
                 "face_groups=None only supported for the canonical tri-prism mesh "
                 "(expected 8 triangle faces). Please pass face_groups explicitly."
-            )    
-    
+            )
+
     groups = expand_face_groups(face_groups)
 
     # color per triangle face index

@@ -13,7 +13,7 @@ __all__ = [
     # helpers
     "fibonacci_sphere",
     "hemisphere_rep",
-    # public-facing builders 
+    # public-facing builders
     "get_s2_fibonacci_cover",
     "get_rp2_fibonacci_cover",
 ]

@@ -260,7 +260,7 @@ def fiberwise_clustering(
     def _v(msg: str):
         if verbose:
             _status(msg)
-    
+
     nx = _require_networkx()
     DBSCAN, PCA = _require_sklearn()
 
@@ -285,7 +285,7 @@ def fiberwise_clustering(
     fiber_component_counts = np.zeros(n_fibers, dtype=int)
     pca_store: Dict[int, Dict[str, Any]] = {}
 
-            
+
     # --- Fiberwise DBSCAN + graph nodes ---
     for r in range(n_fibers):
         _v(f"Clustering set {r+1}/{n_fibers}...")
@@ -314,7 +314,7 @@ def fiberwise_clustering(
             pca_store[r] = {"pca": pca_data, "clusters": labels, "row_inds": row_inds}
 
     _v(f"Computing global clusters...")
-            
+
     # --- Overlap edges ---
     safe_add_edges(G, U, cl)
 
@@ -373,7 +373,7 @@ def fiberwise_clustering(
 
     if verbose:
         _status_clear()
-    
+
     return components, G, graph_dict, cl, summary
 
 

@@ -148,7 +148,7 @@ __all__ = [
     "ClassResult",
     "FramePacking",
     "NerveSummary",
-    "FrameReducerConfig",    
+    "FrameReducerConfig",
 
     # Covers
     "CoverData",
@@ -171,7 +171,7 @@ __all__ = [
     "RP2_FlipMetric",
     "S3QuotientMetric",
     "ProductMetricConcat",
-    
+
     # Advanced utilities
     "fiberwise_clustering",
     "get_local_pca",
@@ -182,7 +182,7 @@ __all__ = [
 
     "sample_sphere",
     "hopf_projection",
-    
+
 ]
 
 __all__ += [*_syn_all, *_viz_all, *_of_all]

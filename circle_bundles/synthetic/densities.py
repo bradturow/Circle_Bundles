@@ -151,7 +151,7 @@ def get_density_axes(
             ratios[i] = (eigvals[-1] + stab) / (eigvals[1] + stab)
 
         if float(v[2]) < 0.0:
-            v = -v            
+            v = -v
         directions[i] = v
     return (directions, ratios) if return_eigs else directions
 
