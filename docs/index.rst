@@ -6,22 +6,32 @@ A toolkit for detecting, classifying, coordinatizing and visualizing circle bund
 When to use this
 ----------------
 
-Many real-world datasets have hidden **circular or rotational structure** that
-standard methods miss. ``circle_bundles`` detects and characterizes this structure
-using tools from fiber bundle theory. Example applications include:
+High-dimensional datasets in computer vision, computational chemistry, and
+motion tracking often concentrate near low-dimensional manifolds whose global
+topology is too complex to capture with a single coordinate chart or a direct
+persistent homology computation. ``circle_bundles`` is designed for the common
+special case where the data is **locally circular**: nearby points are organized
+along circles (or, more precisely, the data admits the structure of a *circle
+bundle* over some base space).
 
-- **Image analysis** — natural image patches and optical flow fields organize
-  around circles (gradient orientation) and tori (joint orientation/frequency),
-  forming Klein bottles and non-trivial circle bundles.
-- **Sensor and signal data** — periodic signals with spatially varying phase
-  naturally form circle bundles over the parameter space.
-- **Molecular and shape data** — conformational flexibility in molecules or
-  articulated shapes often introduces circular fiber structure.
-- **Dimensionality reduction validation** — when circular coordinates from tools
-  like `DREiMaC <https://github.com/scikit-tda/DREiMaC>`_ are available,
-  ``circle_bundles`` determines whether those coordinates can be made globally
-  consistent, or whether topological obstructions (non-trivial characteristic
-  classes) prevent it.
+The package provides a complete **local-to-global inference pipeline**:
+
+1. **Detect** local circular structure via approximate local trivializations.
+2. **Classify** the global topology by computing characteristic classes —
+   discrete invariants that distinguish, for example, a torus from a Klein
+   bottle, or a trivial bundle over S² from SO(3).
+3. **Coordinatize** the dataset by constructing a bundle map that respects the
+   discovered topology, enabling principled dimensionality reduction even when
+   the bundle is non-trivial.
+
+Because characteristic classes can be computed from purely local measurements
+and are stable under perturbation, this pipeline is well-suited to noisy,
+high-dimensional data where direct global methods are intractable.
+
+Datasets that have been successfully analyzed with ``circle_bundles`` include
+natural image patches (Klein bottle), optical flow fields (torus and extended
+models), triangle meshes under rotation (SO(3)), and synthetic density functions
+over RP². See the :doc:`tutorials <auto_examples/index>` for worked examples.
 
 The recommended usage is:
 
