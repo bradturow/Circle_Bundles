@@ -2,6 +2,7 @@ sphinx>=8.0
 sphinx-rtd-theme
 myst-nb
 myst-sphinx-gallery
+Pillow
 sphinxcontrib-bibtex
 numpy
 scipy
