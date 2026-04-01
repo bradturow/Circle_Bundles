@@ -28,11 +28,6 @@ Because characteristic classes can be computed from purely local measurements
 and are stable under perturbation, this pipeline is well-suited to noisy,
 high-dimensional data where direct global methods are intractable.
 
-Datasets that have been successfully analyzed with ``circle_bundles`` include
-natural image patches (Klein bottle), optical flow fields (torus and extended
-models), triangle meshes under rotation (SO(3)), and synthetic density functions
-over RP². See the :doc:`tutorials <auto_examples/index>` for worked examples.
-
 The recommended usage is:
 
 .. code-block:: python
