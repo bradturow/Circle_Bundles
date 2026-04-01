@@ -37,7 +37,7 @@ The recommended usage is:
    :maxdepth: 1
    :caption: Tutorials
 
-   tutorials/auto_examples/index
+   auto_examples/index
 
 .. toctree::
    :maxdepth: 1
