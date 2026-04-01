@@ -19,10 +19,7 @@ from typing import Any
 # ------------------------------------------------------------
 # Version
 # ------------------------------------------------------------
-try:
-    from ._version import __version__  # type: ignore
-except Exception:  # pragma: no cover
-    __version__ = "0+unknown"
+__version__ = "0.1.0"
 
 # ------------------------------------------------------------
 # Curated public API re-export (single source of truth)
