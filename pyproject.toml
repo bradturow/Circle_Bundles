@@ -21,6 +21,8 @@ dependencies = [
   "networkx",
   "scikit-learn",
   "sympy",
+  "trimesh",
+  "shapely",
 ]
 
 [project.optional-dependencies]
