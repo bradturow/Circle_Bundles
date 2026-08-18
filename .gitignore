@@ -28,6 +28,7 @@ data/
 
 # Sphinx build output (built by Read the Docs; not needed in repo)
 docs/_build/
+docs/auto_examples/
 _images/
 _modules/
 _sources/

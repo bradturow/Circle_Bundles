@@ -291,6 +291,7 @@ def plot_cover_summary_boxplot(
     sharey: bool = False,
     label_fmt: str = "{:g}",
     label_dx: float = 0.06,
+    show: bool = True,
 ):
     """
     Plot intersection cardinalities for recorded nerve simplices.
@@ -332,6 +333,8 @@ def plot_cover_summary_boxplot(
         Format string used for min/max labels.
     label_dx :
         Horizontal label offset (currently expressed as a small shift in x data units).
+    show :
+        Whether to display the figure.
 
     Returns
     -------
@@ -383,10 +386,10 @@ def plot_cover_summary_boxplot(
         # One box per panel
         bp = ax.boxplot(
             [arr],
-            labels=[""],
             showfliers=bool(showfliers),
             whis=whis,
         )
+        ax.set_xticks([])
         ax.set_title(title)
         ax.grid(True, axis="y", alpha=0.25)
         ax.set_xlabel("")
@@ -445,7 +448,8 @@ def plot_cover_summary_boxplot(
             out = out + "_cover_summary.pdf"
         fig.savefig(out, format="pdf", bbox_inches="tight")
 
-    plt.show()
+    if show:
+        plt.show()
     return fig, (axes_list[0] if n == 1 else axes_list)
 
 

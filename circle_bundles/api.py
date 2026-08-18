@@ -77,52 +77,19 @@ from .analysis.local_analysis import (
 
 from .geometry.geometric_unwrapping import get_cocycle_dict, lift_base_points
 
-# ==========================
-# Additional helpers (optional)
-# ==========================
+# =============================================================================
+# Synthetic data, visualization, and optical-flow helpers
+# =============================================================================
 
-_syn_all: list[str] = []
-_viz_all: list[str] = []
-_of_all: list[str] = []
-
-try:
-    from .synthetic import *  # noqa: F401,F403
-    from .synthetic import __all__ as _syn_all  # type: ignore
-except Exception:
-    pass
-
-try:
-    from .viz import *  # noqa: F401,F403
-    from .viz import __all__ as _viz_all  # type: ignore
-except Exception:
-    pass
-
-try:
-    from .optical_flow import *  # noqa: F401,F403
-    from .optical_flow import __all__ as _of_all  # type: ignore
-except Exception:
-    pass
-
-
-
-from typing import Optional
-import numpy as np
-
-def sample_sphere(n: int, *, dim: int = 2, rng: Optional[np.random.Generator] = None) -> np.ndarray:
-    """
-    Sample points uniformly from the unit sphere S^dim embedded in R^{dim+1}.
-    Lazy-imported from circle_bundles.synthetic.
-    """
-    from .synthetic import sample_sphere as _sample_sphere
-    return _sample_sphere(n, dim=dim, rng=rng)
-
-def hopf_projection(x: np.ndarray) -> np.ndarray:
-    """
-    Hopf projection S^3 -> S^2 (expects points in R^4).
-    Lazy-imported from circle_bundles.synthetic.
-    """
-    from .synthetic import hopf_projection as _hopf_projection
-    return _hopf_projection(x)
+# These subpackages keep their optional third-party imports inside the functions
+# that need them. Importing the public API is therefore deterministic: the names
+# below do not appear or disappear based on the caller's environment.
+from .synthetic import *  # noqa: F401,F403
+from .synthetic import __all__ as _syn_all
+from .viz import *  # noqa: F401,F403
+from .viz import __all__ as _viz_all
+from .optical_flow import *  # noqa: F401,F403
+from .optical_flow import __all__ as _of_all
 
 
 
@@ -179,9 +146,6 @@ __all__ = [
     "plot_local_rips",
     "get_cocycle_dict",
     "lift_base_points",
-
-    "sample_sphere",
-    "hopf_projection",
 
 ]
 

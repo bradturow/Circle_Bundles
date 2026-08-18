@@ -338,7 +338,8 @@ def plot_nerve_summary_boxplot(
     axes_list = [axes] if n == 1 else list(axes)
 
     for ax, (arr, title) in zip(axes_list, panels):
-        bp = ax.boxplot([arr], labels=[""], showfliers=bool(showfliers), whis=whis)
+        bp = ax.boxplot([arr], showfliers=bool(showfliers), whis=whis)
+        ax.set_xticks([])
         ax.set_title(title)
         ax.grid(True, axis="y", alpha=0.25)
         ax.set_xlabel("")

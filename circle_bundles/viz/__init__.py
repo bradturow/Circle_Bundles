@@ -20,7 +20,6 @@ from . import (
     gudhi_graph_utils,
     lattice_vis,
     nerve_circle,
-    nerve_plotly,
     nerve_vis,
     pca_vis,
     thumb_grids,
@@ -60,17 +59,11 @@ from .thumb_grids import (
 )
 
 # ----------------------------
-# Optional (plotly/dash/sklearn may be required)
+# Interactive helpers (Plotly/Dash are imported when the helper is called)
 # ----------------------------
-_HAVE_PLOTLY_DASH = False
-try:
-    from .bundle_dash import (
-        show_bundle_vis,
-    )
-    _HAVE_PLOTLY_DASH = True
-except ImportError:
-    # Optional dependency not installed
-    show_bundle_vis = None  # type: ignore[assignment]
+from .bundle_dash import (
+    show_bundle_vis,
+)
 
 
 __all__ = [
@@ -84,7 +77,6 @@ __all__ = [
     "lattice_vis",
     "scatter_lattice_vis",
     "nerve_circle",
-    "nerve_plotly",
     "nerve_vis",
     "pca_vis",
     "thumb_grids",
@@ -98,9 +90,5 @@ __all__ = [
     "nerve_vis",
     "show_pca",
     "show_data_vis",
+    "show_bundle_vis",
 ]
-
-if _HAVE_PLOTLY_DASH:
-    __all__ += [
-        "show_bundle_vis",
-    ]

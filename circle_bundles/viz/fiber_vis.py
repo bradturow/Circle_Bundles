@@ -28,27 +28,50 @@ def fiber_vis(
     scatter_s: float = 10.0,
 ):
     """
-    Visualize up to `max_images` items from `data` by embedding them to 3D (PCA).
+    Visualize up to ``max_images`` items from ``data`` by embedding them to 3D with PCA.
 
-    - If `vis_func` is provided: overlay thumbnails rendered by `vis_func`.
-    - If `vis_func` is None: just show the embedded points.
+    If ``vis_func`` is provided, the plot includes thumbnails rendered by that
+    function. Otherwise, it shows only the embedded points.
 
     Parameters
     ----------
-    data : (N, d) array
-    vis_func : optional callable(datum) -> (Figure | ndarray image)
-        Something render_to_rgba can handle after vis_func returns.
+    data : ndarray, shape (N, d)
+        Data embedded for the scatter plot.
+    vis_func : callable, optional
+        Callable returning a Matplotlib figure or image array that
+        :func:`render_to_rgba` can handle.
         If None, no thumbnails are rendered; points only.
-    vis_data : optional data source for vis_func (same length N)
-        If provided, thumbnails are rendered from vis_data[idx] while embedding uses data[idx].
-    selected_indices : optional explicit indices to visualize
-    max_images : cap on number of items/points shown (and thumbnails if vis_func given)
-    random_state : RNG seed used when selected_indices is None
+    vis_data : ndarray, optional
+        Alternate thumbnail data with the same length as ``data``.
+    selected_indices : sequence of int, optional
+        Explicit indices to visualize.
+    max_images : int
+        Maximum number of points and thumbnails to show.
+    zoom : float
+        Thumbnail zoom factor.
+    figsize : tuple
+        Figure size when creating a new figure.
+    dpi : int
+        Figure resolution.
+    save_path : str, optional
+        Destination for the rendered figure.
+    random_state : int, optional
+        Random seed used when ``selected_indices`` is None.
+    ax : matplotlib axis, optional
+        Existing 3D axis to draw into.
+    clear_ax : bool
+        Whether to clear an existing axis before drawing.
+    show : bool
+        Whether to display the figure.
+    scatter_alpha : float
+        Scatter-point opacity.
+    scatter_s : float
+        Scatter-point size.
 
     Subplot usage
     -------------
-    If `ax` is provided, it must be a 3D axis (projection='3d'). In that case,
-    this function draws into `ax` and will not create a new figure.
+    If ``ax`` is provided, it must be a 3D axis (``projection='3d'``). In that
+    case, this function draws into ``ax`` and does not create a new figure.
     """
     import matplotlib.pyplot as plt
     from matplotlib.offsetbox import OffsetImage, AnnotationBbox

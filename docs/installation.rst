@@ -28,13 +28,25 @@ For interactive visualization support, install the ``viz`` extra:
 
    pip install "circle_bundles[viz] @ git+https://github.com/bradturow/Circle_Bundles.git"
 
-This adds `Plotly <https://plotly.com/python/>`_ for interactive 3D plots.
+This adds `Plotly <https://plotly.com/python/>`_ and Dash for interactive figures.
 
-Some tutorials also use the following packages, which can be installed separately:
+Install the complete environment for the tutorial notebooks with:
 
 .. code-block:: bash
 
-   pip install ripser persim dreimac
+   pip install "circle-bundles[notebooks] @ git+https://github.com/bradturow/Circle_Bundles.git"
+
+This includes the persistent-homology packages, a Trimesh triangulation backend,
+and the Jupyter execution tools used by the repository's reproducibility checks.
+
+The MPI-Sintel tutorial additionally requires optical-flow table support:
+
+.. code-block:: bash
+
+   pip install "circle-bundles[optical-flow] @ git+https://github.com/bradturow/Circle_Bundles.git"
+
+Download the Sintel optical-flow frames separately under their original license and
+set ``MPI_SINTEL_FLOW_DIR`` to the dataset's ``training/flow`` directory.
 
 Developer installation
 ----------------------
@@ -48,7 +60,7 @@ with development dependencies:
    cd Circle_Bundles
    pip install -e ".[dev]"
 
-This installs ``pytest`` and ``ruff`` for testing and linting.
+This installs the test, lint, and distribution-build tools.
 Run the test suite with:
 
 .. code-block:: bash

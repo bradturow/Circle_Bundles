@@ -115,7 +115,16 @@ def make_star_pyramid(
     if not polygon.is_valid:
         polygon = polygon.buffer(0)
 
-    tri_vertices_2d, tri_faces_2d = triangulate_polygon(polygon)
+    try:
+        tri_vertices_2d, tri_faces_2d = triangulate_polygon(polygon)
+    except ValueError as exc:
+        if "No available triangulation engine" not in str(exc):
+            raise
+        raise ImportError(
+            "make_star_pyramid requires a Trimesh triangulation backend. "
+            "Install `mapbox-earcut` directly or use "
+            "`pip install 'circle-bundles[notebooks]'`."
+        ) from exc
 
     # Lift triangulated base into 3D at x=0  -> (x=0, y, z)
     base_vertices = np.column_stack(

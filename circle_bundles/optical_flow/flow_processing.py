@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import List, Sequence, Tuple, Union
 
 import numpy as np
-import pandas as pd
 from sklearn.neighbors import KDTree
 
 from .contrast import get_contrast_norms
@@ -20,6 +19,17 @@ __all__ = [
     "get_patch_sample",
     "preprocess_flow_patches",
 ]
+
+
+def _require_pandas():
+    try:
+        import pandas as pd
+    except ImportError as exc:  # pragma: no cover - exercised in a minimal install
+        raise ImportError(
+            "Optical-flow table utilities require pandas. Install them with "
+            "`pip install 'circle-bundles[optical-flow]'`."
+        ) from exc
+    return pd
 
 
 def read_flo(file: PathLike) -> np.ndarray:
@@ -96,7 +106,7 @@ def get_patch_sample(
     patches_per_frame: int = 385,
     d: int = 3,
     random_state: int = 0,
-) -> Tuple[pd.DataFrame, List[List[Path]]]:
+) -> Tuple["pd.DataFrame", List[List[Path]]]:
     """
     Sample patches_per_frame from every .flo file under flow_root/*/*.flo.
 
@@ -106,6 +116,7 @@ def get_patch_sample(
               where 'patch' stores a 1D np.ndarray of length 2*d*d.
     file_paths : list of lists of .flo Paths, grouped by scene folder order
     """
+    pd = _require_pandas()
     flow_root = Path(flow_root)
     if not flow_root.is_dir():
         raise NotADirectoryError(str(flow_root))
@@ -168,13 +179,13 @@ def get_patch_sample(
 
 
 def preprocess_flow_patches(
-    patch_df: pd.DataFrame,
+    patch_df: "pd.DataFrame",
     *,
     hc_frac: float = 0.2,
     max_samples: int = 50_000,
     k_list: Sequence[int] = (300,),
     random_state: int = 42,
-) -> pd.DataFrame:
+) -> "pd.DataFrame":
     """
     Preprocess optical flow patches in patch_df.
 
@@ -189,6 +200,7 @@ def preprocess_flow_patches(
     - compute density estimates 1 / dist_to_kNN for each k in k_list
     - sort by largest k density (descending)
     """
+    _require_pandas()
     if "patch" not in patch_df.columns:
         raise ValueError("patch_df must contain a 'patch' column.")
     if not (0 < float(hc_frac) <= 1):

@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Optional, Sequence, Tuple, Union
 
 import numpy as np
-import pandas as pd
 
 from .flow_processing import read_flo  # unified .flo reader
 
@@ -19,6 +18,17 @@ __all__ = [
     "annotate_optical_flow",
     "get_sintel_scene_folders",
 ]
+
+
+def _require_pandas():
+    try:
+        import pandas as pd
+    except ImportError as exc:  # pragma: no cover - exercised in a minimal install
+        raise ImportError(
+            "Optical-flow frame utilities require pandas. Install them with "
+            "`pip install 'circle-bundles[optical-flow]'`."
+        ) from exc
+    return pd
 
 
 def change_path(flow_path: PathLike, old_base: PathLike, new_base: PathLike) -> Path:
@@ -49,7 +59,7 @@ def change_path(flow_path: PathLike, old_base: PathLike, new_base: PathLike) -> 
 def get_labeled_frame(
     frame_path: PathLike,
     save_path: Optional[PathLike],
-    patch_df: pd.DataFrame,
+    patch_df: "pd.DataFrame",
     *,
     dot_radius: int = 3,
     custom_colors: Sequence[str] = ("#4B0082", "#FF4500", "#ADD8E6"),
@@ -61,6 +71,8 @@ def get_labeled_frame(
     patch_df must have columns: ['row', 'column', 'color'].
     'color' can be any hashable ID (ints/strings). IDs are mapped to custom_colors.
     """
+    pd = _require_pandas()
+
     # Lazy imports (keeps package lightweight)
     try:
         import matplotlib.colors as mcolors
@@ -144,7 +156,7 @@ def get_labeled_video(
     flo_paths: Sequence[PathLike],
     *,
     scene_num: int,
-    patch_df: pd.DataFrame,
+    patch_df: "pd.DataFrame",
     inds_list: Sequence[np.ndarray],
     old_flow_base: PathLike,
     new_frame_base: PathLike,
@@ -162,6 +174,7 @@ def get_labeled_video(
     -----
     Assumes flo_paths are ordered by frame number, corresponding to frames 1..T.
     """
+    pd = _require_pandas()
     patch_df = patch_df.reset_index(drop=True)
 
     out_dir = Path(out_dir)

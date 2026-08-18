@@ -79,18 +79,18 @@ def sample_opt_flow_torus(
     with RP^1 base angle theta folded to [0, pi).
 
     Optionally extends the model with an r-parameter in [r_min, 1] that mixes each patch
-    with its perpendicular patch, using:
-        perp patch = (alpha + pi/2, theta - pi/2) (then re-fold),
-        lambda = 1/sqrt(2 - r),
-        patch_mix = lambda*patch + sqrt(1-lambda^2)*perp.
+    with its perpendicular patch using::
 
-    Default behavior:
-      - sample_r=True
-      - r ~ truncated exponential away from 1 on [r_min, 1]
-        (so virtually all mass near 1, but never below r_min).
+        perp_patch = (alpha + pi/2, theta - pi/2)  # then re-fold
+        lambda = 1/sqrt(2 - r)
+        patch_mix = lambda*patch + sqrt(1-lambda^2)*perp_patch
 
-    Noise:
-      - if sigma > 0 and contrast_renorm=True, we add Gaussian noise then contrast-renormalize.
+    By default, ``sample_r=False``. When enabled, ``r`` follows a truncated
+    exponential distribution on [r_min, 1], concentrating mass near 1 without
+    sampling below ``r_min``.
+
+    If ``sigma > 0`` and ``contrast_renorm=True``, Gaussian noise is added before
+    contrast renormalization.
 
     Returns
     -------
@@ -227,9 +227,11 @@ def make_flow_patches(
 
     Folds theta into [0, pi) (RP^1 base) and adjusts alpha accordingly.
 
-    If r is provided, it mixes a patch with a perpendicular patch:
-        patches_mix = λ * patches + sqrt(1-λ^2) * patches_perp
-    where λ = 1/sqrt(2-r).
+    If r is provided, it mixes a patch with a perpendicular patch::
+
+        patches_mix = lambda * patches + sqrt(1-lambda**2) * patches_perp
+
+    where ``lambda = 1/sqrt(2-r)``.
 
     If contrast_renorm=True, rescales each patch to unit "contrast norm".
     """

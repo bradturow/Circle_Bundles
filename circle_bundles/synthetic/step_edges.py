@@ -84,7 +84,7 @@ def make_step_edges(
     Generate optical-flow step edge patches as flattened vectors of length 18 (3x3x2).
 
     Conventions
-    ----------
+    -----------
     - Patch array shaped (n, 3, 3, 2) with last axis = (u,v).
     - Flattening order is 'F' to match legacy notebooks.
 

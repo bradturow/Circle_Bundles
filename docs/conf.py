@@ -35,8 +35,7 @@ extensions = [
     "myst_nb",
     "myst_sphinx_gallery",
     "sphinxcontrib.bibtex",
-    "sphinx_exec_code",  
-
+    "sphinx_exec_code",
 ]
 
 bibtex_bibfiles = ["references.bib"]
@@ -74,15 +73,12 @@ autodoc_default_options = {
     "exclude-members": "__init__",
 }
 
-# If you have optional deps (dash/plotly/etc), don't hard fail doc builds
+# Mock only integrations that are not installed by the documentation extra.
+# Core scientific dependencies are imported normally so documentation builds catch
+# real packaging and import regressions.
 autodoc_mock_imports = [
-    "sympy",
-    "matplotlib",
-    "mpl_toolkits",
     "plotly",
     "dash",
-    "PIL",
-    "networkx",
     "gudhi",
     "ripser",
     "dreimac",
@@ -113,7 +109,7 @@ html_theme_options = {
     "titles_only": False,
 }
 
-# Static files 
+# Static files
 html_static_path = ["_static"]
 
 # -- Intersphinx -------------------------------------------------------------
@@ -121,6 +117,12 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
 }
+if os.environ.get("SPHINX_OFFLINE") == "1":
+    intersphinx_mapping = {}
+
+# Keep warning-strict local and CI builds reproducible when an external inventory
+# is temporarily unavailable. Local cross-reference warnings remain errors.
+suppress_warnings = ["intersphinx.external"]
 
 # -- MyST Sphinx Gallery -----------------------------------------------------
 from myst_sphinx_gallery import GalleryConfig  # noqa: E402
@@ -131,9 +133,6 @@ myst_sphinx_gallery_config = GalleryConfig(
     gallery_dirs=["auto_examples"],
     notebook_thumbnail_strategy="code",
 )
-
-
-
 myst_enable_extensions = [
     "dollarmath",
     "amsmath",

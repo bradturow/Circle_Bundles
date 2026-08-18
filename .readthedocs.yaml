@@ -6,10 +6,8 @@ build:
     python: "3.10"
   commands:
     - python -m pip install --upgrade pip setuptools
-    - python -m pip install --upgrade --upgrade-strategy only-if-needed .
-    - python -m pip install --exists-action=w -r docs/requirements.txt
-    - sphinx-build -T -b html -d _build/doctrees docs $READTHEDOCS_OUTPUT/html
+    - python -m pip install --upgrade --upgrade-strategy only-if-needed ".[docs]"
+    - sphinx-build -W --keep-going -T -b html -d _build/doctrees docs $READTHEDOCS_OUTPUT/html
 
 sphinx:
   configuration: docs/conf.py
-

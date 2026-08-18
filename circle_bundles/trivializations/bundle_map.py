@@ -490,7 +490,7 @@ def cocycle_project_from_raw_frames(
     Phi: np.ndarray,
     edges: Iterable[Edge],
 ) -> CocycleProjectionResult:
-    """
+    r"""
     Input:
       Phi: (n_sets,n_samples,D,2) "raw" frames (your \hat{Psi}_j, possibly already reduced to d)
 
@@ -589,7 +589,7 @@ def cocycle_projection_distance(
     Omega_true: Dict[Edge, np.ndarray],
     edges: Iterable[Edge],
 ) -> float:
-    """
+    r"""
     d_\infty(Ω, Π(Ω)) := sup_{(jk)} sup_{b in U_j∩U_k} || Ω_{jk} - Π(Ω)_{jk}(b) ||_F.
 
     (Here Π(Ω) is realized as Omega_true[(j,k)][s] built from the projected Stiefel frames.)
@@ -925,7 +925,7 @@ def build_true_frames(
     edges: Optional[Iterable[Edge]] = None,
     packing: FramePacking = "none",
 ) -> TrueFramesResult:
-    """
+    r"""
     Step 2 (paper): build raw stacked frames \hat{Psi}_j over the sampled base points.
 
     Returns:
@@ -1576,7 +1576,7 @@ def get_bundle_map(
     compute_chart_disagreement: bool = True,
     packing: FramePacking = "none",
 ) -> Tuple[np.ndarray, np.ndarray, Dict[Edge, np.ndarray], np.ndarray, BundleMapReport]:
-    """
+    r"""
     End-to-end coordinatization.
 
     Paper-aligned stages (default when reducer.stage == "pre_classifying"):

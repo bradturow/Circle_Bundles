@@ -5,7 +5,7 @@ This page demonstrates a minimal end-to-end example using a classical circle bun
 the Hopf fibration :math:`S^3 \to S^2`. The Hopf fibration is a non-trivial orientable circle bundle with Euler number :math:`\pm 1`.
 
 Minimal Working Example
-----------------------
+-----------------------
 
 .. exec_code::
 

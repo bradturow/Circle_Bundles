@@ -36,6 +36,15 @@ Install directly from GitHub using `pip`:
 pip install git+https://github.com/bradturow/Circle_Bundles.git
 ```
 
+To run every self-contained tutorial notebook, install the reproducibility extra:
+
+```bash
+pip install "circle-bundles[notebooks] @ git+https://github.com/bradturow/Circle_Bundles.git"
+```
+
+Other optional extras are `viz` for interactive Plotly/Dash figures and
+`optical-flow` for the full image, table, and video workflow.
+
 After installation, you should be able to import the package from Python:
 
 ```python
@@ -85,8 +94,12 @@ via Read the Docs.
 
 The source notebooks live in:
 
-- `notebooks/tutorials/`  
+- `notebooks/tutorials/all/`
   Core tutorials demonstrating the main analysis pipeline and example datasets.
+
+The MPI-Sintel tutorial additionally requires the external Sintel optical-flow
+frames. Set `MPI_SINTEL_FLOW_DIR` to its `training/flow` directory before running
+that notebook.
 
 For narrative explanations and rendered outputs, see the documentation site.
 

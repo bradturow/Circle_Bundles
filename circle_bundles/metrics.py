@@ -255,7 +255,7 @@ class S1UnitVectorMetric:
     base_name_latex: str = r"\mathbb{S}^1"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
-        """
+        r"""
         Compute geodesic distances on :math:`\mathbb{S}^1` between unit-vector samples.
 
         Parameters
@@ -316,7 +316,7 @@ class RP1UnitVectorMetric:
     base_name_latex: str = r"\mathbb{RP}^1"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
-        """
+        r"""
         Compute projective geodesic distances between unit-vector samples.
 
         Parameters
@@ -395,7 +395,7 @@ class RP2UnitVectorMetric:
     base_name_latex: str = r"\mathbb{RP}^2"
 
     def pairwise(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> np.ndarray:
-        """
+        r"""
         Compute chordal quotient distances on :math:`\mathbb{RP}^2`.
 
         Parameters

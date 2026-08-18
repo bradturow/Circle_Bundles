@@ -384,10 +384,10 @@ def _display_summary_latex(summary: TransitionSummary) -> bool:
         mean_rms = getattr(rep, "mean_rms_angle_err", None)
         max_rms = getattr(rep, "max_rms_angle_err", None)
         trans_rows.append(
-            (r"\text{mean RMS angle err}", f"{float(mean_rms):.6g}\ \mathrm{{rad}}" if mean_rms is not None else r"\text{—}")
+            (r"\text{mean RMS angle err}", fr"{float(mean_rms):.6g}\ \mathrm{{rad}}" if mean_rms is not None else r"\text{—}")
         )
         trans_rows.append(
-            (r"\text{max RMS angle err}", f"{float(max_rms):.6g}\ \mathrm{{rad}}" if max_rms is not None else r"\text{—}")
+            (r"\text{max RMS angle err}", fr"{float(max_rms):.6g}\ \mathrm{{rad}}" if max_rms is not None else r"\text{—}")
         )
     else:
         if q is None:
@@ -404,10 +404,10 @@ def _display_summary_latex(summary: TransitionSummary) -> bool:
             mean_rms = getattr(q, "mean_edge_rms", None)
             max_rms = getattr(q, "max_edge_rms", None)
             trans_rows.append(
-                (r"\text{mean RMS angle err}", f"{float(mean_rms):.6g}\ \mathrm{{rad}}" if mean_rms is not None else r"\text{—}")
+                (r"\text{mean RMS angle err}", fr"{float(mean_rms):.6g}\ \mathrm{{rad}}" if mean_rms is not None else r"\text{—}")
             )
             trans_rows.append(
-                (r"\text{max RMS angle err}", f"{float(max_rms):.6g}\ \mathrm{{rad}}" if max_rms is not None else r"\text{—}")
+                (r"\text{max RMS angle err}", fr"{float(max_rms):.6g}\ \mathrm{{rad}}" if max_rms is not None else r"\text{—}")
             )
 
     def _rows_to_aligned(rows: List[Tuple[str, str]]) -> str:

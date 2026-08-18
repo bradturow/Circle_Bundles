@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +8,8 @@ version = "0.1.0"
 description = "Discrete approximate circle bundles and characteristic classes for data analysis."
 readme = "README.md"
 requires-python = ">=3.9"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
   { name = "Brad Turow" },
   { name = "José A. Perea" }
@@ -26,8 +27,41 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-viz = ["plotly"]
-dev = ["pytest", "ruff"]
+viz = [
+  "dash",
+  "plotly",
+]
+optical-flow = [
+  "imageio",
+  "opencv-python",
+  "pandas",
+  "Pillow",
+]
+notebooks = [
+  "dreimac",
+  "ipykernel",
+  "mapbox-earcut",
+  "nbconvert",
+  "pandas",
+  "persim",
+  "ripser",
+]
+docs = [
+  "myst-nb",
+  "myst-sphinx-gallery",
+  "pandas",
+  "Pillow",
+  "sphinx>=8.0",
+  "sphinx-exec-code",
+  "sphinx-rtd-theme",
+  "sphinxcontrib-bibtex",
+]
+dev = [
+  "build",
+  "pytest",
+  "ruff",
+  "twine",
+]
 
 [project.urls]
 Homepage = "https://github.com/bradturow/Circle_Bundles"

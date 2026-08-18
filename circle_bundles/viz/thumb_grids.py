@@ -34,9 +34,10 @@ def show_data_vis(
     """
     Show a thumbnail grid of rendered data.
 
-    IMPORTANT:
-    - `data` is treated as a Sequence. We do NOT coerce it to np.asarray(data),
-      because that can break for object-like payloads (meshes, images with varying shape, etc.)
+    Notes
+    -----
+    ``data`` is treated as a sequence rather than being coerced to an array. This
+    preserves object-like payloads such as meshes or images with varying shapes.
     """
     n_total = len(data)
     if n_total == 0:
